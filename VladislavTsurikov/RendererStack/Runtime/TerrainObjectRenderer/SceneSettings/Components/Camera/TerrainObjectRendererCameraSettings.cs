@@ -1,0 +1,19 @@
+﻿using System;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
+
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components.Camera
+{
+    [Serializable]
+    public enum CameraCullingMode
+    {
+        FrustumCulling = 0,
+        Complete360 = 1        
+    }
+    
+    public class TerrainObjectRendererCameraSettings : CameraComponent
+    {
+        public CameraCullingMode CameraCullingMode = CameraCullingMode.FrustumCulling;
+        public float LodBias = 1;
+        public bool EnableColliders = true;
+    }
+}

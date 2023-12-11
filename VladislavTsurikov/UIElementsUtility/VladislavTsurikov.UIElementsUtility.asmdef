@@ -1,0 +1,19 @@
+{
+    "name": "VladislavTsurikov.UIElementsUtility",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2a400728d5f9e3541900bf1dc560868c",
+        "GUID:5c9c0ef81e306bb4fb8182d62410223a",
+        "GUID:c372a3935f457fe43ba8f977ae663de7",
+        "GUID:4f3f15d33f84e044490b60cf8fdc046e"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,96 @@
+﻿using UnityEngine;
+using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.Utility.Runtime.Extensions;
+
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
+{
+    public class Area
+    {
+        private Vector3 _center;
+        private Vector3 _size;
+        
+        public float Rotation = 0;
+
+        public Texture2D Mask = Texture2D.whiteTexture;
+
+        public float SizeMultiplier
+        {
+            get
+            {
+                if (Rotation == 0)
+                {
+                    return 1;
+                }
+                else
+                {
+                    float sizeMultiplier = Mathf.Abs(CosAngle);
+                    sizeMultiplier += Mathf.Abs(SinAngle);
+
+                    return sizeMultiplier;
+                }
+            }
+        }
+
+        public Vector3 Size
+        {
+            get => _size * SizeMultiplier;
+            protected set => _size = value;
+        }
+        
+        public float CosAngle => Mathf.Cos(Rotation * Mathf.Deg2Rad);
+        public float SinAngle => Mathf.Sin(Rotation * Mathf.Deg2Rad);
+        
+        public Vector3 Center => _center;
+
+        public Bounds Bounds =>
+            new()
+            {
+                size = new Vector3(Size.x, Size.y, Size.z),
+                center = _center
+            };
+
+        protected Area(Vector3 center, Vector3 size)
+        {
+            _center = center;
+            _size = size;
+        }
+
+        protected Area(Vector3 center, float size) : this(center, new Vector3(size, size, size))
+        {
+        }
+
+        public bool Contains(Vector2 point)
+        {
+            return RectExtension.CreateRectFromBounds(Bounds).Contains(point);
+        }
+        
+        public float GetAlpha(Vector2 pos, Vector2 size)
+        {
+            if (Mask == null)
+            {
+                return 1.0f;
+            }
+            
+            pos += Vector2Int.one;
+            
+            if (Rotation == 0.0f)
+            {
+                return TextureUtility.GetAlpha(pos, size, Mask);
+            }
+            
+            Vector2 halfTarget = size / 2.0f;
+            Vector2 origin = pos - halfTarget;
+            origin *= SizeMultiplier;
+            origin = new Vector2(
+                origin.x * CosAngle - origin.y * SinAngle + halfTarget.x,
+                origin.x * SinAngle + origin.y * CosAngle + halfTarget.y);
+
+            if (origin.x < 0.0f || origin.x > size.x || origin.y < 0.0f || origin.y > size.y)
+            {
+                return 0.0f;
+            }
+
+            return TextureUtility.GetAlpha(origin, size, Mask);
+        }
+    }
+}

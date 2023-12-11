@@ -1,0 +1,43 @@
+﻿using System;
+using UnityEditor;
+using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
+using VladislavTsurikov.OdinSerializer.Core.Misc;
+
+namespace VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem
+{
+    [LocationAsset("MegaWorld/PreferencesSettings")]
+    public class PreferencesSettings : SerializedScriptableObjectSingleton<PreferencesSettings>
+    {
+        [OdinSerialize]
+        private ComponentStackOnlyDifferentTypes<PreferenceSettings> _stack =
+            new ComponentStackOnlyDifferentTypes<PreferenceSettings>();
+
+#if UNITY_EDITOR
+        public IMGUIComponentStackEditor<PreferenceSettings, IMGUIElementEditor> StackEditor;
+#endif
+        
+        private void OnEnable()
+        {
+            _stack.CreateAllElementTypes();
+            
+#if UNITY_EDITOR
+            StackEditor = new IMGUIComponentStackEditor<PreferenceSettings, IMGUIElementEditor>(_stack);
+#endif
+        }
+        
+        public Component GetElement(Type elementType)
+        {
+            return _stack.GetElement(elementType);
+        }
+
+#if UNITY_EDITOR
+        public void Save()
+        {
+            EditorUtility.SetDirty(this);
+        }
+#endif
+    }
+}

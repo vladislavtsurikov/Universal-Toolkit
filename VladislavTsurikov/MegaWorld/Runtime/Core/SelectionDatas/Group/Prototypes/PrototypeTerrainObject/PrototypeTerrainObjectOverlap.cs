@@ -1,0 +1,61 @@
+﻿#if RENDERER_STACK
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+
+namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
+{
+    public static class PrototypeTerrainObjectOverlap
+    {
+        public static void OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<PrototypeTerrainObject, TerrainObjectInstance, bool> func)
+        {
+            TerrainObjectRendererAPI.OverlapSphere(sphereCenter, sphereRadius, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
+            {
+                List<PrototypeTerrainObject> prototypes = GetPrototypeUtility.GetPrototypes<PrototypeTerrainObject>(largeObjectInstance.PrototypeID);
+                
+                if(prototypes.Count == 0)
+                {
+                    return true;
+                }
+
+                foreach (var prototype in prototypes)
+                {
+                    func.Invoke(prototype, largeObjectInstance);
+                }
+                
+                return true;
+            });
+        }
+
+        public static void OverlapBox(Bounds bounds, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection,
+            Func<PrototypeTerrainObject, TerrainObjectInstance, bool> func)
+        {
+            OverlapBox(bounds.center, bounds.size, Quaternion.identity, objectFilter, quadTree, checkObbIntersection, func);
+        }
+
+        public static void OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<PrototypeTerrainObject, TerrainObjectInstance, bool> func)
+        {
+            TerrainObjectRendererAPI.OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
+            {
+                List<PrototypeTerrainObject> prototypes = GetPrototypeUtility.GetPrototypes<PrototypeTerrainObject>(largeObjectInstance.PrototypeID);
+
+                if(prototypes.Count == 0)
+                {
+                    return true;
+                }
+
+                foreach (var prototype in prototypes)
+                {
+                    func.Invoke(prototype, largeObjectInstance);
+                }
+                
+                return true;
+            });
+        }
+    }
+}
+#endif

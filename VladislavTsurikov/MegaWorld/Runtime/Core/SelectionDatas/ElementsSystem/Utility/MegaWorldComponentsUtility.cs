@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections;
+using System.Linq;
+using VladislavTsurikov.AttributeUtility.Runtime;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+
+namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Utility
+{
+    public static class MegaWorldComponentsUtility
+    {
+        public static IEnumerable GetAttributes(Type addElementsAttributeType, Type prototypeType, Type toolType)
+        {
+            foreach (var attribute1 in toolType.GetAttributes(addElementsAttributeType))
+            {
+                var attribute = (AddComponentsAttribute)attribute1;
+                if (attribute.PrototypeTypes.Contains(prototypeType))
+                {
+                    yield return attribute;
+                }
+            }
+        }
+    }
+}

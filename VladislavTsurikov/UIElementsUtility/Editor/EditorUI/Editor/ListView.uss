@@ -1,0 +1,35 @@
+.ListView#HeaderContainer {
+    align-items: center;
+    justify-content: center;
+    height: 25px;
+    flex-direction: row;
+    padding-left: 10px;
+}
+
+.ListView#ListViewContainer {
+    align-items: stretch;
+}
+
+.ListView#ListTitle {
+    display: flex;
+    font-size: 14px;
+    padding: 0;
+    -unity-font-definition: initial;
+    -unity-font: url('project://database/Assets/Doozy/_Extras/Fonts/Ubuntu-Light.ttf?fileID=12800000&guid=552e0d24472ded44cad7385aa405c1e6&type=3#Ubuntu-Light');
+    -unity-font-style: bold;
+    -unity-text-align: upper-center;
+}
+
+.ListView#Top {
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    height: 6px;
+    background-color: rgb(44, 44, 44);
+}
+
+.ListView#Bottom {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    height: 6px;
+    background-color: rgb(44, 44, 44);
+}

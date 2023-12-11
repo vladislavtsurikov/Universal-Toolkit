@@ -1,0 +1,136 @@
+#if UNITY_EDITOR
+using System;
+using UnityEditor;
+using UnityEngine;
+using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.IMGUIUtility.Editor;
+using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Core;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
+
+namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Components
+{
+    [Serializable]
+	[ElementEditor(typeof(FrustumCulling))]
+    public class FrustumCullingComponentEditor : PrototypeComponentEditor
+    {
+		private FrustumCulling _render;
+
+		public override void OnEnable()
+		{
+			_render = (FrustumCulling)Target;
+		}
+
+		public override void OnGUI(Rect rect, int index)
+		{
+			var quality = (Quality)Runtime.Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), RendererType);
+			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality));
+			
+			Shadow shadow = (Shadow)Prototype.GetSettings(typeof(Shadow));
+
+			_render.IncreaseBoundingSphere = Mathf.Max(0, CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), IncreaseBoundingSphere, _render.IncreaseBoundingSphere));
+			rect.y += CustomEditorGUI.SingleLineHeight;
+			
+			if (PrototypeComponent.IsValid(shadow) && quality.IsShadowCasting)
+			{
+				_render.GetAdditionalShadow = (GetAdditionalShadow)CustomEditorGUI.EnumPopup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), GetAdditionalShadow, _render.GetAdditionalShadow);
+				rect.y += CustomEditorGUI.SingleLineHeight;
+				EditorGUI.indentLevel++;
+            
+				switch (_render.GetAdditionalShadow)
+				{
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.MinCullingDistance:
+					{
+						_render.MinCullingDistance = CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), MinCullingDistance, _render.MinCullingDistance);
+						rect.y += CustomEditorGUI.SingleLineHeight;
+						break;
+					}
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.IncreaseBoundingSphere:
+					{
+						_render.IncreaseShadowsBoundingSphere = Mathf.Max(0, CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), IncreaseShadowsBoundingSphere, _render.IncreaseShadowsBoundingSphere));
+						rect.y += CustomEditorGUI.SingleLineHeight;
+						break;
+					}
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.DirectionLightShadowVisible:
+					{
+						if(sceneQuality.DirectionalLight == null)
+						{
+							if(CustomEditorGUI.ClickButton(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Find Directional Light", ButtonStyle.Add))
+							{
+								sceneQuality.FindDirectionalLight();
+							}
+            
+							rect.y += CustomEditorGUI.SingleLineHeight;
+            
+							sceneQuality.DirectionalLight = (Light)CustomEditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), DirectionalLight, sceneQuality.DirectionalLight, typeof(Light));
+							rect.y += CustomEditorGUI.SingleLineHeight;
+						}
+						else
+						{
+							sceneQuality.DirectionalLight = (Light)CustomEditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), DirectionalLight, sceneQuality.DirectionalLight, typeof(Light));
+							rect.y += CustomEditorGUI.SingleLineHeight;
+						}
+            							
+						break;
+					}
+				}
+            
+				EditorGUI.indentLevel--;
+			}
+		}
+
+		public override float GetElementHeight(int index)
+		{
+			var quality = (Quality)Runtime.Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), RendererType);
+			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality));
+			
+			Shadow shadow = (Shadow)Prototype.GetSettings(typeof(Shadow));
+			
+			float height = EditorGUIUtility.singleLineHeight;
+
+			if (PrototypeComponent.IsValid(shadow) && quality.IsShadowCasting)
+			{
+				height += CustomEditorGUI.SingleLineHeight;
+            
+				switch (_render.GetAdditionalShadow)
+				{
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.MinCullingDistance:
+					{
+						height += CustomEditorGUI.SingleLineHeight;
+						break;
+					}
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.IncreaseBoundingSphere:
+					{
+						height += CustomEditorGUI.SingleLineHeight;
+						break;
+					}
+					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.DirectionLightShadowVisible:
+					{
+						if(sceneQuality.DirectionalLight == null)
+						{
+							height += CustomEditorGUI.SingleLineHeight;
+							height += CustomEditorGUI.SingleLineHeight;
+						}
+						else
+						{
+							height += CustomEditorGUI.SingleLineHeight;
+						}
+            							
+						break;
+					}
+				}
+			}
+			
+			return height;
+		}
+
+		public GUIContent IncreaseBoundingSphere = new GUIContent("Increase Bounding Sphere", "Objects have a Bounding Box or Bounding Sphere, this can be used for Frustum Culling to determine if the camera can see the object. The Renderer uses the Bounding Sphere. The Increase Bounding Sphere parameter allows you to increase the Bounding Sphere, this is necessary so that the object does not disappear when the object is expected to have more Scale, and also if the shader bends the object too much.");
+        public GUIContent GetAdditionalShadow = new GUIContent("Get Additional Shadow", "Allows you to choose how the shadows appear when the shadows are not in Camera Frustum. This parameter is necessary so that you can see the shadows behind the camera, mainly this parameter is necessary when the sun is not directed straight down.");
+		public GUIContent MinCullingDistance = new GUIContent("Min Culling Distance", "Defines the minimum distance that any kind of culling will occur. If it is a value higher than 0, the instances with a distance less than the specified value to the Camera will not be culled.");
+		public GUIContent IncreaseShadowsBoundingSphere = new GUIContent("Increase Shadows Bounding", "The Increase Bounding Sphere parameter allows you to increase the Bounding Sphere, then the number of visible shadows becomes larger."); 
+		public GUIContent DirectionalLight = new GUIContent("Directional Light", "This parameter is needed to know the direction of the sun's shadows, this allows only visible sun shadows to be displayed.");
+    }
+}
+#endif
