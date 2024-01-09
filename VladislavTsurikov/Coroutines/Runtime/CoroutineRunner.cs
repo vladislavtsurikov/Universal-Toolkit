@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 
@@ -13,7 +14,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
         {
             if (_coroutines.Count == 0)
             {
-                EditorAndRuntimeUpdate.AddListener(OnUpdate);
+                EditorAndRuntimeUpdate.AddUpdateFunction(OnUpdate);
             }
             
             Coroutine coroutine = new Coroutine(routine, obj);
@@ -30,7 +31,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
         {
             if (_coroutines.Count == 0)
             {
-                EditorAndRuntimeUpdate.AddListener(OnUpdate);
+                EditorAndRuntimeUpdate.AddUpdateFunction(OnUpdate);
             }
             
             Coroutine coroutine = new Coroutine(routine);
@@ -48,10 +49,15 @@ namespace VladislavTsurikov.Coroutines.Runtime
             for (int j = _coroutines.Count - 1; j >= 0; j--)
             {
                 Coroutine coroutine = _coroutines[j];
+                
+                if (coroutine.Finished)
+                {
+                    continue;
+                }
 
                 if (coroutine == routine)
                 {
-                    _coroutines.RemoveAt(j);
+                    coroutine.Finished = true;
                     return;
                 }
             }
@@ -62,10 +68,15 @@ namespace VladislavTsurikov.Coroutines.Runtime
             for (int j = _coroutines.Count - 1; j >= 0; j--)
             {
                 Coroutine coroutine = _coroutines[j];
+                
+                if (coroutine.Finished)
+                {
+                    continue;
+                }
 
                 if (coroutine.Routine.MethodName() == routine.MethodName())
                 {
-                    _coroutines.RemoveAt(j);
+                    coroutine.Finished = true;
                 }
             }
         }
@@ -76,11 +87,16 @@ namespace VladislavTsurikov.Coroutines.Runtime
             {
                 Coroutine coroutine = _coroutines[j];
 
-                if (coroutine.Owner == reference)
+                if (coroutine.Finished || coroutine.Owner == null)
+                {
+                    continue;
+                }
+
+                if (coroutine.Owner.Target != null && coroutine.Owner.Target == reference)
                 {
                     if (coroutine.Routine.MethodName() == routine.MethodName())
                     {
-                        _coroutines.RemoveAt(j);
+                        coroutine.Finished = true;
                     }
                 }
             }
@@ -91,10 +107,15 @@ namespace VladislavTsurikov.Coroutines.Runtime
             for (int j = _coroutines.Count - 1; j >= 0; j--)
             {
                 Coroutine coroutine = _coroutines[j];
-
-                if (coroutine.Owner == reference)
+                
+                if (coroutine.Finished || coroutine.Owner == null)
                 {
-                    _coroutines.RemoveAt(j);
+                    continue;
+                }
+                
+                if (coroutine.Owner.Target != null && coroutine.Owner.Target == reference)
+                {
+                    coroutine.Finished = true;
                 }
             }
         }
@@ -108,7 +129,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
         {
             if (_coroutines.Count == 0)
             {
-                EditorAndRuntimeUpdate.RemoveListener(OnUpdate);
+                EditorAndRuntimeUpdate.RemoveUpdateFunction(OnUpdate);
                 return;
             }
 

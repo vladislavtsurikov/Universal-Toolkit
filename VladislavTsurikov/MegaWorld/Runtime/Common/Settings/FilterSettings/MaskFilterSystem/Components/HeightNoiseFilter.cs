@@ -64,13 +64,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _heightNoiseMat;
         }
 
-        public override void Eval(MaskFilterContext fc, int index)
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             CreateNoiseSettingsIfNecessary();
 
-            Vector3 brushPosWs = fc.BrushPos;
-            float brushSize = fc.BoxArea.BoxSize;
-            float brushRotation = fc.BoxArea.Rotation;
+            Vector3 brushPosWs = maskFilterContext.BrushPos;
+            float brushSize = maskFilterContext.BoxArea.BoxSize;
+            float brushRotation = maskFilterContext.BoxArea.Rotation;
 
             // TODO(wyatt): remove magic number and tie it into NoiseSettingsGUI preview size somehow
             float previewSize = 1 / 512f;
@@ -101,20 +101,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             int pass = NoiseUtils.KNumBlitPasses * NoiseLib.GetNoiseIndex( NoiseSettings.DomainSettings.NoiseTypeName );
 
-            RenderTextureDescriptor desc = new RenderTextureDescriptor(fc.DestinationRenderTexture.width, fc.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
+            RenderTextureDescriptor desc = new RenderTextureDescriptor(maskFilterContext.DestinationRenderTexture.width, maskFilterContext.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
             RenderTexture rt = RenderTexture.GetTemporary( desc );
 
-            Graphics.Blit(fc.SourceRenderTexture, rt, mat, pass);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, rt, mat, pass);
 
             Material matFinal = GetMaterial(); 
 
             matFinal.SetTexture("_NoiseTex", rt);
-            matFinal.SetTexture("_BaseMaskTex", fc.SourceRenderTexture);
-            matFinal.SetTexture("_HeightTex", fc.HeightContext.sourceRenderTexture);
+            matFinal.SetTexture("_BaseMaskTex", maskFilterContext.SourceRenderTexture);
+            matFinal.SetTexture("_HeightTex", maskFilterContext.HeightContext.sourceRenderTexture);
 
-            SetMaterial(matFinal, fc, index);
+            SetMaterial(matFinal, maskFilterContext, index);
 
-            Graphics.Blit(fc.SourceRenderTexture, fc.DestinationRenderTexture, matFinal, 0);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, matFinal, 0);
 
             RenderTexture.ReleaseTemporary(rt);
         }

@@ -27,7 +27,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 		public abstract void SetColliders(Sphere sphere, Object usedObj);
 		public abstract void OnNewInstanceVisibility(TerrainObjectInstance terrainObjectInstance);
 		public abstract void OnInstanceInvisible(TerrainObjectInstance terrainObjectInstance);
-		protected abstract void OnRemoveObjectInstanceSelectorData(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj);
+		protected abstract void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj);
+		protected abstract void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData);
 		public abstract Type GetInstanceSelectorData();
 		
 		protected void EnableCollider(TerrainObjectCollider terrainObjectCollider, Object usedObj)
@@ -57,6 +58,37 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 				OnInstanceInvisible(terrainObjectCollider.Instance);
 			}
 		}
+		
+		protected void DisableCollider(TerrainObjectCollider terrainObjectCollider)
+		{
+			if (terrainObjectCollider.Instance.HierarchyTerrainObjectInstance == null)
+			{
+				return;
+			}
+			
+			OnInstanceInvisible(terrainObjectCollider.Instance);
+		}
+		
+		public void OnDisableCollider(Object usedObj) 
+		{
+			for (int i = _prototypeInstancesSelectorDataList.Count - 1; i >= 0; i--)
+			{
+				if (_prototypeInstancesSelectorDataList[i].Object == usedObj)
+				{
+					OnDisableCollider(_prototypeInstancesSelectorDataList[i], usedObj);
+					_prototypeInstancesSelectorDataList.RemoveAt(i);
+				}
+			}
+		}
+		
+		public void OnDisableCollider() 
+		{
+			for (int i = _prototypeInstancesSelectorDataList.Count - 1; i >= 0; i--)
+			{
+				OnDisableCollider(_prototypeInstancesSelectorDataList[i]);
+				_prototypeInstancesSelectorDataList.RemoveAt(i);
+			}
+		}
 
 		public PrototypeInstancesSelectorData GetPrototypeInstancesSelectorData(Object usedObj)
 		{
@@ -74,17 +106,5 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
 			return prototypeInstancesSelectorData;
 		}
-
-		public void RemovePrototypeInstancesSelectorData(Object usedObj) 
-		{
-			for (int i = _prototypeInstancesSelectorDataList.Count - 1; i >= 0; i--)
-			{
-				if (_prototypeInstancesSelectorDataList[i].Object == usedObj)
-				{
-					OnRemoveObjectInstanceSelectorData(_prototypeInstancesSelectorDataList[i], usedObj);
-					_prototypeInstancesSelectorDataList.RemoveAt(i);
-				}
-			}
-		}
-	}
+    }
 }

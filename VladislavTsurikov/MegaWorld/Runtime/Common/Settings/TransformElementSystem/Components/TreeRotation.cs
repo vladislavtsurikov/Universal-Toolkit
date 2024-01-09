@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -13,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         public float RandomizeOrientationXZ = 3;
         public float SuccessRandomizeOrientationXZ = 20;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             Vector3 randomVector = UnityEngine.Random.insideUnitSphere * 0.5f;
 
@@ -26,13 +26,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
                 RandomizeOrientationY * 3.6f * randomVector.y,
                 RandomizeOrientationXZ * 3.6f * randomVector.z));
 
-                instanceData.Rotation *= randomRotation;
+                transform.Rotation *= randomRotation;
             }
             else
             {
                 Quaternion randomRotation = Quaternion.Euler(new Vector3(0, RandomizeOrientationY * 3.6f * randomVector.y, 0));
 
-                instanceData.Rotation *= randomRotation;
+                transform.Rotation *= randomRotation;
             }
         }
     }

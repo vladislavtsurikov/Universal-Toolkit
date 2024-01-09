@@ -1,6 +1,6 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
 {
@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public Vector3 MinScale = new Vector3(0.8f, 0.8f, 0.8f);
         public Vector3 MaxScale = new Vector3(1.2f, 1.2f, 1.2f);
 
-        public override void SetInstanceData(ref InstanceData instanceData, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             Vector3 scale;
             if (UniformScale)
@@ -27,7 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
                     Random.Range(MinScale.z, MaxScale.z));
             }
 
-            instanceData.Scale = Vector3.Lerp(instanceData.Scale, scale, fitness);
+            transform.Scale = Vector3.Lerp(transform.Scale, scale, fitness);
         }
     }
 }

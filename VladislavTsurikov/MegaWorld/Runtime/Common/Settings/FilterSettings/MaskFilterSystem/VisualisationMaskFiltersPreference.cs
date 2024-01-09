@@ -10,6 +10,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         BrushFilter,
         None
     }
+    
+    public enum ColorSpaceForBrushMaskFilter
+    {
+        СustomColor,
+        Colorful,
+        Heightmap
+    }
 
     [MenuItem("Visualisation Mask Filters")]
     public class VisualisationMaskFiltersPreference : PreferenceSettings

@@ -2,7 +2,7 @@
 
 namespace VladislavTsurikov.ComponentStack.Editor.Attributes
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class)]
     public sealed class DontDrawAttribute : Attribute
     {
     }

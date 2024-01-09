@@ -37,7 +37,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 			instance.HierarchyTerrainObjectInstance = null;
 		}
 		
-		protected override void OnRemoveObjectInstanceSelectorData(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj)
+		protected override void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj)
 		{
 			CellPrototypeInstancesSelectorData cellPrototypeInstancesSelectorData = (CellPrototypeInstancesSelectorData)prototypeInstancesSelectorData;
 			
@@ -46,6 +46,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 				foreach (var largeObjectCollider in colliderCell.PrototypeBVHObjectTreeStack.GetAllInstances(_proto.ID))
 				{
 					DisableCollider(largeObjectCollider, usedObj);
+				}
+			}
+		}
+
+		protected override void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData)
+		{
+			CellPrototypeInstancesSelectorData cellPrototypeInstancesSelectorData = (CellPrototypeInstancesSelectorData)prototypeInstancesSelectorData;
+			
+			foreach (var colliderCell in cellPrototypeInstancesSelectorData.LastColliderCellList)
+			{
+				foreach (var largeObjectCollider in colliderCell.PrototypeBVHObjectTreeStack.GetAllInstances(_proto.ID))
+				{
+					DisableCollider(largeObjectCollider);
 				}
 			}
 		}

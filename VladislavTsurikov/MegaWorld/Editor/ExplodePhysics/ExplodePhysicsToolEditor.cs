@@ -4,7 +4,8 @@ using VladislavTsurikov.MegaWorld.Editor.Common;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
@@ -24,7 +25,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 	    
 		public override void DrawFirstSettings()
 		{
-			PhysicsSimulatorSettingsEditor.OnGUI(PhysicsSimulatorSettings.Instance, DisablePhysicsMode.ObjectTime);
+			PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysics>(PhysicsSimulatorSettings.Instance);
 		}
     }
 }

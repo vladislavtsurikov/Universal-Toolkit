@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -9,7 +9,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
     [MenuItem("Cliffs Align")]
     public class CliffsAlign : TransformComponent
     {
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             Vector3 direction = new Vector3(normal.x, 0, normal.z);
 
@@ -19,12 +19,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
             if(distancePositive < distanceNegative)
             {
                 float angle = Vector3.Angle(Vector3.forward, direction);
-                instanceData.Rotation = Quaternion.AngleAxis(angle, Vector3.up) * instanceData.Rotation;
+                transform.Rotation = Quaternion.AngleAxis(angle, Vector3.up) * transform.Rotation;
             }
             else
             {
                 float angle = -Vector3.Angle(Vector3.forward, direction);
-                instanceData.Rotation = Quaternion.AngleAxis(angle, Vector3.up) * instanceData.Rotation;
+                transform.Rotation = Quaternion.AngleAxis(angle, Vector3.up) * transform.Rotation;
             }
         }
     }

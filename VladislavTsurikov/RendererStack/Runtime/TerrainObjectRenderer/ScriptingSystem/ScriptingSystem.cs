@@ -10,7 +10,6 @@ using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSetting
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.SceneSettings.Components.Camera;
-using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem
 {    
@@ -111,7 +110,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             Profiler.EndSample();
         }
 
-        public static void SetColliders(Sphere sphere, Object obj)
+        public static void SetColliders(Sphere sphere, object obj)
         {
             ScriptingSystem scriptingSystem = TerrainObjectRenderer.Instance.ScriptingSystem;
 
@@ -139,6 +138,39 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
                 if (PrototypeComponent.IsValid(collidersSettings) || PrototypeComponent.IsValid(scriptingSettings))
                 {
                     prototypeScriptingManager.SetColliders(sphere, obj);
+                }
+            }
+        }
+
+        public static void RemoveCollider(int prototypeID)
+        {
+            TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
+
+            if (terrainObjectRenderer == null)
+            {
+                return;
+            }
+            
+            ScriptingSystem scriptingSystem = terrainObjectRenderer.ScriptingSystem;
+
+            if (scriptingSystem == null || scriptingSystem._colliderParent == null)
+            {
+                return; 
+            }
+
+            if (scriptingSystem._prototypeScriptingManager.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var prototypeScriptingManager in scriptingSystem._prototypeScriptingManager)
+            {
+                if (prototypeScriptingManager.Proto.ID == prototypeID)
+                {
+                    prototypeScriptingManager.DefaultPrototypeInstancesSelector.OnDisableCollider();
+                    prototypeScriptingManager.CellsPrototypeInstancesSelector.OnDisableCollider();
+                    
+                    return;
                 }
             }
         }

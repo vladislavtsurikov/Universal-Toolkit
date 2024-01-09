@@ -58,6 +58,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
         protected Area(Vector3 center, float size) : this(center, new Vector3(size, size, size))
         {
         }
+        
+        public bool Contains(Vector3 point)
+        {
+            return Bounds.Contains(point);
+        }
 
         public bool Contains(Vector2 point)
         {

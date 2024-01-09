@@ -41,7 +41,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 						if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 						{
 							UnspawnUtility.UnspawnGroups(TextureStamper.Data.GroupList, false);
-							TextureStamper.Spawn();
+							TextureStamper.StamperSpawn();
 						}
 						GUILayout.Space(5);
 					}
@@ -71,7 +71,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 					GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 					if(CustomEditorGUILayout.ClickButton("Cancel", ButtonStyle.Remove))
 					{
-						CancelSpawn();
+						_stamperControllerSettings.StamperTool.CancelSpawn();;
 					}
 					GUILayout.Space(5);
 				}
@@ -89,7 +89,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 						if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 						{
 							UnspawnUtility.UnspawnGroups(TextureStamper.Data.GroupList, false);
-							TextureStamper.Spawn();
+							TextureStamper.StamperSpawn();
 						}
 
 						GUILayout.Space(5);
@@ -104,7 +104,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 					GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 					if(CustomEditorGUILayout.ClickButton("Spawn", ButtonStyle.Add))
 					{
-						TextureStamper.Spawn();
+						TextureStamper.StamperSpawn();
 					}
 					GUILayout.Space(5);
 				}
@@ -123,7 +123,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 					GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 					if(CustomEditorGUILayout.ClickButton("Cancel", ButtonStyle.Remove))
 					{
-						CancelSpawn();
+						_stamperControllerSettings.StamperTool.CancelSpawn();
 					}
 					GUILayout.Space(5);
 				}
@@ -174,13 +174,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
 				GUILayout.Space(3);
            	}
-        }
-
-		public void CancelSpawn()
-        {
-            TextureStamper.CancelSpawn = true;
-            TextureStamper.SpawnProgress = 0f;
-			EditorUtility.ClearProgressBar();
         }
     }
 }

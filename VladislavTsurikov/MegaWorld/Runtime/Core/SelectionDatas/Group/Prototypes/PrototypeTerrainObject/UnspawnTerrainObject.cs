@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {
@@ -8,6 +10,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public static void Unspawn(List<Prototype> prototypes, bool unspawnSelected)
         {
 #if RENDERER_STACK
+            List<GameObject> unspawnPrefabs = new List<GameObject>();
+
             foreach (PrototypeTerrainObject proto in prototypes)
             {
                 if(unspawnSelected)
@@ -17,9 +21,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                         continue;
                     }
                 }
+                
+                unspawnPrefabs.Add((GameObject)proto.PrototypeObject);
 
                 TerrainObjectRendererAPI.RemoveInstances(proto.ID);
             }
+            
+            //Not a necessary call, but the tools can spawn GameObjects to later convert them into Terrain Object Renderer
+            GameObjectUtility.Unspawn(unspawnPrefabs);
 #endif
         }
     }

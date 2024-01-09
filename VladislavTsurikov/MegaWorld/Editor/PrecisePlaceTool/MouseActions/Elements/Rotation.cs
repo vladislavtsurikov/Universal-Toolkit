@@ -203,8 +203,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 {
                     TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.X, out var upwards, out _, out var forward);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.xAxisColor;
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.xAxisColor;
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(upwards),
@@ -212,13 +212,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                         EventType.Repaint
                     );
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.selectedColor;
+                    Handles.color = Handles.selectedColor;
                     #if UNITY_2020_3_OR_NEWER
-                    UnityEditor.Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+                    Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
                     #else
                     UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
                     #endif
-                    UnityEditor.Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+                    Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
 
                     break;
                 }
@@ -228,8 +228,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                     {
                         TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Y, out var upwards, out _, out var forward);
 
-                        UnityEditor.Handles.color = UnityEditor.Handles.yAxisColor;
-                        UnityEditor.Handles.CircleHandleCap(
+                        Handles.color = Handles.yAxisColor;
+                        Handles.CircleHandleCap(
                             0,
                             GameObject.transform.position,
                             Quaternion.LookRotation(upwards),
@@ -237,19 +237,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                             EventType.Repaint
                         );
 
-                        UnityEditor.Handles.color = UnityEditor.Handles.selectedColor;
+                        Handles.color = Handles.selectedColor;
                         #if UNITY_2020_3_OR_NEWER
-                        UnityEditor.Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+                        Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
                         #else
                         UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
                         #endif
-                        UnityEditor.Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+                        Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
                     }
                     else
                     {
                         if (IntersectsHitPlane(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out var point))
                         {
-                            UnityEditor.Handles.DrawDottedLine(GameObject.transform.position, point, 4.0f);
+                            Handles.DrawDottedLine(GameObject.transform.position, point, 4.0f);
                         }
                     }
                     
@@ -259,8 +259,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 {
                     TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Z, out var upwards, out _, out var forward);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.zAxisColor;
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.zAxisColor;
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(upwards),
@@ -268,13 +268,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                         EventType.Repaint
                     );
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.selectedColor;
+                    Handles.color = Handles.selectedColor;
                     #if UNITY_2020_3_OR_NEWER
-                    UnityEditor.Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+                    Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
                     #else
                     UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
                     #endif
-                    UnityEditor.Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+                    Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
 
                     break;
                 }
@@ -284,8 +284,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
 
                     TransformAxes.GetRightForward(upwards, out _, out _);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.selectedColor.WithAlpha(0.5f);
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.selectedColor.WithAlpha(0.5f);
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(upwards),
@@ -297,8 +297,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                     Vector3 axisY = TransformAxes.GetVector(Axis.Y, TransformSpace.Local, GameObject.transform);
                     Vector3 axisZ = TransformAxes.GetVector(Axis.Z, TransformSpace.Local, GameObject.transform);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.xAxisColor.WithAlpha(0.5f);
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.xAxisColor.WithAlpha(0.5f);
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(axisX),
@@ -306,8 +306,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                         EventType.Repaint
                     );
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.yAxisColor.WithAlpha(0.5f);
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.yAxisColor.WithAlpha(0.5f);
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(axisY),
@@ -315,8 +315,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                         EventType.Repaint
                     );
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.zAxisColor.WithAlpha(0.5f);
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Handles.zAxisColor.WithAlpha(0.5f);
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(axisZ),
@@ -332,8 +332,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
 
                     TransformAxes.GetRightForward(upwards, out _, out _);
 
-                    UnityEditor.Handles.color = Color.white;
-                    UnityEditor.Handles.CircleHandleCap(
+                    Handles.color = Color.white;
+                    Handles.CircleHandleCap(
                         0,
                         GameObject.transform.position,
                         Quaternion.LookRotation(upwards),

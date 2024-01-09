@@ -34,18 +34,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
         }
 
-        public override void Eval(MaskFilterContext fc, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index) 
         {
             if (Terrain.activeTerrain == null)
             {
                 return;
             }
             
-            Terrain terrain = fc.BoxArea.TerrainUnder;
+            Terrain terrain = maskFilterContext.BoxArea.TerrainUnder;
 
-            Vector2 currUV = UnityTerrainUtility.WorldPointToUV(fc.BoxArea.Center, terrain);
+            Vector2 currUV = UnityTerrainUtility.WorldPointToUV(maskFilterContext.BoxArea.Center, terrain);
 
-            BrushTransform brushTransform = TerrainPaintUtility.CalculateBrushTransform(terrain, currUV, fc.BoxArea.BoxSize, 0.0f);
+            BrushTransform brushTransform = TerrainPaintUtility.CalculateBrushTransform(terrain, currUV, maskFilterContext.BoxArea.BoxSize, 0.0f);
             Rect brushRect = brushTransform.GetBrushXYBounds();
 
             List<TerrainTexture> addTexturesToRenderTextureList = new List<TerrainTexture>();
@@ -65,12 +65,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             Material blendMat = MaskFilterUtility.blendModesMaterial;
 
-            RenderTexture output = RenderTexture.GetTemporary(fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, fc.SourceRenderTexture.depth, GraphicsFormat.R16_SFloat);
+            RenderTexture output = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, maskFilterContext.SourceRenderTexture.depth, GraphicsFormat.R16_SFloat);
             output.enableRandomWrite = true;
 
             foreach (var terrainTexture in addTexturesToRenderTextureList)
             {
-                RenderTexture localSourceRender = RenderTexture.GetTemporary(fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
+                RenderTexture localSourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
                 localSourceRender.enableRandomWrite = true;
 
                 PaintContext localTextureContext = TerrainPaintUtility.BeginPaintTexture(terrain, brushRect, Terrain.activeTerrain.terrainData.terrainLayers[terrainTexture.TerrainProtoId]);
@@ -87,7 +87,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 RenderTexture.ReleaseTemporary(localSourceRender);
             }
 
-            RenderTexture sourceRender = RenderTexture.GetTemporary(fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
+            RenderTexture sourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
             sourceRender.enableRandomWrite = true;
 
             if(index == 0)
@@ -100,9 +100,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
 
             blendMat.SetTexture("_MainTex", output);
-            blendMat.SetTexture("_BlendTex", fc.SourceRenderTexture);
+            blendMat.SetTexture("_BlendTex", maskFilterContext.SourceRenderTexture);
 
-            Graphics.Blit(output, fc.DestinationRenderTexture, blendMat, 0);
+            Graphics.Blit(output, maskFilterContext.DestinationRenderTexture, blendMat, 0);
 
             RenderTexture.ReleaseTemporary(output);
             RenderTexture.ReleaseTemporary(sourceRender);

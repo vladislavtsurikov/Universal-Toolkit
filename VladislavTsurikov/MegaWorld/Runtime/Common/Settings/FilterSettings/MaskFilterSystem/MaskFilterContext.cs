@@ -2,11 +2,6 @@
 using UnityEngine.TerrainTools;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 
-#if UNITY_2021_2_OR_NEWER
-#else
-using UnityEngine.Experimental.TerrainAPI;
-#endif
-
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     public class MaskFilterContext 

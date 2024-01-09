@@ -25,13 +25,17 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         public bool DrawHandleIfNotSelected;
 
         public StamperTool StamperTool;
+        
+        public delegate void OnSetAreaBoundsDelegate();
+        public OnSetAreaBoundsDelegate OnSetAreaBounds;
 
         protected override void SetupElement(object[] args = null)
         {
             StamperTool = (StamperTool)args[0];
+            SetupArea();
         }
 
-        public virtual void OnSetAreaBounds()
+        protected virtual void SetupArea()
         {
         }
         
@@ -102,17 +106,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
             if(hasChangedPosition || hasChangedSize)
             {
-#if UNITY_EDITOR
-                stamperToolTool.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-#endif
-                
+                OnSetAreaBounds?.Invoke();
+
                 SetAreaBounds(stamperToolTool);
             }
             else if(setForce)
             {
-#if UNITY_EDITOR
-                stamperToolTool.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-#endif
+                OnSetAreaBounds?.Invoke();
 
                 SetAreaBounds(stamperToolTool);
             }

@@ -7,20 +7,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     public enum BlendMode
     {
         Multiply,
-        Add,
-    }
-
-    public enum ColorSpaceForBrushMaskFilter
-    {
-        СustomColor,
-        Colorful,
-        Heightmap
+        Add
     }
 
     [Serializable]
     public class MaskFilterStack : ComponentStackSupportSameType<MaskFilter>
     {
-        public void Eval(MaskFilterContext fc)
+        public void Eval(MaskFilterContext maskFilterContext)
         {
             int count = _elementList.Count;
 
@@ -31,8 +24,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             int srcIndex = 0;
             int destIndex = 1;
 
-            rts[0] = RenderTexture.GetTemporary(fc.DestinationRenderTexture.descriptor);
-            rts[1] = RenderTexture.GetTemporary(fc.DestinationRenderTexture.descriptor);
+            rts[0] = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
+            rts[1] = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
 
             rts[0].enableRandomWrite = true;
             rts[1].enableRandomWrite = true;
@@ -44,18 +37,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             {
                 if(_elementList[i].Active)
                 {
-                    fc.SourceRenderTexture = rts[srcIndex];
-                    fc.DestinationRenderTexture = rts[destIndex];
+                    maskFilterContext.SourceRenderTexture = rts[srcIndex];
+                    maskFilterContext.DestinationRenderTexture = rts[destIndex];
 
-                    _elementList[ i ].Eval(fc, i);
+                    _elementList[ i ].Eval(maskFilterContext, i);
 
                     destIndex += srcIndex;
                     srcIndex = destIndex - srcIndex;
-                    destIndex = destIndex - srcIndex;
+                    destIndex -= srcIndex;
                 }
             }
 
-            Graphics.Blit(rts[srcIndex], fc.Output);
+            Graphics.Blit(rts[srcIndex], maskFilterContext.Output);
 
             RenderTexture.ReleaseTemporary(rts[0]);
             RenderTexture.ReleaseTemporary(rts[1]);

@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 		public float MinWeightToNormal;
 		public float MaxWeightToNormal = 0.2f;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             Quaternion normalRotation = Quaternion.FromToRotation(Vector3.up, normal);
 
@@ -33,11 +33,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
                     normalWeight = MaxWeightToNormal;
                 }
 
-                instanceData.Rotation *= Quaternion.Lerp(instanceData.Rotation, normalRotation, normalWeight);
+                transform.Rotation *= Quaternion.Lerp(transform.Rotation, normalRotation, normalWeight);
             }
             else
             {
-                instanceData.Rotation *= normalRotation;
+                transform.Rotation *= normalRotation;
             }
         }
     }

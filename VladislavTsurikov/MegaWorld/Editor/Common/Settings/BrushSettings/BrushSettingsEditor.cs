@@ -30,7 +30,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.BrushSettings
 
 	        if(_brushSettings.SpacingEqualsType == SpacingEqualsType.Custom)
 	        {
-		        _brushSettings.Spacing = CustomEditorGUILayout.FloatField(_spacing, _brushSettings.Spacing);
+		        _brushSettings.CustomSpacing = CustomEditorGUILayout.FloatField(_spacing, _brushSettings.CustomSpacing);
 	        }
 
 	        _brushSettings.MaskType = (MaskType)CustomEditorGUILayout.EnumPopup(_maskType, _brushSettings.MaskType);

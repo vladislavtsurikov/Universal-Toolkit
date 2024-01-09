@@ -48,7 +48,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
         }
 
-        public override void Eval(MaskFilterContext fc, int index)
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             switch (MaskOperations)
             {
@@ -56,35 +56,35 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 {
                     BuiltinMaterial.SetFloat("_Add", Value);
 
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Add );
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Add );
                     break;
                 }
                 case MaskOperations.Multiply:
                 {
                     BuiltinMaterial.SetFloat("_Multiply", Value);
 
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Multiply );
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Multiply );
                     break;
                 }
                 case MaskOperations.Power:
                 {
                     BuiltinMaterial.SetFloat("_Pow", Value);
 
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Power );
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Power );
                     break;
                 }
                 case MaskOperations.Clamp:
                 {
                     BuiltinMaterial.SetVector("_ClampRange", ClampRange);
 
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Clamp );
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Clamp );
                     break;
                 }
                 case MaskOperations.Invert:
                 {
                     BuiltinMaterial.SetFloat("_Strength", StrengthInvert);
 
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Invert);
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Invert);
                     break;
                 }
                 case MaskOperations.Remap:
@@ -92,7 +92,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                     BuiltinMaterial.SetFloat("RemapMin", RemapRange.x);
                     BuiltinMaterial.SetFloat("RemapMax", RemapRange.y);
         
-                    Graphics.Blit( fc.SourceRenderTexture, fc.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Remap);
+                    Graphics.Blit( maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, BuiltinMaterial, (int)MaskOperations.Remap);
                     break;
                 }
             }

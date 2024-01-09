@@ -16,9 +16,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 #if RENDERER_STACK
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
 #endif
@@ -35,14 +35,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 #if RENDERER_STACK
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            transformComponentSettings.Stack.SetInstanceData(ref instanceData, fitness, rayHit.Normal);
+            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
             }
 #endif
         }
@@ -51,14 +51,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            transformComponentSettings.Stack.SetInstanceData(ref instanceData, fitness, rayHit.Normal);
+            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
                 group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(gameObject);
 
 #if UNITY_EDITOR

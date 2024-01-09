@@ -1,14 +1,12 @@
 #if UNITY_EDITOR
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.Undo.Editor.UndoActions;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
 {
-    [DontDraw]
     [MenuItem("Remove")]
 	public class Remove : Action
     {

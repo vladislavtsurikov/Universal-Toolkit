@@ -4,6 +4,7 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -12,7 +13,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
@@ -22,6 +22,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.A
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {
@@ -47,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             _mouseMove.OnMouseDrag += OnMouseDrag;
             _mouseMove.OnRepaint += OnRepaint;
         }
-        
+
         protected override void DoTool()
         {
             _mouseMove.Spacing = _brushSettings.Spacing;
@@ -69,7 +71,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 
                 if (area.RayHit != null)
                 {
-                    PaintGroup(group, area);
+                    CoroutineRunner.StartCoroutine(PaintGroup(group, area));
                 }
             }
         }
@@ -86,7 +88,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 
                     if (area.RayHit != null)
                     {
-                        PaintGroup(group, area);
+                        CoroutineRunner.StartCoroutine(PaintGroup(group, area));
                     }
                 }
             }
@@ -98,40 +100,27 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             BrushPhysicsToolVisualisation.Draw(area);
         }
         
-        private void PaintGroup(Group group, BoxArea area)
+        private IEnumerator PaintGroup(Group group, BoxArea area)
         {
+            ScriptingSystem.SetColliders(new Sphere(area.Center, area.Size.x / 2 * 5), area);
+            
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
-                PrototypeGameObject proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
-                //SpawnPrototype.SpawnGameObject(group, proto, rayHit);
+                yield return SpawnGroup.SpawnGameObject(group, area);
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                CoroutineRunner.StartCoroutine(SpawnTerrainObject(group, area));
+                yield return SpawnGroup.SpawnTerrainObject(group, area);
             }
-        }
-        
-        private IEnumerator SpawnTerrainObject(Group group, BoxArea area)
-        {
-            ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.WaitForNextFrame = false;
-
-            yield return scatterComponentSettings.Stack.Samples(area, sample =>
+            
+            yield return new YieldCustom(IsDone);
+            
+            bool IsDone()
             {
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
-                    GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
-                if (rayHit != null)
-                {
-                    PrototypeTerrainObject proto = (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
-
-                    if (proto == null || proto.Active == false)
-                    {
-                        return;
-                    }
-
-                    SpawnPrototype.SpawnTerrainObject(group, proto, area, rayHit);
-                }
-            });
+                return SimulatedBodyStack.Count == 0;
+            }
+            
+            ScriptingSystem.RemoveColliders(area);
         }
     }
 }

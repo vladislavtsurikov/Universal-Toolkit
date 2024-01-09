@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 	    [OdinSerialize] 
 	    public SelectionData SelectionData = new SelectionData();
 	    [OdinSerialize]
-        public ToolWindow SelectedTool;
+        public ToolWindow SelectedTool => _windowToolStack.SelectedElement;
         public SelectedData SelectedData => SelectionData.SelectedData;
         public WindowToolStack WindowToolStack => _windowToolStack;
         

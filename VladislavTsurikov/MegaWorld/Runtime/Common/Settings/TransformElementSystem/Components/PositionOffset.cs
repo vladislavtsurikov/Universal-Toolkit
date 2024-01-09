@@ -2,7 +2,7 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -14,9 +14,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         public float MinPositionOffsetY = -0.15f;
         public float MaxPositionOffsetY;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
-            instanceData.Position += new Vector3(0, UnityEngine.Random.Range(MinPositionOffsetY, MaxPositionOffsetY), 0);
+            transform.Position += new Vector3(0, UnityEngine.Random.Range(MinPositionOffsetY, MaxPositionOffsetY), 0);
         }
     }
 }

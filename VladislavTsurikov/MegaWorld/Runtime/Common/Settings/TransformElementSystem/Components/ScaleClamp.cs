@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -12,33 +12,33 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         public float MaxScale = 2;
         public float MinScale = 0.5f;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
-            if(instanceData.Scale.x > MaxScale)
+            if(transform.Scale.x > MaxScale)
             {
-                instanceData.Scale.x = MaxScale;
+                transform.Scale.x = MaxScale;
             }
-            else if(instanceData.Scale.x < MinScale)
+            else if(transform.Scale.x < MinScale)
             {
-                instanceData.Scale.x = MinScale;
-            }
-
-            if(instanceData.Scale.y > MaxScale)
-            {
-                instanceData.Scale.y = MaxScale;
-            }
-            else if(instanceData.Scale.y < MinScale)
-            {
-                instanceData.Scale.y = MinScale;
+                transform.Scale.x = MinScale;
             }
 
-            if(instanceData.Scale.z > MaxScale)
+            if(transform.Scale.y > MaxScale)
             {
-                instanceData.Scale.z = MaxScale;
+                transform.Scale.y = MaxScale;
             }
-            else if(instanceData.Scale.z < MinScale)
+            else if(transform.Scale.y < MinScale)
             {
-                instanceData.Scale.z = MinScale;
+                transform.Scale.y = MinScale;
+            }
+
+            if(transform.Scale.z > MaxScale)
+            {
+                transform.Scale.z = MaxScale;
+            }
+            else if(transform.Scale.z < MinScale)
+            {
+                transform.Scale.z = MinScale;
             }
         }
     }

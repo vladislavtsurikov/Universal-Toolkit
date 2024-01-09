@@ -48,7 +48,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
         {
         }
         
-        protected virtual void OnToolEnable()
+        private protected virtual void OnToolEnable()
         {
         }
     }

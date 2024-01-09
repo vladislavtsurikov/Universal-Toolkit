@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
@@ -24,7 +25,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility;
 using Area = VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.Area;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
@@ -72,9 +72,30 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                 return _stamperControllerSettings;
             }
         }
+        
+        [NonSerialized]
+        public TerrainsMaskManager TerrainsMaskManager = new TerrainsMaskManager();
+        
+#if UNITY_EDITOR
+        [NonSerialized]
+        public StamperVisualisation StamperVisualisation = new StamperVisualisation();
+#endif
 
-        protected override void OnToolEnable()
+        [OnDeserializing]
+        private void Initialize()
         {
+            TerrainsMaskManager = new TerrainsMaskManager();
+            
+#if UNITY_EDITOR
+            StamperVisualisation = new StamperVisualisation();
+#endif
+        }
+
+        private protected override void OnStamperEnable()
+        {
+            Area.OnSetAreaBounds -= StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
+            Area.OnSetAreaBounds += StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
+            
             Area.SetAreaBoundsIfNecessary(this, true);
         }
 
@@ -83,31 +104,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        public override void Spawn(bool displayProgressBar = false)
+        protected override IEnumerator Spawn()
         {
-            SpawnComplete = false;
-            
-            CoroutineRunner.StartCoroutine(RunSpawn(displayProgressBar), this);
-        }
-
-        private IEnumerator RunSpawn(bool displayProgressBar)
-        {
-            CancelSpawn = false;
-
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
             
             for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
             {
-                if (CancelSpawn)
+                if (IsCancelSpawn)
                 {
                     break;
                 }
 #if UNITY_EDITOR
-                if (displayProgressBar)
-                {
-                    EditorUtility.DisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name, completedTypes / (float)maxTypes);
-                }
+                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name,
+                    completedTypes / (float)maxTypes);
 #endif
 
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[typeIndex].PrototypeType));
@@ -126,17 +136,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
             }
 
             SpawnProgress = completedTypes / (float)maxTypes;
-            SpawnProgress = 0;
-
-#if UNITY_EDITOR
-            if (displayProgressBar)
-            {
-                EditorUtility.ClearProgressBar();
-            }
-#endif
-            SpawnComplete = true;
         }
-        
+
         private IEnumerator SpawnGroup(Group group, BoxArea boxArea)
         {
             if(group.HasAllActivePrototypes())
@@ -144,20 +145,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                 if (group.PrototypeType == typeof(PrototypeGameObject))
                 {
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
-                    randomSeedSettings.GenerateNewRandomSeed();
+                    randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnGameObject(group, boxArea);
+                    yield return Utility.SpawnGroup.SpawnGameObject(group, TerrainsMaskManager, boxArea);
                 }
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
-                    randomSeedSettings.GenerateNewRandomSeed();
+                    randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnTerrainObject(group, boxArea);
+                    yield return Utility.SpawnGroup.SpawnTerrainObject(group, TerrainsMaskManager, boxArea);
                 }
                 else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
-                    yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, boxArea);
+                    yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, TerrainsMaskManager, boxArea);
                 }
             }
             

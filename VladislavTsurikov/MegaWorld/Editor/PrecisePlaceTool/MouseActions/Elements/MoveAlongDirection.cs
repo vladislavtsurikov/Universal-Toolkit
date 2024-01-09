@@ -92,8 +92,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 direction = Vector3.up;
             }
 
-            UnityEditor.Handles.color = UnityEditor.Handles.selectedColor;
-            UnityEditor.Handles.ArrowHandleCap(0, GameObject.transform.position, Quaternion.FromToRotation(Vector3.forward, direction), 0.5f * HandleUtility.GetHandleSize(GameObject.transform.position), EventType.Repaint);
+            Handles.color = Handles.selectedColor;
+            Handles.ArrowHandleCap(0, GameObject.transform.position, Quaternion.FromToRotation(Vector3.forward, direction), 0.5f * HandleUtility.GetHandleSize(GameObject.transform.position), EventType.Repaint);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _mAspectCs;
         }
 
-        public override void Eval(MaskFilterContext fc, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index) 
         {
             ComputeShader cs = GetComputeShader();
             int kidx = cs.FindKernel("AspectRemap");
@@ -65,16 +65,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 cs.SetInt("_BlendMode", (int)BlendMode);
             }
 
-            cs.SetTexture(kidx, "In_BaseMaskTex", fc.SourceRenderTexture);
-            cs.SetTexture(kidx, "In_HeightTex", fc.HeightContext.sourceRenderTexture);
-            cs.SetTexture(kidx, "OutputTex", fc.DestinationRenderTexture);
+            cs.SetTexture(kidx, "In_BaseMaskTex", maskFilterContext.SourceRenderTexture);
+            cs.SetTexture(kidx, "In_HeightTex", maskFilterContext.HeightContext.sourceRenderTexture);
+            cs.SetTexture(kidx, "OutputTex", maskFilterContext.DestinationRenderTexture);
             cs.SetTexture(kidx, "RemapTex", remapTex);
             cs.SetInt("RemapTexRes", remapTex.width);
             cs.SetFloat("EffectStrength", EffectStrength);
-            cs.SetVector("TextureResolution", new Vector4(fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, 0.0f, 0.0f));
+            cs.SetVector("TextureResolution", new Vector4(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 0.0f, 0.0f));
             cs.SetVector("AspectValues", new Vector4(Mathf.Cos(rotRad), Mathf.Sin(rotRad), Epsilon, 0.0f));
 
-            cs.Dispatch(kidx, fc.SourceRenderTexture.width / numWorkGroups[0], fc.SourceRenderTexture.height / numWorkGroups[1], numWorkGroups[2]);
+            cs.Dispatch(kidx, maskFilterContext.SourceRenderTexture.width / numWorkGroups[0], maskFilterContext.SourceRenderTexture.height / numWorkGroups[1], numWorkGroups[2]);
         }
     }
 }

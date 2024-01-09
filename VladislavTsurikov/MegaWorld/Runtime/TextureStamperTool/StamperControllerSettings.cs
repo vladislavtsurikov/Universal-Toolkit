@@ -5,7 +5,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 {
-    [Serializable]
     [MenuItem("Stamper Tool Controller")]
     public class StamperControllerSettings : Component
     {

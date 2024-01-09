@@ -46,14 +46,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Comp
             Vector2 point = AddSample(boxArea, new Vector2(UnityEngine.Random.value * _rect.width, UnityEngine.Random.value * _rect.height));
             samples.Add(point);
             onSpawn?.Invoke(point);
-            if (IsWaitForNextFrame())
+            if (ScatterStack.IsWaitForNextFrame())
             {
                 yield return null;
             }
 
             while (_activeSamples.Count > 0)
             {
-                if (IsWaitForNextFrame())
+                if (ScatterStack.IsWaitForNextFrame())
                 {
                     yield return null;
                 }

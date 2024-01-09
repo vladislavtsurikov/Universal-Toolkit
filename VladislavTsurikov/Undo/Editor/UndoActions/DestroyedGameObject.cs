@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using VladislavTsurikov.Runtime;
 using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.Undo.Editor.UndoActions
 {
@@ -12,14 +13,14 @@ namespace VladislavTsurikov.Undo.Editor.UndoActions
     {
         public GameObject Prefab;
         public GameObject Parent;
-        public InstanceData InstanceData;
+        public Transform Transform;
 
         public DestroyedData(GameObject gameObject, GameObject parent)
         {
             Parent = parent;
             
             Prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-            InstanceData = new InstanceData(gameObject); 
+            Transform = new Transform(gameObject); 
         }
 
         public GameObject Instantiate()
@@ -28,9 +29,9 @@ namespace VladislavTsurikov.Undo.Editor.UndoActions
             
             go = PrefabUtility.InstantiatePrefab(Prefab) as GameObject;
 
-            go.transform.position = InstanceData.Position;
-            go.transform.localScale = InstanceData.Scale;
-            go.transform.rotation = InstanceData.Rotation;
+            go.transform.position = Transform.Position;
+            go.transform.localScale = Transform.Scale;
+            go.transform.rotation = Transform.Rotation;
 
             GameObjectUtility.ParentGameObject(go, Parent);
 

@@ -11,7 +11,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 {
@@ -45,21 +45,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
-            InstanceData instanceData = GetInstancedDataForSpawn(proto, rayHit, settings.RememberPastTransform);
+            Transform transform = GetInstancedDataForSpawn(proto, rayHit, settings.RememberPastTransform);
 
-            if(!CanPlace(proto, instanceData))
+            if(!CanPlace(proto, transform))
             {
                 return null;
             }
 
-            return Place(group, proto, rayHit, instanceData);
+            return Place(group, proto, rayHit, transform);
         }
 
-        private static PlacedObjectData Place(Group group, PlacedObjectPrototype proto, RayHit rayHit, InstanceData instanceData)
+        private static PlacedObjectData Place(Group group, PlacedObjectPrototype proto, RayHit rayHit, Transform transform)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
-            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
@@ -80,11 +80,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
         public static bool CanPlace(PlacedObjectPrototype proto, GameObject go)
         {
-            InstanceData instanceData = new InstanceData(go);
-            return CanPlace(proto, instanceData);
+            Transform transform = new Transform(go);
+            return CanPlace(proto, transform);
         }
 
-        private static bool CanPlace(PlacedObjectPrototype proto, InstanceData instanceData)
+        private static bool CanPlace(PlacedObjectPrototype proto, Transform transform)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
             
@@ -94,14 +94,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
                 if(proto is PrototypeGameObject)
                 {
-                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
                     {
                         return false;
                     }
@@ -111,7 +111,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
             return true;
         }
         
-        private static InstanceData GetInstancedDataForSpawn(PlacedObjectPrototype proto, RayHit rayHit, bool rememberPastTransform)
+        private static Transform GetInstancedDataForSpawn(PlacedObjectPrototype proto, RayHit rayHit, bool rememberPastTransform)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
@@ -124,15 +124,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                 rotation = proto.PastTransform.Rotation;
             }
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, scaleFactor, rotation);
+            Transform transform = new Transform(rayHit.Point, scaleFactor, rotation);
 
             if(settings.UseTransformComponents)
             {
                 TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-                transformComponentSettings.Stack.SetInstanceData(ref instanceData, 1, rayHit.Normal);
+                transformComponentSettings.Stack.ManipulateTransform(ref transform, 1, rayHit.Normal);
             }
 
-            return instanceData;
+            return transform;
         }
     }
 }

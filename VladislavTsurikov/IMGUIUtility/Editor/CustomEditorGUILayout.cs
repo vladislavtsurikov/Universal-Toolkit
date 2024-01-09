@@ -52,7 +52,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 			return 15 * indentLevel;
 		}
 
-		public static void GeneralDrawGUIParamater(GUIContent text, Action drawEditorGUILayout)
+		private static void GeneralDrawGUIParamater(GUIContent text, Action drawEditorGUILayout)
 		{
 			SetLabelGUIStyle(out var labelTextStyle, out _);
 
@@ -60,8 +60,16 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
             {
 				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
 				labelRect.width += 25;
-				labelRect.x += 1;
-	
+
+				if (IsInspector)
+				{
+					labelRect.x -= 3;
+				}
+				else
+				{
+					labelRect.x += 1;
+				}
+
 				labelTextStyle.normal.textColor = EditorColors.Instance.LabelColor;
 				EditorGUI.LabelField(labelRect, new GUIContent(text), labelTextStyle);
     			
@@ -105,7 +113,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			int initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.Popup(value, displayedOptions)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.Popup(value, displayedOptions));
 
 			if(!initialValue.Equals(value))
 			{
@@ -119,7 +127,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			float initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.Slider(value, min, max)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.Slider(value, min, max));
 
 			if(!initialValue.Equals(value))
 			{
@@ -133,7 +141,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			int initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.IntSlider(value, min, max)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.IntSlider(value, min, max));
 
 			if(!initialValue.Equals(value))
 			{
@@ -147,7 +155,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			Bounds initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.BoundsField(value)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.BoundsField(value));
 
 			if(!initialValue.Equals(value))
 			{
@@ -166,8 +174,18 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
     		GUILayout.BeginHorizontal();
             {
 				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
+				
+				if (IsInspector)
+				{
+					labelRect.x -= 3;
+				}
+				else
+				{
+					labelRect.x += 1;
+				}
+				
 				EditorGUI.LabelField(labelRect, new GUIContent(text), labelTextStyle);
-    			    			
+
 				value = DragChangeField(value, labelRect, 0, 0);
 				value = EditorGUILayout.FloatField(value);
 
@@ -196,6 +214,16 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
     			labelTextStyle.normal.textColor = EditorColors.Instance.LabelColor;
 				
 				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
+				
+				if (IsInspector)
+				{
+					labelRect.x -= 3;
+				}
+				else
+				{
+					labelRect.x += 1;
+				}
+				
 				EditorGUI.LabelField(labelRect, new GUIContent(text), labelTextStyle);
     			
 				value = DragChangeField(value, labelRect, 0, 0);
@@ -218,7 +246,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			Color initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.ColorField(value)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.ColorField(value));
 
 			if(!initialValue.Equals(value))
 			{
@@ -232,7 +260,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			Vector3 initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.Vector3Field(GUIContent.none, value)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.Vector3Field(GUIContent.none, value));
 
 			if(!initialValue.Equals(value))
 			{
@@ -246,7 +274,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			Vector2 initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.Vector2Field(GUIContent.none, value)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.Vector2Field(GUIContent.none, value));
 
 			if(!initialValue.Equals(value))
 			{
@@ -260,7 +288,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			string initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = EditorGUILayout.TextField(GUIContent.none, value)));
+			GeneralDrawGUIParamater(text, () => value = EditorGUILayout.TextField(GUIContent.none, value));
 
 			if(initialValue != null)
 			{
@@ -277,7 +305,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			LayerMask initialValue = value;
 
-			GeneralDrawGUIParamater(text, new Action(() => value = LayerMaskField(value)));
+			GeneralDrawGUIParamater(text, () => value = LayerMaskField(value));
 
 			if(!initialValue.Equals(value))
 			{
@@ -409,7 +437,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
     			GUILayout.Space(GetCurrentSpace(indentLevel));
 				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
 				labelRect.width += 25;
-				labelRect.x += 1;
+				labelRect.x += 4;
 				labelTextStyle.normal.textColor = EditorColors.Instance.LabelColor;
 				EditorGUI.LabelField(labelRect, new GUIContent(text), labelTextStyle);
 
@@ -437,7 +465,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
 		public static void MinMaxIntSlider(GUIContent text, ref int min, ref int max, int minimumValue, int maximumValue)
         {
-			int indentLevel = EditorGUI.indentLevel;
+	        int indentLevel = EditorGUI.indentLevel;
 			EditorGUI.indentLevel = 0;
 
 			int initialMinValue = min;
@@ -453,7 +481,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 				GUILayout.Space(GetCurrentSpace(indentLevel));
 				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
 				labelRect.width += 25;
-				labelRect.x += 1;
+				labelRect.x += 4;
 				labelTextStyle.normal.textColor = EditorColors.Instance.LabelColor;
 				EditorGUI.LabelField(labelRect, new GUIContent(text), labelTextStyle);
     			    			
@@ -615,23 +643,24 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		public static void Label(string text)
 		{
 			SetLabelGUIStyle(out var labelTextStyle, out _);
-
 			Label(text, labelTextStyle);
 		}
 
 		public static void Label(string text, GUIStyle style)
 		{
 			GUILayout.BeginHorizontal();
-            {
-				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(ScreenRect.width - GetCurrentSpace()));
+			{
+				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
+				labelRect.width += 25;
 				labelRect.x += 1;
-
+	
+				style.normal.textColor = EditorColors.Instance.LabelColor;
 				EditorGUI.LabelField(labelRect, new GUIContent(text), style);
-			    			
+				
 				GUILayout.Space(5);
-    		}
-    		GUILayout.EndHorizontal();
-    		GUILayout.Space(2);
+			}
+			GUILayout.EndHorizontal();
+			GUILayout.Space(2);
 		}
 
 		public static void RectTab(Rect rect, string text, ButtonStyle colorSpace, float height, int fontSize)

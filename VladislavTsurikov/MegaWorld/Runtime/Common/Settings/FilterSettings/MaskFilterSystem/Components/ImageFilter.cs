@@ -70,15 +70,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _imageMat;
         }
 
-        public override void Eval(MaskFilterContext fc, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index) 
         {
             Material mat = GetMaterial();
 
-            mat.SetTexture("_InputTex", fc.SourceRenderTexture);
+            mat.SetTexture("_InputTex", maskFilterContext.SourceRenderTexture);
 
             SetMaterial(mat, index);
 
-            Graphics.Blit(fc.SourceRenderTexture, fc.DestinationRenderTexture, mat, 0);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, mat, 0);
         }
 
         public void SetMaterial(Material mat, int index)

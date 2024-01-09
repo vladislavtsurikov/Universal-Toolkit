@@ -1,113 +1,73 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.Core.Runtime.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor.Integrations.TerrainObjectRenderer;
-using VladislavTsurikov.Runtime;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
 using VladislavTsurikov.Undo.Editor.UndoActions;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
 {
     public static class SpawnPrototype 
     {
-        public static void SpawnTerrainObject(Group group, RayHit rayHit)
+        public static void SpawnTerrainObject(Group group, PrototypeTerrainObject proto, ExplodePhysicsToolSettings settings, RayHit rayHit, Vector3 positionSpawn, Vector3 centerPosition)
         {
-            ExplodePhysicsToolSettings settings = (ExplodePhysicsToolSettings)ToolsComponentStack.GetElement(typeof(ExplodePhysicsTool), typeof(ExplodePhysicsToolSettings));
+            Transform transform = new Transform(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
-            int spawnCount = Random.Range(settings.InstancesMin, settings.InstancesMax);
-
-            for (int i = 0; i < spawnCount; i++)
-            {
-                PrototypeTerrainObject proto = (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
-
-                Vector3 centerPosition = rayHit.Point + new Vector3(0, settings.PositionOffsetY, 0);
-                Vector3 positionSpawn = centerPosition + Random.insideUnitSphere * (settings.Size / 2);
-
-                if (settings.SpawnFromOnePoint) 
-                {
-                    positionSpawn = centerPosition;
-                }
-
-                InstanceData instanceData = new InstanceData(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
-
-                PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
-                transformComponentSettings.TransformComponentStack.SetInstanceData(ref instanceData, 1, rayHit.Normal);
-
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
-
-                SimulatedTerrainObjectBody simulatedBody = new SimulatedTerrainObjectBody(proto.RendererPrototype, gameObject);
-                PhysicsSimulator.RegisterGameObject(simulatedBody);
-                PhysicsSimulator.Activate(DisablePhysicsMode.ObjectTime);
-
-                if (!settings.SpawnFromOnePoint) 
-                {
-                    Vector3 normal = (instanceData.Position - centerPosition).normalized;
-                    PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
-                }
-                else
-                {
-                    PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, Random.insideUnitSphere.normalized);
-                }
-
-                //Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(gameObject));
-            }
+            PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, 1, rayHit.Normal);
             
-            RandomUtility.ChangeRandomSeed();
+            TerrainObjectOnDisablePhysics onDisableSimulatedBodyAction = new TerrainObjectOnDisablePhysics(group, proto.RendererPrototype);
+
+            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+
+            SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+                transform.Position, transform.Scale, transform.Rotation, new List<OnDisableSimulatedBodyAction>{onDisableSimulatedBodyAction});
+                
+            group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
+            
+            if (!settings.SpawnFromOnePoint) 
+            {
+                Vector3 normal = (transform.Position - centerPosition).normalized;
+                PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
+            }
+            else
+            {
+                PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, Random.insideUnitSphere.normalized);
+            }
         }
         
-        public static void SpawnGameObject(Group group, RayHit rayHit)
+        public static void SpawnGameObject(Group group, PrototypeGameObject proto, ExplodePhysicsToolSettings settings, RayHit rayHit, Vector3 positionSpawn, Vector3 centerPosition)
         {
-            ExplodePhysicsToolSettings settings = (ExplodePhysicsToolSettings)ToolsComponentStack.GetElement(typeof(ExplodePhysicsTool), typeof(ExplodePhysicsToolSettings));
+            Transform transform = new Transform(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
-            int spawnCount = Random.Range(settings.InstancesMin, settings.InstancesMax);
+            PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, 1, rayHit.Normal);
 
-            for (int i = 0; i < spawnCount; i++)
-            {
-                PrototypeGameObject proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
+            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
 
-                Vector3 centerPosition = rayHit.Point + new Vector3(0, settings.PositionOffsetY, 0);
-                Vector3 positionSpawn = centerPosition + Random.insideUnitSphere * (settings.Size / 2);
-
-                if (settings.SpawnFromOnePoint) 
-                {
-                    positionSpawn = centerPosition;
-                }
-
-                InstanceData instanceData = new InstanceData(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
-
-                PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
-                transformComponentSettings.TransformComponentStack.SetInstanceData(ref instanceData, 1, rayHit.Normal);
-
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
-
-                SimulatedBody simulatedBody = new SimulatedBody(gameObject);
-                PhysicsSimulator.RegisterGameObject(simulatedBody);
-                PhysicsSimulator.Activate(DisablePhysicsMode.ObjectTime);
-
-                if (!settings.SpawnFromOnePoint) 
-                {
-                    Vector3 normal = (instanceData.Position - centerPosition).normalized;
-                    PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
-                }
-                else
-                {
-                    PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, Random.insideUnitSphere.normalized);
-                }
-
-                group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(gameObject);
-                Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(gameObject));
-            }
+            SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+                transform.Position, transform.Scale, transform.Rotation);
+                
+            group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
             
-            RandomUtility.ChangeRandomSeed();
+            if (!settings.SpawnFromOnePoint) 
+            {
+                Vector3 normal = (transform.Position - centerPosition).normalized;
+                PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
+            }
+            else
+            {
+                PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, Random.insideUnitSphere.normalized);
+            }
+
+            Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(simulatedBody.GameObject));
         }
     }
 }

@@ -28,10 +28,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 
         public override void OnChangeGUIGroup(Group group)
 		{
-			if (MaskFilterStackElementEditor.ChangedGUI)
+			if (MaskFilterComponentSettingsEditor.ChangedGUI)
 			{
 				_stamperTool.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-				MaskFilterStackElementEditor.ChangedGUI = false;
+				MaskFilterComponentSettingsEditor.ChangedGUI = false;
 			}
 			
 			if (!_stamperTool.StamperControllerSettings.AutoRespawn)
@@ -44,10 +44,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 
 		public override void OnChangeGUIPrototype(Prototype proto)
 		{
-			if (MaskFilterStackElementEditor.ChangedGUI)
+			if (MaskFilterComponentSettingsEditor.ChangedGUI)
 			{
 				_stamperTool.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-				MaskFilterStackElementEditor.ChangedGUI = false;
+				MaskFilterComponentSettingsEditor.ChangedGUI = false;
 			}
 			
 			if (!_stamperTool.StamperControllerSettings.AutoRespawn)
@@ -65,7 +65,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 			_stamperTool.AutoRespawnController.StartAutoRespawn(_stamperTool.StamperControllerSettings.DelayAutoRespawn, new RespawnGroup(_stamperTool));
 		}
 
-		[UnityEditor.MenuItem("GameObject/MegaWorld/Add Terrain Spawner", false, 14)]
+		[MenuItem("GameObject/MegaWorld/Add Terrain Spawner", false, 14)]
     	public static void AddStamper(MenuCommand menuCommand)
     	{
     		GameObject stamper = new GameObject("Terrain Spawner")

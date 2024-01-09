@@ -166,5 +166,32 @@ namespace VladislavTsurikov.Utility.Runtime.Extensions
             gameObject.transform.rotation = copyGameObject.transform.rotation;
             gameObject.transform.localScale = copyGameObject.transform.localScale;
         }
+        
+        public static void DisableMeshRenderers(this GameObject gameObject)
+        {
+            Renderer renderer = gameObject.GetComponent<Renderer>();
+
+            if (renderer != null)
+            {
+                renderer.enabled = false;
+            }
+            
+            for (int i = 0; i < gameObject.transform.childCount; i++)
+            {
+                GameObject go = gameObject.transform.GetChild(i).gameObject;
+
+                if (!go.activeInHierarchy)
+                {
+                    continue;
+                }
+
+                renderer = go.GetComponent<Renderer>();
+
+                if (renderer != null)
+                {
+                    renderer.enabled = false;
+                }
+            }
+        }
     }
 }

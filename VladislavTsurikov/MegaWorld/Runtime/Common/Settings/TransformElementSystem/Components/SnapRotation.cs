@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         public bool RotateAxisY = true;
         public bool RotateAxisZ;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             List<float> rotationValueList = new List<float>();
             int count = 0;
@@ -49,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
                 Quaternion rotationY = Quaternion.AngleAxis(randomY, Vector3.up);
                 Quaternion rotationZ = Quaternion.AngleAxis(randomZ, Vector3.forward);
 
-                instanceData.Rotation = rotationX * rotationY * rotationZ;
+                transform.Rotation = rotationX * rotationY * rotationZ;
             }
         }
     }

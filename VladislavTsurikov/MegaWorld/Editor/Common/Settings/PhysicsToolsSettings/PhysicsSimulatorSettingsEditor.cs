@@ -1,48 +1,46 @@
 #if UNITY_EDITOR
-using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings 
 {
-	[Serializable]
 	public static class PhysicsSimulatorSettingsEditor 
 	{
 		public static bool PhysicsSimulatorSettingsFoldout = true;
 
-		public static void OnGUI(PhysicsSimulatorSettings settings, DisablePhysicsMode disablePhysicsMode, bool accelerationPhysics = true)
+		public static void OnGUI<T>(PhysicsSimulatorSettings settings, bool accelerationPhysics = true) where T: DisablePhysics
 		{
 			PhysicsSimulatorSettingsFoldout = CustomEditorGUILayout.Foldout(PhysicsSimulatorSettingsFoldout, "Physics Simulator Settings");
 
-			if (!PhysicsSimulatorSettingsFoldout) return;
+			if (!PhysicsSimulatorSettingsFoldout)
+			{
+				return;
+			}
 			
 			EditorGUI.indentLevel++;
-
-			string disablePhysicsModeText = disablePhysicsMode == DisablePhysicsMode.GlobalTime ? "Global Time" : "Object Time";
-
-			CustomEditorGUILayout.Label("Disable Physics Mode" + " (" + disablePhysicsModeText + ")");
-
+			
 			EditorGUI.BeginChangeCheck();
 
-			settings.SimulatePhysics = CustomEditorGUILayout.Toggle(new GUIContent("Simulate Physics"), settings.SimulatePhysics);
+			settings.SimulatePhysics = CustomEditorGUILayout.Toggle(new GUIContent("Simulate Physics", "You can freeze physics, and then turn on physics again and objects will fall."), settings.SimulatePhysics);
 
-			if(disablePhysicsMode == DisablePhysicsMode.GlobalTime)
+			if(typeof(T) == typeof(GlobalTimeDisablePhysics))
 			{
-				settings.GlobalTime = CustomEditorGUILayout.FloatField(new GUIContent("Global Time"), settings.GlobalTime);
+				settings.GlobalDisablePhysicsTime = CustomEditorGUILayout.FloatField(new GUIContent("Global Disable Physics Time", "Time for all objects when physics turns off."), settings.GlobalDisablePhysicsTime);
 			}
 			else
 			{
-				settings.ObjectTime = CustomEditorGUILayout.FloatField(new GUIContent("Object Time"), settings.ObjectTime);
+				settings.DisablePhysicsTime = CustomEditorGUILayout.FloatField(new GUIContent("Disable Physics Time", "The time when an object's physics turns off."), settings.DisablePhysicsTime);
 			}
 
 			if(accelerationPhysics)
 			{
-				settings.AccelerationPhysics = CustomEditorGUILayout.IntSlider(new GUIContent("Acceleration Physics"), settings.AccelerationPhysics, 1, 100);
+				settings.SpeedUpPhysics = CustomEditorGUILayout.IntSlider(new GUIContent("Speed Up Physics", "Speeds up physics several times as much as was installed."), settings.SpeedUpPhysics, 1, 100);
 			}
 
-			PositionOffsetSettingsEditor.OnGUI(settings.PositionOffsetSettings);
+			PositionOffsetSettingsEditor.OnGUI(settings.AutoPositionDownSettings);
 
 			if(EditorGUI.EndChangeCheck())
 			{

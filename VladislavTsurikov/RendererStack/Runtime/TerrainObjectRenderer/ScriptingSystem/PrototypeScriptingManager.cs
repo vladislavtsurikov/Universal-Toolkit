@@ -61,7 +61,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
         {
             if (sphere.Radius >= 50)
             {
-                DefaultPrototypeInstancesSelector.RemovePrototypeInstancesSelectorData(usedObj);
+                DefaultPrototypeInstancesSelector.OnDisableCollider(usedObj);
                 CellPrototypeInstancesSelectorData cellPrototypeInstancesSelectorData = (CellPrototypeInstancesSelectorData)CellsPrototypeInstancesSelector.GetPrototypeInstancesSelectorData(usedObj);
 
                 if (cellPrototypeInstancesSelectorData.IsNeedUpdate(sphere))
@@ -71,7 +71,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             }
             else
             {
-                CellsPrototypeInstancesSelector.RemovePrototypeInstancesSelectorData(usedObj);
+                CellsPrototypeInstancesSelector.OnDisableCollider(usedObj);
                 DefaultPrototypeInstancesSelectorData defaultPrototypeInstancesSelectorData = (DefaultPrototypeInstancesSelectorData)DefaultPrototypeInstancesSelector.GetPrototypeInstancesSelectorData(usedObj);
 
                 if (defaultPrototypeInstancesSelectorData.IsNeedUpdate(sphere))
@@ -190,8 +190,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
         
         public void RemoveColliders(object usedObj)
         {
-            DefaultPrototypeInstancesSelector.RemovePrototypeInstancesSelectorData(usedObj); 
-            CellsPrototypeInstancesSelector.RemovePrototypeInstancesSelectorData(usedObj);
+            DefaultPrototypeInstancesSelector.OnDisableCollider(usedObj); 
+            CellsPrototypeInstancesSelector.OnDisableCollider(usedObj);
         }
 
         public float GetMaxDistance()

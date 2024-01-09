@@ -5,7 +5,8 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
@@ -28,18 +29,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
                 return true;
             });
 
-            GetGameObject(rayHit, prefabRoot =>
-            {
-                if(!prefabList.Contains(prefabRoot))
-                {
-                    ApplyEffectIfNecessary(prefabRoot, GetPositionOffsetY(rayHit));
-                }
-
-                return true;
-            }); 
-
-            PhysicsSimulator.Activate(DisablePhysicsMode.GlobalTime, false, true);
-            ActiveTimePhysicsSimulator.RefreshTime(); 
+            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<GlobalTimeDisablePhysics>(false);
         }
 
         private void ApplyEffectIfNecessary(GameObject prefabRoot, Vector3 positionOffsetY)
@@ -69,7 +59,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
             if(SimulatedBodyStack.GetSimulatedBody(prefabRoot) == null)
             {
                 SimulatedBody simulatedBody = new SimulatedBody(prefabRoot);
-                PhysicsSimulator.RegisterGameObject(simulatedBody);
+                SimulatedBodyStack.RegisterSimulatedBody(simulatedBody);
 
                 return simulatedBody;
             }
@@ -78,29 +68,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
                 SimulatedBody simulatedBody = SimulatedBodyStack.GetSimulatedBody(prefabRoot);
                 return simulatedBody;
             }
-        }
-
-        private void GetGameObject(RayHit rayHit, Func<GameObject, bool> func)
-        {
-            Bounds bounds = new Bounds(rayHit.Point, new Vector3(Size, Size, Size));
-
-            PrototypeGameObjectOverlap.OverlapBox(bounds, (proto, go) =>
-            {
-                if(proto == null || proto.Active == false || proto.Selected == false)
-                {
-                    return true;
-                }
-
-                GameObject prefabRoot = GameObjectUtility.GetPrefabRoot(go);
-                if (prefabRoot == null)
-                {
-                    return true;
-                }
-
-                func.Invoke(prefabRoot);
-
-                return true;
-            });
         }
 
         private void GetGameObjectFromPhysicsOverlapSphere(RayHit rayHit, Func<GameObject, bool> func)

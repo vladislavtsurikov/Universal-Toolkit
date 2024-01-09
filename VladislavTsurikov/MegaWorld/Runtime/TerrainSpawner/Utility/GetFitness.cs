@@ -2,19 +2,20 @@
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
     public static class GetFitness
     {
-        public static float Get(Group group, RayHit rayHit)
+        public static float Get(Group group, TerrainsMaskManager terrainsMaskManager, RayHit rayHit)
         {
             FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
             
             if(filterSettings.FilterType == FilterType.MaskFilter)
             {
-                return TerrainsMaskManager.GetFitness(group, filterSettings.MaskFilterComponentSettings, rayHit.Point);
+                return terrainsMaskManager.GetFitness(group, filterSettings.MaskFilterComponentSettings, rayHit.Point);
             }
             else
             {
@@ -22,9 +23,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
             }
         }
         
-        public static float Get(Group group, MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain, Vector3 point)
+        public static float Get(Group group, TerrainsMaskManager terrainsMaskManager, MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain, Vector3 point)
         {
-            return TerrainsMaskManager.GetFitness(group, maskFilterComponentSettings, terrain, point);
+            return terrainsMaskManager.GetFitness(group, maskFilterComponentSettings, terrain, point);
         }
     }
 }

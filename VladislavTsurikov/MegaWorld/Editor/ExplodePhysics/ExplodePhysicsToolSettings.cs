@@ -5,7 +5,6 @@ using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
-    [Serializable]
     [MenuItem("Explode Physics Tool Settings")]
     public class ExplodePhysicsToolSettings : Component
     {

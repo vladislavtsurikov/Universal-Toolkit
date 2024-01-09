@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         public float MaxUniformScaleOffset = 2;
         public Vector3 MaxScaleOffset = new Vector3(2, 2, 0.5f);
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             float normalAngle = Vector3.Angle(normal, Vector3.up);
             float difference = normalAngle / MaxSlope;
@@ -25,7 +25,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
             {
                 float value = Mathf.Lerp(0, MaxUniformScaleOffset, difference);
 
-                instanceData.Scale += new Vector3(value, value, value);
+                transform.Scale += new Vector3(value, value, value);
             }
             else
             {
@@ -33,7 +33,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
                 float valueY = Mathf.Lerp(0, MaxScaleOffset.y, difference);
                 float valueZ = Mathf.Lerp(0, MaxScaleOffset.z, difference);
 
-                instanceData.Scale += new Vector3(valueX, valueY, valueZ);
+                transform.Scale += new Vector3(valueX, valueY, valueZ);
             }
         }
     }

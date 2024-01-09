@@ -1,15 +1,14 @@
 #if UNITY_EDITOR
-using System;
 using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.Common;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.GUI 
 {
-	[Serializable]
 	[ElementEditor(typeof(BrushPhysicsTool))]
 	public class BrushPhysicsToolEditor : ToolWindowEditor
 	{
@@ -26,7 +25,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.GUI
 		
 		public override void DrawFirstSettings()
 		{
-			PhysicsSimulatorSettingsEditor.OnGUI(PhysicsSimulatorSettings.Instance, DisablePhysicsMode.ObjectTime);
+			PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysics>(PhysicsSimulatorSettings.Instance);
 		}
 	}
 }

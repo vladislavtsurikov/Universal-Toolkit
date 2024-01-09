@@ -169,8 +169,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
                 StrokeDirection = (hitPoint - lastHitPoint).normalized;
 
                 OnPointDetectionFromMouseDrag(func);
-                
-                func.Invoke(hitPoint);
             }
             
             _prevRaycast = Raycast;

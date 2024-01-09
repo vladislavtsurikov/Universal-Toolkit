@@ -1,9 +1,12 @@
 #if UNITY_EDITOR
+using System.Collections;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ColliderSystem.Runtime.Utility;
 using VladislavTsurikov.ColorUtility.Runtime;
+using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility;
@@ -16,6 +19,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.A
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
@@ -53,7 +58,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
         {
             Group group = WindowData.Instance.SelectionData.SelectedData.SelectedGroup;
             
-            SpawnPrototype.SpawnTerrainObject(group, _mouseMove.Raycast);
+            CoroutineRunner.StartCoroutine(PaintGroup(group, _mouseMove.Raycast));
         }
 
         private void OnMouseDrag(Vector3 dragPoint)
@@ -65,8 +70,31 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 
             if(rayHit != null)
             {
-                SpawnPrototype.SpawnTerrainObject(group, rayHit);
+                CoroutineRunner.StartCoroutine(PaintGroup(group, rayHit));
             }
+        }
+        
+        private IEnumerator PaintGroup(Group group, RayHit rayHit)
+        {
+            ScriptingSystem.SetColliders(new Sphere(rayHit.Point, 500), rayHit);
+            
+            if (group.PrototypeType == typeof(PrototypeGameObject))
+            {
+                SpawnGroup.SpawnGameObject(group, rayHit);
+            }
+            else if (group.PrototypeType == typeof(PrototypeTerrainObject))
+            {
+                SpawnGroup.SpawnTerrainObject(group, rayHit);
+            }
+            
+            yield return new YieldCustom(IsDone);
+            
+            bool IsDone()
+            {
+                return SimulatedBodyStack.Count == 0;
+            }
+            
+            ScriptingSystem.RemoveColliders(rayHit);
         }
 
         private void OnRepaint()

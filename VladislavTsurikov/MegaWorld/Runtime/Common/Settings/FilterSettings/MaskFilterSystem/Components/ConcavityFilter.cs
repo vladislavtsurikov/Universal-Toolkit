@@ -50,23 +50,23 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _concavityCs;
         }
 
-        public override void Eval(MaskFilterContext fc, int index)
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             ComputeShader cs = GetComputeShader();
             int kidx = cs.FindKernel("ConcavityMultiply");
 
             Texture2D remapTex = GetRemapTexture();
 
-            cs.SetTexture(kidx, "In_BaseMaskTex", fc.SourceRenderTexture);
-            cs.SetTexture(kidx, "In_HeightTex", fc.HeightContext.sourceRenderTexture);
-            cs.SetTexture(kidx, "OutputTex", fc.DestinationRenderTexture);
+            cs.SetTexture(kidx, "In_BaseMaskTex", maskFilterContext.SourceRenderTexture);
+            cs.SetTexture(kidx, "In_HeightTex", maskFilterContext.HeightContext.sourceRenderTexture);
+            cs.SetTexture(kidx, "OutputTex", maskFilterContext.DestinationRenderTexture);
             cs.SetTexture(kidx, "RemapTex", remapTex);
             cs.SetInt("RemapTexRes", remapTex.width);
             cs.SetFloat("EffectStrength", ConcavityStrength);
-            cs.SetVector("TextureResolution", new Vector4(fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, ConcavityEpsilon, ConcavityScalar));
+            cs.SetVector("TextureResolution", new Vector4(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, ConcavityEpsilon, ConcavityScalar));
 
             //using 1s here so we don't need a multiple-of-8 texture in the compute shader (probably not optimal?)
-            cs.Dispatch(kidx, fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, 1);
+            cs.Dispatch(kidx, maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1);
         }
     }
 }

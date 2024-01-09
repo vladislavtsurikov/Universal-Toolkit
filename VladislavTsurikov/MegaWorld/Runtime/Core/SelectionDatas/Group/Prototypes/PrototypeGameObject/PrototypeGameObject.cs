@@ -10,9 +10,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     [Serializable]
     [MenuItem("Unity/GameObject")]
-    [AddDefaultGroupComponents(new []{typeof(ContainerForGameObjects)})]
     [DropObjects(new[]{typeof(GameObject)})]
     [MissingIconsWarning("Drag & Drop Prefabs Here")]
+    [AddDefaultGroupComponents(new []{typeof(ContainerForGameObjects)})]
     public class PrototypeGameObject : PlacedObjectPrototype
     {
         public override bool IsSamePrototypeObject(Object obj)

@@ -11,8 +11,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions
         public override void OnRespawn()
         {
             UnspawnUtility.UnspawnGroups(StamperTool.Data.SelectedData.SelectedGroupList, false);
-			        
-            StamperTool.Spawn();
+            
+            StamperTool.StamperSpawn();
         }
     }
 }

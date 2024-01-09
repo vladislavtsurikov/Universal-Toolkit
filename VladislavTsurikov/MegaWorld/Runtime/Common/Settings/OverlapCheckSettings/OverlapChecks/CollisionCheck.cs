@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks
 {
@@ -23,13 +23,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             return false;
         }
         
-        public bool RunCollisionCheck(Vector3 prefabExtents, InstanceData instanceData)
+        public bool RunCollisionCheck(Vector3 prefabExtents, Transform transform)
         {
             if(CollisionCheckType)
             {
-                Vector3 extents = Vector3.Scale(prefabExtents * MultiplyBoundsSize, instanceData.Scale);
+                Vector3 extents = Vector3.Scale(prefabExtents * MultiplyBoundsSize, transform.Scale);
 
-                if(IsBoundHittingWithCollisionsLayers(instanceData.Position, instanceData.Rotation.eulerAngles.y, extents))
+                if(IsBoundHittingWithCollisionsLayers(transform.Position, transform.Rotation.eulerAngles.y, extents))
                 {
                     return true;
                 }

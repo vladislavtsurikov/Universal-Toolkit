@@ -5,6 +5,7 @@ using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
@@ -19,12 +20,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
     public static class SpawnGroup 
     {
-        public static IEnumerator SpawnGameObject(Group group, BoxArea boxArea, bool supportUndo = true)
+        public static IEnumerator SpawnGameObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool supportUndo = true)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.WaitForNextFrame = true;
-            scatterComponentSettings.Stack.SecondsUntilNextFrame = 0.2f;
-            
+            scatterComponentSettings.Stack.SetWaitingNextFrame(new DefaultWaitingNextFrame(0.2f));
+
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
             yield return scatterComponentSettings.Stack.Samples(boxArea, sample =>
@@ -39,7 +39,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                         return;
                     }
 
-                    float fitness = GetFitness.Get(group, rayHit);
+                    float fitness = GetFitness.Get(group, terrainsMaskManager, rayHit);
 
                     if(fitness != 0)
                     {
@@ -54,12 +54,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
             });
         }
         
-        public static IEnumerator SpawnTerrainObject(Group group, BoxArea boxArea)
+        public static IEnumerator SpawnTerrainObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {            
 #if RENDERER_STACK
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.WaitForNextFrame = true;
-            scatterComponentSettings.Stack.SecondsUntilNextFrame = 0.2f;
+            scatterComponentSettings.Stack.SetWaitingNextFrame(new DefaultWaitingNextFrame(0.2f));
             
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
@@ -75,7 +74,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                         return;
                     }
                     
-                    float fitness = GetFitness.Get(group, rayHit);
+                    float fitness = GetFitness.Get(group, terrainsMaskManager, rayHit);
 
                     if(fitness != 0)
                     {
@@ -93,7 +92,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
             yield return null;
         }
 
-        public static IEnumerator SpawnTerrainDetails(Group group, List<Prototype> protoTerrainDetailList, BoxArea boxArea)
+        public static IEnumerator SpawnTerrainDetails(Group group, List<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {
             if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
@@ -119,7 +118,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                             continue;
                         }
                         
-                        SpawnPrototype.SpawnTerrainDetails(group, proto, boxArea, terrain);
+                        SpawnPrototype.SpawnTerrainDetails(group, proto, terrainsMaskManager, boxArea, terrain);
                         
                         yield return null;
                     }

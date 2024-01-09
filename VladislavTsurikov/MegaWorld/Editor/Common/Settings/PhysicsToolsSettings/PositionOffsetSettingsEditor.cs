@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings
 {
@@ -10,7 +10,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSetting
     {
 	    private static bool _positionOffsetFoldout = true;
 
-        public static void OnGUI(PositionOffsetSettings settings)
+        public static void OnGUI(AutoPositionDownSettings settings)
         {
 			_positionOffsetFoldout = CustomEditorGUILayout.Foldout(_positionOffsetFoldout, "Position Offset Settings");
 
@@ -18,10 +18,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSetting
 			{
 				EditorGUI.indentLevel++;
 
-				settings.EnableAutoOffset = CustomEditorGUILayout.Toggle(new GUIContent("Enable Auto Offset"), settings.EnableAutoOffset);
-                settings.PositionOffsetDown = CustomEditorGUILayout.Slider(new GUIContent("Position Offset Down (%)"), settings.PositionOffsetDown, 0, 100);
-                
-				EditorGUI.indentLevel--;
+				settings.EnableAutoPositionDown = CustomEditorGUILayout.Toggle(new GUIContent("Enable Auto Position Down", "Automatically moves object down when physics turns off."), settings.EnableAutoPositionDown);
+
+				if (settings.EnableAutoPositionDown)
+				{
+					EditorGUI.indentLevel++;
+					settings.PositionDown = CustomEditorGUILayout.Slider(new GUIContent("Position Down (%)", "Moves the object down when physics is turned off. 100% - moves the object down by the size of the object."),
+						settings.PositionDown, 0, 100);
+					EditorGUI.indentLevel--;
+				}
 			}
         }
     }

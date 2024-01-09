@@ -8,7 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions
 
         public override void OnRespawn()
         {
-            StamperTool.Spawn();
+            StamperTool.StamperSpawn();
         }
     }
 }

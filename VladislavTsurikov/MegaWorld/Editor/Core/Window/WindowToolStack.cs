@@ -49,8 +49,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 
         public void DoSelectedTool()
         {
-            WindowData.Instance.SelectedTool = SelectedElement;
-
             if (WindowData.Instance.SelectedTool == null)
             {
                 return;

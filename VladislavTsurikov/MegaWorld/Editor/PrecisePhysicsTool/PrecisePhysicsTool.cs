@@ -1,9 +1,13 @@
 #if UNITY_EDITOR
+using System.Collections;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ColliderSystem.Runtime.Utility;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.Core.Runtime.Utility;
+using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool.Utility;
@@ -19,6 +23,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.A
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
@@ -56,7 +62,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
         {
             Group group = WindowData.Instance.SelectionData.SelectedData.SelectedGroup;
             
-            PaintGroup(group, _mouseMove.Raycast);
+            CoroutineRunner.StartCoroutine(PaintGroup(group, _mouseMove.Raycast));
         }
 
         private void OnMouseDrag(Vector3 dragPoint)
@@ -68,12 +74,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
 
             if(rayHit != null)
             {
-                PaintGroup(group, rayHit);
+                CoroutineRunner.StartCoroutine(PaintGroup(group, rayHit));
             }
         }
         
-        private void PaintGroup(Group group, RayHit rayHit)
+        private IEnumerator PaintGroup(Group group, RayHit rayHit)
         {
+            ScriptingSystem.SetColliders(new Sphere(rayHit.Point, 500), rayHit);
+            
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
                 PrototypeGameObject proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
@@ -84,6 +92,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
                 PrototypeTerrainObject proto = (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
                 SpawnPrototype.SpawnTerrainObject(group, proto, rayHit);
             }
+            
+            RandomUtility.ChangeRandomSeed();
+            
+            yield return new YieldCustom(IsDone);
+            
+            bool IsDone()
+            {
+                return SimulatedBodyStack.Count == 0;
+            }
+            
+            ScriptingSystem.RemoveColliders(rayHit);
         }
 
         private void OnRepaint()

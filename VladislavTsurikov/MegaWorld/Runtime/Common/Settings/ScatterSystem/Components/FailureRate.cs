@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Comp
         {
             for (int i = samples.Count - 1; i >= 0 ; i--)
             {
-                if (IsWaitForNextFrame())
+                if (ScatterStack.IsWaitForNextFrame())
                 {
                     yield return null;
                 }

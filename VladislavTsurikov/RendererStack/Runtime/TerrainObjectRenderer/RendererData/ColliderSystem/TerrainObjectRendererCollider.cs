@@ -31,7 +31,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
         public TerrainObjectRendererCollider(SceneDataManager sceneDataManager, Cell cell, PrototypeRenderDataStack prototypeRenderDataStack)
         {
             RefreshCells(cell.Bounds);
-            //return;
 
             foreach (var prototypeRenderData in prototypeRenderDataStack.PrototypeRenderDataList)
             {
@@ -48,7 +47,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
 
         public void Setup()
         { 
-            return;
             TerrainObjectRenderer terrainObject = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
 
             if(terrainObject != null)

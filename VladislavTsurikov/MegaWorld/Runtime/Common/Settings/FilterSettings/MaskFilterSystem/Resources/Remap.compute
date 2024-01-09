@@ -22,7 +22,7 @@ void Remap(uint3 id : SV_DispatchThreadID)
 {
 	float heightScale = GetHeightScale(In_BaseMaskTex[id.xy]);
 
-    float value = 1;
+    float value;
 
     if (heightScale < RemapMin) 
     {

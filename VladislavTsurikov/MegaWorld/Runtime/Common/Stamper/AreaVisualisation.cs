@@ -1,9 +1,8 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
     public class AreaVisualisation
     {

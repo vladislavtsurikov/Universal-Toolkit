@@ -20,6 +20,17 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
         public CustomMasks CustomMasks = new CustomMasks();
         
         public bool ShowCells = true;
+        
+        public TextureStamper TextureStamper => (TextureStamper)StamperTool;
+
+        protected override void SetupArea()
+        {
+            OnSetAreaBounds -= () => TextureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
+            OnSetAreaBounds += () => TextureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
+            
+            OnSetAreaBounds -= ClearCellList;
+            OnSetAreaBounds += ClearCellList;
+        }
 
         public void CreateCells()
         {
@@ -47,15 +58,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
                 }
             }
         }
-        
-        public override void OnSetAreaBounds()
+
+        private void ClearCellList()
         {
             if(UseSpawnCells)
             {
                 CellList.Clear();
             }
         }
-        
+
         public override Texture2D GetCurrentRaw()
         {
             if(UseMask == false || UseSpawnCells)

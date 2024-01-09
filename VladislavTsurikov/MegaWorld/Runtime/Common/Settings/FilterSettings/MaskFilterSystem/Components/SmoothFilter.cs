@@ -25,12 +25,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
         }
         
-        public override void Eval(MaskFilterContext fc, int index)
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             Material filterMat = Material;
 
             Vector4 brushParams = new Vector4(Mathf.Clamp(1, 0.0f, 1.0f), 0.0f, 0.0f, 0.0f);
-            filterMat.SetTexture("_MainTex", fc.SourceRenderTexture);
+            filterMat.SetTexture("_MainTex", maskFilterContext.SourceRenderTexture);
             filterMat.SetTexture("_BrushTex", Texture2D.whiteTexture);
             filterMat.SetVector("_BrushParams", brushParams);
             Vector4 smoothWeights = new Vector4(
@@ -40,9 +40,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 SmoothBlurRadius);                                  // kernel size
             filterMat.SetVector("_SmoothWeights", smoothWeights);
 
-            RenderTexture tmpRT = RenderTexture.GetTemporary(fc.DestinationRenderTexture.descriptor);
-            Graphics.Blit(fc.SourceRenderTexture, tmpRT, filterMat, 0);
-            Graphics.Blit(tmpRT, fc.DestinationRenderTexture, filterMat, 1);
+            RenderTexture tmpRT = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, tmpRT, filterMat, 0);
+            Graphics.Blit(tmpRT, maskFilterContext.DestinationRenderTexture, filterMat, 1);
 
             RenderTexture.ReleaseTemporary(tmpRT);
         }

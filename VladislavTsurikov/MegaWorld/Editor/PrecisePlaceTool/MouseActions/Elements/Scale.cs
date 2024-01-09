@@ -155,7 +155,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 {
                     TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.X, out var upwards, out _, out _);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.xAxisColor;
+                    Handles.color = Handles.xAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
 
                     break;
@@ -164,7 +164,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 {
                     TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Y, out var upwards, out _, out _);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.yAxisColor;
+                    Handles.color = Handles.yAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
 
                     break;
@@ -173,16 +173,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
                 {
                     TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Z, out var upwards, out _, out _);
 
-                    UnityEditor.Handles.color = UnityEditor.Handles.zAxisColor;
+                    Handles.color = Handles.zAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
 
                     break;
                 }
                 case ScaleMode.UniformScale:
                 {
-                    UnityEditor.Handles.color = UnityEditor.Handles.selectedColor;
+                    Handles.color = Handles.selectedColor;
                     var position = GameObject.transform.position;
-                    UnityEditor.Handles.RectangleHandleCap(0, position, Quaternion.FromToRotation(Vector3.forward, Vector3.up), HandleUtility.GetHandleSize(position) * 0.5f, EventType.Repaint);
+                    Handles.RectangleHandleCap(0, position, Quaternion.FromToRotation(Vector3.forward, Vector3.up), HandleUtility.GetHandleSize(position) * 0.5f, EventType.Repaint);
 
                     break;
                 }

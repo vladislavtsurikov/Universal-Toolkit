@@ -165,7 +165,24 @@ namespace VladislavTsurikov.Utility.Runtime
                 if (!prop.CanWrite || prop.Name == "name") continue;
                 prop.SetValue(dst, prop.GetValue(original, null), null);
             }
-            return dst as T;
+            return dst;
+        }
+        
+        public static void Unspawn(List<GameObject> unspawnPrefabs)
+        {
+            GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
+
+            for (int index = 0; index < allGameObjects.Length; index++)
+            {
+                foreach (var prefab in unspawnPrefabs)
+                {
+                    if (IsSameGameObject(prefab, allGameObjects[index]))
+                    {
+                        Object.DestroyImmediate(allGameObjects[index]);
+                        break;
+                    }
+                }
+            }
         }
     }
 }

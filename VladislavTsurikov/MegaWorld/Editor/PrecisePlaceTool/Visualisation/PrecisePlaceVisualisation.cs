@@ -6,9 +6,9 @@ using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation
 {
@@ -84,13 +84,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation
                 Vector3 scale = ActiveObjectController.PlacedObjectData.GameObject.transform.localScale;
                 Quaternion rotation = ActiveObjectController.PlacedObjectData.GameObject.transform.rotation;
 
-                InstanceData instanceData = new InstanceData(position, scale, rotation);
+                Transform transform = new Transform(position, scale, rotation);
 
                 PlacedObjectPrototype proto = ActiveObjectController.PlacedObjectData.Proto;
 
                 OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-                if(!OverlapCheckSettings.RunOverlapCheck(ActiveObjectController.PlacedObjectData.Proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+                if(!OverlapCheckSettings.RunOverlapCheck(ActiveObjectController.PlacedObjectData.Proto.GetType(), overlapCheckSettings, proto.Extents, transform))
                 {
                     return Color.red;
                 }

@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
@@ -14,7 +18,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
@@ -30,8 +33,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
     [AddGeneralPrototypeComponents(typeof(PrototypeTerrainTexture), new []{typeof(MaskFilterComponentSettings)})]
     public class TextureStamper : StamperTool
     {
-        private IEnumerator _updateCoroutine;
-        
         private TextureStamperArea _area;
         private StamperControllerSettings _stamperControllerSettings;
         
@@ -60,8 +61,21 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
                 return _stamperControllerSettings;
             }
         }
+        
+#if UNITY_EDITOR
+        [NonSerialized]
+        public StamperVisualisation StamperVisualisation = new StamperVisualisation();
+#endif
 
-        protected override void OnToolEnable()
+        [OnDeserializing]
+        private void Initialize()
+        {
+#if UNITY_EDITOR
+            StamperVisualisation = new StamperVisualisation();
+#endif
+        }
+
+        private protected override void OnStamperEnable()
         {
             Area.SetAreaBoundsIfNecessary(this, true);
         }
@@ -71,104 +85,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        public void StartEditorUpdates()
+        protected override IEnumerator Spawn()
         {
-#if UNITY_EDITOR
-            EditorApplication.update += EditorUpdate;
-#endif
-        }
-
-        public void StopEditorUpdates()
-        {
-  #if UNITY_EDITOR
-            EditorApplication.update -= EditorUpdate;
-#endif
-        }
-
-        private void EditorUpdate()
-        {
-            if (_updateCoroutine == null)
-            {
-                StopEditorUpdates();
-            }
-            else
-            {
-                _updateCoroutine.MoveNext();
-            }
-        }
-        
-        public override void Spawn(bool displayProgressBar = false)
-        {
-            _updateCoroutine = RunSpawnCoroutine();
-            StartEditorUpdates();
-        }
-
-        public void SpawnWithCells(List<Bounds> cellList)
-        {
-            _updateCoroutine = RunSpawnCoroutineWithSpawnCells(cellList);
-            StartEditorUpdates();
-        }
-
-        public void Spawn(Group group, BoxArea boxArea)
-        {            
-            if(!IsReadyToSpawn(group))
-            {
-                return;
-            }
-            
-            if (group.PrototypeType == typeof(PrototypeTerrainTexture))
-            {
-                SpawnGroup.SpawnTerrainTexture(group, group.PrototypeList, boxArea, 1);
-            }
-        }
-
-        private bool IsReadyToSpawn(Group group)
-        {
-            foreach (Prototype proto in group.PrototypeList)
-            {
-                if(proto.Active)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public void RunSpawn()
-        {
-            for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
-            {
-                Group group = Data.GroupList[typeIndex];
-
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
-        
-                if(rayHit == null)
-                {
-                    return;
-                }
-
-                BoxArea boxArea = Area.GetAreaVariables(rayHit);
-
-                Spawn(group, boxArea);
-            }
-        }
-
-        public IEnumerator RunSpawnCoroutine()
-        {
-            CancelSpawn = false;
-
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
             
             for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
             {
-                if (CancelSpawn)
+                if (IsCancelSpawn)
                 {
                     break;
                 }
 #if UNITY_EDITOR
-                EditorUtility.DisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name, completedTypes / (float)maxTypes);
+                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name,
+                    completedTypes / (float)maxTypes);
 #endif
 
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[typeIndex].PrototypeType));
@@ -188,20 +118,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
             }
 
             SpawnProgress = completedTypes / (float)maxTypes;
-            yield return null;
+        }
 
-            SpawnProgress = 0;
-
-#if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-#endif
-            _updateCoroutine = null;
+        public void SpawnWithCells(List<Bounds> cellList)
+        {
+            CoroutineRunner.StartCoroutine(RunSpawnCoroutineWithSpawnCells(cellList));
         }
 
         private IEnumerator RunSpawnCoroutineWithSpawnCells(List<Bounds> spawnCellList)
         {
-            CancelSpawn = false;
-
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
 
@@ -213,7 +138,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 
                 for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
                 {
-                    if (CancelSpawn)
+                    if (IsCancelSpawn)
                     {
                         break;
                     }
@@ -250,14 +175,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
             }
 
             SpawnProgress = 1;
-            yield return null;
-
-            SpawnProgress = 0;
 
 #if UNITY_EDITOR
             EditorUtility.ClearProgressBar();
 #endif
-            _updateCoroutine = null;
+        }
+        
+        public void Spawn(Group group, BoxArea boxArea)
+        {
+            if (group.PrototypeType == typeof(PrototypeTerrainTexture))
+            {
+                SpawnGroup.SpawnTerrainTexture(group, group.PrototypeList, boxArea, 1);
+            }
         }
     }
 }

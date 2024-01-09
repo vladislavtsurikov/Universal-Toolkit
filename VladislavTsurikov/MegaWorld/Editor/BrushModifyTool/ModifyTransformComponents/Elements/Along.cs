@@ -1,13 +1,13 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
 {
     [MenuItem("Along")]
     public class Along : ModifyTransformComponent
     {
-        public override void SetInstanceData(ref InstanceData instanceData, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             Quaternion rotation = Quaternion.identity;
 
@@ -20,7 +20,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
             
             rotation = Quaternion.LookRotation(forward, upwards);
 
-            instanceData.Rotation = Quaternion.Lerp(instanceData.Rotation, rotation, strength);
+            transform.Rotation = Quaternion.Lerp(transform.Rotation, rotation, strength);
         } 
     }
 }

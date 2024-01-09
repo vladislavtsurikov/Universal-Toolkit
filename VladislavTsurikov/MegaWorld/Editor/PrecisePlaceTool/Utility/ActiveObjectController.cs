@@ -6,8 +6,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Undo.Editor.UndoActions;
+using Transform = VladislavTsurikov.Runtime.Transform;
 #if RENDERER_STACK
 #endif
 
@@ -44,11 +44,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                     else if(_placedObjectData.Proto.GetType() == typeof(PrototypeTerrainObject))
                     {
 #if RENDERER_STACK
-                        InstanceData instanceData = new InstanceData(_placedObjectData.GameObject);
+                        Transform transform = new Transform(_placedObjectData.GameObject);
                         
                         GameObject prefab = PrefabUtility.GetOutermostPrefabInstanceRoot(_placedObjectData.GameObject);
 
-                        TerrainObjectRendererAPI.AddInstance(prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                        TerrainObjectRendererAPI.AddInstance(prefab, transform.Position, transform.Scale, transform.Rotation);
                         Object.DestroyImmediate(_placedObjectData.GameObject);
                         _placedObjectData = value;
 #endif

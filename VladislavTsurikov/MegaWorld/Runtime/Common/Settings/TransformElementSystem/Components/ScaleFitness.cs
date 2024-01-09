@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components
 {
@@ -11,11 +11,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
     {
         public float OffsetScale = -0.7f;
 
-        public override void SetInstanceData(ref InstanceData instanceData, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, float fitness, Vector3 normal)
         {
             float value = Mathf.Lerp(OffsetScale, 0, fitness);
 
-            instanceData.Scale += new Vector3(value, value, value);
+            transform.Scale += new Vector3(value, value, value);
         }
     }
 }

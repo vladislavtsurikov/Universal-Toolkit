@@ -1,13 +1,10 @@
-#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
+using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings
 {
     [MenuItem("Physics Effects")]
-    [DontDraw]
     public class PhysicsEffects : ComponentStack.Runtime.Component
     {
         #region Force
@@ -22,15 +19,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettin
 
         public void ApplyForce(Rigidbody rigidbody) 
         {
-            if (rigidbody == null) return;
+            if (rigidbody == null)
+            {
+                return;
+            }
 
-            float radians = UnityEngine.Random.Range(0, 360) * Mathf.Deg2Rad;
+            float radians = Random.Range(0, 360) * Mathf.Deg2Rad;
 
             Vector3 forceDirection = new Vector3(Mathf.Sin(radians), 0, Mathf.Cos(radians));
 
             Vector3 force = Vector3.Lerp(new Vector3(0, -1, 0), forceDirection, RandomStrength / 100);
-
-            float magnitude = ForceRange ? UnityEngine.Random.Range(MinForce, MaxForce) : MinForce;
+            
+            float magnitude = ForceRange ? Random.Range(MinForce, MaxForce) : MinForce;
 
             force *= magnitude;
 
@@ -38,4 +38,3 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettin
         }
     }
 }
-#endif

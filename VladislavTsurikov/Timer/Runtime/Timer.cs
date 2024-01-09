@@ -322,16 +322,14 @@ namespace VladislavTsurikov.Timer.Runtime
                     if (_instance == null)
                     {
                         _instance = new TimerManager();
-#if UNITY_EDITOR
-                        EditorAndRuntimeUpdate.AddListener(_instance.Update);
-#endif
+                        
+                        EditorAndRuntimeUpdate.AddUpdateFunction(_instance.Update);
                     }
 
                     return _instance;
                 }
             }
 
-            // update all the registered timers on every frame
             private void Update()
             {
                 UpdateAllTimers();
@@ -344,9 +342,7 @@ namespace VladislavTsurikov.Timer.Runtime
 
             private void DestroyTimerManager()
             {
-#if UNITY_EDITOR
-                EditorAndRuntimeUpdate.RemoveListener(Update);
-#endif
+                EditorAndRuntimeUpdate.RemoveUpdateFunction(Update);
                 _instance = null;
             }
 

@@ -9,7 +9,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     public class ContainerForGameObjects : DefaultGroupComponent
     {
         private Dictionary<Scene, GameObject> _containerForGameObjects = new Dictionary<Scene, GameObject>();
-
+        
         public void ParentGameObject(GameObject gameObject)
         {
             _containerForGameObjects ??= new Dictionary<Scene, GameObject>();
@@ -20,6 +20,21 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             }
 
             GameObjectUtility.ParentGameObject(gameObject, _containerForGameObjects[gameObject.scene]);
+        }
+        
+        public void DestroyGameObjects()
+        {
+            if (_containerForGameObjects == null) 
+            {
+                return;
+            }
+            
+            foreach (var gameObject in _containerForGameObjects.Values)
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+            
+            _containerForGameObjects.Clear();
         }
         
         private void FindParentObject(Scene scene)

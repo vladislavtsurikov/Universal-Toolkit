@@ -86,7 +86,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 			instance.HierarchyTerrainObjectInstance = null;
 		}
 
-		protected override void OnRemoveObjectInstanceSelectorData(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj)
+		protected override void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData, object usedObj)
 		{
 			DefaultPrototypeInstancesSelectorData defaultPrototypeInstancesSelectorData = (DefaultPrototypeInstancesSelectorData)prototypeInstancesSelectorData;
 			
@@ -95,6 +95,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 				TerrainObjectCollider terrainObjectCollider = (TerrainObjectCollider)colliderObject;
 
 				DisableCollider(terrainObjectCollider, usedObj);
+			}
+		}
+
+		protected override void OnDisableCollider(PrototypeInstancesSelectorData prototypeInstancesSelectorData)
+		{
+			DefaultPrototypeInstancesSelectorData defaultPrototypeInstancesSelectorData = (DefaultPrototypeInstancesSelectorData)prototypeInstancesSelectorData;
+			
+			foreach (var colliderObject in defaultPrototypeInstancesSelectorData.LastInstanceList)
+			{
+				TerrainObjectCollider terrainObjectCollider = (TerrainObjectCollider)colliderObject;
+
+				DisableCollider(terrainObjectCollider);
 			}
 		}
 

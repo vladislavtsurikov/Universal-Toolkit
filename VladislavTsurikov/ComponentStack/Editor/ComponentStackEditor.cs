@@ -35,13 +35,13 @@ namespace VladislavTsurikov.ComponentStack.Editor
         {
             var settingsType = settings.GetType();
 
-            if (settingsType.GetAttribute(typeof(DontDrawAttribute)) != null)
-            {
-                return;
-            }
-
             if (AllEditorTypes<T>.Types.TryGetValue(settingsType, out var editorType))
             {
+                if (editorType.GetAttribute(typeof(DontDrawAttribute)) != null)
+                {
+                    return;
+                }
+                
                 var editor = (N)Activator.CreateInstance(editorType);
                 editor.Init(settings);
 

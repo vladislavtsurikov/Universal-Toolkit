@@ -2,6 +2,7 @@ using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.Utility.Runtime;
@@ -10,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
     public static class SpawnPrototype
     {
-        public static void SpawnTerrainDetails(Group group, PrototypeTerrainDetail proto, BoxArea boxArea, Terrain terrain)
+        public static void SpawnTerrainDetails(Group group, PrototypeTerrainDetail proto, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, Terrain terrain)
         {
             var terrainData = terrain.terrainData;
             var spawnSize = new Vector2Int(
@@ -48,9 +49,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                     Vector2 normal = current + startPosition; 
                     normal /= detailMapResolution;
         
-                    Vector2 worldPostion = UnityTerrainUtility.GetTerrainWorldPositionFromRange(normal, terrain);
+                    Vector2 worldPosition = UnityTerrainUtility.GetTerrainWorldPositionFromRange(normal, terrain);
 
-                    var fitness = GetFitness.Get(group, maskFilterComponentSettings, terrain, new Vector3(worldPostion.x, 0, worldPostion.y));
+                    var fitness = GetFitness.Get(group, terrainsMaskManager, maskFilterComponentSettings, terrain, new Vector3(worldPosition.x, 0, worldPosition.y));
 
                     int targetStrength;
         

@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
@@ -19,4 +18,3 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettin
         }
     }
 }
-#endif

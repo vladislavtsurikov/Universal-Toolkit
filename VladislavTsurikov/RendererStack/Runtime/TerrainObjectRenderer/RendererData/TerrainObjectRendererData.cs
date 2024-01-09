@@ -89,12 +89,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             }
         }
 
-        public void RemoveInstances(int id)
+        public void RemoveInstances(int prototypeID)
         {
+            ScriptingSystem.ScriptingSystem.RemoveCollider(prototypeID);
+            
             foreach (var cell in CellList)
             {
-                cell.PrototypeRenderDataStack.RemoveInstances(id);
-                cell.TerrainObjectRendererCollider.RemoveInstances(id);
+                cell.PrototypeRenderDataStack.RemoveInstances(prototypeID);
+                cell.TerrainObjectRendererCollider.RemoveInstances(prototypeID);
 
                 BVHCellTree.ChangeNodeSize(cell, cell.GetObjectsAABB());
             }

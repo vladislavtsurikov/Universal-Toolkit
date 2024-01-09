@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.Undo.Editor.UndoActions
 {
     public class TransformData
     {
         public GameObject GameObject;
-        public InstanceData InstanceData;
+        public Transform Transform;
 
         public TransformData(GameObject gameObject)
         {
             GameObject = gameObject;
-            InstanceData = new InstanceData(gameObject);
+            Transform = new Transform(gameObject);
         }
 
         public void SetTransform()
@@ -22,9 +23,9 @@ namespace VladislavTsurikov.Undo.Editor.UndoActions
             if(GameObject == null)
                 return;
             
-            GameObject.transform.position = InstanceData.Position;
-            GameObject.transform.localScale = InstanceData.Scale; 
-            GameObject.transform.rotation = InstanceData.Rotation;
+            GameObject.transform.position = Transform.Position;
+            GameObject.transform.localScale = Transform.Scale; 
+            GameObject.transform.rotation = Transform.Rotation;
         }
     }
 

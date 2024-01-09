@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
         private Runtime.Common.Settings.FilterSettings.FilterSettings _filterSettings;
 
         private SimpleFilterEditor _simpleFilterEditor;
-        private MaskFilterStackElementEditor _maskFilterStackElementEditor;
+        private MaskFilterComponentSettingsEditor _maskFilterComponentSettingsEditor;
         
         public override void OnEnable()
         {
@@ -22,8 +22,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 
             _simpleFilterEditor = new SimpleFilterEditor();
             _simpleFilterEditor.Init(_filterSettings.SimpleFilter);
-            _maskFilterStackElementEditor = new MaskFilterStackElementEditor();
-            _maskFilterStackElementEditor.Init(_filterSettings.MaskFilterComponentSettings);
+            _maskFilterComponentSettingsEditor = new MaskFilterComponentSettingsEditor();
+            _maskFilterComponentSettingsEditor.Init(_filterSettings.MaskFilterComponentSettings);
         }
         
         public override void OnGUI()
@@ -40,7 +40,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
                 case FilterType.MaskFilter:
                 {
                     CustomEditorGUILayout.HelpBox("\"Mask Filter\" works only with Unity terrain");
-                    _maskFilterStackElementEditor.OnGUI();
+                    _maskFilterComponentSettingsEditor.OnGUI();
                     break;
                 }
             }

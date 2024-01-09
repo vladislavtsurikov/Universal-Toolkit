@@ -25,23 +25,16 @@ namespace VladislavTsurikov.Coroutines.Runtime
 
 	internal class YieldWaitForSeconds : ICoroutineYield
 	{
-		//private float _timeLeft;
-
 		private float _timeToFinish;
 
 		public YieldWaitForSeconds(float seconds)
 		{
 			_timeToFinish = Time.time + seconds;
-			
-			//_timeLeft = seconds;
 		}
 
 		public bool IsDone()
 		{
 			return _timeToFinish <= Time.time;
-			// _timeLeft -= Time.deltaTime;
-			// Debug.Log(_timeLeft);
-			// return _timeLeft < 0;
 		}
 	}
 
@@ -122,6 +115,22 @@ namespace VladislavTsurikov.Coroutines.Runtime
 		public bool IsDone()
 		{
 			return !_coroutine.MoveNextIfNecessary();
+		}
+	}
+	
+	public class YieldCustom : ICoroutineYield
+	{
+		public delegate bool IsDoneDelegate();
+		private readonly IsDoneDelegate _isDoneFunction;
+
+		public YieldCustom(IsDoneDelegate isDoneFunction)
+		{
+			_isDoneFunction = isDoneFunction;
+		}
+		
+		public bool IsDone()
+		{
+			return _isDoneFunction.Invoke();
 		}
 	}
 	

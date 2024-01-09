@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSettings;
-using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;

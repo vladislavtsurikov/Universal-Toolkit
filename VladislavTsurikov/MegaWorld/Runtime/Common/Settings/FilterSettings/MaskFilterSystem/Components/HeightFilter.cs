@@ -32,19 +32,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _heightCs;
         }
 
-        public override void Eval(MaskFilterContext fc, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index) 
         {
             ComputeShader cs = GetComputeShader();
             int kidx = cs.FindKernel("Height");
 
-            cs.SetTexture(kidx, "In_BaseMaskTex", fc.SourceRenderTexture);
-            cs.SetTexture(kidx, "In_HeightTex", fc.HeightContext.sourceRenderTexture);
-            cs.SetTexture(kidx, "OutputTex", fc.DestinationRenderTexture);
+            cs.SetTexture(kidx, "In_BaseMaskTex", maskFilterContext.SourceRenderTexture);
+            cs.SetTexture(kidx, "In_HeightTex", maskFilterContext.HeightContext.sourceRenderTexture);
+            cs.SetTexture(kidx, "OutputTex", maskFilterContext.DestinationRenderTexture);
 
-            SetMaterial(cs, fc, index);
+            SetMaterial(cs, maskFilterContext, index);
 
             //using workgroup size of 1 here to avoid needing to resize render textures
-            cs.Dispatch(kidx, fc.SourceRenderTexture.width, fc.SourceRenderTexture.height, 1);
+            cs.Dispatch(kidx, maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1);
         }
 
         public void SetMaterial(ComputeShader cs, MaskFilterContext fс, int index)

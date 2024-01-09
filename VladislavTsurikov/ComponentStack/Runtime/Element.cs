@@ -38,7 +38,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime
         public bool IsHappenedReset { get; internal set; }
 
         protected virtual void SetupElement(object[] args = null){}
-        
+
         protected virtual void OnDisable(){}
 
         protected virtual void OnReset(Element oldElement){}

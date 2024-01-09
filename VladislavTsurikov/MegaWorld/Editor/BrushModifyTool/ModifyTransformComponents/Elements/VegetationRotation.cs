@@ -1,6 +1,6 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
 {
@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public float StrengthXY = 10;
         public float RotationXZ = 3;
 
-        public override void SetInstanceData(ref InstanceData instanceData, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void SetInstanceData(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             float localstrengthRotationY  = StrengthY * fitness;
             float localstrengthRotationXY = StrengthXY * fitness;
@@ -20,16 +20,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
             float angleXZ = RotationXZ * 3.6f;
             float t = localstrengthRotationXY / 100;
 
-            float rotationY = localstrengthRotationY * 3.6f * randomVector.y + instanceData.Rotation.eulerAngles.y;
+            float rotationY = localstrengthRotationY * 3.6f * randomVector.y + transform.Rotation.eulerAngles.y;
             float rotationX = angleXZ;
             float rotationZ = angleXZ;
 
-            instanceData.Rotation = Quaternion.Euler(new Vector3(instanceData.Rotation.eulerAngles.x, rotationY, instanceData.Rotation.eulerAngles.z));  
+            transform.Rotation = Quaternion.Euler(new Vector3(transform.Rotation.eulerAngles.x, rotationY, transform.Rotation.eulerAngles.z));  
             
             Quaternion rotation = Quaternion.Euler(new Vector3(rotationX, rotationY, rotationZ));    
-            Quaternion finalRotation = Quaternion.Lerp(instanceData.Rotation, rotation, t);          
+            Quaternion finalRotation = Quaternion.Lerp(transform.Rotation, rotation, t);          
 
-            instanceData.Rotation = finalRotation;
+            transform.Rotation = finalRotation;
         }
     }
 }

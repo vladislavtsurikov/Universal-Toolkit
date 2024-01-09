@@ -5,7 +5,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.O
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {
@@ -38,9 +38,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             }
         }
 
-        public static bool RunOverlapCheck(Type prototypeType, OverlapCheckSettings overlapCheckSettings, Vector3 extents, InstanceData instanceData)
+        public static bool RunOverlapCheck(Type prototypeType, OverlapCheckSettings overlapCheckSettings, Vector3 extents, Transform transform)
         {
-            if(overlapCheckSettings.CollisionCheck.RunCollisionCheck(extents, instanceData))
+            if(overlapCheckSettings.CollisionCheck.RunCollisionCheck(extents, transform))
             {
                 return false;
             }
@@ -53,7 +53,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             if(prototypeType == typeof(PrototypeGameObject))
             {
 #if UNITY_EDITOR
-                if(!RunOverlapCheckForGameObject(new OverlapInstance(overlapCheckSettings, extents, instanceData)))
+                if(!RunOverlapCheckForGameObject(new OverlapInstance(overlapCheckSettings, extents, transform)))
                 {
                     return true;
                 }
@@ -62,7 +62,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
 #if RENDERER_STACK
             else 
             {
-                if(!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, instanceData)))
+                if(!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, transform)))
                 {
                     return true;
                 }

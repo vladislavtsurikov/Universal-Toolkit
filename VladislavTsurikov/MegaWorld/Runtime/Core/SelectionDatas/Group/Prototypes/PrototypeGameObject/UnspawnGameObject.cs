@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject
 {
@@ -9,28 +9,22 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     {
         public static void Unspawn(List<Prototype> unspawnPrototypes, bool unspawnSelected)
         {
-            GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
-
-            for (int index = 0; index < allGameObjects.Length; index++)
+            List<GameObject> unspawnPrefabs = new List<GameObject>();
+            
+            foreach (var proto in unspawnPrototypes)
             {
-                List<PrototypeGameObject> prototypes = GetPrototypeUtility.GetPrototypes<PrototypeGameObject>(allGameObjects[index]);
-
-                foreach (var proto in prototypes)
+                if(unspawnSelected)
                 {
-                    if(proto != null && unspawnPrototypes.Contains(proto))
+                    if(proto.Selected == false)
                     {
-                        if(unspawnSelected)
-                        {
-                            if(proto.Selected == false)
-                            {
-                                continue;
-                            }
-                        }
-
-                        Object.DestroyImmediate(allGameObjects[index]);
+                        continue;
                     }
                 }
+
+                unspawnPrefabs.Add((GameObject)proto.PrototypeObject);
             }
+
+            GameObjectUtility.Unspawn(unspawnPrefabs);
 
 #if UNITY_EDITOR
             GameObjectColliderUtility.RemoveNullObjectNodesForAllScenes();

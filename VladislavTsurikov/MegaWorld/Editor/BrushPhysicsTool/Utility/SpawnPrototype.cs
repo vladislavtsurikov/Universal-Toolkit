@@ -1,20 +1,17 @@
 #if UNITY_EDITOR
+using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.Core.Runtime.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor;
-using VladislavTsurikov.PhysicsSimulatorEditor.Editor.Integrations.TerrainObjectRenderer;
-using VladislavTsurikov.Runtime;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
+using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.Utility.Runtime;
-using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
 {
@@ -33,19 +30,50 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
                 
                 BrushPhysicsToolSettings brushPhysicsToolSettings = (BrushPhysicsToolSettings)ToolsComponentStack.GetElement(typeof(BrushPhysicsTool), typeof(BrushPhysicsToolSettings));
                 
-                InstanceData instanceData = new InstanceData(rayHit.Point + new Vector3(0, brushPhysicsToolSettings.PositionOffsetY, 0), proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+                Transform transform = new Transform(rayHit.Point + new Vector3(0, brushPhysicsToolSettings.PositionOffsetY, 0), proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
                 PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
-                transformComponentSettings.TransformComponentStack.SetInstanceData(ref instanceData, fitness, rayHit.Normal);
-
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
-
-                SimulatedTerrainObjectBody simulatedBody = new SimulatedTerrainObjectBody(proto.RendererPrototype, gameObject);
-                PhysicsSimulator.RegisterGameObject(simulatedBody);
-                brushPhysicsToolSettings.PhysicsEffects.ApplyForce(simulatedBody.Rigidbody);
-                PhysicsSimulator.Activate(DisablePhysicsMode.ObjectTime);
+                transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
                 
-                RandomUtility.ChangeRandomSeed();
+                TerrainObjectOnDisablePhysics onDisableSimulatedBodyAction = new TerrainObjectOnDisablePhysics(group, proto.RendererPrototype);
+
+                PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+
+                SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+                    transform.Position, transform.Scale, transform.Rotation, new List<OnDisableSimulatedBodyAction>{onDisableSimulatedBodyAction});
+                
+                group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
+                
+                brushPhysicsToolSettings.PhysicsEffects.ApplyForce(simulatedBody.Rigidbody);
+            }
+        }
+        
+        public static void SpawnGameObject(Group group, PrototypeGameObject proto, BoxArea boxArea, RayHit rayHit) 
+        {
+            float fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, rayHit.Point, boxArea.Mask);
+
+            if (fitness != 0)
+            {
+                if (Random.Range(0f, 1f) < 1 - fitness)
+                {
+                    return;
+                }
+                
+                BrushPhysicsToolSettings brushPhysicsToolSettings = (BrushPhysicsToolSettings)ToolsComponentStack.GetElement(typeof(BrushPhysicsTool), typeof(BrushPhysicsToolSettings));
+                
+                Transform transform = new Transform(rayHit.Point + new Vector3(0, brushPhysicsToolSettings.PositionOffsetY, 0), proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+
+                PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
+                transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
+                
+                PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+
+                SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+                    transform.Position, transform.Scale, transform.Rotation);
+                
+                group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
+
+                brushPhysicsToolSettings.PhysicsEffects.ApplyForce(simulatedBody.Rigidbody);
             }
         }
     }

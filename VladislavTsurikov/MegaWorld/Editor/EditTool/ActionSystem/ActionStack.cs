@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-using System;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements;

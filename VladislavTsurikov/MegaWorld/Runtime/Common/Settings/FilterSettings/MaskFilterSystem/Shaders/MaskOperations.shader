@@ -181,7 +181,7 @@ Shader "Hidden/TerrainTools/MaskOperations"
             {
                 float4 heightScale = tex2D( _MainTex, i.uv );
                 
-                float value = 1;
+                float value;
             
                 if (heightScale.x < RemapMin) 
                 {

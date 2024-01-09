@@ -1,7 +1,9 @@
-﻿using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using VladislavTsurikov.Core.Runtime.Attributes;
 using VladislavTsurikov.Runtime.Attributes;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace VladislavTsurikov.Runtime
 {
@@ -9,10 +11,9 @@ namespace VladislavTsurikov.Runtime
     {
         public delegate void UpdateEvent();
         private static UpdateEvent _update;
-        
-        public static void AddListener(UpdateEvent function)
+
+        static EditorAndRuntimeUpdate()
         {
-            _update += function;
             if (Application.isPlaying)
             {
                 UniversalToolkitRuntimeUpdate universalToolkitRuntimeUpdate = UniversalToolkitRuntimeUpdate.Instance;
@@ -25,14 +26,21 @@ namespace VladislavTsurikov.Runtime
             }
         }
         
-        public static void RemoveListener(UpdateEvent function)
+        public static void AddUpdateFunction(UpdateEvent function)
+        {
+            _update += function;
+        }
+        
+        public static void RemoveUpdateFunction(UpdateEvent function)
         {
             _update -= function;
             
             if (Application.isPlaying)
             {
                 if (_update == null)
+                {
                     UniversalToolkitRuntimeUpdate.DestroyGameObject();
+                }
             }
         }
 

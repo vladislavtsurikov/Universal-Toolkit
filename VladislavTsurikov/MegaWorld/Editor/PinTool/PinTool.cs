@@ -14,11 +14,11 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.A
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Undo.Editor.UndoActions;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
 using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
@@ -197,9 +197,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                                 else
                                 {
                                     PrototypeTerrainObject proto = (PrototypeTerrainObject)_placedObjectData.Proto;
-                                    InstanceData instanceData = new InstanceData(_placedObjectData.GameObject);
+                                    Transform transform = new Transform(_placedObjectData.GameObject);
 
-                                    TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                                    TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
 
                                     Object.DestroyImmediate(_placedObjectData.GameObject);
                                 }

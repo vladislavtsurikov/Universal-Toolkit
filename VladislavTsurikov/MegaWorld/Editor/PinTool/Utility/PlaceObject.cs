@@ -7,7 +7,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.Runtime;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool.Utility
 {
@@ -22,9 +22,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool.Utility
                 return null;
             }
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, Vector3.one, Quaternion.identity);
+            Transform transform = new Transform(rayHit.Point, Vector3.one, Quaternion.identity);
 
-            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {

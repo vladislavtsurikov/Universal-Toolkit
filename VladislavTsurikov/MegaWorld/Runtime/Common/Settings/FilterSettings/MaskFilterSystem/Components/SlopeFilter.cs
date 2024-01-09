@@ -34,16 +34,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return _slopeMat;
         }
 
-        public override void Eval(MaskFilterContext fc, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index) 
         {
             Material mat = GetMaterial();
 
-            mat.SetTexture("_BaseMaskTex", fc.SourceRenderTexture);
-            mat.SetTexture("_NormalTex", fc.NormalContext.sourceRenderTexture);
+            mat.SetTexture("_BaseMaskTex", maskFilterContext.SourceRenderTexture);
+            mat.SetTexture("_NormalTex", maskFilterContext.NormalContext.sourceRenderTexture);
 
             SetMaterial(mat, index);
 
-            Graphics.Blit(fc.SourceRenderTexture, fc.DestinationRenderTexture, mat, 0);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, mat, 0);
         }
 
         public void SetMaterial(Material mat, int index)

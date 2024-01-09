@@ -20,9 +20,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Undo.Editor.UndoActions;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
@@ -170,14 +170,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 #if RENDERER_STACK
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             SimpleTransformComponentSettings transformComponentSettings = (SimpleTransformComponentSettings)proto.GetElement(typeof(SprayBrushTool), typeof(SimpleTransformComponentSettings));
-            transformComponentSettings.Stack.SetInstanceData(ref instanceData, fitness, rayHit.Normal);
+            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
             }
 #endif
         }
@@ -186,14 +186,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            InstanceData instanceData = new InstanceData(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             SimpleTransformComponentSettings transformComponentSettings = (SimpleTransformComponentSettings)proto.GetElement(typeof(SprayBrushTool), typeof(SimpleTransformComponentSettings));
-            transformComponentSettings.Stack.SetInstanceData(ref instanceData, fitness, rayHit.Normal);
+            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instanceData))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instanceData.Position, instanceData.Scale, instanceData.Rotation);
+                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
                 group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(gameObject);
 
                 GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  

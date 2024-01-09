@@ -21,12 +21,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
     }
 
 
-    [Serializable]
     [MenuItem("Brush Settings")]
     public class BrushSettings : ComponentStack.Runtime.Component
     {
         [OdinSerialize]
-        private float _brushSpacing = 30;
+        private float _customCustomSpacing = 30;
 
         [OdinSerialize]
         private float _brushRotation;
@@ -40,10 +39,32 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
         public SpacingEqualsType SpacingEqualsType = SpacingEqualsType.HalfBrushSize;
         public BrushJitterSettings BrushJitterSettings = new BrushJitterSettings();
 
+        public float CustomSpacing
+        {
+            set => _customCustomSpacing = Mathf.Max(0.01f, value);
+            get => _customCustomSpacing;
+        }
+        
         public float Spacing
         {
-            set => _brushSpacing = Mathf.Max(0.01f, value);
-            get => _brushSpacing;
+            get
+            {
+                switch (SpacingEqualsType)
+                {
+                    case SpacingEqualsType.BrushSize:
+                    {
+                        return BrushSize;
+                    }
+                    case SpacingEqualsType.HalfBrushSize:
+                    {
+                        return BrushSize / 2;
+                    }
+                    default:
+                    {
+                        return Mathf.Max(0.01f, CustomSpacing);
+                    }
+                }
+            }
         }
 
         public float BrushRotation
@@ -59,25 +80,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
         }
 
         public float BrushRadius => _brushSize / 2;
-
-        public float GetCurrentSpacing()
-        {
-            switch (SpacingEqualsType)
-            {
-                case SpacingEqualsType.BrushSize:
-                {
-                    return BrushSize;
-                }
-                case SpacingEqualsType.HalfBrushSize:
-                {
-                    return BrushSize / 2;
-                }
-                default:
-                {
-                    return Mathf.Max(0.01f, Spacing);
-                }
-            }
-        }
 
         public Texture2D GetCurrentRaw()
         {

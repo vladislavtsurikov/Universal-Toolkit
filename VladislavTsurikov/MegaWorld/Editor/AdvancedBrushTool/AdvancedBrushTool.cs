@@ -62,7 +62,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
         
         protected override void DoTool()
         {
-            float brushSpacing = _brushSettings.GetCurrentSpacing();
+            float brushSpacing = _brushSettings.Spacing;
             if(_mouseMove.IsStartDrag)
             {
                 if(WindowData.Instance.SelectedData.GetSelectedPrototypes(typeof(PrototypeTerrainObject)).Count != 0
@@ -159,7 +159,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             }
 
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.WaitForNextFrame = false;
+            scatterComponentSettings.Stack.SetWaitingNextFrame(null);
 
             yield return scatterComponentSettings.Stack.Samples(area, sample =>
             {
@@ -214,7 +214,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             }
 
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.WaitForNextFrame = false;
+            scatterComponentSettings.Stack.SetWaitingNextFrame(null);
 
             yield return scatterComponentSettings.Stack.Samples(area, sample =>
             {

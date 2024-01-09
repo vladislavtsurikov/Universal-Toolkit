@@ -44,7 +44,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Comp
 	        {
 		        for (position.z = gridOrigin.z; position.z < maxPosition.y; position.z += GridStep.y)
 		        {
-			        if (IsWaitForNextFrame())
+			        if (ScatterStack.IsWaitForNextFrame())
 			        {
 				        yield return null;
 			        }

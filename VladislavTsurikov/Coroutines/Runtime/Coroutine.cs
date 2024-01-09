@@ -41,6 +41,10 @@ namespace VladislavTsurikov.Coroutines.Runtime
 	        {
 		        CurrentYield = new YieldDefault();
 	        }
+	        else if (current is YieldCustom yieldCustom)
+	        {
+		        CurrentYield = yieldCustom;
+	        }
 	        else if (current is ICoroutineYield coroutineYield)
 	        {
 		        CurrentYield = coroutineYield;

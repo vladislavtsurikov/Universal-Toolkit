@@ -15,13 +15,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         public NoiseSettings NoiseSettings = new NoiseSettings();
 
-        public override void Eval(MaskFilterContext fc, int index)
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             CreateNoiseSettingsIfNecessary();
 
-            Vector3 brushPosWs = fc.BrushPos;
-            float brushSize = fc.BoxArea.BoxSize;
-            float brushRotation = fc.BoxArea.Rotation;
+            Vector3 brushPosWs = maskFilterContext.BrushPos;
+            float brushSize = maskFilterContext.BoxArea.BoxSize;
+            float brushRotation = maskFilterContext.BoxArea.Rotation;
 
             // TODO(wyatt): remove magic number and tie it into NoiseSettingsGUI preview size somehow
             float previewSize = 1 / 512f;
@@ -52,10 +52,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             int pass = NoiseUtils.KNumBlitPasses * NoiseLib.GetNoiseIndex( NoiseSettings.DomainSettings.NoiseTypeName );
 
-            RenderTextureDescriptor desc = new RenderTextureDescriptor(fc.DestinationRenderTexture.width, fc.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
+            RenderTextureDescriptor desc = new RenderTextureDescriptor(maskFilterContext.DestinationRenderTexture.width, maskFilterContext.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
             RenderTexture rt = RenderTexture.GetTemporary(desc);
 
-            Graphics.Blit(fc.SourceRenderTexture, rt, mat, pass);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, rt, mat, pass);
 
             Material blendMat = MaskFilterUtility.blendModesMaterial;
             
@@ -68,10 +68,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 blendMat.SetInt("_BlendMode", (int)BlendMode);
             }
 
-            blendMat.SetTexture("_MainTex", fc.SourceRenderTexture);
+            blendMat.SetTexture("_MainTex", maskFilterContext.SourceRenderTexture);
             blendMat.SetTexture("_BlendTex", rt);
 
-            Graphics.Blit(fc.SourceRenderTexture, fc.DestinationRenderTexture, blendMat, 0);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, blendMat, 0);
 
             RenderTexture.ReleaseTemporary(rt);
         }

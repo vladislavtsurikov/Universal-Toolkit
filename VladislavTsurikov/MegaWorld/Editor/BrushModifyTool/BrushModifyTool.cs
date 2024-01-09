@@ -22,10 +22,10 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Runtime;
 using VladislavTsurikov.Undo.Editor.UndoActions;
 using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using Transform = VladislavTsurikov.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
 {
@@ -169,15 +169,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                 {
                     modifyInfo.LastUpdate = _updateTicks;
 
-                    InstanceData instanceData = new InstanceData(persistentInstance.Position, persistentInstance.Scale, persistentInstance.Rotation);
+                    Transform transform = new Transform(persistentInstance.Position, persistentInstance.Scale, persistentInstance.Rotation);
         
                     float moveLenght = Event.current.delta.magnitude;
 
-                    SetInstanceData(ref instanceData, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
+                    SetInstanceData(ref transform, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
 
-                    persistentInstance.Position = instanceData.Position;
-                    persistentInstance.Rotation = instanceData.Rotation.normalized;
-                    persistentInstance.Scale = instanceData.Scale;
+                    persistentInstance.Position = transform.Position;
+                    persistentInstance.Rotation = transform.Rotation.normalized;
+                    persistentInstance.Scale = transform.Scale;
                 }
 
                 _modifiedTerrainObjects[persistentInstance] = modifyInfo;
@@ -262,15 +262,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                 {
                     modifyInfo.LastUpdate = _updateTicks;
 
-                    InstanceData instanceData = new InstanceData(prefabRoot.transform.position, prefabRoot.transform.localScale, prefabRoot.transform.rotation);
+                    Transform transform = new Transform(prefabRoot.transform.position, prefabRoot.transform.localScale, prefabRoot.transform.rotation);
 
                     float moveLenght = Event.current.delta.magnitude;
 
-                    SetInstanceData(ref instanceData, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
+                    SetInstanceData(ref transform, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
 
-                    prefabRoot.transform.position = instanceData.Position;
-                    prefabRoot.transform.rotation = instanceData.Rotation;
-                    prefabRoot.transform.localScale = instanceData.Scale;
+                    prefabRoot.transform.position = transform.Position;
+                    prefabRoot.transform.rotation = transform.Rotation;
+                    prefabRoot.transform.localScale = transform.Scale;
 
                     modifyTransform = true;
                 }
@@ -286,7 +286,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
             }
         }
 
-        private void SetInstanceData(ref InstanceData instanceData, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        private void SetInstanceData(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             ModifyTransformSettings modifyTransformSettings = (ModifyTransformSettings)ToolsComponentStack.GetElement(typeof(BrushModifyTool), typeof(ModifyTransformSettings));
                         
@@ -294,7 +294,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
             {
                 if(item.Active)
                 {
-                    item.SetInstanceData(ref instanceData, ref modifyInfo, moveLenght, strokeDirection, fitness, normal);
+                    item.SetInstanceData(ref transform, ref modifyInfo, moveLenght, strokeDirection, fitness, normal);
                 }
             }
         }

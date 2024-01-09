@@ -71,7 +71,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             Vector3[] pointArray = new Vector3[2];
 
             GetAxisPoints(pos, dir, pointArray);
-            UnityEditor.Handles.DrawAAPolyLine(3, pointArray);
+            Handles.DrawAAPolyLine(3, pointArray);
         }
     }
 }

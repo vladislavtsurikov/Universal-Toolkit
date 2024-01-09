@@ -30,10 +30,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 		
 		public override void OnChangeGUIGroup(Group group)
 		{
-			if (MaskFilterStackElementEditor.ChangedGUI)
+			if (MaskFilterComponentSettingsEditor.ChangedGUI)
 			{
 				_textureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-				MaskFilterStackElementEditor.ChangedGUI = false;
+				MaskFilterComponentSettingsEditor.ChangedGUI = false;
 			}
 			
 			if (!_textureStamper.StamperControllerSettings.AutoRespawn)
@@ -51,10 +51,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
 		public override void OnChangeGUIPrototype(Prototype proto)
 		{
-			if (MaskFilterStackElementEditor.ChangedGUI)
+			if (MaskFilterComponentSettingsEditor.ChangedGUI)
 			{
 				_textureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-				MaskFilterStackElementEditor.ChangedGUI = false;
+				MaskFilterComponentSettingsEditor.ChangedGUI = false;
 			}
 			
 			if (!_textureStamper.StamperControllerSettings.AutoRespawn)

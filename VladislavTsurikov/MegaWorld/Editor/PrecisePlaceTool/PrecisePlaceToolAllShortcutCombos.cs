@@ -1,6 +1,5 @@
 using UnityEngine;
 using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.ShortcutCombo.Editor;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {

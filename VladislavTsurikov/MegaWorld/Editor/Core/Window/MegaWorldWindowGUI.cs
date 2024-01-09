@@ -62,7 +62,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 				WindowData.Instance.WindowToolStackEditor.OnTabStackGUI();
 			}
 
-			WindowData.Instance.WindowToolStackEditor.DrawSelectedEditor();
+			WindowData.Instance.WindowToolStackEditor.DrawSelectedSettings();
 			WindowData.Instance.Save();
 			GlobalSettings.Instance.Save();
 		}
