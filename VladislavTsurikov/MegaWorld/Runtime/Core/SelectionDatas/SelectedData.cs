@@ -113,7 +113,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas
 			return SelectedPrototype != null;
 		}
 
-		private static void SetSelectedPrototypeListFromAssets<T>(List<T> baseList, List<T> setPrototypeList) where T : Prototype
+		private static void SetSelectedPrototypeListFromAssets<T>(IReadOnlyList<T> baseList, List<T> setPrototypeList) where T : Prototype
         {
             foreach (T asset in baseList)
             {

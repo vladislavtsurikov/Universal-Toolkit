@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture
@@ -25,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         }
         
 
-        public static void AddTerrainTexturesToTerrain(Terrain terrain, List<Prototype> protoTerrainTextureList)
+        public static void AddTerrainTexturesToTerrain(Terrain terrain, IReadOnlyList<Prototype> protoTerrainTextureList)
         {
             List<TerrainLayer> currentTerrainLayers = terrain.terrainData.terrainLayers.ToList();
             currentTerrainLayers.RemoveAll(layer => layer == null);

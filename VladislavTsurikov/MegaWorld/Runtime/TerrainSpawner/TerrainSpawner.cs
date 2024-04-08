@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Runtime.Serialization;
-using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
@@ -26,6 +24,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using Area = VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.Area;
+#if UNITY_EDITOR
+using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
+#endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 {
@@ -46,6 +47,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
         private Area _area;
         [NonSerialized]
         private StamperControllerSettings _stamperControllerSettings;
+        [NonSerialized] 
+        private TerrainsMaskManager _terrainsMaskManager = new TerrainsMaskManager();
         
         public Area Area
         {
@@ -72,10 +75,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                 return _stamperControllerSettings;
             }
         }
-        
-        [NonSerialized]
-        public TerrainsMaskManager TerrainsMaskManager = new TerrainsMaskManager();
-        
+
 #if UNITY_EDITOR
         [NonSerialized]
         public StamperVisualisation StamperVisualisation = new StamperVisualisation();
@@ -84,7 +84,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
         [OnDeserializing]
         private void Initialize()
         {
-            TerrainsMaskManager = new TerrainsMaskManager();
+            _terrainsMaskManager = new TerrainsMaskManager();
             
 #if UNITY_EDITOR
             StamperVisualisation = new StamperVisualisation();
@@ -93,8 +93,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 
         private protected override void OnStamperEnable()
         {
-            Area.OnSetAreaBounds -= StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
-            Area.OnSetAreaBounds += StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
+#if UNITY_EDITOR
+            void Action() => StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
+            
+            Area.OnSetAreaBounds -= Action;
+            Area.OnSetAreaBounds += Action;
+#endif
+            
             
             Area.SetAreaBoundsIfNecessary(this, true);
         }
@@ -104,7 +109,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn()
+        protected override IEnumerator Spawn(bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
@@ -129,7 +134,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 
                 BoxArea boxArea = Area.GetAreaVariables(rayHit);
 
-                yield return SpawnGroup(Data.GroupList[typeIndex], boxArea);
+                yield return SpawnGroup(Data.GroupList[typeIndex], boxArea, displayProgressBar);
                 
                 completedTypes++;
                 SpawnProgress = completedTypes / (float)maxTypes;
@@ -138,7 +143,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
             SpawnProgress = completedTypes / (float)maxTypes;
         }
 
-        private IEnumerator SpawnGroup(Group group, BoxArea boxArea)
+        private IEnumerator SpawnGroup(Group group, BoxArea boxArea, bool displayProgressBar)
         {
             if(group.HasAllActivePrototypes())
             {
@@ -147,24 +152,22 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnGameObject(group, TerrainsMaskManager, boxArea);
+                    yield return Utility.SpawnGroup.SpawnGameObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnTerrainObject(group, TerrainsMaskManager, boxArea);
+                    yield return Utility.SpawnGroup.SpawnTerrainObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
                 else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
-                    yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, TerrainsMaskManager, boxArea);
+                    yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, _terrainsMaskManager, boxArea);
                 }
             }
             
-            TerrainsMaskManager.Dispose();
-
-            yield return null;
+            _terrainsMaskManager.Dispose();
         }
     }
 }

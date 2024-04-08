@@ -1,6 +1,6 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
 {
@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public float StrengthXY = 10;
         public float RotationXZ = 3;
 
-        public override void SetInstanceData(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void ModifyTransform(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             float localstrengthRotationY  = StrengthY * fitness;
             float localstrengthRotationXY = StrengthXY * fitness;

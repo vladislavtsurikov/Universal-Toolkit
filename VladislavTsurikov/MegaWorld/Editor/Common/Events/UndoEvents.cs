@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Events
 {

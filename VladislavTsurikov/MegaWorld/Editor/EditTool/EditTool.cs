@@ -1,5 +1,4 @@
-﻿using System.Runtime.Serialization;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
@@ -24,10 +23,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
     {
         private bool _mouseUp = true;
 
-        public static CommonInstance FindObject;
-        
-        [OnDeserializing]
-        private void Initialize()
+        internal static CommonInstance FindObject;
+
+        protected override void  OnEnable()
         {
             _mouseUp = true;
         }
@@ -104,14 +102,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             return false;
         }
 
-        private void RemoveFindObjectsIfNecessary()
+        private static void RemoveFindObjectsIfNecessary()
         {
-            if(FindObject != null)
+            if (FindObject == null)
             {
-                if(FindObject.IsValid() == false)
-                {
-                    FindObject = null;
-                }
+                return;
+            }
+            
+            if(FindObject.IsValid() == false)
+            {
+                FindObject = null;
             }
         }
     }

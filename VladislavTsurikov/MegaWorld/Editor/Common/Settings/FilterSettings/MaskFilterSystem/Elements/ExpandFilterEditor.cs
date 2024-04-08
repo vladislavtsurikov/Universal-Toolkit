@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿#if UNITY_EDITOR
+using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components;
@@ -28,3 +29,4 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
         public static readonly GUIContent KernelSize = EditorGUIUtility.TrTextContent("Kernel Size");
     }
 }
+#endif

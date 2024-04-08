@@ -9,7 +9,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
 {
     public static class GetRandomPrototype 
     {
-        public static Prototype GetMaxSuccessProto(List<Prototype> protoList)
+        public static Prototype GetMaxSuccessProto(IReadOnlyList<Prototype> protoList)
         {
             if(protoList.Count == 0)
             {

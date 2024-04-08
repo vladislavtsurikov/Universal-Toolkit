@@ -7,7 +7,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public static class UnspawnTerrainObject
     {
-        public static void Unspawn(List<Prototype> prototypes, bool unspawnSelected)
+        public static void Unspawn(IReadOnlyList<Prototype> prototypes, bool unspawnSelected)
         {
 #if RENDERER_STACK
             List<GameObject> unspawnPrefabs = new List<GameObject>();
@@ -23,8 +23,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 }
                 
                 unspawnPrefabs.Add((GameObject)proto.PrototypeObject);
-
-                TerrainObjectRendererAPI.RemoveInstances(proto.ID);
+                
+                TerrainObjectRendererAPI.RemoveInstances(proto.RendererPrototypeID);
             }
             
             //Not a necessary call, but the tools can spawn GameObjects to later convert them into Terrain Object Renderer

@@ -20,10 +20,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
     public static class SpawnGroup 
     {
-        public static IEnumerator SpawnGameObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool supportUndo = true)
+        public static IEnumerator SpawnGameObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(new DefaultWaitingNextFrame(0.2f));
+            
+            scatterComponentSettings.Stack.SetWaitingNextFrame(displayProgressBar
+                ? new DefaultWaitingNextFrame(0.2f)
+                : null);
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
@@ -48,18 +51,21 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                             return;
                         }
 
-                        Common.Utility.Spawn.SpawnPrototype.SpawnGameObject(group, proto, rayHit, fitness, supportUndo);
+                        Common.Utility.Spawn.SpawnPrototype.SpawnGameObject(group, proto, rayHit, fitness);
                     }
                 }
             });
         }
         
-        public static IEnumerator SpawnTerrainObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
+        public static IEnumerator SpawnTerrainObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {            
 #if RENDERER_STACK
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(new DefaultWaitingNextFrame(0.2f));
             
+            scatterComponentSettings.Stack.SetWaitingNextFrame(displayProgressBar
+                ? new DefaultWaitingNextFrame(0.2f)
+                : null);
+
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
             yield return scatterComponentSettings.Stack.Samples(boxArea, sample =>
@@ -88,11 +94,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                 }
             });
 #endif
-
-            yield return null;
         }
 
-        public static IEnumerator SpawnTerrainDetails(Group group, List<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
+        public static IEnumerator SpawnTerrainDetails(Group group, IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {
             if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {

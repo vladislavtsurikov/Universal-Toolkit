@@ -13,7 +13,7 @@
 
 =========================================================================*/
 
-#include "../../../../Settings/MaskFilters/Shaders/NoiseLib/NoiseCommon.hlsl"
+#include "../../../../MaskFilterSystem/Shaders/NoiseLib/NoiseCommon.hlsl"
 
 /*=========================================================================
 

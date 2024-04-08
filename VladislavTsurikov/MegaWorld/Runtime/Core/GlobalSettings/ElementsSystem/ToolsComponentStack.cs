@@ -59,7 +59,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
                 {
                     AddToolComponentsAttribute addComponentsAttribute = toolType.GetAttribute<AddToolComponentsAttribute>();
 
-                    if (addComponentsAttribute == null)
+                    if (addComponentsAttribute == null || toolComponentStack.ComponentStack.ElementList[i] == null)
                     {
                         toolComponentStack.ComponentStack.Remove(i);
                         continue;

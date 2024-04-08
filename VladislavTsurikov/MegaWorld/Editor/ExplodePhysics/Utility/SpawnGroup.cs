@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if UNITY_EDITOR
+using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Core.Runtime.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
@@ -60,3 +61,4 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
         }
     }
 }
+#endif

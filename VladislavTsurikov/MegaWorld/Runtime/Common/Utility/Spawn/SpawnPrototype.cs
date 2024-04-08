@@ -16,21 +16,23 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
 using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 #if RENDERER_STACK
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
 #endif
 #if UNITY_EDITOR
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 {
     public static class SpawnPrototype 
     {
-        public static void SpawnTerrainObject(PrototypeTerrainObject proto, RayHit rayHit, float fitness)
+        public static void SpawnTerrainObject(PrototypeTerrainObject proto, RayHit rayHit, float fitness, bool supportUndo = false)
         {
 #if RENDERER_STACK
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
@@ -42,12 +44,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 
             if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                
+#if UNITY_EDITOR
+                if(supportUndo)
+                {
+                    Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObject(terrainObjectInstance));
+                }
+#endif
             }
 #endif
         }
 
-        public static void SpawnGameObject(Group group, PrototypeGameObject proto, RayHit rayHit, float fitness, bool supportUndo = true)
+        public static void SpawnGameObject(Group group, PrototypeGameObject proto, RayHit rayHit, float fitness, bool supportUndo = false)
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
@@ -70,7 +79,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
                 }
 #endif
                 gameObject.transform.hasChanged = false;
-                
             }
         }
 

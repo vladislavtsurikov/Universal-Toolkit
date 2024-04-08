@@ -1,13 +1,13 @@
 #if UNITY_EDITOR
-using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Undo.Editor.UndoActions;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 #if RENDERER_STACK
 #endif
 
@@ -20,16 +20,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
         {
             get
             {
+                if (_placedObjectData == null || _placedObjectData.GameObject == null)
+                {
+                    return null;
+                }
+                
                 return _placedObjectData;
             }
             set
             {
-                if(value == null)
+                if(value == null || value.GameObject == null)
                 {
                     return;
                 }
 
-                if(_placedObjectData != null)
+                if(_placedObjectData != null && _placedObjectData.GameObject != null)
                 {
                     PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
@@ -37,22 +42,23 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                     
                     if(_placedObjectData.Proto.GetType() == typeof(PrototypeGameObject))
                     {
-                        GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(_placedObjectData.GameObject);
+                        GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene?.Invoke(_placedObjectData.GameObject);
                         Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(_placedObjectData.GameObject));
                         _placedObjectData = value;
                     }
+#if RENDERER_STACK
                     else if(_placedObjectData.Proto.GetType() == typeof(PrototypeTerrainObject))
                     {
-#if RENDERER_STACK
-                        Transform transform = new Transform(_placedObjectData.GameObject);
-                        
-                        GameObject prefab = PrefabUtility.GetOutermostPrefabInstanceRoot(_placedObjectData.GameObject);
+                        PrototypeTerrainObject prototypeTerrainObject = (PrototypeTerrainObject)_placedObjectData.Proto;
 
-                        TerrainObjectRendererAPI.AddInstance(prefab, transform.Position, transform.Scale, transform.Rotation);
+                        Transform transform = _placedObjectData.GameObject.transform;
+                        
+                        TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(prototypeTerrainObject.RendererPrototype, transform.position, transform.lossyScale, transform.rotation);
+                        Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObject(terrainObjectInstance));
                         Object.DestroyImmediate(_placedObjectData.GameObject);
                         _placedObjectData = value;
-#endif
                     }
+#endif
                 }
                 else
                 {
@@ -68,7 +74,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                 return;
             }
 
-            if(_placedObjectData.GameObject == null || _placedObjectData.Proto.Selected == false)
+            if(_placedObjectData.Proto.Selected == false)
             {
                 DestroyObject();
             }

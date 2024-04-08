@@ -7,7 +7,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool.Utility
 {

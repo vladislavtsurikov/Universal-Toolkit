@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.Core.Runtime.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
@@ -13,6 +14,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
+using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
@@ -26,16 +28,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
         
         [OdinSerialize]
         private ComponentStackManager _componentStackManager;
-        
+
         [OdinSerialize] 
         private DefaultGroupComponentStack _defaultGroupComponentStack;
-        
+
         public DefaultGroupComponentStack DefaultGroupComponentStack => _defaultGroupComponentStack;
 
         public Type PrototypeType => _prototypeType;
         
         [OdinSerialize] 
-        public List<Prototype> PrototypeList = new List<Prototype>();
+        public AdvancedElementList<Prototype> PrototypeList = new AdvancedElementList<Prototype>();
 
         public string RenamingName = "Group";
         public bool Renaming;
@@ -57,14 +59,37 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
         public void OnEnable() 
         {
             AllAvailableGroups.AddGroup(this);
+            
+            PrototypeList.OnRemoved -= OnRemove;
+            PrototypeList.OnRemoved += OnRemove;
 
             if (_prototypeType != null)
             {
                 SetupComponentStack();
                 SetupPrototypesElementStack();
             }
+
+            foreach (var prototype in PrototypeList)
+            {
+                prototype.Setup();
+            }
         }
-        
+
+        private void OnRemove(int index)
+        {
+            PrototypeList[index].OnDisable();
+        }
+
+        private void OnDestroy()
+        {
+            AllAvailableGroups.RemoveGroup(this);
+            
+            foreach (var prototype in PrototypeList)
+            {
+                prototype.OnDisable();
+            }
+        }
+
         internal void Init(Type prototypeType)
         {
             _prototypeType = prototypeType;
@@ -143,7 +168,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
             if (prototype == null)
             {
                 prototype = (Prototype)Activator.CreateInstance(PrototypeType);
-                prototype.InitInternal(id, obj);
+                prototype.OnCreate(id, obj);
                 PrototypeList.Add(prototype);
 
 #if UNITY_EDITOR
@@ -227,6 +252,31 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
         public void Save() 
         {
             EditorUtility.SetDirty(this);
+        }
+        
+        // Sadly OnDestroy is not being called reliably by the editor. So we need this.
+        private class OnDestroyProcessor: AssetModificationProcessor
+        {
+            static Type _type = typeof(Group);
+     
+            static string _fileEnding = ".asset";
+ 
+            public static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions _)
+            {
+                if (!path.EndsWith(_fileEnding))
+                {
+                    return AssetDeleteResult.DidNotDelete;
+                }
+ 
+                var assetType = AssetDatabase.GetMainAssetTypeAtPath(path);
+                if (assetType != null && (assetType == _type || assetType.IsSubclassOf(_type)))
+                {
+                    var asset = AssetDatabase.LoadAssetAtPath<Group>(path);
+                    asset.OnDestroy();
+                }
+ 
+                return AssetDeleteResult.DidNotDelete;
+            }
         }
 #endif
     }

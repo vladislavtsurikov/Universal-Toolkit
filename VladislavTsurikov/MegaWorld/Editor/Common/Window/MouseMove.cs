@@ -23,12 +23,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
         protected RayHit _prevRaycast;
         
         public delegate void OnMouseDownDelegate();
+        public delegate void OnMouseUpDelegate();
         public delegate void OnMouseDragDelegate(Vector3 dragPoint);
         public delegate void OnMouseMoveDelegate();
         public delegate void OnRepaintDelegate();
         public delegate void BeforePointDetectionFromMouseDragDelegate();
         
         public OnMouseDownDelegate OnMouseDown;
+        public OnMouseUpDelegate OnMouseUp;
         public OnMouseDragDelegate OnMouseDrag;
         public OnMouseMoveDelegate OnMouseMove;
         public OnRepaintDelegate OnRepaint;
@@ -76,6 +78,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
                         OnMouseDown?.Invoke();
                     }
 
+                    break;
+                }
+                case EventType.MouseUp:
+                {
+                    OnMouseUp?.Invoke();
                     break;
                 }
                 case EventType.MouseDrag:

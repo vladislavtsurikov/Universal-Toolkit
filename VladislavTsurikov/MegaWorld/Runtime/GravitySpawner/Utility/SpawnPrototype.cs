@@ -3,7 +3,8 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Core.Runtime.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
@@ -11,7 +12,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.Utility.Runtime;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
 {
@@ -68,7 +69,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
                 
                 PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
 
-                SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+                TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
                         transform.Position, transform.Scale, transform.Rotation, new List<OnDisableSimulatedBodyAction>{gravitySpawnerTerrainObject});
                 
                 group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);

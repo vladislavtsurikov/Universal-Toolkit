@@ -2,15 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Undo;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
-using VladislavTsurikov.Undo.Editor.UndoActions;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
 {
@@ -27,7 +29,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
 
             PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
 
-            SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
+            TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
                 transform.Position, transform.Scale, transform.Rotation, new List<OnDisableSimulatedBodyAction>{onDisableSimulatedBodyAction});
                 
             group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
@@ -41,6 +43,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
             {
                 PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, Random.insideUnitSphere.normalized);
             }
+            
+            Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObjectSimulatedBody(simulatedBody));
         }
         
         public static void SpawnGameObject(Group group, PrototypeGameObject proto, ExplodePhysicsToolSettings settings, RayHit rayHit, Vector3 positionSpawn, Vector3 centerPosition)

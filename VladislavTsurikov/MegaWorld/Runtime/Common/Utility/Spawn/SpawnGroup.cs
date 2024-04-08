@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
@@ -13,7 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 {
     public static class SpawnGroup 
     {
-        public static void SpawnTerrainDetails(Group group, List<Prototype> protoTerrainDetailList, BoxArea boxArea)
+        public static void SpawnTerrainDetails(Group group, CallbackList<Prototype> protoTerrainDetailList, BoxArea boxArea)
         {
             if(TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
@@ -47,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
             }
         }
 
-        public static void SpawnTerrainTexture(Group group, List<Prototype> prototypeTerrainTextures, BoxArea boxArea, float textureTargetStrength)
+        public static void SpawnTerrainTexture(Group group, IReadOnlyList<Prototype> prototypeTerrainTextures, BoxArea boxArea, float textureTargetStrength)
         {
             if(TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {

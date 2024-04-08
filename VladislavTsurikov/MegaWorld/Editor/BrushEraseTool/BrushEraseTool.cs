@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
@@ -26,8 +25,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
@@ -40,7 +39,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
     [AddToolComponents(new[] { typeof(BrushEraseToolSettings), typeof(BrushSettings) })]
-    [AddPrototypeComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)} , new []{typeof(AdditionalEraseElement)})]
+    [AddPrototypeComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)} , new []{typeof(AdditionalEraseSetting)})]
     [AddGroupComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)}, new []{typeof(FilterSettings)})]
     [AddGroupComponents(new []{typeof(PrototypeTerrainDetail)}, new []{typeof(MaskFilterComponentSettings)})]
     public class BrushEraseTool : ToolWindow
@@ -136,8 +135,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                 FilterMaskOperation.UpdateMaskTexture(filterSettings.MaskFilterComponentSettings, boxArea);
             }
             
-            List<TerrainObjectInstance> persistentItemForDestroy = new List<TerrainObjectInstance>();
-
             PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true,(proto, instance) =>
             {
                 if(proto.Active == false || proto.Selected == false)
@@ -145,7 +142,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     return true;
                 }
 
-                AdditionalEraseElement additionalEraseElement = (AdditionalEraseElement)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseElement));
+                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
 
                 float fitness = 1;
 
@@ -177,19 +174,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                 {
                     float randomSuccessForErase = Random.Range(0.0f, 1.0f);
 
-                    if(randomSuccessForErase < additionalEraseElement.Success / 100)
+                    if(randomSuccessForErase < additionalEraseSetting.Success / 100)
                     {
-                        persistentItemForDestroy.Add(instance);
+                        Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedTerrainObject(instance));
+                        instance.Destroy();
                     }
                 }
 
                 return true;
             });
-
-            foreach (TerrainObjectInstance item in persistentItemForDestroy)
-            {
-                item.Destroy();
-            }
 #endif
         }
 
@@ -211,7 +204,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     return true;
                 }
 
-                AdditionalEraseElement additionalEraseElement = (AdditionalEraseElement)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseElement));
+                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
                 
                 GameObject prefabRoot = GameObjectUtility.GetPrefabRoot(go);
                 
@@ -252,7 +245,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     {
                         float randomSuccessForErase = Random.Range(0.0f, 1.0f);
 
-                        if(randomSuccessForErase < additionalEraseElement.Success / 100)
+                        if(randomSuccessForErase < additionalEraseSetting.Success / 100)
                         {
                             Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedGameObject(go));
                             Object.DestroyImmediate(prefabRoot);
@@ -309,7 +302,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     continue;
                 }
 
-                AdditionalEraseElement additionalEraseElement = (AdditionalEraseElement)prototypeTerrainDetail.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseElement));
+                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)prototypeTerrainDetail.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
 
                 int[,] localData = area.TerrainUnder.terrainData.GetDetailLayer(
                     startPosition.x, startPosition.y,
@@ -329,7 +322,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 
                             float randomSuccess = Random.Range(0.0f, 1.0f);
 
-                            if(randomSuccess < additionalEraseElement.Success / 100)
+                            if(randomSuccess < additionalEraseSetting.Success / 100)
                             {
                                 Vector2 normal = Vector2.zero;
                                 normal.y = Mathf.InverseLerp(0, eraseSize.y, current.y);
@@ -362,7 +355,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 
                             float randomSuccess = Random.Range(0.0f, 1.0f);
 
-                            if(randomSuccess < additionalEraseElement.Success / 100)
+                            if(randomSuccess < additionalEraseSetting.Success / 100)
                             {
                                 float maskFitness = area.GetAlpha(current + offset, eraseSize);
 

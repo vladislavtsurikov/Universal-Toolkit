@@ -2,7 +2,7 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings
 {
     [MenuItem("Physics Effects")]
     public class PhysicsEffects : ComponentStack.Runtime.Component

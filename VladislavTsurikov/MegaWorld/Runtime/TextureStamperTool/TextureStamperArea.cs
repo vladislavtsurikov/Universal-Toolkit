@@ -3,7 +3,6 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
@@ -15,8 +14,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
         public List<Bounds> CellList = new List<Bounds>();
 
         public bool UseMask;
-        public MaskType MaskType = MaskType.Procedural;
-        public ProceduralMask ProceduralMask = new ProceduralMask();
         public CustomMasks CustomMasks = new CustomMasks();
         
         public bool ShowCells = true;
@@ -25,9 +22,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 
         protected override void SetupArea()
         {
+#if UNITY_EDITOR
             OnSetAreaBounds -= () => TextureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
             OnSetAreaBounds += () => TextureStamper.StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
-            
+#endif
             OnSetAreaBounds -= ClearCellList;
             OnSetAreaBounds += ClearCellList;
         }
@@ -74,23 +72,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
                 return Texture2D.whiteTexture;
             }
 
-            switch (MaskType)
-            {
-                case MaskType.Custom:
-                {
-                    Texture2D texture = CustomMasks.GetSelectedBrush();
-
-                    return texture;
-                }
-                case MaskType.Procedural:
-                {
-                    Texture2D texture = ProceduralMask.Mask;
-
-                    return texture;
-                }
-            }
-
-            return Texture2D.whiteTexture;
+            return CustomMasks.GetSelectedBrush();
         }
 
         public BoxArea GetAreaVariablesFromSpawnCell(RayHit hit, Bounds bounds)

@@ -9,18 +9,38 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
     public abstract class ToolWindow : ComponentStack.Runtime.Component
     {
-	    public static int EditorHash = "Editor".GetHashCode();
+	    private bool _mouseDownHappened;
 	    
+	    public static int EditorHash = "Editor".GetHashCode();
+
 	    internal void HandleKeyboardEventsInternal()
         {
             switch (Event.current.type)
             {
+	            case EventType.MouseDown:
+	            {
+		            //Second Mouse Button
+		            if (Event.current.button == 1)
+		            {
+			            _mouseDownHappened = true;
+		            }
+	                
+		            break;
+	            }
+	            case EventType.MouseUp:
+	            {
+		            _mouseDownHappened = false;
+		            break;
+	            }
                 case EventType.Layout:
                 case EventType.Repaint:
                     return;
             }
-
-            HandleKeyboardEvents();
+			
+            if (!_mouseDownHappened)
+            {
+	            HandleKeyboardEvents();
+            }
         }
 
         internal void DoToolInternal()
@@ -46,7 +66,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 	        OnEnable();
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
 	        Selected = false;
         }

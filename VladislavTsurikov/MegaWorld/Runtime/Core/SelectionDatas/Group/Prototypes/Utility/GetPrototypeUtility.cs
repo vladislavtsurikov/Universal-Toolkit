@@ -29,29 +29,5 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             
             return prototypes;
         }
-
-        public static List<T> GetPrototypes<T>(int id)
-            where T: Prototype
-        {
-            List<T> prototypes = new List<T>();
-            
-            foreach (Group group in AllAvailableGroups.GetAllGroups())
-            {
-                if (group.PrototypeType != typeof(T))
-                {
-                    continue;
-                }
-                
-                foreach (Prototype proto in group.PrototypeList)
-                {
-                    if(proto.ID == id)
-                    {
-                        prototypes.Add((T)proto);
-                    }
-                }
-            }
-            
-            return prototypes;
-        }
     }
 }

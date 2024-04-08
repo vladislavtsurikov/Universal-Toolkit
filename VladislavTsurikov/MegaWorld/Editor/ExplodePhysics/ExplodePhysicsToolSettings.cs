@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using System;
 using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 

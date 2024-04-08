@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
@@ -25,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             terrain.Flush();
         }
 
-        public static void AddTerrainDetailToTerrain(Terrain terrain, List<Prototype> protoTerrainDetailList)
+        public static void AddTerrainDetailToTerrain(Terrain terrain, IReadOnlyList<Prototype> protoTerrainDetailList)
         {
             bool found;
 

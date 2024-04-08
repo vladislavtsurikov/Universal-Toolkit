@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿#if UNITY_EDITOR
+using System.Collections;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Core.Runtime.Utility;
@@ -67,3 +68,4 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
         }
     }
 }
+#endif

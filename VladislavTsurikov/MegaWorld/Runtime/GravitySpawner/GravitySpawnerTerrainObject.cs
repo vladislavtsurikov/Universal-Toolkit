@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using PrototypeTerrainObject = VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject;

@@ -9,7 +9,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
     {
         public bool Visualisation = true;
         public bool AutoRespawn;
-        public float DelayAutoRespawn;
+        public float DelayAutoRespawn = 0.1f;
         
         [NonSerialized]
         public StamperTool StamperTool;

@@ -4,7 +4,7 @@ using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings
 {
     public static class PositionOffsetSettingsEditor 
     {

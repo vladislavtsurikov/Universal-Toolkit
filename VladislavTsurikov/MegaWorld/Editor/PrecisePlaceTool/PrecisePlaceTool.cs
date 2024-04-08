@@ -33,17 +33,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
     [AddPrototypeComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)}, new []{typeof(PrecisePlaceSettings), typeof(PrecisePlaceSettings)})]
     public class PrecisePlaceTool : ToolWindow
     {
-        private bool _mouseUp = true;
-
         private SpacingMouseMove _mouseMove = new SpacingMouseMove();
 
         private PrecisePlaceToolSettings _settings;
+
+        private bool _mouseUp;
         
         protected override void OnEnable()
         {
             _settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
-            
-            _mouseUp = true;
             
             _mouseMove = new SpacingMouseMove();
             _mouseMove.OnMouseDown += OnMouseDown;
@@ -55,7 +53,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
         
         protected override void DoTool()
         {
+            ActiveObjectController.DestroyObjectIfNecessary();
+            
             float lookAtSize = 0;
+            
             if (ActiveObjectController.PlacedObjectData != null)
             {
                 Bounds bounds = ActiveObjectController.PlacedObjectData.GameObject.GetObjectWorldBounds();
@@ -74,8 +75,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
                     lookAtSize = 0;
                 }
             }
-            
-            StartingAction();
 
             _mouseMove.Spacing = _settings.Spacing;
             _mouseMove.LookAtSize = lookAtSize;
@@ -92,7 +91,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
             _mouseMove.Run();
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             if(ActiveObjectController.PlacedObjectData != null)
             {
@@ -106,28 +105,25 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 
             Tools.current = Tool.None;
 
-            if(!_mouseUp)
+            if (ActiveObjectController.PlacedObjectData == null)
             {
                 return;
             }
+            
+            settings.MouseActionStack.CheckShortcutCombos(ActiveObjectController.PlacedObjectData.GameObject, _mouseMove.Raycast);
 
-            if(ActiveObjectController.PlacedObjectData != null)
+            if(PrecisePlaceToolAllShortcutCombos.Instance.Restore.IsActive())
             {
-                settings.MouseActionStack.CheckShortcutCombos(ActiveObjectController.PlacedObjectData.GameObject, _mouseMove.Raycast);
-
-                if(PrecisePlaceToolAllShortcutCombos.Instance.Restore.IsActive())
-                {
-                    ActiveObjectController.PlacedObjectData.GameObject.CopyTransform(ActiveObjectController.PlacedObjectData.Proto.Prefab);
-                    ActiveObjectController.PlacedObjectData.Proto.PastTransform = new PastTransform(ActiveObjectController.PlacedObjectData.GameObject.transform);
-                    Event.current.Use();
-                }
-
-                if(!settings.MouseActionStack.IsAnyMouseActionActive)
-                {
-                    SelectionPrototypeUtility.ScrollWheelAction(_mouseMove);
-                }
+                ActiveObjectController.PlacedObjectData.GameObject.CopyTransform(ActiveObjectController.PlacedObjectData.Proto.Prefab, false);
+                ActiveObjectController.PlacedObjectData.Proto.PastTransform = new PastTransform(ActiveObjectController.PlacedObjectData.GameObject.transform);
+                Event.current.Use();
             }
-		}
+
+            if(!settings.MouseActionStack.IsAnyMouseActionActive)
+            {
+                SelectionPrototypeUtility.ScrollWheelAction(_mouseMove);
+            }
+        }
 
         public override bool DisableToolIfUnityToolActive()
         {
@@ -172,43 +168,31 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
             if(rayHit != null)
             {
                 PlacedObjectPrototype proto = SelectionPrototypeUtility.GetSelectedProto(group);
-
+                
                 ActiveObjectController.PlacedObjectData = PlaceObjectUtility.DragPlace(group, proto, rayHit, _mouseMove);
             }
         }
         
         private void OnMouseMove()
         {
+            if (ActiveObjectController.PlacedObjectData == null)
+            {
+                Group group = WindowData.Instance.SelectionData.SelectedData.SelectedGroup;
+                ActiveObjectController.PlacedObjectData = PlaceObjectUtility.TryToPlace(group, SelectionPrototypeUtility.GetSelectedProto(group), _mouseMove.Raycast);
+            }
+            
             if(ActiveObjectController.PlacedObjectData != null)
             {
                 _settings.MouseActionStack.OnMouseMove();
                 ActiveObjectController.PlacedObjectData.Proto.PastTransform = new PastTransform(ActiveObjectController.PlacedObjectData.GameObject.transform);
+                
+                ObjectActions.UpdateTransform(_mouseMove.Raycast);
             }
         }
 
         private void OnRepaint()
         {
             PrecisePlaceVisualisation.DrawVisualisation(_mouseMove);
-        }
-
-        private void StartingAction()
-        {
-            Group group = WindowData.Instance.SelectionData.SelectedData.SelectedGroup;
-
-            ActiveObjectController.DestroyObjectIfNecessary();
-
-            if (_mouseMove.Raycast != null)
-            {
-                if (ActiveObjectController.PlacedObjectData == null)
-                {
-                    ActiveObjectController.PlacedObjectData = PlaceObjectUtility.TryToPlace(group, SelectionPrototypeUtility.GetSelectedProto(group), _mouseMove.Raycast);
-                }
-
-                if (ActiveObjectController.PlacedObjectData != null && _mouseUp)
-                {
-                    ObjectActions.UpdateTransform(_mouseMove.Raycast);
-                }
-            }
         }
     }
 }

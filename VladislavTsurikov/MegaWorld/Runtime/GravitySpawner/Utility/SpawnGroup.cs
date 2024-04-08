@@ -1,12 +1,11 @@
 ﻿using System.Collections;
-using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
@@ -84,19 +83,22 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
                     SpawnPrototype.SpawnTerrainObject(gravitySpawner, group, proto, terrainsMaskManager, area, rayHit);
                 }
             });
-
-            yield return new YieldCustom(IsDone);
             
-            bool IsDone()
+            while (!IsDone())
             {
 #if UNITY_EDITOR
                 gravitySpawner.UpdateDisplayProgressBar("Running", "Running " + group.name + " (simulated objects left: " + SimulatedBodyStack.Count + ")");
 #endif
 
-                return SimulatedBodyStack.Count == 0;
+                yield return null;
             }
             
             ScriptingSystem.RemoveColliders(area);
+            
+            bool IsDone()
+            {
+                return SimulatedBodyStack.Count == 0;
+            }
         }
     }
 }

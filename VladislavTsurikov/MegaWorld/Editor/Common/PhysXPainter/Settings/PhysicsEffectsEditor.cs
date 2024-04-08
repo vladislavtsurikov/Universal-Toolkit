@@ -4,9 +4,9 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings
 {
     [ElementEditor(typeof(PhysicsEffects))]
     public class PhysicsEffectsEditor : IMGUIElementEditor

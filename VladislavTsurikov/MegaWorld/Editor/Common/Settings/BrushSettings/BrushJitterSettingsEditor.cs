@@ -19,12 +19,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.BrushSettings
 
             jitter.BrushSizeJitter = CustomEditorGUILayout.Slider(_brushJitter, jitter.BrushSizeJitter, 0f, 1f);
 
-			CustomEditorGUILayout.Separator();
+			//CustomEditorGUILayout.Separator();
 
 			jitter.BrushScatter = CustomEditorGUILayout.Slider(_brushScatter, jitter.BrushScatter, 0f, 1f);
             jitter.BrushScatterJitter = CustomEditorGUILayout.Slider(_brushJitter, jitter.BrushScatterJitter, 0f, 1f);
 
-			CustomEditorGUILayout.Separator();
+			//CustomEditorGUILayout.Separator();
 
 			if(WindowData.Instance.SelectedData.HasOneSelectedGroup())
 			{
@@ -34,7 +34,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.BrushSettings
 					brush.BrushRotation = CustomEditorGUILayout.Slider(_brushRotation, brush.BrushRotation, -180f, 180f);
             		jitter.BrushRotationJitter = CustomEditorGUILayout.Slider(_brushJitter, jitter.BrushRotationJitter, 0f, 1f);
 
-					CustomEditorGUILayout.Separator();
+					//CustomEditorGUILayout.Separator();
 				}
 			}
         }

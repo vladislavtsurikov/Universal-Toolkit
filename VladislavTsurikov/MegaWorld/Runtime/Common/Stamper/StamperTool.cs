@@ -83,7 +83,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
             SpawnProgress = 0;
             _displayProgressBar = displayProgressBar;
             
-            yield return Spawn();
+            yield return Spawn(_displayProgressBar);
             
             SpawnProgress = 1;
             _isCancelSpawn = true;
@@ -114,6 +114,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         public virtual void OnCancelSpawn(){}
         private protected virtual void OnStamperEnable(){}
         
-        protected abstract IEnumerator Spawn();
+        protected abstract IEnumerator Spawn(bool displayProgressBar);
     }
 }

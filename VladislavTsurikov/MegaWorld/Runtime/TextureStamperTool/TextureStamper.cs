@@ -6,7 +6,6 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Coroutines.Runtime;
-using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
@@ -21,6 +20,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+#if UNITY_EDITOR
+using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
+#endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 {
@@ -85,7 +87,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn()
+        protected override IEnumerator Spawn(bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;

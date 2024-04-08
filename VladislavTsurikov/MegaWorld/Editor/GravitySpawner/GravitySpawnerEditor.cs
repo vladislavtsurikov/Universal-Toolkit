@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem;
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Editor.TextureStamperTool;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions;

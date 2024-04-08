@@ -5,7 +5,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public static class UnspawnTerrainDetail
     {
-        public static void Unspawn(List<Prototype> protoTerrainDetailList, bool unspawnSelected)
+        public static void Unspawn(IReadOnlyList<Prototype> protoTerrainDetailList, bool unspawnSelected)
         {
             foreach (PrototypeTerrainDetail prototype in protoTerrainDetailList)
             {

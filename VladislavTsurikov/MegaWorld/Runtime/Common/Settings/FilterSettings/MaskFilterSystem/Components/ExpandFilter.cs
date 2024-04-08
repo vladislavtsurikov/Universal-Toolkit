@@ -46,6 +46,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 
                 Material.SetTexture("_MainTex", maskFilterContext.SourceRenderTexture);
                 Material.SetFloat("KernelSize", localKernelSize);
+                Material.SetFloat("MaxKernelSize", MaxKernelSizeForNextIteration);
 
                 RenderTexture temporaryTextureSource = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
 

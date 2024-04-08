@@ -21,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject RendererPrototype => 
             (RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject)TerrainObjectRendererAPI.AddMissingPrototype(Prefab);
 
-        public override int ID
+        public int RendererPrototypeID
         {
             get
             {
@@ -30,13 +30,23 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 
                 if (rendererPrototype == null)
                 {
-                    return _id;
+                    return -1;
                 }
                 
                 return rendererPrototype.ID; 
             }
         }
 #endif
+
+        public override void SetupPrototype()
+        {
+            AllAvailableTerrainObjectPrototypes.AddPrototype(this);
+        }
+
+        public override void OnDisablePrototype()
+        {
+            AllAvailableTerrainObjectPrototypes.RemovePrototype(this);
+        }
         
         public override bool IsSamePrototypeObject(Object obj)
         {

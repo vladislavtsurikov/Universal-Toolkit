@@ -1,8 +1,10 @@
 ﻿using System;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.Interfaces;
 using VladislavTsurikov.Core.Runtime.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
 using Object = UnityEngine.Object;
@@ -10,7 +12,7 @@ using Object = UnityEngine.Object;
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes
 {
     [Serializable]
-    public abstract class Prototype : IHasElementStack, IShowIcon
+    public abstract class Prototype : IHasElementStack, IShowIcon, IRemoved
     {
         [OdinSerialize] 
         protected int _id;
@@ -22,7 +24,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         private ComponentStackManager _componentStackManager;
 
         public virtual string Name { get; set; }
-        public virtual int ID => _id;
+        public int ID => _id;
 
         public bool Active = true;
 
@@ -42,6 +44,40 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public bool IsRedIcon => !Active;
 #endif
         
+        public abstract void OnCreatePrototype(Object obj);
+        public abstract bool IsSamePrototypeObject(Object obj);
+        
+        public virtual void SetupPrototype() { }
+        public virtual void OnDisablePrototype() { }
+         
+        internal void OnCreate(int id, Object obj)
+        {
+            _id = id;
+            OnCreatePrototype(obj);
+
+            Setup();
+        }
+        
+        internal void Setup()
+        {
+            SetupComponentStack();
+            
+            AllAvailablePrototypes.AddPrototype(this);
+
+            SetupPrototype();
+        }
+
+        internal void OnDisable()
+        {
+            AllAvailablePrototypes.RemovePrototype(this);
+            OnDisablePrototype();
+        }
+        
+        void IRemoved.OnRemove()
+        {
+            OnDisable();
+        }
+
         public void SetupComponentStack()
         {
             if (_componentStackManager == null)
@@ -62,16 +98,5 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             return _componentStackManager.ToolsComponentStack.GetElement(toolType, elementType);
         }
-
-        internal void InitInternal(int id, Object obj)
-        {
-            _id = id;
-            Init(obj);
-            
-            SetupComponentStack();
-        }
-
-        public abstract void Init(Object obj);
-        public abstract bool IsSamePrototypeObject(Object obj);
     }
 }

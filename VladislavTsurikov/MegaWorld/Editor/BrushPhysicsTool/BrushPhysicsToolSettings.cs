@@ -1,6 +1,6 @@
 using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {

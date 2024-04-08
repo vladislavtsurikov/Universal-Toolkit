@@ -5,7 +5,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.O
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {
@@ -16,7 +16,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
         Sphere,
     }
     
-    [Serializable]
     [MenuItem("Overlap Check Settings")]
     public class OverlapCheckSettings : ComponentStack.Runtime.Component
     {
@@ -72,32 +71,34 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
         }
 
 #if RENDERER_STACK
-        public static bool RunOverlapCheckForTerrainObject(OverlapInstance spawnOverlapInstance)
+        private static bool RunOverlapCheckForTerrainObject(OverlapInstance spawnOverlapInstance)
         {
             bool overlaps = false;
 
             PrototypeTerrainObjectOverlap.OverlapBox(spawnOverlapInstance.Obb.Center, spawnOverlapInstance.Obb.Size * PreferenceElementSingleton<OverlapCheckSettingsPreference>.Instance.MultiplyFindSize, 
                 spawnOverlapInstance.Obb.Rotation, null, true,
                 false, (proto, persistentInstance) =>
-            {
-                OverlapCheckSettings localOverlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
-
-                if(localOverlapCheckSettings.OverlapShapeEnum == OverlapShapeEnum.None)
                 {
+                    OverlapCheckSettings localOverlapCheckSettings =
+                        (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
+
+                    if (localOverlapCheckSettings.OverlapShapeEnum == OverlapShapeEnum.None)
+                    {
+                        return true;
+                    }
+
+                    OverlapInstance overlapInstance = new OverlapInstance(localOverlapCheckSettings,
+                        persistentInstance.Position, persistentInstance.Scale, persistentInstance.Rotation,
+                        proto.Extents);
+
+                    if (overlapInstance.Intersects(spawnOverlapInstance))
+                    {
+                        overlaps = true;
+                        return false;
+                    }
+
                     return true;
-                }
-
-                OverlapInstance overlapInstance = new OverlapInstance(localOverlapCheckSettings,
-                    persistentInstance.Position, persistentInstance.Scale, persistentInstance.Rotation, proto.Extents);
-
-                if (overlapInstance.Intersects(spawnOverlapInstance))
-                {
-                    overlaps = true;
-                    return false;
-                }
-
-                return true;
-            });
+                });
 
             return overlaps;
         }

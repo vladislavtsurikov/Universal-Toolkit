@@ -5,7 +5,10 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ColliderSystem.Runtime.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
 {
@@ -44,12 +47,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
             }
         }
 
-        public override void UndoCall()
+        protected override void RegisterUndo()
         {
             if(EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
             {
                 GameObject go = (GameObject)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new GameObjectTransform(go));
+            }
+            else if(EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
+            {
+                TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
+                Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
             }
         }
 

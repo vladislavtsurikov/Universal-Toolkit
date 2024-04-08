@@ -18,14 +18,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
 
         public override void OnGUI(Rect rect, int index) 
         {
-            _smoothFilter.SmoothVerticality = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), Direction, _smoothFilter.SmoothVerticality, -1.0f, 1.0f);
-            rect.y += EditorGUIUtility.singleLineHeight;
             _smoothFilter.SmoothBlurRadius = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), KernelSize, _smoothFilter.SmoothBlurRadius, 0.0f, 10.0f);
         }
 
         public override float GetElementHeight(int index) 
         {
-            return EditorGUIUtility.singleLineHeight * 3;
+            return EditorGUIUtility.singleLineHeight * 2;
         }
 
         public static readonly GUIContent Direction = EditorGUIUtility.TrTextContent("Verticality", "Blur only up (1.0), only down (-1.0) or both (0.0)");

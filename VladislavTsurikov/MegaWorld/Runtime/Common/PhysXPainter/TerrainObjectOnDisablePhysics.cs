@@ -2,15 +2,17 @@
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.Coroutines.Runtime;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
 {
     public class TerrainObjectOnDisablePhysics : OnDisableSimulatedBodyAction
     {
@@ -49,9 +51,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettin
                         return;
                     }
                     
-                    TerrainObjectRendererAPI.AddInstance(_proto,
+                    TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(_proto,
                         SimulatedBody.GameObject.transform.position, SimulatedBody.GameObject.transform.lossyScale,
                         SimulatedBody.GameObject.transform.rotation);
+
+                    TerrainObjectSimulatedBody terrainObjectSimulatedBody = (TerrainObjectSimulatedBody)SimulatedBody;
+                    terrainObjectSimulatedBody.TerrainObjectInstance = terrainObjectInstance;
 
                     addedInstance = true;
                 }

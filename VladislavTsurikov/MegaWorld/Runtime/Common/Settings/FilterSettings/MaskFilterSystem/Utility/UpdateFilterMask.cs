@@ -6,7 +6,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 {
     public static class UpdateFilterMask 
     {
-        public static void UpdateFilterMaskForPrototypes(List<Prototype> prototypes, BoxArea boxArea)
+        public static void UpdateFilterMaskForPrototypes(IReadOnlyList<Prototype> prototypes, BoxArea boxArea)
         {
             if(boxArea.TerrainUnder == null)
             {

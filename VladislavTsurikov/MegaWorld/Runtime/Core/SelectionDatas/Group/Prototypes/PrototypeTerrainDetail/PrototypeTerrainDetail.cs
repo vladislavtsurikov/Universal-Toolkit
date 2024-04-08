@@ -79,7 +79,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         }
 #endif
         
-        public override void Init(Object obj)
+        public override void OnCreatePrototype(Object obj)
 	    {
 		    if (obj is GameObject gameObject)
 		    {

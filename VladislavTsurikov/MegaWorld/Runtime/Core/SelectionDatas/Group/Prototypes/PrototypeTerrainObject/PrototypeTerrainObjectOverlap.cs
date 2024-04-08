@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
 
@@ -15,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             TerrainObjectRendererAPI.OverlapSphere(sphereCenter, sphereRadius, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
             {
-                List<PrototypeTerrainObject> prototypes = GetPrototypeUtility.GetPrototypes<PrototypeTerrainObject>(largeObjectInstance.PrototypeID);
+                List<PrototypeTerrainObject> prototypes = AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
                 
                 if(prototypes.Count == 0)
                 {
@@ -37,20 +36,24 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             OverlapBox(bounds.center, bounds.size, Quaternion.identity, objectFilter, quadTree, checkObbIntersection, func);
         }
 
-        public static void OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<PrototypeTerrainObject, TerrainObjectInstance, bool> func)
+        public static void OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, 
+            bool quadTree, bool checkObbIntersection, Func<PrototypeTerrainObject, TerrainObjectInstance, bool> func)
         {
             TerrainObjectRendererAPI.OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
             {
-                List<PrototypeTerrainObject> prototypes = GetPrototypeUtility.GetPrototypes<PrototypeTerrainObject>(largeObjectInstance.PrototypeID);
+                List<PrototypeTerrainObject> prototypes = AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
 
-                if(prototypes.Count == 0)
+                if(prototypes == null || prototypes.Count == 0)
                 {
                     return true;
                 }
 
                 foreach (var prototype in prototypes)
                 {
-                    func.Invoke(prototype, largeObjectInstance);
+                    if (!func.Invoke(prototype, largeObjectInstance))
+                    {
+                        return false;
+                    }
                 }
                 
                 return true;

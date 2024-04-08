@@ -16,9 +16,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
     {
         public virtual void OnMouseMove(){}
         public virtual bool CheckShortcutCombo(){return false;}
-        public virtual void ObjectFound(){}
-        public virtual Color GetColorHandleButton(){return new Color(0.5f, 0.5f, 0.5f, 0.7f);}
-        public virtual void UndoCall(){}
+        protected virtual void OnObjectFound(){}
+        protected virtual Color GetColorHandleButton(){return new Color(0.5f, 0.5f, 0.5f, 0.7f);}
+        protected virtual void RegisterUndo(){}
         
         public void HandleButtons()
         {
@@ -54,8 +54,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
                         {
                             EditTool.FindObject = new CommonInstance(proto, prefabRoot);
 
-                            UndoCall();
-                            ObjectFound();
+                            RegisterUndo();
+                            OnObjectFound();
                             return false;
                         }
 
@@ -84,8 +84,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
                         if(DrawHandles.HandleButton(ToolWindow.EditorHash + obj.GetHashCode(), obj.Position, GetColorHandleButton(), new Color(1f, 1f, 0f, 0.7f)))
                         {
                             EditTool.FindObject = new CommonInstance(proto, obj);
-
-                            ObjectFound();
+                            
+                            RegisterUndo();
+                            OnObjectFound();
                             return false;
                         }
 

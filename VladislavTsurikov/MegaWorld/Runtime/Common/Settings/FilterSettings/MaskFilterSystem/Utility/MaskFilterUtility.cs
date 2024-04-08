@@ -55,7 +55,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 		{
 			if(data.SelectedData.HasOneSelectedPrototype())
 			{
-				Debug.Log("GetMaskFilterFromSelectedPrototype");
 				MaskFilterComponentSettings maskFilterComponentSettings = (MaskFilterComponentSettings)data.SelectedData.SelectedPrototype.GetElement(typeof(MaskFilterComponentSettings));
 
 				return maskFilterComponentSettings.MaskFilterStack;

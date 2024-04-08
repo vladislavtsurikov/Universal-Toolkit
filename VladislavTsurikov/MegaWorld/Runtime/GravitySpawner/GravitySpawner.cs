@@ -3,9 +3,9 @@ using System.Collections;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
+using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
@@ -96,11 +96,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
             
 #if UNITY_EDITOR
             StamperVisualisation = new GravitySpawnerVisualisation();
+            
+            void Action() => StamperVisualisation.StamperMaskFilterVisualisation.NeedUpdateMask = true;
+            
+            Area.OnSetAreaBounds -= Action;
+            Area.OnSetAreaBounds += Action;
 #endif
-            
-            Area.OnSetAreaBounds -= StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
-            Area.OnSetAreaBounds += StamperVisualisation.StamperMaskFilterVisualisation.SetNeedUpdateMask;
-            
+
             Area.SetAreaBoundsIfNecessary(this, true);
         }
 
@@ -109,7 +111,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn()
+        protected override IEnumerator Spawn(bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;

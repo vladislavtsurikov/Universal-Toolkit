@@ -19,6 +19,7 @@
         float4 _MainTex_TexelSize;
         
         float KernelSize;
+        float MaxKernelSize;
 
         static int KernelWeightCount = 7;
         static float KernelWeights[7] = {0.95f, 0.85f, 0.7f, 0.4f, 0.2f, 0.15f, 0.05f};
@@ -94,10 +95,14 @@
 				float2 heightmapUV = PaintContextUVToHeightmapUV(i.pcUV);
 
 				float height = UnpackHeightmap(tex2D(_MainTex, heightmapUV));
-
+				
 				float newHeight = Smooth(heightmapUV, height, false);
 
-				newHeight = Remap(newHeight, 0, 0.3);
+				float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
+
+                float maxClamp = Lerp(1, 0.3f, inverseValue);
+
+				newHeight = Remap(newHeight, 0, maxClamp);
 
 				return newHeight;
 			}
@@ -119,8 +124,12 @@
 
 				float newHeight = Smooth(heightmapUV, height, true);
 
-				newHeight = Remap(newHeight, 0, 0.3);
+				float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
 
+                float maxClamp = Lerp(1, 0.3f, inverseValue);
+
+				newHeight = Remap(newHeight, 0, maxClamp);
+				
 				return newHeight;
 			}
 			ENDCG

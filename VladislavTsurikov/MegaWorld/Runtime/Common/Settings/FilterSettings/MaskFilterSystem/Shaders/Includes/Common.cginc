@@ -1,6 +1,18 @@
-﻿float InverseLerp(float a, float b, float t)
+﻿float Clamp01(float value)
+{
+    if (value < 0.0)
+        return 0.0f;
+    return value > 1.0 ? 1 : value;
+}
+
+float InverseLerp(float a, float b, float t)
 {
     return (t - a) / (b - a);
+}
+
+float Lerp(float a, float b, float t)
+{
+    return  a + (b - a) * Clamp01(t);
 }
 
 float Remap(float height, float remapMin, float remapMax)

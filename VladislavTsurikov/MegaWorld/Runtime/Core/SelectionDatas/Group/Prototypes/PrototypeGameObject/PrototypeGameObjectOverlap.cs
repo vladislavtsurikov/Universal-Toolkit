@@ -37,7 +37,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 
                 foreach (var prototype in prototypes)
                 {
-                    func.Invoke(prototype, go);
+                    if (!func.Invoke(prototype, go))
+                    {
+                        return;
+                    }
                 }
             }
         }
@@ -74,7 +77,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 
                 foreach (var prototype in prototypes)
                 {
-                    func.Invoke(prototype, go);
+                    if (!func.Invoke(prototype, go))
+                    {
+                        return;
+                    }
                 }
             }
         }

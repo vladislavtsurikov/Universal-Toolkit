@@ -7,7 +7,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public static class UnspawnGameObject
     {
-        public static void Unspawn(List<Prototype> unspawnPrototypes, bool unspawnSelected)
+        public static void Unspawn(IReadOnlyList<Prototype> unspawnPrototypes, bool unspawnSelected)
         {
             List<GameObject> unspawnPrefabs = new List<GameObject>();
             

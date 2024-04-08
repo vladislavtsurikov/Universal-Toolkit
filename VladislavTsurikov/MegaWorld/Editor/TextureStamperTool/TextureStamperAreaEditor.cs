@@ -5,7 +5,6 @@ using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool;
 
 namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
@@ -13,7 +12,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 	[ElementEditor(typeof(TextureStamperArea))]
     public class TextureStamperAreaEditor : IMGUIElementEditor
     {
-	    private ProceduralMaskEditor _proceduralMaskEditor;
 	    private CustomMasksEditor _customMasksEditor;
 
 	    private GUIContent _cellSize = new GUIContent("Cell Size", "Sets the cell size in meters.");
@@ -23,7 +21,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
 	    public override void OnEnable()
 	    {
-		    _proceduralMaskEditor = new ProceduralMaskEditor(Area.ProceduralMask);
 		    _customMasksEditor = new CustomMasksEditor(Area.CustomMasks); 
 	    }
 	    
@@ -66,23 +63,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
             		if(Area.UseMask)
             		{
-                	    Area.MaskType = (MaskType)CustomEditorGUILayout.EnumPopup(new GUIContent("Mask Type"), Area.MaskType);
-
-            		    switch (Area.MaskType)
-			    	    {
-			    	    	case MaskType.Custom:
-			    	    	{
-				                _customMasksEditor.OnGUI();
-
-			    	    		break;
-			    	    	}
-			    	    	case MaskType.Procedural:
-			    	    	{
-				                _proceduralMaskEditor.OnGUI();
-
-			    	    		break;
-			    	    	}
-			    	    }
+	                    _customMasksEditor.OnGUI();
             		}
 				}
 				

@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings
 {
     [MenuItem("Physics Transform Settings")]
     public class PhysicsTransformComponentSettings : Component

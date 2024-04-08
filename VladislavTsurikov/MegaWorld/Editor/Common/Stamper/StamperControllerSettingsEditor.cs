@@ -50,28 +50,25 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
 	            DrawSpawnControls();
             }
             
-            if (_stamperControllerSettings.StamperTool.IsCancelSpawn)
+            GUILayout.BeginHorizontal();
             {
-	            GUILayout.BeginHorizontal();
+	            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
+	            if(CustomEditorGUILayout.ClickButton("Unspawn Selected Prototypes", ButtonStyle.Remove, ButtonSize.ClickButton))
 	            {
-		            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-		            if(CustomEditorGUILayout.ClickButton("Unspawn Selected Prototypes", ButtonStyle.Remove, ButtonSize.ClickButton))
+		            if (EditorUtility.DisplayDialog("WARNING!",
+			                "Are you sure you want to remove all resource instances that have been selected from the scene?",
+			                "OK", "Cancel"))
 		            {
-			            if (EditorUtility.DisplayDialog("WARNING!",
-				                "Are you sure you want to remove all resource instances that have been selected from the scene?",
-				                "OK", "Cancel"))
-			            {
-				            UnspawnUtility.UnspawnGroups(_stamperControllerSettings.StamperTool.Data.SelectedData.SelectedGroupList, true);
-				            GUILayout.BeginHorizontal();
-			            }
+			            UnspawnUtility.UnspawnGroups(_stamperControllerSettings.StamperTool.Data.SelectedData.SelectedGroupList, true);
+			            GUILayout.BeginHorizontal();
 		            }
-            
-		            GUILayout.Space(5);
 	            }
-	            GUILayout.EndHorizontal();
             
-	            GUILayout.Space(3);
+	            GUILayout.Space(5);
             }
+            GUILayout.EndHorizontal();
+            
+            GUILayout.Space(3);
         }
         
         private void DrawSpawnControls()

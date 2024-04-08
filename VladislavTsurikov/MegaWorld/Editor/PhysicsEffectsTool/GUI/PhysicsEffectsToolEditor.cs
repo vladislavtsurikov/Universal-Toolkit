@@ -1,10 +1,9 @@
 #if UNITY_EDITOR
 using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.Common;
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings;
+using VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
@@ -15,13 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.GUI
     {
 	    public override void DrawButtons()
 	    {
-		    if(WindowData.Instance.SelectedData.HasOneSelectedGroup())
-		    {
-			    if(WindowData.Instance.SelectedData.SelectedGroup.PrototypeType == typeof(PrototypeGameObject))
-			    {
-				    UndoEditor.OnGUI();
-			    }
-		    }
+		    UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
 		    
 		    PhysicsEffectsToolSettingsEditor editor = (PhysicsEffectsToolSettingsEditor)ToolsComponentStackEditor.GetEditor(typeof(PhysicsEffectsTool), typeof(PhysicsEffectsToolSettings));
 		    editor.PhysicsEffectStackEditor.DrawButtons();

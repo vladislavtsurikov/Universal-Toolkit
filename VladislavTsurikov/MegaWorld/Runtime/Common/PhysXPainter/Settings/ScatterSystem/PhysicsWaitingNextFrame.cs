@@ -1,7 +1,7 @@
 ﻿using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.PhysicsToolsSettings
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings.ScatterSystem
 {
     public class PhysicsWaitingNextFrame : WaitingNextFrame
     {

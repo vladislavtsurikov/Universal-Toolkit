@@ -7,17 +7,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
 	{
         private static readonly List<Group> _groupList = new List<Group>();
 
-        static AllAvailableGroups()
-        {
-            if (Resources.FindObjectsOfTypeAll(typeof(Group)) is Group[] groups)
-            {
-                foreach (Group group in groups)
-                {
-                    AddGroup(group);
-                }
-            }
-        } 
-
         public static List<Group> GetAllGroups()
         {
             return _groupList;
@@ -29,6 +18,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
             {
                 _groupList.Add(group);
             }
+        }
+        
+        public static void RemoveGroup(Group group)
+        {
+            _groupList.Remove(group);
         }
 	}
 }

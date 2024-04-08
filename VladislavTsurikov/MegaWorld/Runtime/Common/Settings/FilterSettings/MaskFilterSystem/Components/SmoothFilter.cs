@@ -4,7 +4,6 @@ using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components 
 {
-    [Serializable]
     [MenuItem("Smooth")]
     public class SmoothFilter : MaskFilter 
     {

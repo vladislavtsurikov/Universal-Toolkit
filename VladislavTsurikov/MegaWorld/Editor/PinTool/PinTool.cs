@@ -14,11 +14,13 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.A
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
 using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
@@ -188,9 +190,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                         {
                             if (settings.ScaleTransformMode != TransformMode.Fixed)
                             {
-                                Vector2 placeSrceenPoint = HandleUtility.WorldToGUIPoint(_placedObjectData.GameObject.transform.position);
+                                Vector2 placeScreenPoint = HandleUtility.WorldToGUIPoint(_placedObjectData.GameObject.transform.position);
 
-                                if ((e.mousePosition - placeSrceenPoint).magnitude < 5f)
+                                if ((e.mousePosition - placeScreenPoint).magnitude < 5f)
                                 {
                                     Object.DestroyImmediate(_placedObjectData.GameObject);
                                 }
@@ -199,7 +201,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                                     PrototypeTerrainObject proto = (PrototypeTerrainObject)_placedObjectData.Proto;
                                     Transform transform = new Transform(_placedObjectData.GameObject);
 
-                                    TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                                    TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                                    Undo.Editor.Undo.RecordUndo(new CreatedTerrainObject(terrainObjectInstance));
 
                                     Object.DestroyImmediate(_placedObjectData.GameObject);
                                 }
@@ -246,7 +249,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
             }
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             if(_placedObjectData != null)
             {

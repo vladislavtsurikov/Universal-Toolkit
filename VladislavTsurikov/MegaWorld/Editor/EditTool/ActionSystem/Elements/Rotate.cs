@@ -6,7 +6,10 @@ using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
@@ -55,16 +58,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
             EditTool.FindObject.Rotation = _сurrentRotation * _startRotation;
         }
 
-        public override void UndoCall()
+        protected override void RegisterUndo()
         {
             if(EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
             {
                 GameObject go = (GameObject)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new GameObjectTransform(go));
             }
+            else if(EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
+            {
+                TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
+                Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
+            }
         }
 
-        public override void ObjectFound()
+        protected override void OnObjectFound()
         {
             SetStartValue();
         }

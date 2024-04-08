@@ -70,7 +70,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
                     
                 for (int i = toolComponentStack.ComponentStack.ElementList.Count - 1; i >= 0; i--)
                 {
-                    if (!IsElementBelongsToTool(toolComponentStack.ComponentStack.ElementList[i], toolType))
+                    if (toolComponentStack.ComponentStack.ElementList[i] == null ||
+                         !IsElementBelongsToTool(toolComponentStack.ComponentStack.ElementList[i], toolType))
                     {
                         Remove(i);
                     }

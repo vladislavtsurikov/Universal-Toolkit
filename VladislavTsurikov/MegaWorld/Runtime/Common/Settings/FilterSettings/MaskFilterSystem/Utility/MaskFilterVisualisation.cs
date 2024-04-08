@@ -39,11 +39,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
         }
 
-        public void SetNeedUpdateMask()
-        {
-            NeedUpdateMask = true;
-        }
-
         private void UpdateMask(MaskFilterStack maskFilterStack, BoxArea boxArea)
         {
             if(_filterContext == null)

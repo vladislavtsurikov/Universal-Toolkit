@@ -15,9 +15,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
         {
             if (prototypeType == typeof(PrototypeTerrainDetail) || prototypeType == typeof(PrototypeTerrainTexture))
             {
-                if(Terrain.activeTerrain == null || Terrain.activeTerrain.gameObject == null)
+                if(Terrain.activeTerrain == null)
                 {
                     Debug.LogWarning("Not present in the scene with an active Unity Terrain.");
+                    return PaintLayers;
                 }
 
                 return LayerMask.GetMask(LayerMask.LayerToName(Terrain.activeTerrain.gameObject.layer));

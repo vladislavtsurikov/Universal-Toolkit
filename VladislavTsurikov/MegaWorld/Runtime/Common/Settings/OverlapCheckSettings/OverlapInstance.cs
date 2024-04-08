@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.Math.Runtime;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {

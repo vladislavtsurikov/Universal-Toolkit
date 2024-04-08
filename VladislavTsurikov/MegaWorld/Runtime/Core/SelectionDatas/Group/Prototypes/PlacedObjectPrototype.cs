@@ -47,7 +47,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         }
 #endif
 
-        public override void Init(Object obj)
+        public override void OnCreatePrototype(Object obj)
         {
             Prefab = (GameObject)obj;
             PastTransform = new PastTransform(Prefab.transform);

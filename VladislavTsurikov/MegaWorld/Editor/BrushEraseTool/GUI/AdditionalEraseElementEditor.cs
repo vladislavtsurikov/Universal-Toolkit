@@ -9,19 +9,19 @@ using VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.PrototypeElements;
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.GUI
 {
     [DontDrawFoldout]
-    [ElementEditor(typeof(AdditionalEraseElement))]
+    [ElementEditor(typeof(AdditionalEraseSetting))]
     public class AdditionalEraseElementEditor : IMGUIElementEditor
     {
-        private AdditionalEraseElement _additionalEraseElement;
+        private AdditionalEraseSetting _additionalEraseSetting;
         
         public override void OnEnable()
         {
-            _additionalEraseElement = (AdditionalEraseElement)Target;
+            _additionalEraseSetting = (AdditionalEraseSetting)Target;
         }
 
         public override void OnGUI()
         {
-            _additionalEraseElement.Success = CustomEditorGUILayout.Slider(_success, _additionalEraseElement.Success, 0f, 100f);
+            _additionalEraseSetting.Success = CustomEditorGUILayout.Slider(_success, _additionalEraseSetting.Success, 0f, 100f);
 
         }
 

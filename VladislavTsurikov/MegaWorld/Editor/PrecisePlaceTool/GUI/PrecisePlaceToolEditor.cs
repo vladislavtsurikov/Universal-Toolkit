@@ -9,7 +9,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI
 {
@@ -19,13 +18,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI
     {
 	    public override void DrawButtons()
 		{
-			if(WindowData.Instance.SelectedData.HasOneSelectedGroup())
-			{
-				if(WindowData.Instance.SelectedData.SelectedGroup.PrototypeType == typeof(PrototypeGameObject))
-				{
-					UndoEditor.OnGUI();
-				}
-			}
+			UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
 		}
 
 	    protected override void DrawPrototypeSettings(Prototype proto)

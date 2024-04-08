@@ -5,11 +5,11 @@ using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.PhysicsToolsSettings 
+namespace VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings 
 {
 	public static class PhysicsSimulatorSettingsEditor 
 	{
-		public static bool PhysicsSimulatorSettingsFoldout = true;
+		private static bool PhysicsSimulatorSettingsFoldout = true;
 
 		public static void OnGUI<T>(PhysicsSimulatorSettings settings, bool accelerationPhysics = true) where T: DisablePhysics
 		{

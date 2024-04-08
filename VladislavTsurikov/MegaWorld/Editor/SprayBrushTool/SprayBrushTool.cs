@@ -20,9 +20,11 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.Undo.Editor.UndoActions;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
-using Transform = VladislavTsurikov.Runtime.Transform;
+using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
@@ -177,12 +179,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 
             if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
             {
-                TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObject(terrainObjectInstance));
             }
 #endif
         }
 
-        private static void SpawnGameObject(Group group, PrototypeGameObject proto, RayHit rayHit, float fitness, bool registerUndo = true)
+        private static void SpawnGameObject(Group group, PrototypeGameObject proto, RayHit rayHit, float fitness)
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
@@ -198,10 +201,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 
                 GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  
                 
-                if(registerUndo)
-                {
-                    Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(gameObject));
-                }
+                Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(gameObject));
                 
                 gameObject.transform.hasChanged = false;
             }

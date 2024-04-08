@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -25,9 +26,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         public bool DrawHandleIfNotSelected;
 
         public StamperTool StamperTool;
-        
-        public delegate void OnSetAreaBoundsDelegate();
-        public OnSetAreaBoundsDelegate OnSetAreaBounds;
+
+        public Action OnSetAreaBounds;
 
         protected override void SetupElement(object[] args = null)
         {
@@ -124,7 +124,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         public BoxArea GetAreaVariables(RayHit hit)
         {
-            return new BoxArea(hit, Bounds.size.x);
+            BoxArea area = new BoxArea(hit, Bounds.size.x)
+            {
+                Mask = GetCurrentRaw(),
+            };
+
+            return area;
         }
     }
 }
