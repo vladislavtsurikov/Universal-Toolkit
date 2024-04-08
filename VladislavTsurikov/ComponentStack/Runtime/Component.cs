@@ -1,9 +1,10 @@
+using VladislavTsurikov.ComponentStack.Runtime.Interfaces;
 using VladislavTsurikov.Core.Runtime.Interfaces;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.ComponentStack.Runtime
 {
-    public abstract class Component : Element, ISelected
+    public abstract class Component : Element, ISelected, IRemoved
     {
         [OdinSerialize]
         protected bool _selected;
@@ -54,11 +55,11 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             return true;
         }
 
-        internal void OnDeleteInternal()
+        void IRemoved.OnRemove()
         {
             IsSetup = false;
-            OnDelete();
-            OnDisable();
+            OnDeleteElement();
+            ((IDisable)this).OnDisable();
         }
 
         internal void OnCreateInternal()
@@ -66,7 +67,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             OnCreate();
         }
 
-        protected virtual void OnDelete(){}
+        protected virtual void OnDeleteElement(){}
         protected virtual void OnCreate(){}
         protected virtual void OnDeselect(){}
         protected virtual void OnSelect(){}

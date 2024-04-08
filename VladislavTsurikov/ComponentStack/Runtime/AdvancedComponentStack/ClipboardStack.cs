@@ -38,8 +38,8 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
                 }
             }
         }
-        
-        public void ClipboardAction(AdvancedComponentStack<T> stack, Type settingsType, bool paste)
+
+        private void ClipboardAction(AdvancedComponentStack<T> stack, Type settingsType, bool paste)
         {
             if(paste)
             {

@@ -2,12 +2,13 @@
 using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.Interfaces;
 using VladislavTsurikov.Core.Runtime.Interfaces;
 
 namespace VladislavTsurikov.ComponentStack.Runtime
 {
     [Serializable]
-    public class Element : IHasName
+    public class Element : IHasName, ISetup, IDisable
     {
         [NonSerialized] 
         public string RenamingName;
@@ -26,8 +27,10 @@ namespace VladislavTsurikov.ComponentStack.Runtime
                 {
                     return menuItemAttribute.Name.Split('/').Last(); 
                 }
-                
-                return "Missing name";
+                else
+                {
+                    return GetType().ToString().Split('.').Last();
+                }
             }
             set {}
         }
@@ -39,9 +42,9 @@ namespace VladislavTsurikov.ComponentStack.Runtime
 
         protected virtual void SetupElement(object[] args = null){}
 
-        protected virtual void OnDisable(){}
+        protected virtual void OnDisableElement(){}
 
-        protected virtual void OnReset(Element oldElement){}
+        protected virtual void OnResetElement(Element oldElement){}
         
         public virtual bool ShowActiveToggle()
         {
@@ -59,20 +62,20 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             }
             
             IsSetup = false;
-            OnDisable();
+            OnDisableElement();
             SetupElement(args);
             IsSetup = true;
         }
-        
-        internal void OnDisableInternal()
+
+        void IDisable.OnDisable()
         {
             IsSetup = false;
-            OnDisable();
+            OnDisableElement();
         }
         
-        internal void OnResetInternal(Element oldElement)
+        internal void OnReset(Element oldElement)
         {
-            OnReset(oldElement);
+            OnResetElement(oldElement);
         }
     }
 }

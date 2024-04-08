@@ -1,22 +1,22 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.Interfaces;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
 
 namespace VladislavTsurikov.ComponentStack.Runtime
 {
     [Serializable]
-    public class ComponentStack<T> where T : Component
+    public abstract class ComponentStack<T> where T : Component
     {
         [OdinSerialize]
-        protected List<T> _elementList = new List<T>();
+        protected AdvancedElementList<T> _elementList = new AdvancedElementList<T>();
 
         public object[] InitializationDataForElements { get; protected set; }
-
+        
         public IReadOnlyList<T> ElementList => _elementList;
 
         [NonSerialized] 
@@ -51,7 +51,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime
 
         public void Setup(bool force = true, params object[] args)
         {
-            _elementList ??= new List<T>();
+            _elementList ??= new AdvancedElementList<T>();
             
             IsSetup = true;
 
@@ -75,7 +75,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime
 
             for (int i = 0; i < _elementList.Count; i++)
             {
-                _elementList[i].OnDisableInternal();
+                ((IDisable)_elementList[i]).OnDisable();
             }
 
             OnDisableStack();
@@ -103,11 +103,10 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             {
                 return null;
             }
-
-            Debug.Log(type); 
-
+            
             var element = Instantiate(type, false);
             Add(element, index);
+            element.Stack = this;
             element.Setup(InitializationDataForElements);
             element.OnCreateInternal();
 
@@ -182,8 +181,9 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             oldElement.IsHappenedReset = true;
             
             T newElement = Create(oldElement.GetType(), index);
-
-            newElement.OnResetInternal(oldElement);
+            newElement.Stack = this;
+            
+            newElement.OnReset(oldElement);
             
             IsDirty = true;
         }
@@ -212,7 +212,6 @@ namespace VladislavTsurikov.ComponentStack.Runtime
             }
             
             _elementList.RemoveAt(index);
-            element.OnDeleteInternal();
             
             IsDirty = true;
 

@@ -12,7 +12,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         /// <summary>
         /// A public link to the list is required for UnityEditorInternal.ReorderableList
         /// </summary>
-        public List<T> ReorderableElementList => _elementList;
+        public AdvancedElementList<T> ReorderableElementList => _elementList;
         
         protected override void CreateElements()
         {
