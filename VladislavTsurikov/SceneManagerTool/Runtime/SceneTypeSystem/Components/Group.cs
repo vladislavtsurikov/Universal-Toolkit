@@ -12,8 +12,6 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Components
     {
         public List<SceneReference> SceneReferences = new List<SceneReference>();
         
-        public override string Name => "Group";
-
         protected override IEnumerator Load()
         {
             foreach (var sceneReference in SceneReferences)

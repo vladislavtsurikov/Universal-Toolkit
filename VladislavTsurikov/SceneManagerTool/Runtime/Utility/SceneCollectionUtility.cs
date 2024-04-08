@@ -7,12 +7,14 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Utility
     {
         public static SceneCollection GetSceneCollection(int id) 
         {
-            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionList.ElementList)
+            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList)
             {
                 foreach (var sceneCollection in buildSceneCollection.GetAllSceneCollections())
                 {
                     if (sceneCollection.ID == id)
+                    {
                         return sceneCollection;
+                    }
                 }
             }
 
@@ -22,7 +24,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Utility
         public static List<SceneCollection> GetAllCurrentSceneCollection()
         {
             List<SceneCollection> sceneCollections = new List<SceneCollection>();
-            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionList.ElementList)
+            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList)
             {
                 foreach (var sceneCollection in buildSceneCollection.GetAllSceneCollections())
                 {

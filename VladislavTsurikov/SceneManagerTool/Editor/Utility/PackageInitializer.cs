@@ -37,7 +37,9 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.Utility
             EditorApplication.update -= OnPackageListed;
             
             if (_listPackageRequest == null || !_listPackageRequest.IsCompleted || _listPackageRequest.Error != null)
+            {
                 return;
+            }
 
             foreach (UnityEditor.PackageManager.PackageInfo p in _listPackageRequest.Result)
             {

@@ -30,13 +30,17 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         internal void SaveSceneSetup()
         {
             if (EditorSceneManager.GetSceneManagerSetup().Any())
+            {
                 SceneSetups = EditorSceneManager.GetSceneManagerSetup();
+            }
         }
 
         private void RestoreSceneSetup()
         {
             if(SceneSetups == null || !SceneSetups.Any())
+            {
                 return;
+            }
 
             EditorSceneManager.RestoreSceneManagerSetup(SceneSetups);
 

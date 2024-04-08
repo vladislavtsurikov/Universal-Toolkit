@@ -9,28 +9,12 @@ using VladislavTsurikov.SceneUtility.Runtime;
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
 {
     [MenuItem("Active Scene")]
-    [SceneCollection]
-    public class ActiveScene : SettingsComponentElement
+    [SceneCollectionComponent]
+    public class ActiveScene : SettingsComponent
     {
         public SceneReference SceneReference = new SceneReference();
         
-        public IEnumerator LoadScene()
-        {
-            yield return SceneReference.LoadScene();
-            SceneManager.SetActiveScene(SceneReference.Scene);
-        }
-        
-        public IEnumerator UnloadScene()
-        {
-            yield return SceneReference.UnloadScene();
-        }
-        
-        public override List<SceneReference> GetSceneReferences()
-        {
-            return new List<SceneReference>{SceneReference};
-        }
-        
-        internal static IEnumerator LoadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator LoadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ActiveScene activeScene = (ActiveScene)settingsList.GetElement(typeof(ActiveScene));
 
@@ -40,7 +24,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             }
         }
         
-        internal static IEnumerator UnloadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator UnloadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ActiveScene activeScene = (ActiveScene)settingsList.GetElement(typeof(ActiveScene));
 
@@ -48,6 +32,22 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             {
                 yield return activeScene.UnloadScene();
             }
+        }
+        
+        public override List<SceneReference> GetSceneReferences()
+        {
+            return new List<SceneReference>{SceneReference};
+        }
+
+        private IEnumerator LoadScene()
+        {
+            yield return SceneReference.LoadScene();
+            SceneManager.SetActiveScene(SceneReference.Scene);
+        }
+
+        private IEnumerator UnloadScene()
+        {
+            yield return SceneReference.UnloadScene();
         }
     }
 }

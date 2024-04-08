@@ -17,7 +17,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
     public class Profile : SerializedScriptableObject
     { 
         [OdinSerialize] 
-        public BuildSceneCollectionList BuildSceneCollectionList = new BuildSceneCollectionList(); 
+        public BuildSceneCollectionStack BuildSceneCollectionStack = new BuildSceneCollectionStack(); 
         
 #if UNITY_EDITOR
         public BuildSceneCollectionStackEditor BuildSceneCollectionStackEditor;
@@ -27,9 +27,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
 
         public void Setup()
         { 
-                BuildSceneCollectionList.Setup();
+                BuildSceneCollectionStack.Setup();
 #if UNITY_EDITOR
-                BuildSceneCollectionStackEditor = new BuildSceneCollectionStackEditor(BuildSceneCollectionList);
+                BuildSceneCollectionStackEditor = new BuildSceneCollectionStackEditor(BuildSceneCollectionStack);
 #endif
         }
 

@@ -8,12 +8,12 @@ using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Components
 {
     [MenuItem("Spawn Prefabs")]
-    [AfterLoadScene]
+    [AfterLoadSceneComponent]
     public class SpawnPrefabs : Operation
     {
         public List<GameObject> GameObjects = new List<GameObject>();
         
-        public override IEnumerator DoOperation(SceneCollection loadSceneCollection)
+        public override IEnumerator DoOperation()
         {
             foreach (var gameObject in GameObjects)
             {

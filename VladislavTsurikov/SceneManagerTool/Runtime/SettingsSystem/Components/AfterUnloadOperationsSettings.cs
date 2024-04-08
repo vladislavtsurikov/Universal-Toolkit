@@ -9,15 +9,15 @@ using VladislavTsurikov.SceneUtility.Runtime;
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
 {
     [MenuItem("After Unload")]
-    public class AfterUnloadOperationsSettings : SettingsComponentElement
+    public class AfterUnloadOperationsSettings : SettingsComponent
     {
-        public ComponentStackSupportSameType<Operation> OperationList = new ComponentStackSupportSameType<Operation>();
+        public ComponentStackSupportSameType<Operation> OperationStack = new ComponentStackSupportSameType<Operation>();
         
-        public IEnumerator DoOperations(SceneCollection loadSceneCollection)
+        public IEnumerator DoOperations()
         {
-            foreach (var sceneOperation in OperationList.ElementList)
+            foreach (var sceneOperation in OperationStack.ElementList)
             {
-                yield return sceneOperation.DoOperation(loadSceneCollection);
+                yield return sceneOperation.DoOperation();
             }
         }
         
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             List<SceneReference> sceneReferences =
                 new List<SceneReference>();
 
-            foreach (var operation in OperationList.ElementList)
+            foreach (var operation in OperationStack.ElementList)
             {
                 sceneReferences.AddRange(operation.GetSceneReferences());
             }

@@ -10,26 +10,26 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.
     public class DefaultBuildSceneCollection : BuildSceneCollection
     {
         [OdinSerialize] 
-        public SceneCollectionList SceneCollectionList = new SceneCollectionList();
+        public SceneCollectionStack SceneCollectionStack = new SceneCollectionStack();
         
         protected override void SetupElement(object[] args = null)
         {
-            SceneCollectionList.Setup();
+            SceneCollectionStack.Setup();
         }
 
         public override List<SceneReference> GetSceneReferences()
         {
-            return SceneCollectionList.GetSceneReferences();
+            return SceneCollectionStack.GetSceneReferences();
         }
 
         public override List<SceneCollection> GetStartupSceneCollections()
         {
-            return SceneCollectionList.FindAll(sceneCollection => sceneCollection.Startup);
+            return SceneCollectionStack.FindAll(sceneCollection => sceneCollection.Startup);
         }
 
         public override List<SceneCollection> GetAllSceneCollections()
         {
-            return new List<SceneCollection>(SceneCollectionList.ElementList);
+            return new List<SceneCollection>(SceneCollectionStack.ElementList);
         }
     }
 }

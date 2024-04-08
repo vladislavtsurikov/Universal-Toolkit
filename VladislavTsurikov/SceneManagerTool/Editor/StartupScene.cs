@@ -17,8 +17,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         
         public void Setup()
         {
-            if (_sceneReference.IsValid()) return;
-            
+            if (_sceneReference.IsValid())
+            {
+                return;
+            }
+
             EditorApplication.delayCall += () =>
             {
                 _sceneReference = new SceneReference(SceneCreationUtility.CreateScene("Scene Manager", SceneManagerPath.PathToResourcesSceneManager)); 

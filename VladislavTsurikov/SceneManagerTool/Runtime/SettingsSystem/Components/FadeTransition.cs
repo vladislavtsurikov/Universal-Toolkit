@@ -11,8 +11,8 @@ using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
 {
     [ComponentStack.Runtime.Attributes.MenuItem("Fade Transition")]
-    [SceneCollection]
-    public class FadeTransition : SettingsComponentElement
+    [SceneCollectionComponent]
+    public class FadeTransition : SettingsComponent
     {
         public SceneReference SceneReference = new SceneReference();
 
@@ -51,20 +51,24 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             return new List<SceneReference>{SceneReference};
         }
         
-        internal static IEnumerator LoadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator LoadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             FadeTransition fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
 
             if (fadeTransition != null)
+            {
                 yield return fadeTransition.LoadFadeIfNecessary();
+            }
         }
         
-        internal static IEnumerator UnloadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator UnloadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             FadeTransition fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
 
             if (fadeTransition != null)
+            {
                 yield return fadeTransition.UnloadFadeIfNecessary();
+            }
         }
     }
 }

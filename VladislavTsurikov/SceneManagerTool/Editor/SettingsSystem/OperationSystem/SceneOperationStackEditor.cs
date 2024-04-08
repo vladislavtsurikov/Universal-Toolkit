@@ -33,20 +33,32 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
                 switch (_settingsTypes)
                 {
                     case SettingsTypes.AfterLoadScene:
-                        if(settingsType.GetAttribute<AfterLoadScene>() == null)
+                        if(settingsType.GetAttribute<AfterLoadSceneComponentAttribute>() == null)
+                        {
                             continue;
+                        }
+
                         break;
                     case SettingsTypes.BeforeLoadScene:
-                        if(settingsType.GetAttribute<BeforeLoadScene>() == null)
+                        if(settingsType.GetAttribute<BeforeLoadSceneComponentAttribute>() == null)
+                        {
                             continue;
+                        }
+
                         break;
                     case SettingsTypes.AfterUnloadScene:
-                        if(settingsType.GetAttribute<AfterUnloadScene>() == null)
+                        if(settingsType.GetAttribute<AfterUnloadSceneComponentAttribute>() == null)
+                        {
                             continue;
+                        }
+
                         break;
                     case SettingsTypes.BeforeUnloadScene:
-                        if(settingsType.GetAttribute<BeforeUnloadScene>() == null)
+                        if(settingsType.GetAttribute<BeforeUnloadSceneComponentAttribute>() == null)
+                        {
                             continue;
+                        }
+
                         break;
                 }
 

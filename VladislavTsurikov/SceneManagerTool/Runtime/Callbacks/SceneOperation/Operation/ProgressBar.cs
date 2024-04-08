@@ -19,8 +19,10 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation.Op
         public override IEnumerator OnLoad()
         {
             if(_progressBar.DisableFade)
+            {
                 yield break;
-            
+            }
+
             Image.color = Color;
             yield return Group.Fade(1, Duration); 
         }
@@ -28,25 +30,34 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation.Op
         public override IEnumerator OnUnload()
         {
             if(_progressBar.DisableFade)
+            {
                 yield break;
-            
+            }
+
             if (Slider)
+            {
                 Slider.gameObject.SetActive(false);
+            }
+
             yield return Group.Fade(0, Duration);
         }
 
         private void Start()
         {
-            _progressBar = (SettingsSystem.Components.ProgressBar)SceneCollection.Current.SettingsList.GetElement(typeof(SettingsSystem.Components.ProgressBar));
-            
-            if(!_progressBar.DisableFade)
+            _progressBar = (SettingsSystem.Components.ProgressBar)SceneCollection.Current.SettingsStack.GetElement(typeof(SettingsSystem.Components.ProgressBar));
+
+            if (!_progressBar.DisableFade)
+            {
                 Group.alpha = 0;
+            }
         }
 
         private void Update()
         {
             if (Slider)
+            {
                 Slider.value = SceneCollection.Current.LoadingProgress;
+            }
         }
     }
 }

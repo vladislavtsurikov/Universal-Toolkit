@@ -3,14 +3,16 @@ using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
-    public class SceneComponentStack : ComponentStackSupportSameType<SceneType>
+    public class SceneTypeComponentStack : ComponentStackSupportSameType<SceneType>
     {
         public bool HasScene(SceneReference sceneReference)
         {
             foreach (var scene in ElementList)
             {
                 if (scene.HasScene(sceneReference))
+                {
                     return true;
+                }
             }
 
             return false;

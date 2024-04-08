@@ -17,7 +17,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
         public override void OnEnable()
         {
             _buildSceneCollection = (DefaultBuildSceneCollection)Target;
-            _sceneCollectionStackEditor = new SceneCollectionStackEditor(new GUIContent("Scene Collections"), _buildSceneCollection.SceneCollectionList);
+            _sceneCollectionStackEditor = new SceneCollectionStackEditor(new GUIContent("Scene Collections"), _buildSceneCollection.SceneCollectionStack);
         }
 
         public override void OnGUI()

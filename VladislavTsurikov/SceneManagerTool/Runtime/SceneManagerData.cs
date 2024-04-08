@@ -1,23 +1,21 @@
 ﻿using System.Collections.Generic;
-
 using UnityEngine;
 using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-
+using VladislavTsurikov.SceneUtility.Runtime;
 #if UNITY_EDITOR
 using UnityEditor;
 using VladislavTsurikov.SceneManagerTool.Editor;
 using VladislavTsurikov.SceneUtility.Editor;
 #endif
 
-using VladislavTsurikov.SceneUtility.Runtime;
-
 namespace VladislavTsurikov.SceneManagerTool.Runtime
 {
     [LocationAsset("SceneManager/SceneManagerData")]
     public class SceneManagerData : SerializedScriptableObjectSingleton<SceneManagerData>
     {
-        [OdinSerialize] private Profile _profile;
+        [OdinSerialize] 
+        private Profile _profile;
         
         public bool EnableSceneManager;
 
@@ -37,7 +35,8 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
         }
 
 #if UNITY_EDITOR
-        [OdinSerialize] internal SceneManagerEditorData SceneManagerEditorData = new SceneManagerEditorData();
+        [OdinSerialize] 
+        internal SceneManagerEditorData SceneManagerEditorData = new SceneManagerEditorData();
 #endif
 
         private void OnEnable()
@@ -52,7 +51,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
                 return;
             }
             
-            Profile.BuildSceneCollectionList.OnDisable();
+            Profile.BuildSceneCollectionStack.OnDisable();
         }
 
         public void Setup()
@@ -65,7 +64,10 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             Profile.Setup();
             
 #if UNITY_EDITOR
-            if (Application.isPlaying) return;
+            if (Application.isPlaying)
+            {
+                return;
+            }
 
             SceneReference.OnDeleteScene -= Setup;
             SceneReference.OnDeleteScene += Setup;
@@ -80,7 +82,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
         {
             EditorUtility.SetDirty(Instance);
             if (Instance._profile != null)
+            {
                 Instance._profile.MaskAsDirty();
+            }
         }
 #endif
 
@@ -93,7 +97,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
         {
             List<string> scenePaths = new List<string>();
 
-            foreach (var sceneReference in Profile.BuildSceneCollectionList.GetSceneReferences())
+            foreach (var sceneReference in Profile.BuildSceneCollectionStack.GetSceneReferences())
             {
                 if (sceneReference.IsValid())
                 {

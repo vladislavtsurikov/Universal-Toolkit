@@ -2,7 +2,5 @@
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Attributes
 {
-    public class BeforeUnloadScene : Attribute
-    {
-    }
+    public sealed class BeforeUnloadSceneComponentAttribute : Attribute { }
 }

@@ -5,14 +5,20 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks
 {
     public static class RuntimeInitializeOnLoad
     {
-        [RuntimeInitializeOnLoadMethod()]
+        [RuntimeInitializeOnLoadMethod]
         internal static void OnLoad()
         {
-            if(!SceneManagerData.IsValidSceneManager()) return;
+            if (!SceneManagerData.IsValidSceneManager())
+            {
+                return;
+            }
  #if UNITY_EDITOR
-             if (!SceneManagerData.Instance.SceneManagerEditorData.RunAsBuildMode) return;
+            if (!SceneManagerData.Instance.SceneManagerEditorData.RunAsBuildMode)
+            {
+                return;
+            }
  #endif
-             
+            
              RuntimeUtility.Start();
         }
     }

@@ -45,7 +45,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
 
             GenericMenu menu = new GenericMenu();
 
-            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionList.ElementList)
+            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList)
             {
                 foreach (var sceneCollection in buildSceneCollection.GetAllSceneCollections())
                 {

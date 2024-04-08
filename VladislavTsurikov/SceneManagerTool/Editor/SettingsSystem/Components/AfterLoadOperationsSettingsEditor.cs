@@ -17,7 +17,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.Components
         public override void OnEnable()
         {
             _afterLoadOperationsSettings = (AfterLoadOperationsSettings)Target;
-            _sceneOperationStackEditor = new SceneOperationStackEditor(SettingsTypes.AfterLoadScene, _afterLoadOperationsSettings.OperationList);
+            _sceneOperationStackEditor = new SceneOperationStackEditor(SettingsTypes.AfterLoadScene, _afterLoadOperationsSettings.OperationStack);
         }
 
         public override void OnGUI(Rect rect, int index)

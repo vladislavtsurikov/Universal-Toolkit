@@ -18,11 +18,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
 {
     public class BuildSceneCollectionStackEditor : TabComponentStackEditor<BuildSceneCollection, DefaultBuildSceneCollectionEditor>
     {
-        private BuildSceneCollectionList _buildSceneCollectionList;
+        private BuildSceneCollectionStack _buildSceneCollectionStack;
         
-        public BuildSceneCollectionStackEditor(BuildSceneCollectionList list) : base(list)
+        public BuildSceneCollectionStackEditor(BuildSceneCollectionStack stack) : base(stack)
         {
-            _buildSceneCollectionList = (BuildSceneCollectionList)Stack;
+            _buildSceneCollectionStack = (BuildSceneCollectionStack)Stack;
 
             _tabStackEditor.AddCallback = ShowAddManu;
             _tabStackEditor.IconColor = SetTabColor;
@@ -56,10 +56,10 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
             
             menu.AddSeparator("");
             
-            menu.AddItem(new GUIContent("Active"), _buildSceneCollectionList.ActiveBuildSceneCollection == Stack.ElementList[currentTabIndex], GUIUtility.ContextMenuCallback, new Action(() =>
+            menu.AddItem(new GUIContent("Active"), _buildSceneCollectionStack.ActiveBuildSceneCollection == Stack.ElementList[currentTabIndex], GUIUtility.ContextMenuCallback, new Action(() =>
             {
-                BuildSceneCollectionList buildSceneCollectionList = (BuildSceneCollectionList)Stack;
-                buildSceneCollectionList.ActiveBuildSceneCollection = Stack.ElementList[currentTabIndex];
+                BuildSceneCollectionStack buildSceneCollectionStack = (BuildSceneCollectionStack)Stack;
+                buildSceneCollectionStack.ActiveBuildSceneCollection = Stack.ElementList[currentTabIndex];
             }));
 
             return menu;
@@ -75,7 +75,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
             {
                 EditorApplication.delayCall += () =>
                 {
-                    _buildSceneCollectionList.CreateComponent(typeof(DefaultBuildSceneCollection));
+                    _buildSceneCollectionStack.CreateComponent(typeof(DefaultBuildSceneCollection));
                 };
             }
             else
@@ -85,16 +85,18 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
                     Type settingsType = type.Key;
                     
                     if(settingsType.ToString() == typeof(DefaultBuildSceneCollection).ToString())
+                    {
                         continue;
-                
+                    }
+
                     string context = settingsType.GetAttribute<MenuItemAttribute>().Name;
 
-                    menu.AddItem(new GUIContent(context), false, () => _buildSceneCollectionList.CreateComponent(settingsType));
+                    menu.AddItem(new GUIContent(context), false, () => _buildSceneCollectionStack.CreateComponent(settingsType));
                 }
                 
                 menu.AddSeparator("");
                 
-                menu.AddItem(new GUIContent("Create Default"), false, () => _buildSceneCollectionList.CreateComponent(typeof(DefaultBuildSceneCollection)));
+                menu.AddItem(new GUIContent("Create Default"), false, () => _buildSceneCollectionStack.CreateComponent(typeof(DefaultBuildSceneCollection)));
             }
 
             menu.ShowAsContext();
@@ -105,7 +107,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
             BuildSceneCollection buildSceneCollection = (BuildSceneCollection)tab;
             barColor = EditorColors.Instance.LabelColor;
 
-            if(_buildSceneCollectionList.ActiveBuildSceneCollection != buildSceneCollection)
+            if(_buildSceneCollectionStack.ActiveBuildSceneCollection != buildSceneCollection)
             {
                 if(buildSceneCollection.Selected)
                 {

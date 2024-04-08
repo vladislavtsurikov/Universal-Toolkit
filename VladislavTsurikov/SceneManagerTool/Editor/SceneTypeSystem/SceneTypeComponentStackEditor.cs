@@ -6,9 +6,9 @@ using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
 {
-    public class SceneStackEditor : ReorderableListStackEditor<SceneType, SceneTypeEditor>
+    public class SceneTypeComponentStackEditor : ReorderableListStackEditor<SceneType, SceneTypeEditor>
     {
-        public SceneStackEditor(GUIContent reorderableListName, ComponentStackSupportSameType<SceneType> list) : base(reorderableListName, list, true)
+        public SceneTypeComponentStackEditor(GUIContent reorderableListName, ComponentStackSupportSameType<SceneType> list) : base(reorderableListName, list, true)
         {
             CopySettings = true;
             ShowActiveToggle = false;

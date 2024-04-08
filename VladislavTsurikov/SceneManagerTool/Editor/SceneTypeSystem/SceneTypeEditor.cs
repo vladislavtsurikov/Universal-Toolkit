@@ -14,7 +14,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
         public override void OnEnable()
         {
             SceneType = (SceneType)Target;
-            SettingsStackEditor = new SettingsStackEditor(new GUIContent("Settings"), false, SceneType.SettingsList);
+            SettingsStackEditor = new SettingsStackEditor(new GUIContent("Settings"), false, SceneType.SettingsStack);
         }
 
         public override void OnGUI(Rect rect, int index)

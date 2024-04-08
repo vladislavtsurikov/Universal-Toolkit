@@ -4,7 +4,7 @@ using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 {
-    public class SceneCollectionList : ComponentStackSupportSameType<SceneCollection>
+    public class SceneCollectionStack : ComponentStackSupportSameType<SceneCollection>
     {
         public List<SceneReference> GetSceneReferences()
         {

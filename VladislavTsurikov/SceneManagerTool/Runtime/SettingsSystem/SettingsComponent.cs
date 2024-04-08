@@ -4,7 +4,7 @@ using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    public abstract class SettingsComponentElement : Component
+    public abstract class SettingsComponent : Component
     {
         public virtual List<SceneReference> GetSceneReferences()
         {

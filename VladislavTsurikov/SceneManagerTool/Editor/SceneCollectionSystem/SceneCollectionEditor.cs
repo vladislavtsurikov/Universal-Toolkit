@@ -14,15 +14,15 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
     public class SceneCollectionEditor : ReorderableListComponentEditor
     {
         private SceneCollection _sceneCollection;
-        private SceneStackEditor _sceneStackEditor;
+        private SceneTypeComponentStackEditor _sceneTypeComponentStackEditor;
 
         public SettingsStackEditor SettingsStackEditor;
         
         public override void OnEnable()
         {
             _sceneCollection = (SceneCollection)Target;
-            _sceneStackEditor = new SceneStackEditor(new GUIContent("Scenes"), _sceneCollection.SceneComponentStack);
-            SettingsStackEditor = new SettingsStackEditor( new GUIContent("Settings"), true, _sceneCollection.SettingsList);
+            _sceneTypeComponentStackEditor = new SceneTypeComponentStackEditor(new GUIContent("Scenes"), _sceneCollection.SceneTypeComponentStack);
+            SettingsStackEditor = new SettingsStackEditor( new GUIContent("Settings"), true, _sceneCollection.SettingsStack);
         }
 
         public override void OnGUI(Rect rect, int index)
@@ -34,7 +34,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
             
             rect.y += SettingsStackEditor.GetElementStackHeight();
 
-            _sceneStackEditor.OnGUI(rect);
+            _sceneTypeComponentStackEditor.OnGUI(rect);
         }
         
         public override float GetElementHeight(int index)
@@ -42,7 +42,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
             float height = 0;
             
             height += CustomEditorGUI.SingleLineHeight;
-            height += _sceneStackEditor.GetElementStackHeight();
+            height += _sceneTypeComponentStackEditor.GetElementStackHeight();
             height += SettingsStackEditor.GetElementStackHeight();
 
             return height;

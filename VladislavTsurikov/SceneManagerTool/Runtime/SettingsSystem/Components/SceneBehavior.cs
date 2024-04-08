@@ -5,8 +5,8 @@ using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Attributes;
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
 {
     [MenuItem("Scene Behavior")]
-    [Scene]
-    public class SceneBehavior : SettingsComponentElement
+    [SceneComponent]
+    public class SceneBehavior : SettingsComponent
     {
         public SceneCloseBehavior SceneCloseBehavior = SceneCloseBehavior.Close;
         public SceneOpenBehavior SceneOpenBehavior = SceneOpenBehavior.Open;

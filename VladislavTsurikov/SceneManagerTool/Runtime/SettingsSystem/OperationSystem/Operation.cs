@@ -8,7 +8,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSys
 {
     public class Operation : Component
     {
-        public virtual IEnumerator DoOperation(SceneCollection loadSceneCollection)
+        public virtual IEnumerator DoOperation()
         {
             yield break;
         }

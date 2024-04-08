@@ -12,13 +12,13 @@ using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Attributes;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
 {
-    public class SettingsStackEditor : ReorderableListStackEditor<SettingsComponentElement, ReorderableListComponentEditor>
+    public class SettingsStackEditor : ReorderableListStackEditor<SettingsComponent, ReorderableListComponentEditor>
     {
         private readonly bool _sceneCollection;
         
-        private ComponentStackOnlyDifferentTypes<SettingsComponentElement> ComponentStackOnlyDifferentTypes => (ComponentStackOnlyDifferentTypes<SettingsComponentElement>)Stack;
+        private ComponentStackOnlyDifferentTypes<SettingsComponent> ComponentStackOnlyDifferentTypes => (ComponentStackOnlyDifferentTypes<SettingsComponent>)Stack;
         
-        public SettingsStackEditor(GUIContent reorderableListName, bool sceneCollection, ComponentStackOnlyDifferentTypes<SettingsComponentElement> list) : base(reorderableListName, list, true)
+        public SettingsStackEditor(GUIContent reorderableListName, bool sceneCollection, ComponentStackOnlyDifferentTypes<SettingsComponent> list) : base(reorderableListName, list, true)
         {
             _sceneCollection = sceneCollection;
             CopySettings = true;
@@ -29,7 +29,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
         {
             GenericMenu menu = new GenericMenu();
 
-            foreach (var type in AllEditorTypes<SettingsComponentElement>.Types)
+            foreach (var type in AllEditorTypes<SettingsComponent>.Types)
             {
                 Type settingsType = type.Key;
                 
@@ -39,13 +39,17 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
 
                 if (_sceneCollection)
                 {
-                    if(settingsType.GetAttribute<SceneAttribute>() != null)
+                    if(settingsType.GetAttribute<SceneComponentAttribute>() != null)
+                    {
                         continue;
+                    }
                 }
                 else
                 {
-                    if(settingsType.GetAttribute<SceneCollectionAttribute>() != null)
+                    if(settingsType.GetAttribute<SceneCollectionComponentAttribute>() != null)
+                    {
                         continue;
+                    }
                 }
                 
                 if (!exists)

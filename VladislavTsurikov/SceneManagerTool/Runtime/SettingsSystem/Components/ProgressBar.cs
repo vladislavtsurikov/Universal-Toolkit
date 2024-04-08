@@ -11,8 +11,8 @@ using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
 {
     [ComponentStack.Runtime.Attributes.MenuItem("Progress Bar")]
-    [SceneCollection]
-    public class ProgressBar : SettingsComponentElement
+    [SceneCollectionComponent]
+    public class ProgressBar : SettingsComponent
     {
         public SceneReference SceneReference = new SceneReference();
         public bool DisableFade = false;
@@ -52,7 +52,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             return new List<SceneReference>{SceneReference};
         }
         
-        internal static IEnumerator LoadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator LoadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ProgressBar progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
             
@@ -62,7 +62,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
             }
         }
         
-        internal static IEnumerator UnloadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponentElement> settingsList)
+        internal static IEnumerator UnloadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ProgressBar progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
 

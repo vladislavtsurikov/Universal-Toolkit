@@ -24,9 +24,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
         {
             _name = GetType().GetAttribute<MenuItemAttribute>().Name.Split('/').Last();
 
-            if (SceneManagerData.Instance.Profile.BuildSceneCollectionList.ElementList.Count == 1)
+            if (SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList.Count == 1)
             {
-                SceneManagerData.Instance.Profile.BuildSceneCollectionList.ActiveBuildSceneCollection = this;
+                SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ActiveBuildSceneCollection = this;
             }
         }
 

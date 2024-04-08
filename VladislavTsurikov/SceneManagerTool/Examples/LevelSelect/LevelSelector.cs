@@ -10,7 +10,7 @@ namespace VladislavTsurikov.SceneManagerTool.Examples.LevelSelect
 
         private void Start()
         {
-            var search = Profile.Current.BuildSceneCollectionList.ActiveBuildSceneCollection.GetAllSceneCollections().Where(c => c.Name.Contains("Level"));
+            var search = Profile.Current.BuildSceneCollectionStack.ActiveBuildSceneCollection.GetAllSceneCollections().Where(c => c.Name.Contains("Level"));
 
             foreach (var item in search)
             {

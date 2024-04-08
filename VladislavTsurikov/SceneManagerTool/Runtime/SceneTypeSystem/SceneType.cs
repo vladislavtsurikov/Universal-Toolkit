@@ -1,11 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using VladislavTsurikov.ComponentStack.Runtime;
+using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
 using VladislavTsurikov.SceneUtility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
@@ -25,52 +26,56 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
     {
         private SceneCollection _loadSceneCollection;
         
-        public ComponentStackOnlyDifferentTypes<SettingsComponentElement> SettingsList = new ComponentStackOnlyDifferentTypes<SettingsComponentElement>();
+        public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new ComponentStackOnlyDifferentTypes<SettingsComponent>();
 
         protected override void SetupElement(object[] args = null)
         {
             _loadSceneCollection = (SceneCollection)args[0];
 
-            SettingsList.Setup();
+            SettingsStack.Setup();
         }
 
         internal IEnumerator LoadInternal(bool force = false)
         {
-            SceneBehavior sceneBehavior = (SceneBehavior)SettingsList.GetElement(typeof(SceneBehavior));
+            SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
-            if (!force && sceneBehavior != null)
+            if (!force && sceneBehavior is { SceneOpenBehavior: SceneOpenBehavior.DoNotOpen })
             {
-                if (sceneBehavior.SceneOpenBehavior == SceneOpenBehavior.DoNotOpen)
-                    yield break;
+                yield break;
             }
             
-            BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsList.GetElement(typeof(BeforeLoadOperationsSettings));
-            
-            if(beforeLoadOperationsSettings != null)
-                yield return beforeLoadOperationsSettings.DoOperations(_loadSceneCollection);
+            BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
+
+            if (beforeLoadOperationsSettings != null)
+            {
+                yield return beforeLoadOperationsSettings.DoOperations();
+            }
 
             yield return Load();
             
-            AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsList.GetElement(typeof(AfterLoadOperationsSettings));
-            
-            if(afterLoadOperationsSettings != null)
-                yield return afterLoadOperationsSettings.DoOperations(_loadSceneCollection);
+            AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
+
+            if (afterLoadOperationsSettings != null)
+            {
+                yield return afterLoadOperationsSettings.DoOperations();
+            }
         }
 
         internal IEnumerator UnloadInternal(SceneCollection nextLoadSceneCollection = null, bool force = false)
         {
-            SceneBehavior sceneBehavior = (SceneBehavior)SettingsList.GetElement(typeof(SceneBehavior));
+            SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
-            if (!force && sceneBehavior != null)
+            if (!force && sceneBehavior is { SceneCloseBehavior: SceneCloseBehavior.KeepOpenAlways })
             {
-                if(sceneBehavior.SceneCloseBehavior == SceneCloseBehavior.KeepOpenAlways)
-                    yield break;
+                yield break;
             }
             
-            BeforeUnloadOperationsSettings beforeUnloadOperationsSettings = (BeforeUnloadOperationsSettings)SettingsList.GetElement(typeof(BeforeUnloadOperationsSettings));
-            
-            if(beforeUnloadOperationsSettings != null)
-                yield return beforeUnloadOperationsSettings.DoOperations(nextLoadSceneCollection);
+            BeforeUnloadOperationsSettings beforeUnloadOperationsSettings = (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
+
+            if (beforeUnloadOperationsSettings != null)
+            {
+                yield return beforeUnloadOperationsSettings.DoOperations();
+            }
 
             yield return Unload(nextLoadSceneCollection);
         }
@@ -89,10 +94,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 
         internal List<SceneReference> GetSceneReferencesInternal()
         {
-            List<SceneReference> sceneReferences =
-                new List<SceneReference>();
+            List<SceneReference> sceneReferences = new List<SceneReference>();
             
-            foreach (var component in SettingsList.ElementList)
+            foreach (var component in SettingsStack.ElementList)
             {
                 sceneReferences.AddRange(component.GetSceneReferences());
             }
