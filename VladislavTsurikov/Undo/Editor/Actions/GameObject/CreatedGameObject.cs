@@ -4,23 +4,25 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
 
-namespace VladislavTsurikov.Undo.Editor.UndoActions
+namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
 {
     public class CreatedGameObject : UndoRecord
     {
-        private readonly List<GameObject> _gameObjectList = new List<GameObject>();
+        private readonly List<UnityEngine.GameObject> _gameObjectList = new List<UnityEngine.GameObject>();
 
-        public CreatedGameObject(GameObject gameObject) 
+        public CreatedGameObject(UnityEngine.GameObject gameObject) 
         {
-            GameObject prefabRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
+            UnityEngine.GameObject prefabRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
             
             _gameObjectList.Add(prefabRoot);
         }
 
         public override void Merge(UndoRecord record)
         {
-            if (!(record is CreatedGameObject)) return;
-            CreatedGameObject gameObjectUndo = (CreatedGameObject)record;
+            if (record is not CreatedGameObject gameObjectUndo)
+            {
+                return;
+            }
             _gameObjectList.AddRange(gameObjectUndo._gameObjectList);
         }
 

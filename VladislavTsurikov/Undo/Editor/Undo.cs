@@ -9,8 +9,8 @@ namespace VladislavTsurikov.Undo.Editor
     [InitializeOnLoad]
     public static class Undo
     {
-        private static List<UndoRecord> _undoRecordList = new List<UndoRecord>();
-        private static UndoRecord _temporaryUndoRecord = null;
+        private static readonly List<UndoRecord> _undoRecordList = new List<UndoRecord>();
+        private static UndoRecord _temporaryUndoRecord;
 
         public const int MaxNumberOfUndo = 30;
         public static int UndoRecordCount => _undoRecordList.Count;

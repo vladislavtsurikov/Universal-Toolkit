@@ -1,0 +1,35 @@
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+
+namespace VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer
+{
+    public class CreatedTerrainObject : UndoRecord
+    {
+        private readonly List<TerrainObjectInstance> _instanceList = new List<TerrainObjectInstance>();
+
+        public CreatedTerrainObject(TerrainObjectInstance terrainObject) 
+        {
+            _instanceList.Add(terrainObject);
+        }
+
+        public override void Merge(UndoRecord record)
+        {
+            if (record is not CreatedTerrainObject undo)
+            {
+                return;
+            }
+
+            _instanceList.AddRange(undo._instanceList);
+        }
+
+        public override void Undo()
+        {
+            foreach (var terrainObject in _instanceList)
+            {
+                terrainObject.Destroy();
+            }
+        }
+    }
+}
+#endif
