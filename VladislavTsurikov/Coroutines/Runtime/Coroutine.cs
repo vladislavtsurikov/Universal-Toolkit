@@ -90,29 +90,37 @@ namespace VladislavTsurikov.Coroutines.Runtime
 	        }
         }
         
-        internal bool MoveNextIfNecessary()
+        internal bool MoveNext()
         {
 	        if (CurrentYield == null)
 	        {
 		        return false;
 	        }
-	        
-	        if (!CurrentYield.IsDone())
+
+	        if (CurrentYield.IsDone())
+	        {
+		        if (Routine.MoveNext())
+		        {
+			        SetCurrentYield();
+
+			        if (MoveNext())
+			        {
+				        return true;
+			        }
+			        else
+			        {
+				        return false;
+			        }
+		        }
+		        else
+		        {
+			        return false;
+		        }
+	        }
+	        else
 	        {
 		        return true;
 	        }
-
-	        if (Routine.MoveNext())
-	        {
-		        SetCurrentYield();
-
-		        if (MoveNextIfNecessary())
-		        {
-			        return true;
-		        }
-	        }
-        
-	        return false;
         }
         
         private static object GetInstanceField(Type type, object instance, string fieldName)

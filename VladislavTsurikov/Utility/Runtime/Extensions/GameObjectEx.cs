@@ -160,9 +160,13 @@ namespace VladislavTsurikov.Utility.Runtime.Extensions
             }
         }
         
-        public static void CopyTransform(this GameObject gameObject, GameObject copyGameObject)
+        public static void CopyTransform(this GameObject gameObject, GameObject copyGameObject, bool copyPosition = true)
         {
-            gameObject.transform.position = copyGameObject.transform.position;
+            if (copyPosition)
+            {
+                gameObject.transform.position = copyGameObject.transform.position;
+            }
+
             gameObject.transform.rotation = copyGameObject.transform.rotation;
             gameObject.transform.localScale = copyGameObject.transform.localScale;
         }

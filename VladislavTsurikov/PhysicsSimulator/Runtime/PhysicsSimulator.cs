@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
+using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
-using VladislavTsurikov.Runtime;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {

@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using VladislavTsurikov.Runtime;
+using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.Coroutines.Runtime
@@ -19,7 +18,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
             
             Coroutine coroutine = new Coroutine(routine, obj);
 
-            if (coroutine.MoveNextIfNecessary())
+            if (coroutine.MoveNext())
             {
                 _coroutines.Add(coroutine);
             }
@@ -36,7 +35,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
             
             Coroutine coroutine = new Coroutine(routine);
 
-            if (coroutine.MoveNextIfNecessary())
+            if (coroutine.MoveNext())
             {
                 _coroutines.Add(coroutine);
             }
@@ -137,7 +136,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
             {
                 Coroutine coroutine = _coroutines[j];
 
-                if (coroutine.Finished || !coroutine.MoveNextIfNecessary())
+                if (coroutine.Finished || !coroutine.MoveNext())
                 {
                     _coroutines.RemoveAt(j);
                     coroutine.CurrentYield = null;

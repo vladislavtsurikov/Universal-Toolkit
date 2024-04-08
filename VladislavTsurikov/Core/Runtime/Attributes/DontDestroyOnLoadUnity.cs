@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.Runtime.Attributes
+namespace VladislavTsurikov.Core.Runtime.Attributes
 {
     public class DontDestroyOnLoadAttribute : Attribute
     {

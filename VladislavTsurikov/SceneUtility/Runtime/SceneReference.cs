@@ -35,7 +35,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             get
             {
                 if (_sceneOperations != null)
+                {
                     return _sceneOperations;
+                }
 
                 var types = AllTypesDerivedFrom<SceneOperations>.TypeList
                     .Where(
@@ -46,12 +48,17 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 
                 foreach (var type in typeList)
                 {
-                    if(type == typeof(SceneManagerSceneOperations))
+                    if (type == typeof(SceneManagerSceneOperations))
+                    {
                         continue;
+                    }
                     
                     SceneOperations sceneOperations = (SceneOperations)Activator.CreateInstance(type, this);
 
-                    if (!sceneOperations.Enable) continue;
+                    if (!sceneOperations.Enable)
+                    {
+                        continue;
+                    }
                     
                     _sceneOperations = sceneOperations;
                     return _sceneOperations;
@@ -139,7 +146,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             get
             {
                 if (SceneOperations != null)
+                {
                     return SceneOperations.LoadingProgress();
+                }
 
                 return Scene.isLoaded ? 1 : 0;
             }
@@ -185,22 +194,28 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 
         public IEnumerator LoadScene(float waitForSeconds = 0)
         {
-            if(!IsValid())
+            if (!IsValid())
+            {
                 yield break;
-            
+            }
+
             if (IsLoaded || SceneOperations.IsLoading())
+            {
                 yield break;
+            }
             
             UnloadSceneCoroutine?.Cancel();
             KeepCachedSceneCoroutine?.Cancel();
 
             LoadSceneCoroutine = CoroutineRunner.StartCoroutine(Coroutine());
             yield return LoadSceneCoroutine;
-
+            
             IEnumerator Coroutine()
             {
-                if(waitForSeconds != 0)
+                if (waitForSeconds != 0)
+                {
                     yield return new WaitForSeconds(waitForSeconds);
+                }
 
                 if (_cachedScene)
                 {
@@ -218,7 +233,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
                 }
 #else
-                yield return CoroutineRunner.StartCoroutine(SceneOperations.LoadScene(), this);
+                yield return SceneOperations.LoadScene();
 #endif
             }
         }
@@ -226,10 +241,14 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         public IEnumerator UnloadScene(float waitForSeconds = 0)
         {
             if (!IsValid())
+            {
                 yield break;
+            }
 
             if (!IsLoaded || SceneOperations.IsUnloading())
+            {
                 yield break;
+            }
             
             LoadSceneCoroutine?.Cancel();
             KeepCachedSceneCoroutine?.Cancel();
@@ -239,8 +258,10 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 
             IEnumerator Coroutine()
             {
-                if(waitForSeconds != 0)
+                if (waitForSeconds != 0)
+                {
                     yield return new WaitForSeconds(waitForSeconds);
+                }
 
                 if (_cachedScene)
                 {
@@ -255,13 +276,15 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                 }
                 else
                 {
-                    if (Scene.isDirty) 
+                    if (Scene.isDirty)
+                    {
                         EditorSceneManager.SaveScene(Scene);
+                    }
                     
                     EditorSceneManager.CloseScene(Scene, true);
                 }
 #else
-                yield return CoroutineRunner.StartCoroutine(SceneOperations.UnloadScene(), this);
+                yield return SceneOperations.UnloadScene();
 #endif
             }
         }

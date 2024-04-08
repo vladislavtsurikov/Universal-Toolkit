@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
+using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
 {
@@ -13,6 +15,26 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
         public static OnDisableAllSimulatedBodyDelegate OnDisableAllSimulatedBody;
 
         public static int Count => SimulatedBodyHashSet.Count;
+        
+        public static T InstantiateSimulatedBody<T>(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions = null)
+        where T: SimulatedBody
+        {
+#if UNITY_EDITOR
+            var gameObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
+#else
+            var gameObject = Object.Instantiate(prefab);
+#endif
+            
+            gameObject.transform.position = position;
+            gameObject.transform.localScale = scaleFactor;
+            gameObject.transform.rotation = rotation;
+
+            T simulatedBody = (T)Activator.CreateInstance(typeof(T), gameObject, onDisablePhysicsActions);
+            
+            RegisterSimulatedBody(simulatedBody, false);
+
+            return simulatedBody;
+        }
         
         public static SimulatedBody InstantiateSimulatedBody(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions = null)
         {

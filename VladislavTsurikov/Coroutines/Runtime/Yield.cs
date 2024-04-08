@@ -96,8 +96,11 @@ namespace VladislavTsurikov.Coroutines.Runtime
 
 		public bool IsDone()
 		{
-			if (!_coroutine.MoveNextIfNecessary())
+			if (!_coroutine.MoveNext())
+			{
+				_coroutine.Finished = true;
 				return true;
+			}
 
 			return false;
 		}
@@ -114,7 +117,13 @@ namespace VladislavTsurikov.Coroutines.Runtime
 
 		public bool IsDone()
 		{
-			return !_coroutine.MoveNextIfNecessary();
+			if (!_coroutine.MoveNext())
+			{
+				_coroutine.Finished = true;
+				return true;
+			}
+
+			return false;
 		}
 	}
 	

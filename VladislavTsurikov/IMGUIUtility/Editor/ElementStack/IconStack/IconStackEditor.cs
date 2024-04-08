@@ -352,15 +352,15 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack
     				{										
     					if (e.control)
 						{    
-							SelectPrototypeAdditive(iconList, index);               
+							SelectAdditive(iconList, index);               
 						}
 						else if (e.shift)
 						{          
-							SelectPrototypeRange(iconList, index);                
+							SelectRange(iconList, index);                
 						}
 						else 
 						{
-							SelectPrototype(iconList, index);
+							Select(iconList, index);
 						}
 
             	    	e.Use();
@@ -444,7 +444,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack
             elements.Insert(destIndex, item);
         }
 
-		public void SelectPrototype(IList elements, int index)
+		public void Select(IList elements, int index)
         {
             if(index < 0 && index >= elements.Count)
             {
@@ -468,7 +468,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack
 			}
         }
 
-        public void SelectPrototypeAdditive(IList elements, int index)
+        public void SelectAdditive(IList elements, int index)
         {
             if(index < 0 && index >= elements.Count)
             {
@@ -484,7 +484,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack
 			}
         }
 
-        public void SelectPrototypeRange(IList elements, int index)
+        public void SelectRange(IList elements, int index)
         {
             if(index < 0 && index >= elements.Count)
             {

@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace VladislavTsurikov.Core.Runtime
+namespace VladislavTsurikov.Core.Editor
 {
     public static class MenuWindows
     {

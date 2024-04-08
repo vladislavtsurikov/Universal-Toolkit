@@ -16,9 +16,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
         
         public delegate void OnSetup ();
         public static OnSetup OnSetupEvent;
-
-        public override string Name => GetType().ToString().Split('.').Last();
-
+        
         protected override void SetupElement(object[] args = null)
         {
             if (args != null)
@@ -45,7 +43,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
 #endif
         }
 
-        protected override void OnDelete()
+        protected override void OnDeleteElement()
         {
             if (SceneDataManager == null)
             {

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VladislavTsurikov.Runtime
+namespace VladislavTsurikov.Core.Runtime
 {
     public class Transform
     {

@@ -58,6 +58,16 @@ namespace VladislavTsurikov.GameObjectCollider.Runtime
             }
         }
 
+        public void RegisterGameObjectWithChildren(GameObject gameObject)
+        {
+            List<GameObject> allChildrenIncludingSelf = gameObject.GetAllChildrenAndSelf();
+            
+            foreach (GameObject go in allChildrenIncludingSelf)
+            {
+                RegisterGameObject(go);
+            }
+        }
+
         public void RegisterGameObject(GameObject gameObject)
         {
             if (!CanRegisterGameObject(gameObject))
@@ -183,11 +193,22 @@ namespace VladislavTsurikov.GameObjectCollider.Runtime
 
         private bool CanRegisterGameObject(GameObject gameObject)
         {
-            if(gameObject == null) return false;
-            if (gameObject.GetComponent<RectTransform>() != null) return false; 
+            if (gameObject == null)
+            {
+                return false;
+            }
+
+            if (gameObject.GetComponent<RectTransform>() != null)
+            {
+                return false;
+            } 
+            
             if (gameObject.GetComponent<TerrainCollider>() == null)
             {
-                if(!gameObject.IsRendererEnabled()) return false;
+                if (!gameObject.IsRendererEnabled())
+                {
+                    return false;
+                }
             }
 
             if(PrefabUtility.GetPrefabAssetType(gameObject) != PrefabAssetType.NotAPrefab)
@@ -200,23 +221,23 @@ namespace VladislavTsurikov.GameObjectCollider.Runtime
                 {
                     LOD[] lods = lodGroup.GetLODs();
 
-                    if(lods.Length != 0)
+                    if (lods.Length == 0)
                     {
-                        if(lods[0].renderers.Length != 0)
-                        {
-                            if(lods[0].renderers[0].gameObject == gameObject)
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
+                        return true;
                     }
-                }
 
-                return true;
+                    if (lods[0].renderers.Length == 0)
+                    {
+                        return true;
+                    }
+                    
+                    if (lods[0].renderers[0] == null)
+                    {
+                        return false;
+                    }
+                            
+                    return lods[0].renderers[0].gameObject == gameObject;
+                }
             }
 
             return true;

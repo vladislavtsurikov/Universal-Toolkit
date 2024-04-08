@@ -4,9 +4,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.Core.Runtime.Interfaces;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
 using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
-using Object = System.Object;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 {
@@ -38,7 +36,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
         public delegate GenericMenu AddTabMenuCallbackDelegate(int currentTabIndex);
         public delegate void SelectCallbackDelegate(int currentTabIndex);
         public delegate void HappenedMoveCallbackDelegate();
-        public delegate void SetTabColorDelegate(Object tab, out Color barColor, out Color labelColor);
+        public delegate void SetTabColorDelegate(object tab, out Color barColor, out Color labelColor);
         
         public AddCallbackDelegate AddCallback;
         public AddTabMenuCallbackDelegate AddTabMenuCallback;
@@ -83,7 +81,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 
 			int tabUnderCursor = -1;
 
-            Object draggingTab = null;
+            object draggingTab = null;
             if (_dragAndDrop.IsDragging() || _dragAndDrop.IsDragPerform())
             {
                 if(_dragAndDrop.GetData() is ISelected and IHasName)
@@ -141,8 +139,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                     }
                 }
 
-                //StackElement tab = (StackElement)_elements[tabIndex];
-                Object tab = _elements[tabIndex];
+                object tab = _elements[tabIndex];
 
                 float localTabWidth = TabWidth;
 
@@ -293,9 +290,9 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                         UnityEngine.GUIUtility.keyboardControl = tabWindowControlID;
                         UnityEngine.GUIUtility.hotControl = 0;
                         
-                        Component tab = (Component)_elements[tabUnderCursor];
+                        object tab = _elements[tabUnderCursor];
 
-            	    	if(tab.Selected == false)
+            	    	if((tab as ISelected).Selected == false)
             	    	{
             	    	    Select(tabUnderCursor);
             	    	} 
@@ -336,24 +333,22 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                 return;
             }
 
-            for (int i = 0; i < _elements.Count; i++)
+            foreach (var localTab in _elements)
             {
-                Component localTab = (Component)_elements[i];
-
-                localTab.Selected = false;
+                ((ISelected)localTab).Selected = false;
             }
 
-            Component tab = (Component)_elements[index];
+            object tab = _elements[index];
 
-            tab.Selected = true;
+            ((ISelected)tab).Selected = true;
         }
 
         private int GetSelectedIndex()
         {
             for (int i = 0; i < _elements.Count; i++)
             {
-                Component tab = (Component)_elements[i];
-                if(tab.Selected)
+                object tab = _elements[i];
+                if(((ISelected)tab).Selected)
                 {
                     return i;
                 }
@@ -388,7 +383,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 
             destIndex = Mathf.Clamp(destIndex, 0, elements.Count);
 
-            Component item = (Component)elements[sourceIndex];
+            object item = elements[sourceIndex];
             elements.RemoveAt(sourceIndex);
             elements.Insert(destIndex, item);
 
@@ -400,7 +395,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
             int tabCount = _elements.Count;
             if(tabCount != 0)
             {
-                Object obj = _elements[_elements.Count - 1];
+                object obj = _elements[^1];
 
                 if(obj is not IHasName and ISelected)
                 {

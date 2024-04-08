@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Runtime;
+using VladislavTsurikov.Core.Runtime;
 
 namespace VladislavTsurikov.Timer.Runtime 
 {
