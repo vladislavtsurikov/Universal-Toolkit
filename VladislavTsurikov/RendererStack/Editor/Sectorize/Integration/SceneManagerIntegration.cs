@@ -18,10 +18,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
     {
         internal static void PrepareSceneManager()
         {
-            List<Sector> sectors =
-                StreamingUtility.GetAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag());
+            List<Sector> sectors = StreamingUtility.GetAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag());
 
-            if (sectors.Count == 0) return;
+            if (sectors.Count == 0)
+            {
+                return;
+            }
 
             if (SceneManagerData.Instance.EnableSceneManager == false)
             {
@@ -39,14 +41,14 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
                     SceneManagerData.Instance.Profile = Profile.CreateProfile();
                 }
 
-                DefaultBuildSceneCollection buildSceneCollection = GetCurrentDefaultBuildSceneCollection();
+                DefaultBuildSceneCollection buildSceneCollection = CreateDefaultBuildSceneCollectionIfNecessary();
 
-                SceneCollection sceneCollection = GetSectorizeSceneCollection(buildSceneCollection);
+                SceneCollection sceneCollection = GetSectorizeSceneCollection(buildSceneCollection) ?? CreateSectorizeSceneCollection(buildSceneCollection);
 
-                ActiveScene activeSceneSettings = (ActiveScene)sceneCollection.SettingsList.CreateIfMissingType(typeof(ActiveScene));
+                ActiveScene activeSceneSettings = (ActiveScene)sceneCollection.SettingsStack.CreateIfMissingType(typeof(ActiveScene));
                 activeSceneSettings.SceneReference = new SceneReference(scene);
 
-                Runtime.Sectorize.SceneManagerIntegration.Sectorize sectorizeComponent = (Runtime.Sectorize.SceneManagerIntegration.Sectorize)sceneCollection.SceneComponentStack.CreateComponent(
+                Runtime.Sectorize.SceneManagerIntegration.Sectorize sectorizeComponent = (Runtime.Sectorize.SceneManagerIntegration.Sectorize)sceneCollection.SceneTypeComponentStack.CreateComponentIfMissingType(
                     typeof(Runtime.Sectorize.SceneManagerIntegration.Sectorize));
             
                 foreach (var sector in StreamingUtility.GetAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()))
@@ -56,24 +58,24 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
             }
         }
 
-        internal static DefaultBuildSceneCollection GetCurrentDefaultBuildSceneCollection()
+        private static DefaultBuildSceneCollection CreateDefaultBuildSceneCollectionIfNecessary()
         {
             Profile profile = SceneManagerData.Instance.Profile;
             
-            if (profile.BuildSceneCollectionList.ElementList.Count == 0)
+            if (profile.BuildSceneCollectionStack.ElementList.Count == 0)
             {
-                return (DefaultBuildSceneCollection)profile.BuildSceneCollectionList.CreateComponent(typeof(DefaultBuildSceneCollection));
+                return (DefaultBuildSceneCollection)profile.BuildSceneCollectionStack.CreateComponent(typeof(DefaultBuildSceneCollection));
             }
             else
             {
-                if (profile.BuildSceneCollectionList.ActiveBuildSceneCollection is DefaultBuildSceneCollection)
+                if (profile.BuildSceneCollectionStack.ActiveBuildSceneCollection is DefaultBuildSceneCollection collection)
                 {
-                    return (DefaultBuildSceneCollection)profile.BuildSceneCollectionList.ActiveBuildSceneCollection;
+                    return collection;
                 }
                 else
                 {
-                    DefaultBuildSceneCollection buildSceneCollection = (DefaultBuildSceneCollection)profile.BuildSceneCollectionList.CreateComponent(typeof(DefaultBuildSceneCollection));
-                    profile.BuildSceneCollectionList.ActiveBuildSceneCollection = buildSceneCollection;
+                    DefaultBuildSceneCollection buildSceneCollection = (DefaultBuildSceneCollection)profile.BuildSceneCollectionStack.CreateComponent(typeof(DefaultBuildSceneCollection));
+                    profile.BuildSceneCollectionStack.ActiveBuildSceneCollection = buildSceneCollection;
                     return buildSceneCollection;
                 }
             }
@@ -83,21 +85,28 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
         {
             Scene scene = SectorLayerManager.Instance.SceneDataManager.Scene;
 
-            foreach (var sceneCollection in buildSceneCollection.SceneCollectionList.ElementList)
+            foreach (var sceneCollection in buildSceneCollection.SceneCollectionStack.ElementList)
             {
                 if (((IHasName)sceneCollection).Name == scene.name)
                 {
                     return sceneCollection;
                 }
             }
+
+            return null;
+        }
+
+        private static SceneCollection CreateSectorizeSceneCollection(DefaultBuildSceneCollection buildSceneCollection)
+        {
+            Scene scene = SectorLayerManager.Instance.SceneDataManager.Scene;
             
-            SceneCollection newSceneCollection = buildSceneCollection.SceneCollectionList.CreateComponent(typeof(SceneCollection));
+            SceneCollection newSceneCollection = buildSceneCollection.SceneCollectionStack.CreateComponent(typeof(SceneCollection));
             newSceneCollection.Name = scene.name;
 
             return newSceneCollection;
         }
 
-        public static void EnableSceneManagerWithWarning()
+        private static void EnableSceneManagerWithWarning()
         {
             if (EditorUtility.DisplayDialog("WARNING!",
                     "Sectorize works with the Scene Manager. If you enable the Scene Manager, this will remove your added scenes in the Build Settings and automatically add only the added scenes to the Scene Manager in the Build Settings.", 

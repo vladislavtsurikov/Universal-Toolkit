@@ -25,7 +25,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
         public int PrototypeID => _prototypeID;
 
         [OdinSerialize]
-        public List<RendererInstance> InstanceList = new List<RendererInstance>();
+        public List<Instance> InstanceList = new List<Instance>();
         
         public PrototypeRendererData(int prototypeID)
         {
@@ -56,7 +56,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
 
         public void AddPersistentData(TerrainObjectInstance instance)  
         {
-            RendererInstance item;
+            Instance item;
             item.ID = instance.ID;
             item.Position = instance.Position;
             item.Rotation = instance.Rotation;
@@ -68,6 +68,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
 
         public void ClearPersistentData()
         {
+            if (InstanceList.Count == 0)
+            {
+                return;
+            }
+            
             InstanceList.Clear();
             ModifiedPrototypeRenderDataStack.Add(this);
         }
@@ -91,7 +96,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             {
                 if(InstanceList[i].ID == instance.ID)
                 {
-                    InstanceList[i] = RendererInstance.ConvertToSerializableInstance(instance);
+                    InstanceList[i] = Instance.ConvertToSerializableInstance(instance);
                     ModifiedPrototypeRenderDataStack.Add(this);
                     return;
                 }
@@ -106,7 +111,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
                 {
                     if(instance.Enable)
                     {
-                        InstanceList.Add(RendererInstance.ConvertToSerializableInstance(instance));
+                        InstanceList.Add(Instance.ConvertToSerializableInstance(instance));
                     }
                     else
                     {

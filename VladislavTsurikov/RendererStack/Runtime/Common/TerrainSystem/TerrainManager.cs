@@ -36,7 +36,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
             }
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             foreach (var item in TerrainHelperList)
             {

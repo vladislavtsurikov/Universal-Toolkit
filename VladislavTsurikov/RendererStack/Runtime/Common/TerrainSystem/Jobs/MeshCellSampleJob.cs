@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -5,9 +6,7 @@ using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Jobs
 {
-#if RENDERER_STACK_BURST
     [BurstCompile(CompileSynchronously = true)]
-#endif
     public struct MeshCellSampleJob : IJobParallelFor
     {
         public NativeArray<Bounds> CellBoundsList;

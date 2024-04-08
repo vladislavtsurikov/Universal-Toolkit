@@ -16,10 +16,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.
 
         public LODRenderData(LOD lod)
         {
-            PositionBuffer = new ComputeBufferProperty(new ComputeBuffer(5000, (16 * 4 * 2) + 16, ComputeBufferType.Append)); 
+            PositionBuffer = new ComputeBufferProperty(new ComputeBuffer(5000, 16 * 4 * 2 + 16, ComputeBufferType.Append)); 
             PositionBuffer.ComputeBuffer.SetCounterValue(0);
 
-            PositionShadowBuffer = new ComputeBufferProperty(new ComputeBuffer(5000, (16 * 4 * 2) + 16, ComputeBufferType.Append));
+            PositionShadowBuffer = new ComputeBufferProperty(new ComputeBuffer(5000, 16 * 4 * 2 + 16, ComputeBufferType.Append));
             PositionShadowBuffer.ComputeBuffer.SetCounterValue(0);
 
             uint[] args = { 0, 0, 0, 0, 0 };

@@ -4,16 +4,16 @@ using UnityEngine;
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.RendererDataSystem
 {
     [Serializable]
-    public struct RendererInstance
+    public struct Instance
     {
         public int ID;
         public Vector3 Position;
         public Vector3 Scale;
         public Quaternion Rotation;
 
-        public static RendererInstance ConvertToSerializableInstance(TerrainObjectInstance instance)
+        public static Instance ConvertToSerializableInstance(TerrainObjectInstance instance)
         {
-            RendererInstance item;
+            Instance item;
             item.ID = instance.ID;
             item.Position = instance.Position;
             item.Rotation = instance.Rotation;

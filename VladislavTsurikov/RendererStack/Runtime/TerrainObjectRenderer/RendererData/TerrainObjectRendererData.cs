@@ -11,6 +11,7 @@ using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.RendererDataSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.Utility.Runtime.Extensions;
 
@@ -61,7 +62,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             return BVHCellTree.GetAABB();
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             for (int i = 0; i <= CellList.Count - 1; i++)
             {
@@ -95,6 +96,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             
             foreach (var cell in CellList)
             {
+                PrototypeRendererData prototypeRendererData = cell.PrototypeRenderDataStack.GetPrototypeRenderData(prototypeID);
+                
+                if (prototypeRendererData == null || prototypeRendererData.InstanceList.Count == 0)
+                {
+                    continue;
+                }
+                
+                prototypeRendererData.ClearPersistentData();
+                
                 cell.PrototypeRenderDataStack.RemoveInstances(prototypeID);
                 cell.TerrainObjectRendererCollider.RemoveInstances(prototypeID);
 

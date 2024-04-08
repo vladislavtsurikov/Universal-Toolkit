@@ -9,23 +9,27 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
 {
     public partial class TerrainObjectRendererData 
     {
-        public static void AddInstance(TerrainObjectInstance instance, string sectorLayerTag)
+        public static TerrainObjectInstance AddInstance(TerrainObjectInstance instance, string sectorLayerTag)
         {
             List<SceneDataManager> sceneDataManagers = FindSceneDataManager.OverlapPosition(instance.Position, sectorLayerTag, false);
                 
             if (sceneDataManagers.Count != 0)
             {
-                AddInstance(instance, sceneDataManagers[0]);
+                return AddInstance(instance, sceneDataManagers[0]);
+            }
+            else
+            {
+                return null;
             }
         }
 
-        private static void AddInstance(TerrainObjectInstance instance, SceneDataManager sceneDataManager)
+        private static TerrainObjectInstance AddInstance(TerrainObjectInstance instance, SceneDataManager sceneDataManager)
         {
             TerrainObjectRendererData terrainObjectRendererData = (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
 
             if(terrainObjectRendererData == null)
             {
-                return;
+                return null;
             }
             
             Rect positionRect = new Rect(new Vector2(instance.Position.x, instance.Position.z), Vector2.zero);
@@ -35,7 +39,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             
             if(overlapCellList.Count == 0)
             {
-                return;
+                return null;
             }
 
             Cell cell = overlapCellList[0];
@@ -54,6 +58,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             {
                 prototypeRendererData.AddPersistentData(instance);
                 terrainObjectRendererData.ChangeNodeSizeIfNecessary(instantObjectCollider, cell);
+                return instance;
+            }
+            else
+            {
+                return null;
             }
         }
         

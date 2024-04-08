@@ -92,7 +92,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             return _scriptList.GetElement(type);
         }
 
-        public override void Destroy()
+        protected override void DestroyInstance()
         {
             PathToTerrainObjectCollider pathToTerrainObjectCollider = TerrainObjectCollider.PathToTerrainObjectCollider;
             

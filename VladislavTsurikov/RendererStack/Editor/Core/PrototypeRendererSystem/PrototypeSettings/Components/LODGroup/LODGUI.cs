@@ -110,7 +110,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
                 
                 if(i != renderModel.LODs.Count - 1)
                 {
-                    percent = (renderModel.LODs[i + 1].Distance * lodBias) / quality.MaxRenderDistance;
+                    percent = renderModel.LODs[i + 1].Distance * lodBias / quality.MaxRenderDistance;
                 }
                 
                 LodguiInfo info = new LodguiInfo(i, name, percent);
@@ -308,7 +308,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
 
         public static string GetLODName(int i, int count)
         {
-            string name = "LOD " + (i);
+            string name = "LOD " + i;
             if (i == count) name = "Farthest";
             if (count <= 1) name = "Active";
             return name;

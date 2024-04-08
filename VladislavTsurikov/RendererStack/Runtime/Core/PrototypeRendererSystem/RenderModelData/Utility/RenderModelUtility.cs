@@ -176,7 +176,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.R
                 UnityEngine.LOD[] lods = lodGroup.GetLODs();
                 if (lodIndex >= 0 && lodIndex < lods.Length)
                 {
-                    return (lodGroup.size / lods[lodIndex].screenRelativeTransitionHeight);
+                    return lodGroup.size / lods[lodIndex].screenRelativeTransitionHeight;
                 }
             }
             return -1;

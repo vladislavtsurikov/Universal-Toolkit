@@ -17,8 +17,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
         
         public List<SceneReference> SubScenes = new List<SceneReference>();
         
-        public override string Name => "Sectorize";
-
         public static bool StartupLoadComplete { get; private set; }
 
         protected override IEnumerator Load()
@@ -44,7 +42,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
             foreach (var scene in SubScenes)
             {
                 if (scene.SceneName == sceneReference.SceneName)
+                {
                     return true;
+                }
             }
 
             return false;
@@ -58,7 +58,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
         public override float LoadingProgress()
         {
             if (_loadSectors == null)
+            {
                 return 0;
+            }
+            
             return !_loadSectors.Any() ? 1 : _loadSectors.Sum(a => a.SceneReference.LoadingProgress) / _loadSectors.Count;
         }
 

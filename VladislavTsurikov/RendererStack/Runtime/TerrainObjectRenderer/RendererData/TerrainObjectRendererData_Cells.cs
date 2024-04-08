@@ -100,15 +100,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
 
             GeometryUtility.CalculateFrustumPlanes(virtualCamera.Camera, frustumPlaneArray);
             
-            //List<Cell> visibleCellList = new List<Cell>();
-
             float maxDistance = virtualCamera.GetMaxDistance(typeof(TerrainObjectRenderer));
 
             Vector3 selectedCameraPosition = virtualCamera.GetCameraPosition();
 
-            float potentialCellPadding = _cellSize * 2;
-
-            float areaSize = maxDistance * 2 + potentialCellPadding; 
+            float areaSize = maxDistance * 2 + _cellSize;
 
             Vector2 position = new Vector2(selectedCameraPosition.x - areaSize / 2f, selectedCameraPosition.z - areaSize / 2f);
             Rect selectedAreaRect = new Rect(position, new Vector2(areaSize, areaSize));
@@ -120,8 +116,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             
             Profiler.BeginSample("QueryCells");
             
+            //_cellQuadTree.Query(selectedAreaRect, visibleCellListCached);
+            
             _cellQuadTree.Query(selectedAreaRect, cell =>
             {
+                
                 if(Vector3.Distance(selectedCameraPosition, cell.Bounds.center) > maxDistance + cell.Bounds.size.x)
                 {
                     return true;
@@ -138,11 +137,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
                     visibleCellListCached.Add(cell);
                 }
                 
+                visibleCellListCached.Add(cell);
+                
                 return true;
             });
-            
-            Profiler.EndSample();
 
+            Profiler.EndSample();
+            
             return visibleCellListCached;
         }
 

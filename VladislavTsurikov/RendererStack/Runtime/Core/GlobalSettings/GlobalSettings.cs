@@ -1,8 +1,10 @@
 using System;
 using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
+#if UNITY_EDITOR 
+using VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings;
+#endif
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
 {

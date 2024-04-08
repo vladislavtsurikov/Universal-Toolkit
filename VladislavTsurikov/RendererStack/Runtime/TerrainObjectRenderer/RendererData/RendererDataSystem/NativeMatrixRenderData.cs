@@ -28,13 +28,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
     {
         public NativeArrayProperty<InstanceShaderData> InstanceShaderDataList = new NativeArrayProperty<InstanceShaderData>(); 
 
-        public unsafe void ConvertPersistentDataToRenderData(List<RendererInstance> instances)
+        public unsafe void ConvertPersistentDataToRenderData(List<Instance> instances)
         {
             InstanceShaderDataList.ChangeNativeArray(new NativeArray<InstanceShaderData>());
             
             if(instances.Count != 0)
             {
-                NativeArray<RendererInstance> nativeItemArray = new NativeArray<RendererInstance>(instances.Count, Allocator.Persistent);
+                NativeArray<Instance> nativeItemArray = new NativeArray<Instance>(instances.Count, Allocator.Persistent);
                 nativeItemArray.CopyFromFast(instances);
                 
                 InstanceShaderDataList.ChangeNativeArray(new NativeArray<InstanceShaderData>(instances.Count, Allocator.Persistent));
@@ -57,13 +57,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
     {
         public NativeArrayProperty<Matrix4x4> MatrixList = new NativeArrayProperty<Matrix4x4>(); 
 
-        public void ConvertPersistentDataToRenderData(List<RendererInstance> instances)
+        public void ConvertPersistentDataToRenderData(List<Instance> instances)
         {
             MatrixList.ChangeNativeArray(new NativeArray<Matrix4x4>());
             
             if(instances.Count != 0)
             {
-                NativeArray<RendererInstance> nativeItemArray = new NativeArray<RendererInstance>(instances.Count, Allocator.Persistent);
+                NativeArray<Instance> nativeItemArray = new NativeArray<Instance>(instances.Count, Allocator.Persistent);
                 nativeItemArray.CopyFromFast(instances);
                 
                 MatrixList.ChangeNativeArray(new NativeArray<Matrix4x4>(instances.Count, Allocator.Persistent));

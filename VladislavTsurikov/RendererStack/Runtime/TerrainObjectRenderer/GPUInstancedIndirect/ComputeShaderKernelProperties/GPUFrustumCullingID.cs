@@ -74,7 +74,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
         public static void Setup()
         {
-            _dummyComputeBuffer.ChangeComputeBuffer(new ComputeBuffer(1, (16 * 4 * 2) + 16, ComputeBufferType.Append));
+            _dummyComputeBuffer.ChangeComputeBuffer(new ComputeBuffer(1, 16 * 4 * 2 + 16, ComputeBufferType.Append));
             _dummyComputeBuffer.ComputeBuffer.SetCounterValue(0);
 
             _frustumCulling = (ComputeShader)Resources.Load("RendererStackGPUFrustumCullingLOD");

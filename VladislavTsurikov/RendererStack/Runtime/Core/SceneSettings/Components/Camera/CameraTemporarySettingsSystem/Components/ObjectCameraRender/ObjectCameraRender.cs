@@ -38,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.
             }
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             foreach (var prototypeRender in PrototypeRenderDataList)
             {

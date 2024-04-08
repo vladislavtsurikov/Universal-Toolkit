@@ -18,8 +18,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
         public IEnumerator CreateScenesForTerrains()
         {
             List<VirtualTerrain> terrains = AllVirtualTerrainTypes.FindAll();
-            
-            if (terrains.Count <= 0) yield break;
+
+            if (terrains.Count <= 0)
+            {
+                yield break;
+            }
 
             Scene activeScene = SceneManager.GetActiveScene();
             
@@ -31,7 +34,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             
             for (int i = 0; i < terrains.Count; i++)
             {
-                float progress = ((float)i / (float)terrains.Count) * 100;
+                float progress = i / (float)terrains.Count * 100;
                 
                 EditorUtility.DisplayProgressBar("Sector: " + progress + "%" + " (" + i + "/" + terrains.Count + ")", "Running " + terrains[i].Target.name, progress / 100);
                 

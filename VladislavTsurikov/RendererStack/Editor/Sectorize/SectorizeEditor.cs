@@ -16,7 +16,7 @@ using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 {
-	[ElementEditor((typeof(Runtime.Sectorize.Sectorize)))]
+	[ElementEditor(typeof(Runtime.Sectorize.Sectorize))]
     public class SectorizeEditor : RendererEditor
     {
         private Vector2 _windowScrollPos;

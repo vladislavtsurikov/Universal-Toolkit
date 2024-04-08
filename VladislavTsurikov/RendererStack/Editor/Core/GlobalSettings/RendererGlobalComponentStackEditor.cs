@@ -1,4 +1,5 @@
-﻿using VladislavTsurikov.ComponentStack.Editor.Attributes;
+﻿#if UNITY_EDITOR 
+using VladislavTsurikov.ComponentStack.Editor.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
@@ -20,3 +21,4 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
         }
     }
 }
+#endif

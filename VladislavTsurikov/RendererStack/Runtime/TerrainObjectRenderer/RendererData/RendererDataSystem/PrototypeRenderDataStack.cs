@@ -60,7 +60,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             }
         }
 
-        public void ClearInstance()
+        public void ClearInstances()
         {          
             foreach (PrototypeRendererData prototypeRenderData in PrototypeRenderDataList)
             {

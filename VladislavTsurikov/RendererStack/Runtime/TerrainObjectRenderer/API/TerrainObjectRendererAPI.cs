@@ -5,9 +5,11 @@ using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
-using VladislavTsurikov.SceneDataSystem.Editor.Utility;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
+#if UNITY_EDITOR 
+using VladislavTsurikov.SceneDataSystem.Editor.Utility;
+#endif
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
 {
@@ -58,7 +60,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
             }
         }
 
-        public static void AddInstance(GameObject prefab, Vector3 worldPosition, Vector3 scale, Quaternion rotation)
+        public static TerrainObjectInstance AddInstance(GameObject prefab, Vector3 worldPosition, Vector3 scale, Quaternion rotation)
         {
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
             
@@ -72,14 +74,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
             
             PrototypeTerrainObject proto = (PrototypeTerrainObject)terrainObjectRenderer.SelectionData.AddMissingPrototype(prefab);
 
-            AddInstance(proto, worldPosition, scale, rotation);
+            return AddInstance(proto, worldPosition, scale, rotation);
         }
 
-        public static void AddInstance(PrototypeTerrainObject proto, Vector3 position, Vector3 scale, Quaternion rotation)
+        public static TerrainObjectInstance AddInstance(PrototypeTerrainObject proto, Vector3 position, Vector3 scale, Quaternion rotation)
         {
             if(proto == null)
             {
-                return;
+                return null;
             }
             
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
@@ -96,7 +98,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
 
             TerrainObjectInstance instance = new TerrainObjectInstance(position, scale, rotation, proto);
             
-            TerrainObjectRendererData.AddInstance(instance, Sectorize.Sectorize.GetSectorLayerTag());
+            return TerrainObjectRendererData.AddInstance(instance, Sectorize.Sectorize.GetSectorLayerTag());
         }
         
         public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
@@ -171,8 +173,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
                 }
                 
                 TerrainObjectCollider obj = (TerrainObjectCollider)colliderObject;
-
-                func.Invoke(obj.Instance);
+                
+                if (!func.Invoke(obj.Instance))
+                {
+                    return;
+                }
             }
         }
     }

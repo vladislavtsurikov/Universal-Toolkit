@@ -46,7 +46,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.
             FindMainCamera();
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
 #if UNITY_EDITOR
             EditorApplication.update -= FindSceneViewCamera;

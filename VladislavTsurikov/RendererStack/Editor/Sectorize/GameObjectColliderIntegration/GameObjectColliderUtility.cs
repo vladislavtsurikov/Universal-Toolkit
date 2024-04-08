@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderIntegration
@@ -18,17 +17,17 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
             GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene += RegisterGameObjectToCurrentScene;
         }
         
-        public static void RegisterGameObjectToCurrentScene(GameObject instanceGameObject)
+        public static void RegisterGameObjectToCurrentScene(GameObject gameObject)
         {
-            if (instanceGameObject == null)
+            if (gameObject == null)
             {
                 return;
             }
             
-            ChangeGameObjectSceneIfNecessary(instanceGameObject);
+            ChangeGameObjectSceneIfNecessary(gameObject);
 
             List<SceneDataManager> sceneDataManagers =
-                FindSceneDataManager.OverlapPosition(instanceGameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
+                FindSceneDataManager.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
             
             if (sceneDataManagers.Count == 0)
             {
@@ -39,8 +38,6 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
 
             GameObjectCollider.Runtime.GameObjectCollider gameObjectCollider = 
                 (GameObjectCollider.Runtime.GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider.Runtime.GameObjectCollider));
-
-            List<GameObject> allChildrenIncludingSelf = instanceGameObject.GetAllChildrenAndSelf();
             
             if(gameObjectCollider == null)
             {
@@ -48,10 +45,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
             }
             else
             {
-                foreach (GameObject go in allChildrenIncludingSelf)
-                {
-                    gameObjectCollider.RegisterGameObject(go);
-                }
+                gameObjectCollider.RegisterGameObjectWithChildren(gameObject);
             }
         }
         

@@ -8,7 +8,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
         [NonSerialized]
         public bool UsedForColliders = false;
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             ScriptingSystem.RemoveColliders(VirtualCamera);
         }

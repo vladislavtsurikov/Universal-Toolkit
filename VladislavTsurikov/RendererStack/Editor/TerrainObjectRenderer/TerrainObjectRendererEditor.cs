@@ -5,7 +5,7 @@ using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 
 namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
 {
-    [ElementEditor((typeof(Runtime.TerrainObjectRenderer.TerrainObjectRenderer)))]
+    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.TerrainObjectRenderer))]
     public class TerrainObjectRendererEditor : PrototypeRendererEditor
     {
         private readonly TerrainObjectRendererMenu _menu = new TerrainObjectRendererMenu();

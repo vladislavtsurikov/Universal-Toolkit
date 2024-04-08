@@ -7,8 +7,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
         private Vector3 _position;
         private Vector3 _scale;
         private Quaternion _rotation;
+        private bool _isDestroy;
         
         public int ID { get; }
+
+        public bool IsDestroy => _isDestroy;
 
         public Vector3 Position
         {
@@ -93,7 +96,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
             return Matrix4x4.TRS(Position, Rotation, Scale);
         }
 
-        public virtual void Destroy(){}
+        public void Destroy()
+        {
+            _isDestroy = true;
+            DestroyInstance();
+        }
+
+        protected virtual void DestroyInstance(){}
         protected virtual void TransformChanged(){}
         protected virtual void Reposition(){}
 

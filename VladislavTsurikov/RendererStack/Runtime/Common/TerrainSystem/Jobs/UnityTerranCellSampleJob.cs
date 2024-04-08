@@ -1,4 +1,5 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
@@ -6,9 +7,7 @@ using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Jobs
 {
-#if RENDERER_STACK_BURST
     [BurstCompile(CompileSynchronously = true)]
-#endif
     public struct UnityTerranCellSampleJob : IJobParallelFor
     {
         [ReadOnly] public NativeArray<float> InputHeights;

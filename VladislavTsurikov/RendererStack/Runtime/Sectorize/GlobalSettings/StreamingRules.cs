@@ -1,11 +1,9 @@
-using System;
 using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings
 {
-    [Serializable]
     [MenuItem("Streaming Rules")]
     public class StreamingRules : GlobalComponent
     {
@@ -21,8 +19,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings
 
         public float GetMaxPauseBeforeLoadingScene(Sector sector)
         {
-            if(sector.CachedScene)
+            if (sector.CachedScene)
+            {
                 return MaxPauseBeforeLoadingCachedScene;
+            }
 
             return MaxPauseBeforeLoadingScene;
         }

@@ -86,7 +86,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             AfterSetupPrototypeRendererRendererEvent?.Invoke(); 
         }
 
-        protected override void OnDisable()
+        protected override void OnDisableElement()
         {
             ScriptingSystem?.OnDisable();
             MergeInstancedIndirectBuffersID.Dispose();

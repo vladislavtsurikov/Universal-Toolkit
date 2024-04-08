@@ -7,7 +7,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
         public NativeRenderData NativeRenderData = new NativeRenderData();
         public ComputeBufferRenderData ComputeBufferRenderData = new ComputeBufferRenderData();
         
-        public void ConvertPersistentDataToTemporaryData(List<RendererInstance> instanceList)
+        public void ConvertPersistentDataToTemporaryData(List<Instance> instanceList)
         {
             NativeRenderData.ConvertPersistentDataToRenderData(instanceList);
             ComputeBufferRenderData.ConvertPersistentDataToRenderData(NativeRenderData.InstanceShaderDataList.NativeArray);

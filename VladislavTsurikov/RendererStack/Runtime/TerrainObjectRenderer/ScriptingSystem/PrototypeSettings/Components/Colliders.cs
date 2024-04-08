@@ -25,7 +25,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             }
         }
 
-        protected override void OnDelete()
+        protected override void OnDeleteElement()
         { 
             TerrainObjectRenderer.Instance.ScriptingSystem.Setup();
         }

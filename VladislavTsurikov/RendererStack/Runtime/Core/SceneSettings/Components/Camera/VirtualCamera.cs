@@ -4,12 +4,14 @@ using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem.Attributes;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Attributes;
+#if UNITY_EDITOR 
+using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
+#endif
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera
 {
@@ -22,9 +24,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.
     [Serializable]
     public class VirtualCamera
     {
-        [NonSerialized] private float _lastMaxDistance;
-        [NonSerialized] private Matrix4x4 _lastCameraTransform;
-        [NonSerialized] private float _lastFieldOfView;
+        [NonSerialized] 
+        private float _lastMaxDistance;
+        [NonSerialized] 
+        private Matrix4x4 _lastCameraTransform;
+        [NonSerialized] 
+        private float _lastFieldOfView;
 
         public UnityEngine.Camera Camera;
         public bool Active = true;

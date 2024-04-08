@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR 
+using System;
 using UnityEditor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
@@ -42,3 +43,4 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
@@ -5,12 +6,10 @@ using Unity.Mathematics;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.RendererDataSystem.Jobs
 {
-#if RENDERER_STACK_BURST
     [BurstCompile(CompileSynchronously = true)]
-#endif
     public struct ConvertToInstanceShaderDataJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<RendererInstance> InstanceArray;
+        [ReadOnly] public NativeArray<Instance> InstanceArray;
         
         [NativeDisableUnsafePtrRestriction]
         public unsafe void* InstanceShaderDataPtr;
@@ -19,9 +18,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Renderer
         {
             ref InstanceShaderData instanceShaderData = ref UnsafeUtility.ArrayElementAsRef<InstanceShaderData>(InstanceShaderDataPtr, index);
 
-            RendererInstance rendererInstance = InstanceArray[index];
+            Instance instance = InstanceArray[index];
 
-            instanceShaderData.SetMatrix(float4x4.TRS(rendererInstance.Position, rendererInstance.Rotation, rendererInstance.Scale));
+            instanceShaderData.SetMatrix(float4x4.TRS(instance.Position, instance.Rotation, instance.Scale));
         }
     }
 }

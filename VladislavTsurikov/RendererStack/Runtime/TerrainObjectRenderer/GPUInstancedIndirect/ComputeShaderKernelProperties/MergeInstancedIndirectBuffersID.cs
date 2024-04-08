@@ -34,7 +34,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
         public static void Setup()
         {
-            _dummyComputeBuffer.ChangeComputeBuffer(new ComputeBuffer(1, (16 * 4) + 16, ComputeBufferType.Default));
+            _dummyComputeBuffer.ChangeComputeBuffer(new ComputeBuffer(1, 16 * 4 + 16, ComputeBufferType.Default));
 
             _mergeBufferShader = (ComputeShader)Resources.Load("RendererStackMergeInstancedIndirectBuffers");
 

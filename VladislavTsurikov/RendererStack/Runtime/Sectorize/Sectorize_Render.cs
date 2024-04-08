@@ -16,12 +16,24 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 
         public override void Render()
         {
-            if (!Application.isPlaying && !RendererStackManager.Instance.EditorPlayModeSimulation) return;
-            if(SceneManagerIntegration.Sectorize.StartupLoadComplete == false) return;
-
+            if (Application.isPlaying)
+            {
+                if (!SceneManagerIntegration.Sectorize.StartupLoadComplete)
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (!RendererStackManager.Instance.EditorPlayModeSimulation)
+                {
+                    return;
+                }
+            }
+            
             CameraManager cameraManager = (CameraManager)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(CameraManager));
             StreamingRules streamingRules = (StreamingRules)Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(StreamingRules), GetType());
-            
+
             foreach (var cam in cameraManager.VirtualCameraList)
             {
                 if (cam.Ignored) 
@@ -29,45 +41,51 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                     continue;
                 }
 
-                List<Sector> localLoadSectors = FindSector.OverlapSphere(cam.Camera.transform.position, streamingRules.GetMaxLoadingDistance(), GetSectorLayerTag(), false);
-                    
-                if(localLoadSectors == null)
+                List<Sector> loadSectors = FindSector.OverlapSphere(cam.Camera.transform.position, streamingRules.GetMaxLoadingDistance(), GetSectorLayerTag(), false);
+
+                if (loadSectors == null)
+                {
                     continue;
+                }
                     
-                foreach (var sector in localLoadSectors)
+                foreach (var sector in loadSectors)
                 {
                     sector.SceneReference.UnloadSceneCoroutine?.Cancel();
-                                
-                    if (!sector.IsLoaded)
+
+                    if (sector.IsLoaded)
                     {
-                        Sphere loadImmediatelySphere = new Sphere(cam.Camera.transform.position, streamingRules.MaxImmediatelyLoadingDistance);
+                        continue;
+                    }
+                    
+                    Sphere loadImmediatelySphere = new Sphere(cam.Camera.transform.position, streamingRules.MaxImmediatelyLoadingDistance);
                                     
-                        if (loadImmediatelySphere.Intersects(new AABB(sector.Bounds.center, sector.Bounds.size)))
-                        {
-                            sector.LoadScene();
-                            continue;
-                        }
+                    if (loadImmediatelySphere.Intersects(new AABB(sector.Bounds.center, sector.Bounds.size)))
+                    {
+                        sector.LoadScene();
+                        continue;
+                    }
                                     
-                        if (_pauseLoadCoroutine == null || _pauseLoadCoroutine.Finished)
-                        {
-                            sector.LoadScene(CalculateMaximumPauseBeforeLoadingScene(sector, cam.Camera.transform.position, streamingRules));
-                            _pauseLoadCoroutine = sector.SceneReference.LoadSceneCoroutine;
-                        }
+                    if (_pauseLoadCoroutine == null || _pauseLoadCoroutine.Finished)
+                    {
+                        sector.LoadScene(CalculateMaximumPauseBeforeLoadingScene(sector, cam.Camera.transform.position, streamingRules));
+                        _pauseLoadCoroutine = sector.SceneReference.LoadSceneCoroutine;
                     }
                 }
                         
                 Sphere preventingUnloadSceneSphere = new Sphere(cam.Camera.transform.position, streamingRules.GetMaxLoadingDistance() + streamingRules.OffsetMaxDistancePreventingUnloadScene);
                         
-                UnloadUnnecessaryScenes(localLoadSectors, preventingUnloadSceneSphere, streamingRules);
+                UnloadUnnecessaryScenes(loadSectors, preventingUnloadSceneSphere, streamingRules);
             }
         }
 
         private void UnloadUnnecessaryScenes(List<Sector> loadSectors, Sphere preventingUnloadSceneSphere, StreamingRules streamingRules)
         {
             List<Sector> allLoadedScenes = SectorLayerManager.Instance.GetLoadedScenes(GetSectorLayerTag());
-            
-            if(allLoadedScenes == null)
+
+            if (allLoadedScenes == null)
+            {
                 return;
+            }
             
             List<Sector> unloadSceneDatas = new List<Sector>(allLoadedScenes);
             unloadSceneDatas.RemoveAll(loadSectors.Contains);
@@ -76,10 +94,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             {
                 if (!preventingUnloadSceneSphere.Intersects(new AABB(sector.Bounds.center, sector.Bounds.size)))
                 {
-                    if(streamingRules.UseCaching)
+                    if (streamingRules.UseCaching)
+                    {
                         sector.CacheScene(0, streamingRules.KeepScenes);
+                    }
                     else
+                    {
                         sector.UnloadScene();
+                    }
                 }
             }
         }
