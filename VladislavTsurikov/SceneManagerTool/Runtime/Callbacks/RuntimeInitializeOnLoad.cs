@@ -18,8 +18,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks
                 return;
             }
  #endif
-            
-             RuntimeUtility.Start();
+            RuntimeUtility.Start();
         }
     }
 }
