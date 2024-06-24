@@ -12,10 +12,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
     public abstract class StamperTool : MonoBehaviourTool
     {
         [NonSerialized]
-        private bool _isCancelSpawn;
-        [NonSerialized]
-        private bool _displayProgressBar;
-        [NonSerialized]
         private float _pastProgress;
         
         public float SpawnProgress;
@@ -24,7 +20,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         {
             get
             {
-                if (_isCancelSpawn)
+                if (IsCancelSpawn)
                 {
                     return true;
                 }
@@ -35,9 +31,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
             }
         }
 
-        public bool DisplayProgressBar => _displayProgressBar;
+        [field: NonSerialized]
+        public bool DisplayProgressBar { get; private set; }
 
-        public bool IsCancelSpawn => _isCancelSpawn;
+        [field: NonSerialized]
+        public bool IsCancelSpawn { get; private set; }
 
 #if UNITY_EDITOR
         public AutoRespawnController AutoRespawnController = new AutoRespawnController();
@@ -53,13 +51,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         
         private protected override void OnToolEnable()
         {
-            _isCancelSpawn = true;
+            IsCancelSpawn = true;
             OnStamperEnable();
         }
 
         public void CancelSpawn()
         {
-            _isCancelSpawn = true;
+            IsCancelSpawn = true;
             SpawnProgress = 0f;
             
             CoroutineRunner.StopCoroutines(this);
@@ -79,14 +77,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         private IEnumerator StamperSpawnCoroutine(bool displayProgressBar = false)
         {
-            _isCancelSpawn = false;
+            IsCancelSpawn = false;
             SpawnProgress = 0;
-            _displayProgressBar = displayProgressBar;
+            DisplayProgressBar = displayProgressBar;
             
-            yield return Spawn(_displayProgressBar);
+            yield return Spawn(DisplayProgressBar);
             
             SpawnProgress = 1;
-            _isCancelSpawn = true;
+            IsCancelSpawn = true;
 
 #if UNITY_EDITOR
             EditorUtility.ClearProgressBar();
@@ -96,7 +94,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 #if UNITY_EDITOR
         public void UpdateDisplayProgressBar(string title, string info, float progress = -1)
         {
-            if (_displayProgressBar)
+            if (DisplayProgressBar)
             {
                 float localProgress = _pastProgress;
 

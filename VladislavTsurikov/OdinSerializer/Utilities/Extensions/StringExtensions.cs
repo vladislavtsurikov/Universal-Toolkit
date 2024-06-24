@@ -19,7 +19,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// String method extensions.

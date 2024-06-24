@@ -4,16 +4,16 @@ using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Attributes;
-#if UNITY_EDITOR 
-using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.Attributes;
+#if UNITY_EDITOR
+using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.CameraSettingsSystem;
 #endif
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 {
     public enum CameraType
     {
@@ -220,7 +220,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.
 
         public bool IsNeedUpdateRenderData(Type rendererType)
         {
-            bool needUpdate = _lastMaxDistance != GetMaxDistance(rendererType) || !_lastCameraTransform.Equals(GetMatrix4X4()) || _lastFieldOfView != Camera.fieldOfView;
+            bool needUpdate = _lastMaxDistance != GetMaxDistance(rendererType) 
+                              || !_lastCameraTransform.Equals(GetMatrix4X4()) 
+                              || _lastFieldOfView != Camera.fieldOfView;
             
             return needUpdate;
         }

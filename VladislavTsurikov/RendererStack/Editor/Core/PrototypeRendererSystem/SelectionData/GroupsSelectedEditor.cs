@@ -5,17 +5,18 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.SelectionData
 {
     public class GroupsSelectedEditor 
     {
-        private readonly Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData _selectionData;
+        private readonly Runtime.Core.PrototypeRendererSystem.SelectionData _selectionData;
         private readonly TabStackEditor _tabStackEditor;
 
-        public GroupsSelectedEditor(Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData selectionData)
+        public GroupsSelectedEditor(Runtime.Core.PrototypeRendererSystem.SelectionData selectionData)
         {
             _selectionData = selectionData;
 
@@ -97,12 +98,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
         {
             GenericMenu menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Add Tab"), false, GUIUtility.ContextMenuCallback, new Action(AddGroup));
+            menu.AddItem(new GUIContent("Add Tab"), false, ContextMenuUtility.ContextMenuCallback, new Action(AddGroup));
 
             menu.AddSeparator ("");
             if (_selectionData.GroupList.Count > 1)
             {
-                menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(DeleteSelectedGroups));
+                menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(DeleteSelectedGroups));
             }
             else
             {

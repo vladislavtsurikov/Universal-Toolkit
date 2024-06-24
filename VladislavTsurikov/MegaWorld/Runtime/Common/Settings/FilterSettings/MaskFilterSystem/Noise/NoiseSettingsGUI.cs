@@ -7,8 +7,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 {
     public class NoiseSettingsGUI
     {
-        private RenderTexture _mPreviewRT;
-        public RenderTexture previewRT => _mPreviewRT;
+        public RenderTexture previewRT { get; private set; }
 
         public NoiseSettings MNoiseSettings;
 
@@ -168,23 +167,23 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 if ( Event.current.type == EventType.Repaint )
                 {
                     // create preview RT here and keep until the next Repaint
-                    if( _mPreviewRT != null )
+                    if( previewRT != null )
                     {
-                        RenderTexture.ReleaseTemporary( _mPreviewRT );
+                        RenderTexture.ReleaseTemporary( previewRT );
                     }
 
-                    _mPreviewRT = RenderTexture.GetTemporary(512, 512, 0, RenderTextureFormat.ARGB32);
+                    previewRT = RenderTexture.GetTemporary(512, 512, 0, RenderTextureFormat.ARGB32);
                     RenderTexture tempRT = RenderTexture.GetTemporary(512, 512, 0, RenderTextureFormat.RFloat);
 
                     RenderTexture prevActive = RenderTexture.active;
 
                     NoiseUtils.Blit2D(MNoiseSettings, tempRT);
 
-                    NoiseUtils.BlitPreview2D(tempRT, _mPreviewRT);
+                    NoiseUtils.BlitPreview2D(tempRT, previewRT);
 
                     RenderTexture.active = prevActive;
 
-                    GUI.DrawTexture(previewRect, _mPreviewRT, ScaleMode.ScaleToFit, false);
+                    GUI.DrawTexture(previewRect, previewRT, ScaleMode.ScaleToFit, false);
 
                     RenderTexture.ReleaseTemporary(tempRT);
                 }

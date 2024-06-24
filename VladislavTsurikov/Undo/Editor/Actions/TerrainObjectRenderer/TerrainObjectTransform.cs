@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
 
-namespace VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer
+namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 {
     public class TerrainObjectTransform : UndoRecord
     {
@@ -33,12 +33,12 @@ namespace VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer
         private class TransformData
         {
             private readonly TerrainObjectInstance _gameObject;
-            private readonly Transform _transform;
+            private readonly Instance _instance;
 
             public TransformData(TerrainObjectInstance gameObject)
             {
                 _gameObject = gameObject;
-                _transform = new Transform(gameObject.Position, gameObject.Scale, gameObject.Rotation);
+                _instance = new Instance(gameObject.Position, gameObject.Scale, gameObject.Rotation);
             }
 
             public void SetTransform()
@@ -48,9 +48,9 @@ namespace VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer
                     return;
                 }
             
-                _gameObject.Position = _transform.Position;
-                _gameObject.Scale = _transform.Scale; 
-                _gameObject.Rotation = _transform.Rotation;
+                _gameObject.Position = _instance.Position;
+                _gameObject.Scale = _instance.Scale; 
+                _gameObject.Rotation = _instance.Rotation;
             }
         }
     }

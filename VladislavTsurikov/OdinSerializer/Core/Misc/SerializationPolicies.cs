@@ -21,7 +21,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Unity_Integration;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {

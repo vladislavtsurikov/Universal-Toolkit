@@ -1,12 +1,12 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.PrototypeSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     public static class ObjectActions 
     {

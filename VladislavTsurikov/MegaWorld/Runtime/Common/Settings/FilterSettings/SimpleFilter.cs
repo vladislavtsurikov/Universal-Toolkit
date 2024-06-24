@@ -1,17 +1,17 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.CPUNoise.Runtime;
-using VladislavTsurikov.CPUNoise.Runtime.Noises;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings
 {
     [Serializable]
     [MenuItem("Simple Filter Settings")]
-    public class SimpleFilter : ComponentStack.Runtime.Component
+    public class SimpleFilter : Component
     {
         [SerializeField]
         public bool UseFalloff = true;

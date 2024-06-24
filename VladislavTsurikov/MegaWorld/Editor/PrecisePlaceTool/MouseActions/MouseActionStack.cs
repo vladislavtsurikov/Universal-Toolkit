@@ -1,10 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.Attributes;
-using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Elements;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {

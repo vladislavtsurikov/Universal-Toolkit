@@ -1,12 +1,11 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
 
-namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
 {
     [ElementEditor(typeof(BeforeLoadOperationsSettings))]
     public class BeforeLoadOperationsSettingsEditor : ReorderableListComponentEditor

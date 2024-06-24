@@ -3,9 +3,8 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.SceneDataSystem.Runtime;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
 #if UNITY_EDITOR 
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings;
@@ -13,7 +12,7 @@ using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core
 {
-    [SceneType(SceneType.ParentScene)]
+    [RequiredSceneType(SceneType.ParentScene)]
     public class RendererStackManager : SingletonSceneData<RendererStackManager>
     {
         [NonSerialized]

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using Object = System.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem

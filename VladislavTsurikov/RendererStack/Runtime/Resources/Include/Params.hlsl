@@ -31,7 +31,7 @@ uniform bool isStandardRenderPipeline;
 
 uniform int getAdditionalShadow;
 uniform float shadowDistance;
-uniform float minCullingDistance;
+uniform float minCullingDistanceForAdditionalShadow;
 uniform float increaseBoundingSphereForShadows;
 
 uniform float3 directionLight;

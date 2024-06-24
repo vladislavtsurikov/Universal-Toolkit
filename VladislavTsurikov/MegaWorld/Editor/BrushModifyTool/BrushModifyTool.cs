@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -12,21 +12,22 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
 {
@@ -84,7 +85,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
         private void OnMouseUp()
         {
             _modifiedGameObjects.Clear();
+#if RENDERER_STACK
             _modifiedTerrainObjects.Clear();
+#endif
         }
         
         private void OnMouseDrag(Vector3 dragPoint)
@@ -130,14 +133,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             ModifyTransformSettings modifyTransformSettings = (ModifyTransformSettings)ToolsComponentStack.GetElement(typeof(BrushModifyTool), typeof(ModifyTransformSettings));
             
-            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true, (proto, instance) =>
+            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true, (proto, terrainObjectInstance) =>
             {
                 if(proto.Active == false || proto.Selected == false)
                 {
                     return true;
                 }
 
-                if (!_modifiedTerrainObjects.TryGetValue(instance, out var modifyInfo))
+                if (!_modifiedTerrainObjects.TryGetValue(terrainObjectInstance, out var modifyInfo))
                 {
                     Vector3 randomVector = Random.insideUnitSphere;
 
@@ -145,11 +148,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                     modifyInfo.RandomPositionY = 1f - Random.value;
                     modifyInfo.RandomRotation = new Vector3(randomVector.x, randomVector.y, randomVector.z);
                     
-                    Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
+                    Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(terrainObjectInstance));
                 }
 
                 float fitness = 1;
-                Vector3 checkPoint = instance.Position;
+                Vector3 checkPoint = terrainObjectInstance.Position;
 
                 switch (filterSettings.FilterType)
                 {
@@ -166,13 +169,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                     {
                         if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                         {
-                            fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, checkPoint, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                         }
                         break;
                     }
                 }
 
-                float maskFitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
+                float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
                     
                 fitness *= maskFitness;
 
@@ -180,18 +183,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                 {
                     modifyInfo.LastUpdate = _updateTicks;
 
-                    Transform transform = new Transform(instance.Position, instance.Scale, instance.Rotation);
+                    Instance instance = new Instance(terrainObjectInstance.Position, terrainObjectInstance.Scale, terrainObjectInstance.Rotation);
         
                     float moveLenght = Event.current.delta.magnitude;
                     
-                    modifyTransformSettings.ModifyTransform(ref transform, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
+                    modifyTransformSettings.ModifyTransform(ref instance, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
 
-                    instance.Position = transform.Position;
-                    instance.Rotation = transform.Rotation.normalized;
-                    instance.Scale = transform.Scale;
+                    instance.Position = instance.Position;
+                    instance.Rotation = instance.Rotation.normalized;
+                    instance.Scale = instance.Scale;
                 }
 
-                _modifiedTerrainObjects[instance] = modifyInfo;
+                _modifiedTerrainObjects[terrainObjectInstance] = modifyInfo;
 
                 return true;
             });
@@ -260,13 +263,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                     {
                         if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                         {
-                            fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                         }
                         break;
                     }
                 }
 
-                float maskFitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
+                float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
 
                 fitness *= maskFitness;
 
@@ -274,15 +277,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                 {
                     modifyInfo.LastUpdate = _updateTicks;
 
-                    Transform transform = new Transform(prefabRoot.transform.position, prefabRoot.transform.localScale, prefabRoot.transform.rotation);
+                    Instance instance = new Instance(prefabRoot.transform.position, prefabRoot.transform.localScale, prefabRoot.transform.rotation);
 
                     float moveLenght = Event.current.delta.magnitude;
 
-                    modifyTransformSettings.ModifyTransform(ref transform, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
+                    modifyTransformSettings.ModifyTransform(ref instance, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
                     
-                    prefabRoot.transform.position = transform.Position;
-                    prefabRoot.transform.rotation = transform.Rotation;
-                    prefabRoot.transform.localScale = transform.Scale;
+                    prefabRoot.transform.position = instance.Position;
+                    prefabRoot.transform.rotation = instance.Rotation;
+                    prefabRoot.transform.localScale = instance.Scale;
                     
                     modifyTransform = true;
                 }

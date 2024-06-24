@@ -1,16 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Attributes;
 using VladislavTsurikov.SceneUtility.Runtime;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Progress Bar")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Progress Bar")]
     [SceneCollectionComponent]
     public class ProgressBar : SettingsComponent
     {

@@ -1,5 +1,4 @@
 ﻿using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem

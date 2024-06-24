@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.MegaWorld.Editor.Common;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 

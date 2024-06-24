@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem;
 using VladislavTsurikov.SceneDataSystem.Editor.StreamingUtility;
 using VladislavTsurikov.SceneDataSystem.Runtime;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
+using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize

@@ -1,21 +1,21 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter
 {
-    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter.GameObjectConverter))]
+    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter.GameObjectConverter))]
     [IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes.ContextMenu("Converter/GameObject Converter")]
     public class GameObjectConverterEditor : ReorderableListComponentEditor
     {
-        public Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter.GameObjectConverter GameObjectConverter;
+        public Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter.GameObjectConverter GameObjectConverter;
 
         public override void OnEnable()
         {
-            GameObjectConverter = (Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter.GameObjectConverter)Target;
+            GameObjectConverter = (Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter.GameObjectConverter)Target;
         }
         
         public override void OnGUI(Rect rect, int index)
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSet
             
             if(CustomEditorGUI.ClickButton(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), "Convert GameObject To Terrain Object Renderer"))
             {
-                Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter.GameObjectConverter.ConvertGameObjectToTerrainObjectRenderer();
+                Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter.GameObjectConverter.ConvertGameObjectToTerrainObjectRenderer();
             }
             
             rect.y += CustomEditorGUI.SingleLineHeight;

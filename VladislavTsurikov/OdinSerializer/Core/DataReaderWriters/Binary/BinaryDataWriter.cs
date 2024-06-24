@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Binary
 {

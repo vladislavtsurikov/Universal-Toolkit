@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSystem
 {

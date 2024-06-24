@@ -2,9 +2,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {

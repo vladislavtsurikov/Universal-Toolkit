@@ -1,11 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using Object = UnityEngine.Object;
-#if UNITY_EDITOR
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
-#endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes
 {
@@ -39,7 +37,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             {
                 if (Prefab != null)
                 {
-                    return GUIUtility.GetPrefabPreviewTexture(Prefab);  
+                    return TextureUtility.GetPrefabPreviewTexture(Prefab);  
                 }
 
                 return null;
@@ -51,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             Prefab = (GameObject)obj;
             PastTransform = new PastTransform(Prefab.transform);
-            Extents = MeshUtility.CalculateBoundsInstantiate(Prefab).extents;    
+            Extents = GameObjectUtility.CalculateBoundsInstantiate(Prefab).extents;    
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
     public abstract class ChangeShaderCodeAttribute : Attribute

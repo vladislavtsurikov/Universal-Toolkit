@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.BVH.Runtime
 {
@@ -30,7 +30,10 @@ namespace VladislavTsurikov.BVH.Runtime
         
         public void RemoveLeafNode(TNode node)
         {
-            if (!node.IsLeaf) return;
+            if (!node.IsLeaf)
+            {
+                return;
+            }
 
             BVHNode<TNodeData> currentParent = node.Parent;
             node.SetParent(null);
@@ -55,10 +58,7 @@ namespace VladislavTsurikov.BVH.Runtime
 
             if (sort)
             {
-                nodeHits.Sort(delegate(BVHNodeRayHit<TNodeData> h0, BVHNodeRayHit<TNodeData> h1)
-                {
-                    return h0.Distance.CompareTo(h1.Distance);
-                });
+                nodeHits.Sort((h0, h1) => h0.Distance.CompareTo(h1.Distance));
             }
 
             return nodeHits;
@@ -73,11 +73,16 @@ namespace VladislavTsurikov.BVH.Runtime
 
         private void FindAllLeafNodeRecurse(BVHNode<TNodeData> node, List<BVHNode<TNodeData>> outputNodes)
         {
-            if (node.IsLeaf) outputNodes.Add(node);
+            if (node.IsLeaf)
+            {
+                outputNodes.Add(node);
+            }
             else
             {
                 for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                {
                     FindAllLeafNodeRecurse(node.GetChild(childIndex), outputNodes);
+                }
             }
         }
 
@@ -143,11 +148,16 @@ namespace VladislavTsurikov.BVH.Runtime
         {
             if (node.IntersectsBox(boxCenter, boxSize, boxRotation))
             {
-                if (node.IsLeaf) outputNodes.Add(node);
+                if (node.IsLeaf)
+                {
+                    outputNodes.Add(node);
+                }
                 else
                 {
                     for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                    {
                         OverlapBoxRecurse(node.GetChild(childIndex), boxCenter, boxSize, boxRotation, outputNodes);
+                    }
                 }
             }
         }
@@ -156,11 +166,16 @@ namespace VladislavTsurikov.BVH.Runtime
         {
             if (node.IntersectsSphere(sphereCenter, sphereRadius))
             {
-                if (node.IsLeaf) outputNodes.Add(node);
+                if (node.IsLeaf)
+                {
+                    outputNodes.Add(node);
+                }
                 else
                 {
                     for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                    {
                         OverlapSphereRecurse(node.GetChild(childIndex), sphereCenter, sphereRadius, outputNodes);
+                    }
                 }
             }
         }
@@ -213,7 +228,9 @@ namespace VladislavTsurikov.BVH.Runtime
             }
        
             for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+            {
                 DrawCellRecurse(node.GetChild(childIndex), transformMtx, lineColor);
+            }
         }
         #endregion
 #endif

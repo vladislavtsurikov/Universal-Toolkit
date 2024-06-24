@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -13,18 +13,18 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFil
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
+
 
 namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
@@ -126,19 +126,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
-                CoroutineRunner.StartCoroutine(Utility.SpawnGroup.SpawnGroupGameObject(group, area, dragMouse));
+                CoroutineRunner.StartCoroutine(SpawnGroup.SpawnGroupGameObject(group, area, dragMouse));
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                CoroutineRunner.StartCoroutine(Utility.SpawnGroup.SpawnGroupTerrainObject(group, area, dragMouse));
+                CoroutineRunner.StartCoroutine(SpawnGroup.SpawnGroupTerrainObject(group, area, dragMouse));
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
             {
-                SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, area);
+                Runtime.Common.Utility.Spawn.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, area);
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainTexture))
             {
-                SpawnGroup.SpawnTerrainTexture(group, group.GetAllSelectedPrototypes(), area, advancedBrushToolSettings.TextureTargetStrength);
+                Runtime.Common.Utility.Spawn.SpawnGroup.SpawnTerrainTexture(group, group.GetAllSelectedPrototypes(), area, advancedBrushToolSettings.TextureTargetStrength);
             }
         }
     }

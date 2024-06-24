@@ -21,9 +21,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// MemberInfo method extensions.

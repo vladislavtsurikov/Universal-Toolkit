@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Compares types by reference before comparing them using the default type equality operator.

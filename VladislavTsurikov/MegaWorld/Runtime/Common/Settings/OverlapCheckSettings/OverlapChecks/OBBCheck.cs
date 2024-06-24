@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks
 {

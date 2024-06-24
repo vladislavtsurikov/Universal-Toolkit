@@ -19,7 +19,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Contains utilities for performing common unsafe operations.

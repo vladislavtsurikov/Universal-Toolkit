@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderIntegration
 {
@@ -14,7 +14,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
     {
         static GameObjectColliderUtility()
         {
-            GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene += RegisterGameObjectToCurrentScene;
+            GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene += RegisterGameObjectToCurrentScene;
         }
         
         public static void RegisterGameObjectToCurrentScene(GameObject gameObject)
@@ -36,12 +36,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
 
             SceneDataManager sceneDataManager = sceneDataManagers[0];
 
-            GameObjectCollider.Runtime.GameObjectCollider gameObjectCollider = 
-                (GameObjectCollider.Runtime.GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider.Runtime.GameObjectCollider));
+            GameObjectCollider.Editor.GameObjectCollider gameObjectCollider = 
+                (GameObjectCollider.Editor.GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider.Editor.GameObjectCollider));
             
             if(gameObjectCollider == null)
             {
-                SceneDataStackUtility.InstanceSceneData<GameObjectCollider.Runtime.GameObjectCollider>(sceneDataManager.Scene);
+                SceneDataStackUtility.InstanceSceneData<GameObjectCollider.Editor.GameObjectCollider>(sceneDataManager.Scene);
             }
             else
             {

@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Core.Runtime.IconStack;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 {
@@ -41,7 +42,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
             
             foreach (var type in ToolUtility.GetSupportedPrototypeTypes(_toolType))
             {
-	            menu.AddItem(new GUIContent("Create Group/" + type.GetAttribute<MenuItemAttribute>().Name), false, GUIUtility.ContextMenuCallback, new Action(() => CreateGroup(Data.GroupList, type)));
+	            menu.AddItem(new GUIContent("Create Group/" + type.GetAttribute<MenuItemAttribute>().Name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => CreateGroup(Data.GroupList, type)));
             }
 
             List<Runtime.Core.SelectionDatas.Group.Group> groups = AllAvailableGroups.GetAllGroups();
@@ -49,7 +50,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
             if (groups.Count != 0)
             {
 	            menu.AddSeparator ("");
-	            menu.AddItem(new GUIContent("Show All Group"), false, GUIUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(groups[0])));
+	            menu.AddItem(new GUIContent("Show All Group"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(groups[0])));
             }
 
             menu.ShowAsContext();
@@ -61,10 +62,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 
 			Runtime.Core.SelectionDatas.Group.Group group = (Runtime.Core.SelectionDatas.Group.Group)icon;
 
-            menu.AddItem(new GUIContent("Reveal in Project"), false, GUIUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(group)));
+            menu.AddItem(new GUIContent("Reveal in Project"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(group)));
             menu.AddSeparator ("");
 
-            menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => DeleteSelectedGroups(Data.GroupList)));
+            menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => DeleteSelectedGroups(Data.GroupList)));
 
             Type prototypeType = GroupUtility.GetGeneralPrototypeType(Data.SelectedData.SelectedGroupList);
             
@@ -75,7 +76,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
             }
             
 	        menu.AddSeparator ("");
-			menu.AddItem(new GUIContent("Rename"), group.Renaming, GUIUtility.ContextMenuCallback, new Action(() => group.Renaming = !group.Renaming));
+			menu.AddItem(new GUIContent("Rename"), group.Renaming, ContextMenuUtility.ContextMenuCallback, new Action(() => group.Renaming = !group.Renaming));
 
             return menu;
         }

@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.Core.Runtime.Interfaces;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
 using VladislavTsurikov.SceneManagerTool.Editor;
 using VladislavTsurikov.SceneManagerTool.Runtime;
-using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration

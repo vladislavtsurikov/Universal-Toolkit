@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
 {
     [MenuItem("Build Scene Collection")]
     public class DefaultBuildSceneCollection : BuildSceneCollection

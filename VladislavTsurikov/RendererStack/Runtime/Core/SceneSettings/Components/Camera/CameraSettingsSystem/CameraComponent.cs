@@ -1,6 +1,6 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime;
+﻿using VladislavTsurikov.ComponentStack.Runtime.Core;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem
 {
     public abstract class CameraComponent : Component
     {

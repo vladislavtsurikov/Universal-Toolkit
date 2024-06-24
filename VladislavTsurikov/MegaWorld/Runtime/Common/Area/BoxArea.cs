@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area

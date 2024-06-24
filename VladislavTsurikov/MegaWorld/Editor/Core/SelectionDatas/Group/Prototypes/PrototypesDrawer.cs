@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime.IconStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.TemplatesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.OdinSerializer.Utilities;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes
 {
@@ -44,11 +45,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 
 			if(prototypeObject != null)
 			{
-				menu.AddItem(new GUIContent("Reveal in Project"), false, GUIUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(prototypeObject)));
+				menu.AddItem(new GUIContent("Reveal in Project"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(prototypeObject)));
 				menu.AddSeparator ("");
 			}
 
-			menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => Data.SelectedData.SelectedGroup.DeleteSelectedPrototype()));
+			menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => Data.SelectedData.SelectedGroup.DeleteSelectedPrototype()));
 
 			ClipboardPrototype clipboardPrototype = ClipboardObject.GetCurrentClipboardObject(Data.SelectedData.SelectedGroup.PrototypeType, _toolType, _clipboardPrototypes);
 
@@ -56,8 +57,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 			_templateStackEditor?.ShowMenu(menu, _toolType, Data.SelectedData.SelectedGroup, Data.SelectedData);
 			
 			menu.AddSeparator ("");
-            menu.AddItem(new GUIContent("Select All"), false, GUIUtility.ContextMenuCallback, new Action(() => Data.SelectedData.SelectedGroup.SelectAllPrototypes(true)));
-			menu.AddItem(new GUIContent("Active"), prototype.Active, GUIUtility.ContextMenuCallback, new Action(() => 
+            menu.AddItem(new GUIContent("Select All"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => Data.SelectedData.SelectedGroup.SelectAllPrototypes(true)));
+			menu.AddItem(new GUIContent("Active"), prototype.Active, ContextMenuUtility.ContextMenuCallback, new Action(() => 
 				Data.SelectedData.SelectedPrototypeList.ForEach (proto => { proto.Active = !proto.Active;})));
 			
             return menu;

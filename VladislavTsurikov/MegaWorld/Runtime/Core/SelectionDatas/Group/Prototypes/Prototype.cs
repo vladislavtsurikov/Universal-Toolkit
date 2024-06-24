@@ -1,12 +1,11 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Interfaces;
-using VladislavTsurikov.Core.Runtime.IconStack;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes

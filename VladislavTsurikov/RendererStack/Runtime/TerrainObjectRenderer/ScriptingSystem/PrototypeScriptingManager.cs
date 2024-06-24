@@ -2,15 +2,15 @@
 using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.RendererStack.Runtime.Core;
+using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.InstancesSelectors.CellsInstancesSelector;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.InstancesSelectors.DefaultInstancesSelector;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.CellsInstancesSelector;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.DefaultInstancesSelector;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.MonoBehaviour;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem

@@ -1,12 +1,14 @@
 ﻿using System;
 using UnityEngine;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
     [Serializable]
-    public abstract class ModifyTransformComponent : ComponentStack.Runtime.Component
+    public abstract class ModifyTransformComponent : Component
     {
-        public virtual void ModifyTransform(ref Transform spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal) {}
+        public virtual void ModifyTransform(ref Instance spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal) {}
     }
 }

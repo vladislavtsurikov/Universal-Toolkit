@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.Events;
-using VladislavTsurikov.Core.Runtime;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using VladislavTsurikov.UnityUtility.Runtime;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
-namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
+namespace VladislavTsurikov.Undo.Editor.GameObject
 {
     public class DestroyedGameObject : UndoRecord
     {
@@ -52,7 +52,7 @@ namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
         private class DestroyedData
         {
             private readonly UnityEngine.GameObject _parent;
-            private readonly Transform _transform;
+            private readonly Instance _instance;
             
             public readonly UnityEngine.GameObject Prefab;
 
@@ -61,7 +61,7 @@ namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
                 _parent = parent;
             
                 Prefab = PrefabUtility.GetCorrespondingObjectFromSource(gameObject);
-                _transform = new Transform(gameObject); 
+                _instance = new Instance(gameObject); 
             }
 
             public UnityEngine.GameObject Instantiate()
@@ -70,9 +70,9 @@ namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
             
                 go = PrefabUtility.InstantiatePrefab(Prefab) as UnityEngine.GameObject;
 
-                go.transform.position = _transform.Position;
-                go.transform.localScale = _transform.Scale;
-                go.transform.rotation = _transform.Rotation;
+                go.transform.position = _instance.Position;
+                go.transform.localScale = _instance.Scale;
+                go.transform.rotation = _instance.Rotation;
 
                 GameObjectUtility.ParentGameObject(go, _parent);
 

@@ -2,9 +2,10 @@
 using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
     public enum MoveAlongAxis
     {
@@ -12,10 +13,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
         Y
     }
     
-    [ComponentStack.Runtime.Attributes.MenuItem("Move Along Direction")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Move Along Direction")]
     public class MoveAlongDirection : MouseAction
     {
-        private ShortcutCombo.Editor.ShortcutCombo _mainShortcutCombo;
+        private ShortcutCombo _mainShortcutCombo;
         private Vector3 _startPosition;
         private float _surfaceOffset;
         
@@ -36,7 +37,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
         
         private void InitShortcutCombo()
         {
-            _mainShortcutCombo = new ShortcutCombo.Editor.ShortcutCombo();
+            _mainShortcutCombo = new ShortcutCombo();
             _mainShortcutCombo.AddKey(KeyCode.Q);
         }
 

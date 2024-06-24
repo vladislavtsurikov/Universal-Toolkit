@@ -1,15 +1,16 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.UnityUtility.Runtime;
+using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PinTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
     public static class PlaceObject 
     {
@@ -22,9 +23,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool.Utility
                 return null;
             }
 
-            Transform transform = new Transform(rayHit.Point, Vector3.one, Quaternion.identity);
+            Instance instance = new Instance(rayHit.Point, Vector3.one, Quaternion.identity);
 
-            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
+            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {

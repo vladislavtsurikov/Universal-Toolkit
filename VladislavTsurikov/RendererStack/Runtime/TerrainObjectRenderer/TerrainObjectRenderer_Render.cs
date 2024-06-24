@@ -2,16 +2,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
 using VladislavTsurikov.RendererStack.Runtime.Core;
+using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
 using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Components.ObjectCameraRender;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect.ComputeShaderKernelProperties;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.RendererDataSystem.Utility;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components;
-using PrototypeRenderData = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Components.ObjectCameraRender.PrototypeRenderData;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings;
+using PrototypeRenderData = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender.PrototypeRenderData;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
@@ -43,8 +44,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
                 ForceUpdateRendererData = true;
             }
 
-            ForceUpdateRendererData = true;
-            
+            if (RendererStackSettings.Instance.ForceUpdateRendererData)
+            {
+                ForceUpdateRendererData = true;
+            }
+
             for (int i = 0; i < cameraManager.VirtualCameraList.Count; i++)
             {
                 VirtualCamera cam = cameraManager.VirtualCameraList[i];

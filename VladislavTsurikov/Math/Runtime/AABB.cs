@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Math.Runtime.PrimitiveMath;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.Math.Runtime
 {

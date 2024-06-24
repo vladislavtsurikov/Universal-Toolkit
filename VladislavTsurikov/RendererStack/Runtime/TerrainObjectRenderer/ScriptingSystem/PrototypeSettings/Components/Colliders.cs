@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings
 {
     [MenuItem("Colliders")]
     public class Colliders : PrototypeComponent

@@ -1,4 +1,4 @@
-﻿namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.Components
+﻿namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
 {
     /*[Name("Net Build")]
     public class NetBuild : BuildSceneCollection

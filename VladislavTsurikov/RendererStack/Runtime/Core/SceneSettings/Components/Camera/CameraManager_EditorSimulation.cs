@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 {
     public partial class CameraManager
     {

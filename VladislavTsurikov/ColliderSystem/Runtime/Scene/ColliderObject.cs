@@ -3,7 +3,7 @@ using UnityEngine;
 using VladislavTsurikov.BVH.Runtime;
 using VladislavTsurikov.Math.Runtime;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public abstract class ColliderObject 
     {
@@ -21,8 +21,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
             if (mesh != null && IsRendererEnabled())
             {
                 var meshRayHit = GetMesh().Raycast(ray, GetMatrix());
-                if (meshRayHit != null) 
-                    sortedObjectHits.Add(new RayHit(ray, this, meshRayHit));
+                if (meshRayHit != null)
+                {
+                    sortedObjectHits.Add(new RayHit(this, meshRayHit));
+                }
             }
         }
         
@@ -42,7 +44,7 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
         protected virtual void SetPathToObjectCollider(List<object> pathDatas){}
 
         public abstract bool IsRendererEnabled();
-        public abstract Mesh.Mesh GetMesh();
+        public abstract Mesh GetMesh();
         public abstract GameObject GetPrefab();
         public abstract Matrix4x4 GetMatrix();
         public abstract OBB GetOBB();

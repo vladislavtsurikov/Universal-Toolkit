@@ -1,11 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -14,16 +13,16 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {
@@ -108,10 +107,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             {
                 yield return SpawnGroup.SpawnGameObject(group, area);
             }
+#if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 yield return SpawnGroup.SpawnTerrainObject(group, area);
             }
+#endif
             
             yield return new YieldCustom(IsDone);
             

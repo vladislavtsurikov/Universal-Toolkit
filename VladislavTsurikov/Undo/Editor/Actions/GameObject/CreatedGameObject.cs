@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
+using VladislavTsurikov.GameObjectCollider.Editor;
 
-namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
+namespace VladislavTsurikov.Undo.Editor.GameObject
 {
     public class CreatedGameObject : UndoRecord
     {

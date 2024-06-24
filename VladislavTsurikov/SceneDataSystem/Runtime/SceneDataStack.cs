@@ -1,7 +1,6 @@
 ﻿using System;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {

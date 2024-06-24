@@ -18,9 +18,8 @@
 
 using System;
 using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// PropertyInfo method extensions.

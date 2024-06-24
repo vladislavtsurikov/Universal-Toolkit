@@ -1,11 +1,12 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
+using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GlobalSettings
 {

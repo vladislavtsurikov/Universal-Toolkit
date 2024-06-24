@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Rendering;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components
+namespace VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings
 {
     [MenuItem("Quality")]
     public class Quality : GlobalComponent

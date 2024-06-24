@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace VladislavTsurikov.Utility.Runtime.Extensions
+namespace VladislavTsurikov.Utility.Runtime
 {
     public static class ListExtensions
     {

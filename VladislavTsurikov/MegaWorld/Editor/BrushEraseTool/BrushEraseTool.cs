@@ -1,8 +1,8 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.PrototypeElements;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -13,24 +13,24 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
@@ -158,11 +158,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                 {
                     if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                     {
-                        fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, instance.Position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                        fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                     }
                 }
 
-                float maskFitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
+                float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
 
                 fitness *= maskFitness;
 
@@ -229,11 +229,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     {
                         if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                         {
-                            fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                         }
                     }
 
-                    float maskFitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, boxArea.Mask);
+                    float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, boxArea.Mask);
 
                     fitness *= maskFitness;
 
@@ -328,7 +328,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                                 normal.y = Mathf.InverseLerp(0, eraseSize.y, current.y);
                                 normal.x = Mathf.InverseLerp(0, eraseSize.x, current.x);
 
-                                fitness = GrayscaleFromTexture.Get(normal, maskFilterComponentSettings.FilterMaskTexture2D);
+                                fitness = TextureUtility.Get(normal, maskFilterComponentSettings.FilterMaskTexture2D);
 
                                 float maskFitness = area.GetAlpha(current + offset, eraseSize);
 

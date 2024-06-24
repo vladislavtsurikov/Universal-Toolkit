@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
 using VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem;

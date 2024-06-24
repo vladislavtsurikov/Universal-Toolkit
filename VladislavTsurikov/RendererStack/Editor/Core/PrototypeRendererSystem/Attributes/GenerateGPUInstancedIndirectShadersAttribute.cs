@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.RenderModes.GPUInstancedIndirect.GPUISupport;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect;
 
-namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Attributes
+namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem
 {
     public class GenerateGPUInstancedIndirectShadersAttribute : ChangeShaderCodeAttribute
     {

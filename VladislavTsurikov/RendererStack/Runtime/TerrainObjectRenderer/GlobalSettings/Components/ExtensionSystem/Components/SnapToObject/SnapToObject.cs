@@ -1,7 +1,7 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.SnapToObject
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject
 {
     [MenuItem("Snap To Object")]
     public class SnapToObject : Extension

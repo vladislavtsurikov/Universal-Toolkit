@@ -2,30 +2,28 @@
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
-using VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
+using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("PhysX Painter/Explode Physics")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("PhysX Painter/Explode Physics")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeGameObject), typeof(PrototypeTerrainObject)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]
@@ -82,10 +80,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
             {
                 SpawnGroup.SpawnGameObject(group, rayHit);
             }
+#if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 SpawnGroup.SpawnTerrainObject(group, rayHit);
             }
+#endif
             
             yield return new YieldCustom(IsDone);
             

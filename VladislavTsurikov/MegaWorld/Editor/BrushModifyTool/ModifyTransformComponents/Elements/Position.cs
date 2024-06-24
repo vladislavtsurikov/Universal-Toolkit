@@ -1,8 +1,8 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
     [MenuItem("Position")]
     public class Position : ModifyTransformComponent
@@ -10,7 +10,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public float Strength = -0.1f;
         public float YStrengthRandomize = 100;   
 
-        public override void ModifyTransform(ref Transform spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void ModifyTransform(ref Instance spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             float randomPositionY = modifyInfo.RandomPositionY * (YStrengthRandomize / 100f);
 

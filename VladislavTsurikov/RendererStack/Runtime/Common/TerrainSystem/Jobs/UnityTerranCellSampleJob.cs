@@ -3,9 +3,9 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Jobs
+namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     [BurstCompile(CompileSynchronously = true)]
     public struct UnityTerranCellSampleJob : IJobParallelFor

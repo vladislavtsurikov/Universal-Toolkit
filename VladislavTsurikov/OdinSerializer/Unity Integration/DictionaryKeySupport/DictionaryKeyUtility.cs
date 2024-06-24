@@ -22,7 +22,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
 {

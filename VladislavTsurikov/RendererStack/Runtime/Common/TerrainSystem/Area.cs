@@ -1,6 +1,6 @@
 ﻿using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UnityUtility.Editor;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {

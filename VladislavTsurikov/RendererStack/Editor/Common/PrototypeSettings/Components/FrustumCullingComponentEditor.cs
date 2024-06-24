@@ -2,15 +2,15 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 
-namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Components
+namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings
 {
     [Serializable]
 	[ElementEditor(typeof(FrustumCulling))]
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Compon
 		public override void OnGUI(Rect rect, int index)
 		{
 			var quality = (Quality)Runtime.Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), RendererType);
-			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality));
+			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Quality));
 			
 			Shadow shadow = (Shadow)Prototype.GetSettings(typeof(Shadow));
 
@@ -41,19 +41,19 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Compon
             
 				switch (_render.GetAdditionalShadow)
 				{
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.MinCullingDistance:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.MinCullingDistance:
 					{
-						_render.MinCullingDistance = CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), MinCullingDistance, _render.MinCullingDistance);
+						_render.MinCullingDistanceForAdditionalShadow = CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), MinCullingDistance, _render.MinCullingDistanceForAdditionalShadow);
 						rect.y += CustomEditorGUI.SingleLineHeight;
 						break;
 					}
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.IncreaseBoundingSphere:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.IncreaseBoundingSphere:
 					{
 						_render.IncreaseShadowsBoundingSphere = Mathf.Max(0, CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), IncreaseShadowsBoundingSphere, _render.IncreaseShadowsBoundingSphere));
 						rect.y += CustomEditorGUI.SingleLineHeight;
 						break;
 					}
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.DirectionLightShadowVisible:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.DirectionLightShadowVisible:
 					{
 						if(sceneQuality.DirectionalLight == null)
 						{
@@ -84,7 +84,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Compon
 		public override float GetElementHeight(int index)
 		{
 			var quality = (Quality)Runtime.Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), RendererType);
-			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Components.Quality));
+			var sceneQuality = (Runtime.TerrainObjectRenderer.SceneSettings.Quality)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(Runtime.TerrainObjectRenderer.SceneSettings.Quality));
 			
 			Shadow shadow = (Shadow)Prototype.GetSettings(typeof(Shadow));
 			
@@ -96,17 +96,17 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Compon
             
 				switch (_render.GetAdditionalShadow)
 				{
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.MinCullingDistance:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.MinCullingDistance:
 					{
 						height += CustomEditorGUI.SingleLineHeight;
 						break;
 					}
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.IncreaseBoundingSphere:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.IncreaseBoundingSphere:
 					{
 						height += CustomEditorGUI.SingleLineHeight;
 						break;
 					}
-					case Runtime.Common.PrototypeSettings.Components.GetAdditionalShadow.DirectionLightShadowVisible:
+					case Runtime.Common.PrototypeSettings.GetAdditionalShadow.DirectionLightShadowVisible:
 					{
 						if(sceneQuality.DirectionalLight == null)
 						{

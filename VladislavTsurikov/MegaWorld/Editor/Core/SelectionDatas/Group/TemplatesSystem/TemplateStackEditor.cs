@@ -6,8 +6,9 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.OdinSerializer.Utilities;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.TemplatesSystem
 {
@@ -45,7 +46,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Templates
 
                 if(templateAttribute.ToolTypes.Contains(toolType))
                 {
-			        menu.AddItem(new GUIContent("Apply Templates/" + name), false, GUIUtility.ContextMenuCallback, new Action(() => 
+			        menu.AddItem(new GUIContent("Apply Templates/" + name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => 
 			        	selectedData.SelectedPrototypeList.ForEach (proto => { template.Apply(supportedResourceTypes, group, proto);})));
                 }
             }

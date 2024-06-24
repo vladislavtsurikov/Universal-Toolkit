@@ -6,11 +6,10 @@ using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem.Attributes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
-namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Components.Camera.CameraSettingsSystem
+namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.CameraSettingsSystem
 {
     public class CameraComponentStackEditor : ReorderableListStackEditor<CameraComponent, ReorderableListComponentEditor>
     {

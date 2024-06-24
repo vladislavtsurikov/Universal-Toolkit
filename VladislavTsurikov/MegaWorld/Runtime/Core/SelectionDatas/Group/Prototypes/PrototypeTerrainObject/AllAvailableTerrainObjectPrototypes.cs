@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if RENDERER_STACK
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
@@ -59,3 +60,4 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         }
     }
 }
+#endif

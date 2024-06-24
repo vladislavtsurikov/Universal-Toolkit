@@ -3,11 +3,9 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Jobs;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Terrains
+namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     [Serializable]
     [TerrainHelper(typeof(Area), "Raycast Terrain")]

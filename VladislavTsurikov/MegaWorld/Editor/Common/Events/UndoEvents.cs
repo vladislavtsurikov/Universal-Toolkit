@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
+using VladislavTsurikov.Undo.Editor.GameObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Events
 {
@@ -19,7 +19,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Events
         {
             foreach (GameObject go in gameObjectList)
             {
-                GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(go);
+                GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene(go);
             }
         }
     }

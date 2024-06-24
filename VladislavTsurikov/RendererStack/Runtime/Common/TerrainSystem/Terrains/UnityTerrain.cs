@@ -2,13 +2,12 @@ using System;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties;
+using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Jobs;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
+using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Terrains
+namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     [Serializable]
     [TerrainHelper(typeof(Terrain), "Unity terrain")]

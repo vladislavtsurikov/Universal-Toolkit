@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
@@ -11,8 +11,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize;
 using VladislavTsurikov.SceneDataSystem.Editor.StreamingUtility;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 {

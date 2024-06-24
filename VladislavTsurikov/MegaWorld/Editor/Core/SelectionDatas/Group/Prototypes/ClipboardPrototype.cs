@@ -5,11 +5,11 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes
 {
@@ -87,13 +87,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
                 
                 if(selectedData.HasOneSelectedPrototype())
                 {
-                    menu.AddItem(new GUIContent("Copy All Settings"), false, GUIUtility.ContextMenuCallback, new Action(() => 
+                    menu.AddItem(new GUIContent("Copy All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                         Copy(new List<IHasElementStack> { selectedData.SelectedPrototype })));
                 }
             
                 if(GetAllCopiedComponent().Count != 0)
                 {
-                    menu.AddItem(new GUIContent("Paste All Settings"), false, GUIUtility.ContextMenuCallback, new Action(() => 
+                    menu.AddItem(new GUIContent("Paste All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                         ClipboardAction(new List<IHasElementStack>(selectedData.SelectedPrototypeList), true)));
 
                     foreach (Component component in GetAllCopiedComponent())
@@ -106,7 +106,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
                             continue;
                         }
                     
-                        menu.AddItem(new GUIContent("Paste Settings/" + menuItemAttribute.Name), false, GUIUtility.ContextMenuCallback, 
+                        menu.AddItem(new GUIContent("Paste Settings/" + menuItemAttribute.Name), false, ContextMenuUtility.ContextMenuCallback, 
                             new Action(() => ClipboardAction(new List<IHasElementStack>(selectedData.SelectedPrototypeList), component.GetType(), true)));	
                     }
                 }

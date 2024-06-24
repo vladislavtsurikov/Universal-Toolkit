@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.SceneSettings.Components
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.SceneSettings
 {
 	[ElementEditor(typeof(Quality))]
     public class QualityEditor : IMGUIElementEditor

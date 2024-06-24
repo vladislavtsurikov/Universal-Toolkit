@@ -4,7 +4,7 @@ using System.Diagnostics;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.QuadTree.Runtime
 {  

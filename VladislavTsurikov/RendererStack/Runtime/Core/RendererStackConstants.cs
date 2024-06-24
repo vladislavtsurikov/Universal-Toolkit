@@ -9,8 +9,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
         private const string RendererStack = "RendererStack";
         private const string ShadersName = "Shaders";
 
-        private static readonly string _pathToResourcesRendererStack = CommonPath.CombinePath(CommonPath.PathToResources, RendererStack);
-        public static readonly string PathToShaders = CommonPath.CombinePath(_pathToResourcesRendererStack, ShadersName);
+        public static readonly string PathToResourcesRendererStack = CommonPath.CombinePath(CommonPath.PathToResources, RendererStack);
+        public static readonly string PathToShaders = CommonPath.CombinePath(PathToResourcesRendererStack, ShadersName);
         
         #region Shaders
         public static readonly string ShaderUnityInternalError = "Hidden/InternalErrorShader";

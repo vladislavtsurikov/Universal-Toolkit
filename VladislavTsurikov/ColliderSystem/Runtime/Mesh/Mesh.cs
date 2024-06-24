@@ -1,27 +1,27 @@
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Math.Runtime;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class Mesh
     {
-        private UnityEngine.Mesh _unityMesh;
         private Vector3[] _vertices;
         private int[] _vertIndices;
-        private int _numTriangles;
         private MeshTree _tree;
 
-        public UnityEngine.Mesh UnityMesh { get { return _unityMesh; } }
-        public int NumTriangles { get { return _numTriangles; } }
-        public Vector3[] Vertices { get { return _vertices.Clone() as Vector3[]; } }
+        public UnityEngine.Mesh UnityMesh { get; }
+
+        public int NumTriangles { get; }
+
+        public Vector3[] Vertices => _vertices.Clone() as Vector3[];
 
         public Mesh(UnityEngine.Mesh unityMesh)
         {
-            _unityMesh = unityMesh;
-            _vertices = _unityMesh.vertices;
-            _vertIndices = _unityMesh.triangles;
-            _numTriangles = (int)(_vertIndices.Length / 3);
+            UnityMesh = unityMesh;
+            _vertices = UnityMesh.vertices;
+            _vertIndices = UnityMesh.triangles;
+            NumTriangles = _vertIndices.Length / 3;
             _tree = new MeshTree(this);
         }
 

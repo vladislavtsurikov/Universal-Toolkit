@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace VladislavTsurikov.CPUNoise.Runtime.Noises
+namespace VladislavTsurikov.CPUNoise.Runtime
 {
 	public class PerlinNoiseCPU : NoiseCPU
 	{

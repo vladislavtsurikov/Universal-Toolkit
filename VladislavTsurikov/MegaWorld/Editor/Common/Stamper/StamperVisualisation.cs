@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Utility;
+using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
+using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;

@@ -1,4 +1,4 @@
-namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties
+namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 {
     /*public unsafe class NativeListProperty<T> : AutoDisposeProperty where T : unmanaged
     {

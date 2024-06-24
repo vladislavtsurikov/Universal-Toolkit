@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility
+namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public static class StreamingUtility
     {

@@ -1,19 +1,22 @@
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Components.ObjectCameraRender;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender;
 using VladislavTsurikov.RendererStack.Runtime.Core.Utility;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components.Camera;
-using VladislavTsurikov.Utility.Runtime;
-using LODGroup = VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Camera;
+using VladislavTsurikov.UnityUtility.Runtime;
+using LODGroup = VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup;
+#if BillboardSystem
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.BillboardSystem.PrototypeSettings;
+#endif
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect.ComputeShaderKernelProperties
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect
 {
     public static class GPUFrustumCullingID 
     {
@@ -56,7 +59,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
         private static int _useLODFadeID = -1;
         private static int _getAdditionalShadowID = -1;
         private static int _shadowDistanceID = -1;
-        private static int _minCullingDistanceID = -1;
+        private static int _minCullingDistanceForAdditionalShadowID = -1;
         private static int _increaseBoundingSphereForShadowsID = -1;
 
         private static int _lodDistancesID = -1;
@@ -113,7 +116,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
             _useLODFadeID = Shader.PropertyToID("useLODFade");
             _getAdditionalShadowID = Shader.PropertyToID("getAdditionalShadow");
             _shadowDistanceID = Shader.PropertyToID("shadowDistance");
-            _minCullingDistanceID = Shader.PropertyToID("minCullingDistance");
+            _minCullingDistanceForAdditionalShadowID = Shader.PropertyToID("minCullingDistanceForAdditionalShadow");
             _increaseBoundingSphereForShadowsID = Shader.PropertyToID("increaseBoundingSphereForShadows");
 
             _lodFadeDistanceID = Shader.PropertyToID("LODFadeDistance");
@@ -174,10 +177,21 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
             LODGroup lodGroup = (LODGroup)proto.GetSettings(typeof(LODGroup));
             DistanceCulling distanceCulling = (DistanceCulling)proto.GetSettings(typeof(DistanceCulling));
             Shadow shadow = (Shadow)proto.GetSettings(typeof(Shadow));
+            
+#if BillboardSystem
+            ImposterSettings imposterSettings = (ImposterSettings)proto.GetSettings(typeof(ImposterSettings));
+#endif
 
             Vector3 directionLight = quality.DirectionalLight ? quality.DirectionalLight.transform.forward : new Vector3(0, 0, 0);
 
             float maxDistance = Core.Utility.Utility.GetMaxDistance(typeof(TerrainObjectRenderer), virtualCamera, distanceCulling);
+            
+#if BillboardSystem
+            if (PrototypeComponent.IsValid(imposterSettings))
+            {
+                maxDistance = imposterSettings.MinDistance;
+            }
+#endif
 
             Vector4 floatingOriginOffsetVector4 = new Vector4(quality.FloatingOriginOffset.x, quality.FloatingOriginOffset.y, quality.FloatingOriginOffset.z, 0);
 
@@ -186,19 +200,21 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
             _frustumCulling.SetBuffer(_frustumKernelHandle, _positionsID, prototypeRenderData.MergeBuffer.ComputeBuffer); 
 
             _frustumCulling.SetInt(_instanceCountID, totalInstanceCount);
-
+            
             if (PrototypeComponent.IsValid(frustumCulling))
             {
                 _frustumCulling.SetBool(_isFrustumCullingID, terrainObjectRendererCameraSettings.CameraCullingMode == CameraCullingMode.FrustumCulling);
                 _frustumCulling.SetFloat(_boundingSphereRadiusID, renderModel.BoundingSphereRadius + frustumCulling.IncreaseBoundingSphere);
                 _frustumCulling.SetInt(_getAdditionalShadowID, (int)frustumCulling.GetAdditionalShadow);
-                _frustumCulling.SetFloat(_minCullingDistanceID, frustumCulling.MinCullingDistance);
+                _frustumCulling.SetFloat(_minCullingDistanceForAdditionalShadowID, frustumCulling.MinCullingDistanceForAdditionalShadow);
                 _frustumCulling.SetFloat(_increaseBoundingSphereForShadowsID, frustumCulling.IncreaseShadowsBoundingSphere);
             }
             else
             {
                 _frustumCulling.SetBool(_isFrustumCullingID, false);
             }
+
+            _frustumCulling.SetFloat(_maxDistanceID, maxDistance);
 
             _frustumCulling.SetBool(_isDistanceCullingID, PrototypeComponent.IsValid(distanceCulling));
 
@@ -209,14 +225,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
             _frustumCulling.SetFloat(_lodFadeDistanceID, lodGroup.LodFadeTransitionDistance);
             _frustumCulling.SetBool(_lodFadeForLastLodID, lodGroup.LodFadeForLastLOD);
             _frustumCulling.SetFloat(_lodDistanceRandomOffsetID, lodGroup.LODDistanceRandomOffset);
-            _frustumCulling.SetBool(_isStandardRenderPipelineID, FindRenderPipeline.IsStandardRP);
+            _frustumCulling.SetBool(_isStandardRenderPipelineID, FindRenderPipelineUtility.IsStandardRP);
             
             float[] lodDistances = Core.Utility.Utility.GetLODDistances(renderModel, lodBias, maxDistance);
 
             _frustumCulling.SetFloats(_lodDistancesID, lodDistances);
             _frustumCulling.SetFloats(_shadowLODMapID, shadow.ShadowLODMap);
             _frustumCulling.SetInt(_lodCountID, renderModel.LODs.Count);
-            _frustumCulling.SetFloat(_maxDistanceID, maxDistance);
             _frustumCulling.SetFloat(_distanceRandomOffsetID, distanceCulling.DistanceRandomOffset);
 
             _frustumCulling.SetVector(_directionLightID, directionLight);
@@ -226,7 +241,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
         public static void DispatchGPUFrustumCulling(RendererStackManager rendererStackManager, PrototypeRenderData prototypeRenderData, PrototypeTerrainObject proto, RenderModel renderModel, VirtualCamera camera, int totalInstanceCount, int threadGroups)
         {
             TerrainObjectRendererCameraSettings terrainObjectRendererCameraSettings = (TerrainObjectRendererCameraSettings)camera.CameraComponentStack.GetElement(typeof(TerrainObjectRendererCameraSettings));
-            Common.GlobalSettings.Components.Quality quality = (Common.GlobalSettings.Components.Quality)Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Common.GlobalSettings.Components.Quality), typeof(TerrainObjectRenderer));
+            Common.GlobalSettings.Quality quality = (Common.GlobalSettings.Quality)Core.GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Common.GlobalSettings.Quality), typeof(TerrainObjectRenderer));
 
             LODGroup lodGroup = (LODGroup)proto.GetSettings(typeof(LODGroup));
             float lodBias = QualitySettings.lodBias * quality.LODBias * lodGroup.LODBias * terrainObjectRendererCameraSettings.LodBias;

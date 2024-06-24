@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute
+namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class TerrainHelperAttribute : System.Attribute

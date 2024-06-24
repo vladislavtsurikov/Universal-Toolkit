@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.Attributes
+namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
     public class CreateComponentsAttribute : Attribute

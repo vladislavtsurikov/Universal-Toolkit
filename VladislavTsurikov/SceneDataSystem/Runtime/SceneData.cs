@@ -5,12 +5,12 @@ using UnityEditor.SceneManagement;
 #endif
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {
     [Serializable]
-    public abstract class SceneData : ComponentStack.Runtime.Component
+    public abstract class SceneData : Component
     {
         public SceneDataManager SceneDataManager;
         

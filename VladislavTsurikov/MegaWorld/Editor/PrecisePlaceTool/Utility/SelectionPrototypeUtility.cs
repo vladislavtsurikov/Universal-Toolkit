@@ -8,9 +8,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     public static class SelectionPrototypeUtility 
     {

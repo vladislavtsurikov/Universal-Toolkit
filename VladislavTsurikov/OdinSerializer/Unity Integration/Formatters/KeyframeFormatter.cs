@@ -22,7 +22,7 @@ using VladislavTsurikov.OdinSerializer.Core.Formatters;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.OdinSerializer.Core.Serializers;
 using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 [assembly: RegisterFormatter(typeof(KeyframeFormatter))]
 

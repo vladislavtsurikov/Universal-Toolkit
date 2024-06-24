@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.SerializationNodes;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects
 {

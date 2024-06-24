@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Compares objects by reference only, ignoring equality operators completely. This is used by the property tree reference dictionaries to keep track of references.

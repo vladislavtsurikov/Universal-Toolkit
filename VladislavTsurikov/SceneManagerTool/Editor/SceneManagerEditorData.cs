@@ -27,8 +27,6 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
 
         public void Setup()
         {
-            _runAsRunAsBuildMode = false;
-            
             StartupScene.Setup();
             SceneSetupManager.Setup();
         }

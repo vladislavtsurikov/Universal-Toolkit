@@ -3,7 +3,6 @@ using UnityEngine;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 using Coroutine = VladislavTsurikov.Coroutines.Runtime.Coroutine;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics

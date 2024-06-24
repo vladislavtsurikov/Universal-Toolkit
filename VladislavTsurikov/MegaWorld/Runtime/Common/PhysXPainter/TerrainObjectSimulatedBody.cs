@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
 {
@@ -13,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
         {
         }
 
-        public TerrainObjectSimulatedBody(GameObject gameObject, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions) : base(gameObject, onDisablePhysicsActions)
+        public TerrainObjectSimulatedBody(GameObject gameObject, List<OnDisableSimulatedBodyEvent> onDisablePhysicsEvents) : base(gameObject, onDisablePhysicsEvents)
         {
         }
     }

@@ -3,15 +3,14 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Core.Runtime.IconStack;
-using VladislavTsurikov.Core.Runtime.IconStack.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI
 {

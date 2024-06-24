@@ -5,7 +5,6 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Attributes;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings
 {

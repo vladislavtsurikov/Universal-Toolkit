@@ -1,10 +1,7 @@
 {
     "name": "VladislavTsurikov.Core",
     "rootNamespace": "",
-    "references": [
-        "GUID:c58cb679f31162c47bc160d1f716ecea",
-        "GUID:ce9acb4c89fd77746a90c158718c588d"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -8,7 +8,7 @@ namespace VladislavTsurikov.Core.Runtime
     public class BasePathFinder<T> : ScriptableObject where T : ScriptableObject
     {
         private static bool DebugMode => false;
-        private static string _sFoundPath = string.Empty;
+        private static string s_foundPath = string.Empty;
 
         // ReSharper disable once MemberCanBeProtected.Global
         public static string Path
@@ -16,10 +16,10 @@ namespace VladislavTsurikov.Core.Runtime
             get
             {
 #if UNITY_EDITOR
-                if (!string.IsNullOrEmpty(_sFoundPath))
+                if (!string.IsNullOrEmpty(s_foundPath))
                 {
-                    if (DebugMode) Debug.Log($"Saved Path: {_sFoundPath}");
-                    return _sFoundPath;
+                    if (DebugMode) Debug.Log($"Saved Path: {s_foundPath}");
+                    return s_foundPath;
                 }
 
                 T obj = CreateInstance<T>();
@@ -33,8 +33,8 @@ namespace VladislavTsurikov.Core.Runtime
                 int index = baseDirPath.IndexOf("Assets/", StringComparison.Ordinal);
                 Assert.IsTrue(index >= 0);
                 baseDirPath = baseDirPath.Substring(index);
-                _sFoundPath = baseDirPath;
-                if (DebugMode) Debug.Log($"Found Path: {_sFoundPath}");
+                s_foundPath = baseDirPath;
+                if (DebugMode) Debug.Log($"Found Path: {s_foundPath}");
                 return baseDirPath;
 #else
                 return "Path cannot be returned outside the Unity Editor";

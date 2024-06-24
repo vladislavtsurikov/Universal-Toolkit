@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.Core.Runtime.IconStack;
-using VladislavTsurikov.Core.Runtime.IconStack.Attributes;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack
 {

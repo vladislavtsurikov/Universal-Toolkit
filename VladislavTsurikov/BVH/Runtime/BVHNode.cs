@@ -1,28 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.BVH.Runtime
 {
-    [Serializable]
     public abstract class BVHNode<TData>
         where TData : class
     {
-        [OdinSerialize]
-        private TData _data;
-        [OdinSerialize]
-        private bool _isLeaf;
-        [OdinSerialize]
-        public BVHNode<TData> _parent;
-        [OdinSerialize]
-        public List<BVHNode<TData>> _children = new List<BVHNode<TData>>();
+        private List<BVHNode<TData>> _children = new List<BVHNode<TData>>();
 
-        public TData Data => _data;
-        public bool IsLeaf => _isLeaf;
+        public TData Data { get; }
+
+        public bool IsLeaf { get; private set; }
+
         public abstract Vector3 Position { get; set; }
         public abstract Vector3 Size { get; set; }
-        public BVHNode<TData> Parent => _parent;
+        public BVHNode<TData> Parent { get; private set; }
+
         public int NumChildren => _children.Count;
 
         public BVHNode()
@@ -32,7 +25,7 @@ namespace VladislavTsurikov.BVH.Runtime
 
         public BVHNode(TData data)
         {
-            _data = data;
+            Data = data;
         }
 
         public BVHNode<TData> GetChild(int index)
@@ -42,15 +35,21 @@ namespace VladislavTsurikov.BVH.Runtime
 
         public void MakeLeaf()
         {
-            _isLeaf = true;
+            IsLeaf = true;
         }
 
         public void SetParent(BVHNode<TData> parent)
         {
-            if (_parent != null) _parent._children.Remove(this);
+            if (Parent != null)
+            {
+                Parent._children.Remove(this);
+            }
 
-            _parent = parent;
-            if (_parent != null) _parent._children.Add(this);
+            Parent = parent;
+            if (Parent != null)
+            {
+                Parent._children.Add(this);
+            }
         }
 
         public BVHNode<TData> FindClosestChild(BVHNode<TData> node)
@@ -72,7 +71,10 @@ namespace VladislavTsurikov.BVH.Runtime
 
         public void EncapsulateChildrenBottomUp()
         {
-            if (IsLeaf || NumChildren == 0) return;
+            if (IsLeaf || NumChildren == 0)
+            {
+                return;
+            }
 
             BVHNode<TData> currentParent = this;
             while (currentParent != null)
@@ -81,7 +83,9 @@ namespace VladislavTsurikov.BVH.Runtime
                 currentParent.Size = currentParent._children[0].Size;
 
                 for (int childIndex = 1; childIndex < currentParent.NumChildren; ++childIndex)
+                {
                     currentParent.EncapsulateNode(currentParent._children[childIndex]);
+                }
 
                 currentParent = currentParent.Parent;
             }

@@ -1,14 +1,12 @@
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings.Attributes;
+using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {

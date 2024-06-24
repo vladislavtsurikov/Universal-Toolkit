@@ -1,31 +1,28 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.PrototypeSettings;
-using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Happy Artist/Precise Place")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Happy Artist/Precise Place")]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
     [AddToolComponents(new []{typeof(PrecisePlaceToolSettings)})]
@@ -91,7 +88,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
             _mouseMove.Run();
         }
 
-        protected override void OnDisableElement()
+        protected override void OnDeselect()
         {
             if(ActiveObjectController.PlacedObjectData != null)
             {

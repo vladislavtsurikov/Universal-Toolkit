@@ -4,11 +4,12 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
-
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 {
@@ -69,7 +70,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 
             if (Stack.ElementList.Count > 1)
             {
-                menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => { Stack.Remove(currentTabIndex); }));
+                menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => { Stack.Remove(currentTabIndex); }));
             }
             else
             {

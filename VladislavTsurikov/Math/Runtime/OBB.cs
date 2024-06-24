@@ -1,112 +1,106 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Math.Runtime.PrimitiveMath;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.Math.Runtime
 {
     public struct OBB
     {
         private Vector3 _size;
-        private Vector3 _center;
-        private Quaternion _rotation;
-        private bool _isValid;
 
-        public bool IsValid => _isValid;
-        public Vector3 Center { get => _center;
-            set => _center = value;
-        }
+        public bool IsValid { get; }
+
+        public Vector3 Center { get; set; }
+
         public Vector3 Size { get => _size;
             set => _size = value.Abs();
         }
         public Vector3 Extents => Size * 0.5f;
-        public Quaternion Rotation { get => _rotation;
-            set => _rotation = value;
-        }
-        public Matrix4x4 RotationMatrix => Matrix4x4.TRS(Vector3.zero, _rotation, Vector3.one);
-        public Vector3 Right => _rotation * Vector3.right;
-        public Vector3 Up => _rotation * Vector3.up;
-        public Vector3 Look => _rotation * Vector3.forward;
+        public Quaternion Rotation { get; set; }
+
+        public Matrix4x4 RotationMatrix => Matrix4x4.TRS(Vector3.zero, Rotation, Vector3.one);
+        public Vector3 Right => Rotation * Vector3.right;
+        public Vector3 Up => Rotation * Vector3.up;
+        public Vector3 Look => Rotation * Vector3.forward;
 
         public OBB(Vector3 center, Vector3 size)
         {
-            _center = center;
+            Center = center;
             _size = size.Abs();
-            _rotation = Quaternion.identity;
-            _isValid = true;
+            Rotation = Quaternion.identity;
+            IsValid = true;
         }
 
         public OBB(Vector3 center, Vector3 size, Quaternion rotation)
         {
-            _center = center;
+            Center = center;
             _size = size.Abs();
-            _rotation = rotation;
-            _isValid = true;
+            Rotation = rotation;
+            IsValid = true;
         }
 
         public OBB(Vector3 center, Quaternion rotation)
         {
-            _center = center;
+            Center = center;
             _size = Vector3.zero;
-            _rotation = rotation;
-            _isValid = true;
+            Rotation = rotation;
+            IsValid = true;
         }
 
         public OBB(Quaternion rotation)
         {
-            _center = Vector3.zero;
+            Center = Vector3.zero;
             _size = Vector3.zero;
-            _rotation = rotation;
-            _isValid = true;
+            Rotation = rotation;
+            IsValid = true;
         }
 
         public OBB(Bounds bounds, Quaternion rotation)
         {
-            _center = bounds.center;
+            Center = bounds.center;
             _size = bounds.size.Abs();
-            _rotation = rotation;
-            _isValid = true;
+            Rotation = rotation;
+            IsValid = true;
         }
 
         public OBB(AABB aabb)
         {
-            _center = aabb.Center;
+            Center = aabb.Center;
             _size = aabb.Size;
-            _rotation = Quaternion.identity;
-            _isValid = true;
+            Rotation = Quaternion.identity;
+            IsValid = true;
         }
 
         public OBB(AABB aabb, Quaternion rotation)
         {
-            _center = aabb.Center;
+            Center = aabb.Center;
             _size = aabb.Size;
-            _rotation = rotation;
-            _isValid = true;
+            Rotation = rotation;
+            IsValid = true;
         }
 
         public OBB(AABB modelSpaceAABB, Transform worldTransform)
         {
             _size = Vector3.Scale(modelSpaceAABB.Size, worldTransform.lossyScale).Abs();
-            _center = worldTransform.TransformPoint(modelSpaceAABB.Center);
-            _rotation = worldTransform.rotation;
-            _isValid = true;
+            Center = worldTransform.TransformPoint(modelSpaceAABB.Center);
+            Rotation = worldTransform.rotation;
+            IsValid = true;
         }
 
         public OBB(AABB modelSpaceAABB, Matrix4x4 worldTransform)
         {
             _size = Vector3.Scale(modelSpaceAABB.Size, worldTransform.lossyScale).Abs();
 
-            _center = worldTransform.TransformPoint(modelSpaceAABB.Center);
-            _rotation = worldTransform.rotation;
-            _isValid = true;
+            Center = worldTransform.TransformPoint(modelSpaceAABB.Center);
+            Rotation = worldTransform.rotation;
+            IsValid = true;
         }
 
         public OBB(OBB copy)
         {
             _size = copy._size;
-            _center = copy._center;
-            _rotation = copy._rotation;
-            _isValid = copy._isValid;
+            Center = copy.Center;
+            Rotation = copy.Rotation;
+            IsValid = copy.IsValid;
         }
 
         public static OBB GetInvalid()
@@ -121,13 +115,13 @@ namespace VladislavTsurikov.Math.Runtime
 
         public Matrix4x4 GetUnitBoxTransform()
         {
-            if (!_isValid) return Matrix4x4.identity;
+            if (!IsValid) return Matrix4x4.identity;
             return Matrix4x4.TRS(Center, Rotation, Size);
         }
 
         public List<Vector3> GetCornerPoints()
         {
-            return BoxMath.CalcBoxCornerPoints(_center, _size, _rotation);
+            return BoxMath.CalcBoxCornerPoints(Center, _size, Rotation);
         }
 
         public List<Vector3> GetCenterAndCornerPoints()
@@ -167,12 +161,12 @@ namespace VladislavTsurikov.Math.Runtime
 
         public bool IntersectsOBB(OBB otherOBB)
         {
-            return BoxMath.BoxIntersectsBox(_center, _size, _rotation, otherOBB.Center, otherOBB.Size, otherOBB.Rotation);
+            return BoxMath.BoxIntersectsBox(Center, _size, Rotation, otherOBB.Center, otherOBB.Size, otherOBB.Rotation);
         }
 
         public Vector3 GetClosestPoint(Vector3 point)
         {
-            return BoxMath.CalcBoxPtClosestToPt(point, _center, _size, _rotation);
+            return BoxMath.CalcBoxPtClosestToPt(point, Center, _size, Rotation);
         }
     }
 }

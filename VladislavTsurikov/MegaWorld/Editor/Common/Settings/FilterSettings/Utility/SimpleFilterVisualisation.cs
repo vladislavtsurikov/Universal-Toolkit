@@ -7,10 +7,10 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 {
     public static class SimpleFilterVisualisation
     {
@@ -45,7 +45,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Util
                         }
                     }
                     
-                    float maskFitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, position, boxArea.Mask);
+                    float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, position, boxArea.Mask);
 
                     float fitness = filter.GetFitness(group, position, layerSettings, out var localPoint);
 

@@ -6,13 +6,13 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
 using VladislavTsurikov.SceneUtility.Runtime;
-using ProgressBar = VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components.ProgressBar;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using ProgressBar = VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.ProgressBar;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 {
-    public class SceneCollection : ComponentStack.Runtime.Component
+    public class SceneCollection : Component
     {
         [OdinSerialize] 
         private int _id;

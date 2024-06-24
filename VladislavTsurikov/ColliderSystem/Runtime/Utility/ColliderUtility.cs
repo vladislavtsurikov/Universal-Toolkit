@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Utility
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {    
     public static class ColliderUtility
     {
         public static RayHit Raycast(Ray ray, LayerMask layerMask)
         {
-            ObjectFilter raycastFilter = new ObjectFilter();
-            raycastFilter.LayerMask = layerMask;
+            ObjectFilter raycastFilter = new ObjectFilter
+            {
+                LayerMask = layerMask
+            };
 
             return Raycast(ray, raycastFilter);
         }
@@ -19,8 +20,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Utility
         public static RayHit Raycast<T>(Ray ray, LayerMask layerMask)
             where T: RendererSceneData, IRaycast
         {
-            ObjectFilter raycastFilter = new ObjectFilter();
-            raycastFilter.LayerMask = layerMask;
+            ObjectFilter raycastFilter = new ObjectFilter
+            {
+                LayerMask = layerMask
+            };
 
             return Raycast<T>(ray, raycastFilter);
         }
@@ -58,7 +61,9 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Utility
                 T rendererSceneData = SceneDataStackUtility.InstanceSceneData<T>(sceneDataManager.Scene);
 
                 if(rendererSceneData != null)
+                {
                     allObjectHits.AddRange(rendererSceneData.RaycastAll(ray, raycastFilter));
+                }
             }
 
             return allObjectHits;

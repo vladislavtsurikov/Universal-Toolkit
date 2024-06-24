@@ -2,10 +2,9 @@
 using UnityEngine;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
 using Coroutine = VladislavTsurikov.Coroutines.Runtime.Coroutine;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize

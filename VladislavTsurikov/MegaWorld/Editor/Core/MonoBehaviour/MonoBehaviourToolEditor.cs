@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas;
@@ -14,13 +14,14 @@ using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceController;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour
 {
@@ -100,9 +101,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour
             }
 
 #if !RENDERER_STACK
-			if(Target.Data.SelectedVariables.HasOneSelectedGroup())
+			if(Target.Data.SelectedData.HasOneSelectedGroup())
             {
-                if(Target.Data.SelectedVariables.SelectedGroup.PrototypeType == typeof(PrototypeTerrainObject))
+                if(Target.Data.SelectedData.SelectedGroup.PrototypeType == typeof(PrototypeTerrainObject))
 				{
 					CustomEditorGUILayout.HelpBox("Terrain Object Renderer is missing in the project. Terrain Object Renderer is only available by sponsor through Patreon."); 
 

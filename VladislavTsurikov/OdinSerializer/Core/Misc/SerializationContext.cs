@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {
@@ -31,8 +31,6 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
     {
         private SerializationConfig config;
         private Dictionary<object, int> internalReferenceIdMap = new Dictionary<object, int>(128, ReferenceEqualityComparer<object>.Default);
-        private StreamingContext streamingContext;
-        private IFormatterConverter formatterConverter;
         private TwoWaySerializationBinder binder;
 
         /// <summary>
@@ -74,8 +72,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
                 throw new ArgumentNullException("formatterConverter");
             }
 
-            this.streamingContext = context;
-            this.formatterConverter = formatterConverter;
+            this.StreamingContext = context;
+            this.FormatterConverter = formatterConverter;
 
             this.ResetToDefault();
         }
@@ -110,7 +108,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The streaming context.
         /// </value>
-        public StreamingContext StreamingContext { get { return this.streamingContext; } }
+        public StreamingContext StreamingContext { get; }
 
         /// <summary>
         /// Gets the formatter converter.
@@ -118,7 +116,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The formatter converter.
         /// </value>
-        public IFormatterConverter FormatterConverter { get { return this.formatterConverter; } }
+        public IFormatterConverter FormatterConverter { get; }
 
         /// <summary>
         /// Gets or sets the index reference resolver.

@@ -4,10 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
+using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
@@ -50,8 +50,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                             Handles.color = Color.yellow;
                             DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), streamingRules.GetMaxLoadingDistance() + streamingRules.OffsetMaxDistancePreventingUnloadScene);
                             
-                            Handles.color = Color.yellow.WithAlpha(0.1f);
-                            Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.GetMaxLoadingDistance() + streamingRules.OffsetMaxDistancePreventingUnloadScene);
+                            //Handles.color = Color.yellow.WithAlpha(0.1f);
+                            //Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.GetMaxLoadingDistance() + streamingRules.OffsetMaxDistancePreventingUnloadScene);
                         }
                         
                         if (streamingRules.OffsetMaxLoadingDistanceWithPause != 0)
@@ -59,8 +59,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                             Handles.color = Color.blue;
                             DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), streamingRules.GetMaxLoadingDistance());
                             
-                            Handles.color = Color.blue.WithAlpha(0.1f);
-                            Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.GetMaxLoadingDistance());
+                            //Handles.color = Color.blue.WithAlpha(0.1f);
+                            //Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.GetMaxLoadingDistance());
                         }
 
                         if (streamingRules.MaxImmediatelyLoadingDistance != 0)
@@ -68,8 +68,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                             Handles.color = Color.red;
                             DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), streamingRules.MaxImmediatelyLoadingDistance);
                                 
-                            Handles.color = Color.red.WithAlpha(0.1f);
-                            Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.MaxImmediatelyLoadingDistance);
+                            //Handles.color = Color.red.WithAlpha(0.1f);
+                            //Handles.DrawSolidDisc(cam.Camera.transform.position, Vector3.up, streamingRules.MaxImmediatelyLoadingDistance);
                         }
                     }
 

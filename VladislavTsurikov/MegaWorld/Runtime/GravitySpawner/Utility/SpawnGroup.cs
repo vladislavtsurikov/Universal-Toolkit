@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -26,9 +26,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
             ScriptingSystem.SetColliders(new Sphere(area.Center, area.Size.x / 2), area);
             
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(new PhysicsWaitingNextFrame(1000));
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(new PhysicsWaitingNextFrame(1000));
 
-            yield return scatterComponentSettings.Stack.Samples(area, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
@@ -60,14 +60,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
             ScriptingSystem.RemoveColliders(area);
         }
         
+#if RENDERER_STACK
         public static IEnumerator SpawnTerrainObject(GravitySpawner gravitySpawner, Group group, TerrainsMaskManager terrainsMaskManager, BoxArea area)
         {
             ScriptingSystem.SetColliders(new Sphere(area.Center, area.Size.x / 2), area);
             
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(new PhysicsWaitingNextFrame(1000));
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(new PhysicsWaitingNextFrame(1000));
 
-            yield return scatterComponentSettings.Stack.Samples(area, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
@@ -100,5 +101,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
                 return SimulatedBodyStack.Count == 0;
             }
         }
+#endif
     }
 }

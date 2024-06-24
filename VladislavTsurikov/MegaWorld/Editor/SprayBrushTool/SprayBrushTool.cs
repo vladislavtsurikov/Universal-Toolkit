@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -11,20 +11,20 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
+using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.PrototypeTerrainObject;
+using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
@@ -172,14 +172,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 #if RENDERER_STACK
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             SimpleTransformComponentSettings transformComponentSettings = (SimpleTransformComponentSettings)proto.GetElement(typeof(SprayBrushTool), typeof(SimpleTransformComponentSettings));
-            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal); 
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
             {
-                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale, instance.Rotation);
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObject(terrainObjectInstance));
             }
 #endif
@@ -189,17 +189,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             SimpleTransformComponentSettings transformComponentSettings = (SimpleTransformComponentSettings)proto.GetElement(typeof(SprayBrushTool), typeof(SimpleTransformComponentSettings));
-            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
             {
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
+                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
                 group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(gameObject);
 
-                GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  
+                GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  
                 
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(gameObject));
                 

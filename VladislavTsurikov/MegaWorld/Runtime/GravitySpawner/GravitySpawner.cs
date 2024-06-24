@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
@@ -9,12 +10,11 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
@@ -26,7 +26,7 @@ using VladislavTsurikov.MegaWorld.Editor.GravitySpawner;
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 {
     [ExecuteInEditMode]
-    [ComponentStack.Runtime.Attributes.MenuItem("Gravity Spawner")]
+    [MenuItem("Gravity Spawner")]
     [SupportMultipleSelectedGroups]
     [AddMonoBehaviourComponents(new[]{typeof(Area), typeof(StamperControllerSettings), typeof(PhysicsEffects)})]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
@@ -167,6 +167,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
                     
                     yield return Utility.SpawnGroup.SpawnGameObject(this, group, _terrainsMaskManager, boxArea);
                 }
+#if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
@@ -174,6 +175,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 
                     yield return Utility.SpawnGroup.SpawnTerrainObject(this, group, _terrainsMaskManager, boxArea);
                 }
+#endif
             }
             
             _terrainsMaskManager.Dispose();

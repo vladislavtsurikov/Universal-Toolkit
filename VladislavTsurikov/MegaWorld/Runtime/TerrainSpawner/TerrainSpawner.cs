@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
@@ -12,12 +13,11 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
@@ -31,7 +31,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 {
     [ExecuteInEditMode]
-    [ComponentStack.Runtime.Attributes.MenuItem("Terrain Spawner")]
+    [MenuItem("Terrain Spawner")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)})]
     [AddMonoBehaviourComponents(new[]{typeof(Area), typeof(StamperControllerSettings)})]
@@ -154,6 +154,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                     
                     yield return Utility.SpawnGroup.SpawnGameObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
+#if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
@@ -161,6 +162,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                     
                     yield return Utility.SpawnGroup.SpawnTerrainObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
+#endif
                 else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
                     yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, _terrainsMaskManager, boxArea);

@@ -1,8 +1,8 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
     [MenuItem("Vegetation Rotation")]
     public class VegetationRotation : ModifyTransformComponent
@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public float StrengthXY = 10;
         public float RotationXZ = 3;
 
-        public override void ModifyTransform(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void ModifyTransform(ref Instance instance, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             float localstrengthRotationY  = StrengthY * fitness;
             float localstrengthRotationXY = StrengthXY * fitness;
@@ -20,16 +20,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
             float angleXZ = RotationXZ * 3.6f;
             float t = localstrengthRotationXY / 100;
 
-            float rotationY = localstrengthRotationY * 3.6f * randomVector.y + transform.Rotation.eulerAngles.y;
+            float rotationY = localstrengthRotationY * 3.6f * randomVector.y + instance.Rotation.eulerAngles.y;
             float rotationX = angleXZ;
             float rotationZ = angleXZ;
 
-            transform.Rotation = Quaternion.Euler(new Vector3(transform.Rotation.eulerAngles.x, rotationY, transform.Rotation.eulerAngles.z));  
+            instance.Rotation = Quaternion.Euler(new Vector3(instance.Rotation.eulerAngles.x, rotationY, instance.Rotation.eulerAngles.z));  
             
             Quaternion rotation = Quaternion.Euler(new Vector3(rotationX, rotationY, rotationZ));    
-            Quaternion finalRotation = Quaternion.Lerp(transform.Rotation, rotation, t);          
+            Quaternion finalRotation = Quaternion.Lerp(instance.Rotation, rotation, t);          
 
-            transform.Rotation = finalRotation;
+            instance.Rotation = finalRotation;
         }
     }
 }

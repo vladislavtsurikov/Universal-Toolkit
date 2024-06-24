@@ -3,23 +3,24 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.UnityUtility.Runtime;
+using VladislavTsurikov.Utility.Runtime;
+using GUIUtility = UnityEngine.GUIUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
 {
     public class MouseMove
     {
         private static int _editorHash = "Editor".GetHashCode();
-        
-        private bool _isStartDrag;
-        
+
         protected RayHit _prevRaycast;
         
         public delegate void OnMouseDownDelegate();
@@ -42,8 +43,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
 
         public RayHit Raycast { get; protected set; }
         public Vector3 StrokeDirection { get; protected set; }
-        public bool IsStartDrag => _isStartDrag;
-        
+        public bool IsStartDrag { get; private set; }
+
         protected virtual void OnPointDetectionFromMouseDrag(Func<Vector3, bool> func)
         {
             func.Invoke(Raycast.Point);
@@ -150,7 +151,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
                                 break;
                             }
                             
-                            if (Utility.Runtime.GUIUtility.IsModifierDown(EventModifiers.None) && Raycast != null)
+                            if (EventModifiersUtility.IsModifierDown(EventModifiers.None) && Raycast != null)
                             {
                                 SceneView.lastActiveSceneView.LookAt(Raycast.Point, SceneView.lastActiveSceneView.rotation, LookAtSize);
                                 e.Use();
@@ -166,7 +167,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
 
         private void PointDetectionFromMouseDrag(Func<Vector3, bool> func)
         {
-            _isStartDrag = false;
+            IsStartDrag = false;
             
             Vector3 hitPoint = Raycast.Point;
             Vector3 lastHitPoint = _prevRaycast.Point;
@@ -219,7 +220,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
                 return;
             }
 
-            _isStartDrag = true;
+            IsStartDrag = true;
             _prevRaycast = Raycast;
 
             OnStartDrag();

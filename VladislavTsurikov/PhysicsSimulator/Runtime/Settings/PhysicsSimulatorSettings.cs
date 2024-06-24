@@ -1,5 +1,6 @@
 using UnityEditor;
 using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
 {

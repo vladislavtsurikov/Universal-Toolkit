@@ -1,11 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem
 {
     [MenuItem("Spawn Prefabs")]
     [AfterLoadSceneComponent]

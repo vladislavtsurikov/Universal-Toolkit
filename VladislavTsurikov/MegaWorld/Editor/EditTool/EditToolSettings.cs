@@ -1,7 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System;
 using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 

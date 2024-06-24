@@ -7,15 +7,7 @@ float GetRandomDistanceToCamera(InstanceShaderData instanceData, float random)
 
 bool Culling(float distanceToCamera, float minDistance, float maxDistance)
 {
-	if(isDistanceCulling)
-	{
-		if (distanceToCamera > maxDistance)
-		{
-			return true;
-		}
-	}
-	
-	if (distanceToCamera < minDistance)
+	if (distanceToCamera > maxDistance || distanceToCamera < minDistance)
 	{
 		return true;
 	}
@@ -25,7 +17,7 @@ bool Culling(float distanceToCamera, float minDistance, float maxDistance)
 
 bool DistanceCulling(InstanceShaderData instanceData, float maxScaleValue, float random)
 {
-	float minDistanceCulling = minDistance;
+	int minDistanceCulling = minDistance;
 
 	if(startLOD != 0)
 	{

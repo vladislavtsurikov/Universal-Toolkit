@@ -20,7 +20,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 				{
                     foreach (var item in SceneDataManagerUtility.GetAllSceneDataManager())
                     {
-                        GameObjectCollider.Runtime.GameObjectCollider gameObjectCollider = (GameObjectCollider.Runtime.GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider.Runtime.GameObjectCollider));
+                        GameObjectCollider.Editor.GameObjectCollider gameObjectCollider = (GameObjectCollider.Editor.GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider.Editor.GameObjectCollider));
 
                         gameObjectCollider?.RefreshObjectTree();
                     }

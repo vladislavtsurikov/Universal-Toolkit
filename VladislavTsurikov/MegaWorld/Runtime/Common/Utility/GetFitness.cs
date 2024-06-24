@@ -1,8 +1,9 @@
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
@@ -32,7 +33,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
         {
             if(stack.ElementList.Count != 0)
             {
-                return GrayscaleFromTexture.GetFromWorldPosition(bounds, point, filterMask);
+                return TextureUtility.GetFromWorldPosition(bounds, point, filterMask);
             }
 
             return 1;

@@ -1,6 +1,6 @@
 ﻿using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn
 {
     public class RespawnGroup: Respawn
     {

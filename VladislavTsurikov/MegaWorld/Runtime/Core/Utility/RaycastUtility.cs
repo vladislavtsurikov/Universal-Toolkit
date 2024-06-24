@@ -1,6 +1,5 @@
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
@@ -28,7 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.Utility
         {
             if (Physics.Raycast(ray, out var hitInfo, PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance, layersMask))
             {
-                RayHit rayHit = new RayHit(ray, hitInfo.transform.gameObject, hitInfo.normal, hitInfo.point, hitInfo.distance);
+                RayHit rayHit = new RayHit(hitInfo.transform.gameObject, hitInfo.normal, hitInfo.point, hitInfo.distance);
                 return rayHit;
             }
 

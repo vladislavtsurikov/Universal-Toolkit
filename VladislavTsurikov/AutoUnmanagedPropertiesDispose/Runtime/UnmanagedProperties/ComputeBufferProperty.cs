@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties
+namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 {
     public class ComputeBufferProperty : AutoDisposeProperty
     {

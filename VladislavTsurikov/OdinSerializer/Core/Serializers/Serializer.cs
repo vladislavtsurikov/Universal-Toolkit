@@ -22,8 +22,7 @@ using System.Diagnostics;
 using System.Reflection;
 using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Serializers
 {

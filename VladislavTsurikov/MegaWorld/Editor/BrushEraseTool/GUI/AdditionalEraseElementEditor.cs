@@ -1,12 +1,12 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.PrototypeElements;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.GUI
+namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
     [DontDrawFoldout]
     [ElementEditor(typeof(AdditionalEraseSetting))]

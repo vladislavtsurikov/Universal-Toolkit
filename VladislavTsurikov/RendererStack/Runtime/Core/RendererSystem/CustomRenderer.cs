@@ -1,13 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
 {
-    public abstract class CustomRenderer : ComponentStack.Runtime.Component
+    public abstract class CustomRenderer : Component
     {
         public bool ForceUpdateRendererData = false;
 

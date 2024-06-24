@@ -26,14 +26,11 @@
 
 using System;
 using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using System.Reflection.Emit;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
 #if CAN_EMIT
-
-    using System.Reflection.Emit;
-
 #endif
 
     /// <summary>

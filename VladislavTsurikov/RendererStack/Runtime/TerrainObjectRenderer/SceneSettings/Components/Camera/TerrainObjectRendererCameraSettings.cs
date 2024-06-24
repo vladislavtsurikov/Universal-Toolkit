@@ -1,7 +1,7 @@
 ﻿using System;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Camera
 {
     [Serializable]
     public enum CameraCullingMode

@@ -1,8 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.Core.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
@@ -12,17 +11,18 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {
     public static class SpawnGroup
     {
         public static IEnumerator SpawnGameObject(Group group, BoxArea area)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(null);
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.Stack.Samples(area, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
@@ -42,12 +42,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
             RandomUtility.ChangeRandomSeed();
         }
         
+#if RENDERER_STACK
         public static IEnumerator SpawnTerrainObject(Group group, BoxArea area)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            scatterComponentSettings.Stack.SetWaitingNextFrame(null);
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.Stack.Samples(area, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
@@ -66,6 +67,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool.Utility
             
             RandomUtility.ChangeRandomSeed();
         }
+#endif
     }
 }
 #endif

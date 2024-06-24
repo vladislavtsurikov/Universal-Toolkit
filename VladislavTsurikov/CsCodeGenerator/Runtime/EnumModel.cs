@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
@@ -8,7 +7,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     {
         public EnumModel(string name = null)
         {
-            base.CustomDataType = Util.Enum;
+            base.CustomDataType = Constants.Enum;
             base.Name = name;
         }
 
@@ -24,12 +23,12 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         public override string ToString()
         {
             string result = base.ToString();
-            result += Util.NewLine + Indent + "{";
+            result += Constants.NewLine + Indent + "{";
 
-            result += EnumValues.Count > 0 ? Util.NewLine : "";
-            result += String.Join("," + Util.NewLine, EnumValues);
-            result += Util.NewLine + Indent + "}";
-            result += Util.NewLine;
+            result += EnumValues.Count > 0 ? Constants.NewLine : "";
+            result += String.Join("," + Constants.NewLine, EnumValues);
+            result += Constants.NewLine + Indent + "}";
+            result += Constants.NewLine;
             return result;
         }
     }

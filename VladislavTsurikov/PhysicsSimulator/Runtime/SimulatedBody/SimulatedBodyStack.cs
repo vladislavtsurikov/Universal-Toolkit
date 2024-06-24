@@ -16,7 +16,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
 
         public static int Count => SimulatedBodyHashSet.Count;
         
-        public static T InstantiateSimulatedBody<T>(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions = null)
+        public static T InstantiateSimulatedBody<T>(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
         where T: SimulatedBody
         {
 #if UNITY_EDITOR
@@ -36,7 +36,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
             return simulatedBody;
         }
         
-        public static SimulatedBody InstantiateSimulatedBody(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions = null)
+        public static SimulatedBody InstantiateSimulatedBody(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
         {
 #if UNITY_EDITOR
             var gameObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;

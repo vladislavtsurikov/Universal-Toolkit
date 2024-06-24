@@ -1,8 +1,8 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components
+namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings
 {
     [MenuItem("Distance Culling")]
     public class DistanceCulling : PrototypeComponent

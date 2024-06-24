@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
-using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
+namespace VladislavTsurikov.Undo.Editor.GameObject
 {
     public class GameObjectTransform : UndoRecord
     {
@@ -35,12 +35,12 @@ namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
         private class TransformData
         {
             private readonly UnityEngine.GameObject _gameObject;
-            private readonly Transform _transform;
+            private readonly Instance _instance;
 
             public TransformData(UnityEngine.GameObject gameObject)
             {
                 _gameObject = gameObject;
-                _transform = new Transform(gameObject);
+                _instance = new Instance(gameObject);
             }
 
             public void SetTransform()
@@ -50,9 +50,9 @@ namespace VladislavTsurikov.Undo.Editor.Actions.GameObject
                     return;
                 }
             
-                _gameObject.transform.position = _transform.Position;
-                _gameObject.transform.localScale = _transform.Scale; 
-                _gameObject.transform.rotation = _transform.Rotation;
+                _gameObject.transform.position = _instance.Position;
+                _gameObject.transform.localScale = _instance.Scale; 
+                _gameObject.transform.rotation = _instance.Rotation;
             }
         }
     }

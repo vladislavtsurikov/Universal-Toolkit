@@ -1,7 +1,7 @@
 using System;
 using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Components;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
@@ -9,16 +9,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
     [MenuItem("Scatter Settings")]
     public class ScatterComponentSettings : Component
     {
-        public ScatterStack Stack = new ScatterStack();
+        public ScatterStack ScatterStack = new ScatterStack();
 
         protected override void SetupElement(object[] args = null)
         {
-            Stack.Setup();
+            ScatterStack.Setup();
         }
 
         protected override void OnCreate()
         {
-            Stack.CreateIfMissingType(typeof(RandomGrid));
+            ScatterStack.CreateIfMissingType(typeof(RandomGrid));
         }
     }
 }

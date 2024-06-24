@@ -4,8 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
     {
         private ComponentStackOnlyDifferentTypes<ModifyTransformComponent> ComponentStackOnlyDifferentTypes => (ComponentStackOnlyDifferentTypes<ModifyTransformComponent>)Stack;
         
-        public ModifyTransformStackEditor(GUIContent label, ComponentStackOnlyDifferentTypes<ModifyTransformComponent> list) : base(label, list, true)
+        public ModifyTransformStackEditor(GUIContent label, ComponentStackOnlyDifferentTypes<ModifyTransformComponent> stack) : base(label, stack, true)
         {
             DisplayHeaderText = false;
         }

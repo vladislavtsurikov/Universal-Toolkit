@@ -10,9 +10,8 @@
 
 using System;
 using UnityEngine;
-using VladislavTsurikov.ColorUtility.Runtime.Models;
-using HSL = VladislavTsurikov.ColorUtility.Runtime.Models.HSL;
-using RGB = VladislavTsurikov.ColorUtility.Runtime.Models.RGB;
+using HSL = VladislavTsurikov.ColorUtility.Runtime.HSL;
+using RGB = VladislavTsurikov.ColorUtility.Runtime.RGB;
 
 // ReSharper disable UnusedMember.Global
 // ReSharper disable InconsistentNaming

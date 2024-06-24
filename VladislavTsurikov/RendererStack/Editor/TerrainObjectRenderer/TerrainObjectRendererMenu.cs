@@ -4,9 +4,10 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.RenderModes.GPUInstancedIndirect.GPUISupport;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
 {
@@ -16,18 +17,18 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
         {
             Runtime.TerrainObjectRenderer.TerrainObjectRenderer terrainObjectRenderer = (Runtime.TerrainObjectRenderer.TerrainObjectRenderer)customRenderer;
             
-            menu.AddItem(new GUIContent("Regenerate Instanced Indirect Shaders"), false, GUIUtility.ContextMenuCallback, 
+            menu.AddItem(new GUIContent("Regenerate Instanced Indirect Shaders"), false, ContextMenuUtility.ContextMenuCallback, 
                 new Action(() => { GPUInstancedIndirectShaderStack.Instance.RegenerateShaders(); })); 
 
-            menu.AddItem(new GUIContent("Terrain Cells Occlusion Culling/Refresh Cells"), false, GUIUtility.ContextMenuCallback, 
+            menu.AddItem(new GUIContent("Terrain Cells Occlusion Culling/Refresh Cells"), false, ContextMenuUtility.ContextMenuCallback, 
                 new Action(TerrainObjectRendererData.RefreshAllCells)); 
             
             menu.AddSeparator ("");
 
-            menu.AddItem(new GUIContent("Debug/Terrain Cells Occlusion Culling/All Cells"), terrainObjectRenderer.DebugAllCells, GUIUtility.ContextMenuCallback, new Action(() => 
+            menu.AddItem(new GUIContent("Debug/Terrain Cells Occlusion Culling/All Cells"), terrainObjectRenderer.DebugAllCells, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                 terrainObjectRenderer.DebugAllCells = !terrainObjectRenderer.DebugAllCells));
             
-            menu.AddItem(new GUIContent("Debug/Terrain Cells Occlusion Culling/Visible Cells"), terrainObjectRenderer.DebugVisibleCells, GUIUtility.ContextMenuCallback, new Action(() => 
+            menu.AddItem(new GUIContent("Debug/Terrain Cells Occlusion Culling/Visible Cells"), terrainObjectRenderer.DebugVisibleCells, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                 terrainObjectRenderer.DebugVisibleCells = !terrainObjectRenderer.DebugVisibleCells));
         }
     }

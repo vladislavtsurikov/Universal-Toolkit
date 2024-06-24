@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
     [MenuItem("Random Seed Settings")]
-    public class RandomSeedSettings : Component
+    public class RandomSeedSettings : ComponentStack.Runtime.Core.Component
     {
         public int RandomSeed;
         public bool GenerateRandomSeed;

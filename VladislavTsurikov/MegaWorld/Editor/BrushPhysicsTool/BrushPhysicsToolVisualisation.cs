@@ -6,7 +6,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
-using DrawHandles = VladislavTsurikov.Utility.Runtime.DrawHandles;
+using DrawHandles = VladislavTsurikov.UnityUtility.Editor.DrawHandles;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {

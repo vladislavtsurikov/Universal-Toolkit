@@ -1,25 +1,23 @@
 using UnityEngine;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class MeshRayHit
     {
-        private float _hitEnter;
-        private Vector3 _hitPoint;
-        private Vector3 _hitNormal;
-        private int _triangleIndex;
+        public float HitEnter { get; }
 
-        public float HitEnter { get { return _hitEnter; } }
-        public Vector3 HitPoint { get { return _hitPoint; } }
-        public Vector3 HitNormal { get { return _hitNormal; } }
-        public int TriangleIndex { get { return _triangleIndex; } }
+        public Vector3 HitPoint { get; }
+
+        public Vector3 HitNormal { get; }
+
+        public int TriangleIndex { get; }
 
         public MeshRayHit(Ray ray, float hitEnter, int triangleIndex, Vector3 hitNormal)
         {
-            _hitEnter = hitEnter;
-            _hitPoint = ray.GetPoint(hitEnter);
-            _triangleIndex = triangleIndex;
-            _hitNormal = hitNormal;
+            HitEnter = hitEnter;
+            HitPoint = ray.GetPoint(hitEnter);
+            TriangleIndex = triangleIndex;
+            HitNormal = hitNormal;
         }
     }
 }

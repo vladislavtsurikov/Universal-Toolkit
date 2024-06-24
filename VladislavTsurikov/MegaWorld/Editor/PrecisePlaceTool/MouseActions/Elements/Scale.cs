@@ -2,10 +2,11 @@
 using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
-using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
     public enum ScaleMode
     {
@@ -15,17 +16,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
         UniformScale,
     }
     
-    [ComponentStack.Runtime.Attributes.MenuItem("Scale")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Scale")]
     public class Scale : MouseAction
     {
         private ScaleMode _scaleMode;
         private Vector3 _startScale;
         private float _scaleDist;  
 
-        private ShortcutCombo.Editor.ShortcutCombo _mouseUniformScale;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseScaleX;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseScaleY;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseScaleZ;
+        private ShortcutCombo _mouseUniformScale;
+        private ShortcutCombo _mouseScaleX;
+        private ShortcutCombo _mouseScaleY;
+        private ShortcutCombo _mouseScaleZ;
         
         public MouseSensitivitySettings MouseScaleSettings = new MouseSensitivitySettings();
         public bool EnableSnapScale = false;
@@ -44,19 +45,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
         
         private void InitShortcutCombo()
         {
-            _mouseUniformScale = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseUniformScale = new ShortcutCombo();
             _mouseUniformScale.AddKey(KeyCode.LeftShift);
             _mouseUniformScale.AddKey(KeyCode.LeftControl);
 
-            _mouseScaleX = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseScaleX = new ShortcutCombo();
             _mouseScaleX.AddKey(KeyCode.X);
             _mouseScaleX.AddShortcutCombo(_mouseUniformScale);
 
-            _mouseScaleY = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseScaleY = new ShortcutCombo();
             _mouseScaleY.AddKey(KeyCode.Y);
             _mouseScaleY.AddShortcutCombo(_mouseUniformScale);
 
-            _mouseScaleZ = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseScaleZ = new ShortcutCombo();
             _mouseScaleZ.AddKey(KeyCode.Z);
             _mouseScaleZ.AddShortcutCombo(_mouseUniformScale);
         }

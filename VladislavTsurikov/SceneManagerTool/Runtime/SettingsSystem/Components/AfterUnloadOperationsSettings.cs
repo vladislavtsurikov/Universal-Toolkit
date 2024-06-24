@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
     [MenuItem("After Unload")]
     public class AfterUnloadOperationsSettings : SettingsComponent

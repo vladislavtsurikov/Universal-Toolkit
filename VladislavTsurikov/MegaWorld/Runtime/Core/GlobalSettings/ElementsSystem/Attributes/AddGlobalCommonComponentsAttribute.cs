@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes
+namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class AddGlobalCommonComponentsAttribute : Attribute

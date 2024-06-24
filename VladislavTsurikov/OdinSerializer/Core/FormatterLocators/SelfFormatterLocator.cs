@@ -20,7 +20,7 @@ using System;
 using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
 using VladislavTsurikov.OdinSerializer.Core.Formatters;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 [assembly: RegisterFormatterLocator(typeof(SelfFormatterLocator), -60)]
 

@@ -18,7 +18,7 @@
 
 using System.Collections.Generic;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Unity_Integration
 {

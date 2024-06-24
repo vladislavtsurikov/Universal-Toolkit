@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
 {

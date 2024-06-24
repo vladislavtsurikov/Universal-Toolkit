@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Core.Runtime.IconStack.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;

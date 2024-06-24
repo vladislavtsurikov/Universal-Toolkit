@@ -1,29 +1,28 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
     [MenuItem("Modify Transform Components")]
-    public class ModifyTransformSettings : Component
+    public class ModifyTransformSettings : ComponentStack.Runtime.Core.Component
     {
-        public ComponentStackOnlyDifferentTypes<ModifyTransformComponent> Stack = new ComponentStackOnlyDifferentTypes<ModifyTransformComponent>();
+        public ComponentStackOnlyDifferentTypes<ModifyTransformComponent> ModifyTransformComponentStack = new ComponentStackOnlyDifferentTypes<ModifyTransformComponent>();
 
         protected override void OnCreate()
         {
-            Stack.CreateIfMissingType(typeof(RandomizeScale));
+            ModifyTransformComponentStack.CreateIfMissingType(typeof(RandomizeScale));
         }
         
-        public void ModifyTransform(ref Transform transform, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public void ModifyTransform(ref Instance instance, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
-            foreach (ModifyTransformComponent item in Stack.ElementList)
+            foreach (ModifyTransformComponent item in ModifyTransformComponentStack.ElementList)
             {
                 if(item.Active)
                 {
-                    item.ModifyTransform(ref transform, ref modifyInfo, moveLenght, strokeDirection, fitness, normal);
+                    item.ModifyTransform(ref instance, ref modifyInfo, moveLenght, strokeDirection, fitness, normal);
                 }
             }
         }

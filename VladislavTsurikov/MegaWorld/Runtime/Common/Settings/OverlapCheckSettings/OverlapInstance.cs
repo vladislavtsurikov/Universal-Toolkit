@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {
@@ -30,8 +31,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             }
         }
         
-        public OverlapInstance(OverlapCheckSettings overlapCheckSettings, Vector3 extents, Transform transform) 
-            : this(overlapCheckSettings, transform.Position, transform.Scale, transform.Rotation, extents)
+        public OverlapInstance(OverlapCheckSettings overlapCheckSettings, Vector3 extents, Instance instance) 
+            : this(overlapCheckSettings, instance.Position, instance.Scale, instance.Rotation, extents)
         {
         }
         

@@ -6,22 +6,17 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public class FileModel
     {
-        public FileModel() { }
-        public FileModel(string name)
-        {
-            Name = name;
-        }
-
-        public bool WarningGeneratedFile = true;
-        public List<string> UsingDirectives { get; set; } = new List<string>();
+        private List<string> UsingDirectives { get; set; } = new List<string>();
         
+        public bool WarningGeneratedFile = true;
+
         public List<string> PreprocessorDirectives { get; set; } = new List<string>();
 
         public string Namespace { get; set; }
 
         public string Name { get; set; }
 
-        public string Extension { get; set; } = Util.CsExtension;
+        public string Extension { get; set; } = Constants.CsExtension;
 
         public string FullName => Name + "." + Extension;
 
@@ -29,28 +24,33 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public List<ClassModel> Classes { get; set; } = new List<ClassModel>();
         
+        public FileModel(string name)
+        {
+            Name = name;
+        }
+
         public override string ToString()
         {
             string result = WarningGeneratedFile ? GetWarningGeneratedFileText() : "";
             
             foreach (var preprocessorDirective in PreprocessorDirectives)
             {
-                result += "#if " + preprocessorDirective + Util.NewLine;
+                result += "#if " + preprocessorDirective + Constants.NewLine;
             }
             
-            string usingText = UsingDirectives.Count > 0 ? Util.Using + " " : "";
-            result += usingText + String.Join(Util.NewLine + usingText, UsingDirectives);
-            result += Util.NewLineDouble + Util.Namespace + " " + Namespace;
-            result += Util.NewLine + "{";
-            result += String.Join(Util.NewLine, Enums);
-            result += (Enums.Count > 0 && Classes.Count > 0) ? Util.NewLine : "";
-            result += String.Join(Util.NewLine, Classes);
-            result += Util.NewLine + "}";
-            result += Util.NewLine;
+            string usingText = UsingDirectives.Count > 0 ? Constants.Using + " " : "";
+            result += usingText + String.Join(Constants.NewLine + usingText, UsingDirectives);
+            result += Constants.NewLineDouble + Constants.Namespace + " " + Namespace;
+            result += Constants.NewLine + "{";
+            result += String.Join(Constants.NewLine, Enums);
+            result += (Enums.Count > 0 && Classes.Count > 0) ? Constants.NewLine : "";
+            result += String.Join(Constants.NewLine, Classes);
+            result += Constants.NewLine + "}";
+            result += Constants.NewLine;
             
             foreach (var preprocessorDirective in PreprocessorDirectives)
             {
-                result += "#endif" + Util.NewLine;
+                result += "#endif" + Constants.NewLine;
             }
             
             return result;
@@ -60,8 +60,21 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         {
             foreach (var usingDirective in usingDirectives)
             {
-                UsingDirectives.Add(usingDirective);
+                UsingDirectives.Add(usingDirective + ";");
             }
+        }
+        
+        public void LoadUsingDirectives(params Type[] types)
+        {
+            foreach (var usingDirective in NamespaceUtility.GetUsingDirectives(types))
+            {
+                UsingDirectives.Add(usingDirective + ";");
+            }
+        }
+        
+        public void SetNamespaceFromFolder(string path, params string[] ignoredFolders)
+        {
+            Namespace = NamespaceUtility.GetNamespaceFromPath(path, "VladislavTsurikov", ignoredFolders);
         }
 
         private string GetWarningGeneratedFileText()
@@ -74,7 +87,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
             namesStringBuilder.AppendLine("//.......Do not edit.......");
             namesStringBuilder.AppendLine("//.........................");
 
-            return namesStringBuilder + Util.NewLine;
+            return namesStringBuilder + Constants.NewLine;
         }
     }
 }

@@ -3,11 +3,12 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceController;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
-    public abstract class ToolWindow : ComponentStack.Runtime.Component
+    public abstract class ToolWindow : Component
     {
 	    private bool _mouseDownHappened;
 	    

@@ -6,7 +6,7 @@ using UnityEditor.Callbacks;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 
-namespace VladislavTsurikov.SceneManagerTool.Editor.Utility
+namespace VladislavTsurikov.SceneManagerTool.Editor
 {
     public static class PackageInitializer
     {

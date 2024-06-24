@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.SceneManagerTool.Editor.Utility;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 using VladislavTsurikov.SceneUtility.Editor;
 

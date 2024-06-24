@@ -1,19 +1,20 @@
 #if UNITY_EDITOR
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
-namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
     [MenuItem("Remove")]
 	public class Remove : Action
     {
-        private ShortcutCombo.Editor.ShortcutCombo _shortcutCombo;
+        private ShortcutCombo _shortcutCombo;
 
         [OnDeserializing]
         private void OnDeserializing()
@@ -28,7 +29,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
         
         private void InitShortcutCombo()
         {
-            _shortcutCombo = new ShortcutCombo.Editor.ShortcutCombo();
+            _shortcutCombo = new ShortcutCombo();
             _shortcutCombo.AddKey(KeyCode.T);
         }
 

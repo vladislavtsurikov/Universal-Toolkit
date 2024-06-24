@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
@@ -11,7 +11,7 @@ using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 {
-    public class GravitySpawnerGameObject : OnDisableSimulatedBodyAction
+    public class GravitySpawnerGameObject : OnDisableSimulatedBodyEvent
     {
         private readonly Group _group;
         private readonly TerrainsMaskManager _terrainsMaskManager;

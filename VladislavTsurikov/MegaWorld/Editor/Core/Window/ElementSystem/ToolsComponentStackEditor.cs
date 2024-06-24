@@ -13,9 +13,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
     {
         private ToolsComponentStack _toolsComponentStack;
         
-        public ToolsComponentStackEditor(ToolsComponentStack list) : base(list)
+        public ToolsComponentStackEditor(ToolsComponentStack stack) : base(stack)
         {
-            _toolsComponentStack = list;
+            _toolsComponentStack = stack;
         }
 
         public static void OnGUI(Type toolType, Type type)

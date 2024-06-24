@@ -1,7 +1,6 @@
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
-namespace VladislavTsurikov.Math.Runtime.PrimitiveMath
+namespace VladislavTsurikov.Math.Runtime
 {
     public static class TriangleMath
     {

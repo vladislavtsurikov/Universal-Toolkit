@@ -2,10 +2,10 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSystem.Components
 { 

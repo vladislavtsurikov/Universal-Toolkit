@@ -1,24 +1,19 @@
 ﻿using System;
-using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public class Property : Field
     {
-        public Property() { }
-
-        public Property(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name) { }
-
-        public Property(Type customDataType, string name) : base(customDataType, name) { }
-
+        private bool _isAutoImplemented;
+        
         public override bool HasAttributes => true;
 
         public override AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
 
-        public bool IsGetOnly { get; set; } = false;
+        public bool IsGetOnly { get; set; }
 
-        public bool IsAutoImplemented { get; set; } = true;
-        
+        public bool IsAutoImplemented => string.IsNullOrEmpty(GetterBody) && string.IsNullOrEmpty(SetterBody);
+
         public string GetterBody { get; set; }
 
         public string SetterBody { get; set; }
@@ -31,23 +26,33 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
             {
                 if (IsAutoImplemented)
                 {
-                    return IsGetOnly? " { get; }" : " { get; set; }";
+                    return IsGetOnly ? " { get; }" : " { get; set; }";
                 }
                 else
                 {
-                    string result = Util.NewLine + Indent + "{";
-                    string curentIndent = Util.NewLine + Indent + CsGenerator.IndentSingle;
-
-                    result += curentIndent + "get { return " + GetterBody + "; }";
-                    if (!IsGetOnly && SetterBody != null)
+                    if (IsGetOnly)
                     {
-                        result += curentIndent + "set { " + SetterBody + "; }";
+                        return " => " + GetterBody + ";";
                     }
-                    result += Util.NewLine + Indent + "}";
+                    else
+                    {
+                        string result = Constants.NewLine + Indent + "{";
+                        string currentIndent = Constants.NewLine + Indent + CsGenerator.IndentSingle;
+                    
+                        result += currentIndent + "get { return " + GetterBody + "; }";
+                        result += currentIndent + "set { " + SetterBody + "; }";
+                        result += Constants.NewLine + Indent + "}";
 
-                    return result;
+                        return result;
+                    }
                 }
             } 
         }
+        
+        public Property() { }
+
+        public Property(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name) { }
+
+        public Property(Type customDataType, string name) : base(customDataType, name) { }
     }
 }

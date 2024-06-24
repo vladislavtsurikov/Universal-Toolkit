@@ -3,11 +3,9 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem.Attributes;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSystem
 {

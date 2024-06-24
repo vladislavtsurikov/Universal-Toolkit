@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
 {
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
         }
     }
 
-    public class ApplyPositionDown : OnDisableSimulatedBodyAction
+    public class ApplyPositionDown : OnDisableSimulatedBodyEvent
     {
         private AutoPositionDownSettings _autoPositionDownSettings;
         

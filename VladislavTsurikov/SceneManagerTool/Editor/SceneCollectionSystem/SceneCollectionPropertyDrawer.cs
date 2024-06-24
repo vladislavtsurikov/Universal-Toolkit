@@ -2,10 +2,9 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.SceneManagerTool.Editor.Utility;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Editor;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
 {

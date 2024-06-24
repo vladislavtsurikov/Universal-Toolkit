@@ -3,15 +3,15 @@ using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
+using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.PrototypeTerrainObject;
 #if RENDERER_STACK
 #endif
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     public static class ActiveObjectController
     {
@@ -42,7 +42,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                     
                     if(_placedObjectData.Proto.GetType() == typeof(PrototypeGameObject))
                     {
-                        GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene?.Invoke(_placedObjectData.GameObject);
+                        GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene?.Invoke(_placedObjectData.GameObject);
                         Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedGameObject(_placedObjectData.GameObject));
                         _placedObjectData = value;
                     }

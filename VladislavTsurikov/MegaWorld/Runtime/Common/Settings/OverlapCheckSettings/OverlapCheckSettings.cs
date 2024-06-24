@@ -1,11 +1,13 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.UnityUtility.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {
@@ -17,7 +19,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
     }
     
     [MenuItem("Overlap Check Settings")]
-    public class OverlapCheckSettings : ComponentStack.Runtime.Component
+    public class OverlapCheckSettings : Component
     {
         public OverlapShapeEnum OverlapShapeEnum = OverlapShapeEnum.Sphere;
         public OBBCheck ObbCheck = new OBBCheck();
@@ -37,9 +39,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             }
         }
 
-        public static bool RunOverlapCheck(Type prototypeType, OverlapCheckSettings overlapCheckSettings, Vector3 extents, Transform transform)
+        public static bool RunOverlapCheck(Type prototypeType, OverlapCheckSettings overlapCheckSettings, Vector3 extents, Instance instance)
         {
-            if(overlapCheckSettings.CollisionCheck.RunCollisionCheck(extents, transform))
+            if(overlapCheckSettings.CollisionCheck.RunCollisionCheck(extents, instance))
             {
                 return false;
             }
@@ -52,7 +54,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             if(prototypeType == typeof(PrototypeGameObject))
             {
 #if UNITY_EDITOR
-                if(!RunOverlapCheckForGameObject(new OverlapInstance(overlapCheckSettings, extents, transform)))
+                if(!RunOverlapCheckForGameObject(new OverlapInstance(overlapCheckSettings, extents, instance)))
                 {
                     return true;
                 }
@@ -61,7 +63,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
 #if RENDERER_STACK
             else 
             {
-                if(!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, transform)))
+                if(!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, instance)))
                 {
                     return true;
                 }

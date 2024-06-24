@@ -22,8 +22,7 @@ using System.Reflection;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.Formatters;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.FormatterLocators
 {

@@ -159,7 +159,7 @@ bool AddAdditionalShadow(float distanceToCamera, float3 position)
 	{
 	case 1: //GetAdditionalShadow.MinCullingDistance:
 		{
-			if(distanceToCamera <= minCullingDistance)
+			if(distanceToCamera <= minCullingDistanceForAdditionalShadow)
 			{
 				return true;
 			}

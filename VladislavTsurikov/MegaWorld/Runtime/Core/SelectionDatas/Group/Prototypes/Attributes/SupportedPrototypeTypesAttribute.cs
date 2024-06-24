@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes
+namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class SupportedPrototypeTypesAttribute : Attribute

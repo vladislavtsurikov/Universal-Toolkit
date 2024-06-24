@@ -3,8 +3,9 @@ using System;
 using System.Collections;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime.Interfaces;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 {
@@ -322,7 +323,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 
         private void RenameMenu(GenericMenu menu, int currentTabIndex)
         {
-            menu.AddItem(new GUIContent("Rename"), false, GUIUtility.ContextMenuCallback, new Action(() => { _onBeginTabRename = true; _renameIndexTab = currentTabIndex; }));
+            menu.AddItem(new GUIContent("Rename"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => { _onBeginTabRename = true; _renameIndexTab = currentTabIndex; }));
         }
 
         private void Select(int index)

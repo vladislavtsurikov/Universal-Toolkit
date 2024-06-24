@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
@@ -13,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
     }
 
     [MenuItem("Area Settings")]
-    public class Area : ComponentStack.Runtime.Component
+    public class Area : Component
     {
         public Vector3 PastThisPosition = Vector3.zero;
         public Vector3 PastScale = Vector3.one;

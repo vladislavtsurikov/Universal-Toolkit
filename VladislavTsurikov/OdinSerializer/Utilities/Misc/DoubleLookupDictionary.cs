@@ -18,9 +18,8 @@
 
 using System;
 using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Not yet documented.

@@ -1,6 +1,6 @@
 using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddPrototypeComponentsAttribute : Attribute

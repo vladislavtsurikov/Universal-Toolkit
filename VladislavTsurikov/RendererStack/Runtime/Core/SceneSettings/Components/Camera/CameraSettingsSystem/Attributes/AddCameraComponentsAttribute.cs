@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddCameraComponentsAttribute : Attribute

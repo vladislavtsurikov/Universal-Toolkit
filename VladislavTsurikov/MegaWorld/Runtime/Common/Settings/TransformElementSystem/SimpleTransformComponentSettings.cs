@@ -1,19 +1,19 @@
 ﻿using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [MenuItem("Simple Transform Settings")]
     public class SimpleTransformComponentSettings : Component
     {
-        public TransformComponentStack Stack = new TransformComponentStack();
+        public TransformComponentStack TransformComponentStack = new TransformComponentStack();
 
         protected override void OnCreate()
         {
-            Stack.CreateIfMissingType(typeof(PositionOffset));
-            Stack.CreateIfMissingType(typeof(Rotation));
-            Stack.CreateIfMissingType(typeof(Scale));
+            TransformComponentStack.CreateIfMissingType(typeof(PositionOffset));
+            TransformComponentStack.CreateIfMissingType(typeof(Rotation));
+            TransformComponentStack.CreateIfMissingType(typeof(Scale));
         }
     }
 }

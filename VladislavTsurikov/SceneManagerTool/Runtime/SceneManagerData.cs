@@ -3,6 +3,7 @@ using UnityEngine;
 using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneUtility.Runtime;
+using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 #if UNITY_EDITOR
 using UnityEditor;
 using VladislavTsurikov.SceneManagerTool.Editor;

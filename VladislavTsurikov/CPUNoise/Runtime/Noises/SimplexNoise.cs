@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VladislavTsurikov.CPUNoise.Runtime.Noises
+namespace VladislavTsurikov.CPUNoise.Runtime
 {
     /// <summary>
     /// Implementation of the Perlin simplex noise, an improved Perlin noise algorithm.

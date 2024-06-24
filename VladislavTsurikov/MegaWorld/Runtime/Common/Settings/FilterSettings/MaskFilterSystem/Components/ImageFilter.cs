@@ -2,12 +2,12 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     public enum FilterMode {GrayScale, Color, RedColorChannel, GreenColorChannel, BlueColorChannel, AlphaChannel }
 
     [Serializable]
-    [ComponentStack.Runtime.Attributes.MenuItem("Image")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Image")]
     public class ImageFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

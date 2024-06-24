@@ -1,13 +1,12 @@
 using UnityEngine;
 using VladislavTsurikov.BVH.Runtime;
-using VladislavTsurikov.Math.Runtime.PrimitiveMath;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Math.Runtime;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class MeshTree
     {
-        public class NodeData
+        private class NodeData
         {
             public int TriangleIndex;
         }
@@ -23,7 +22,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
 
         public MeshRayHit Raycast(Ray ray, Matrix4x4 transformMtx)
         {
-            if (!_isReady) Build();
+            if (!_isReady)
+            {
+                Build();
+            }
 
             var nodeHits = _tree.RaycastAll(transformMtx.inverse.TransformRay(ray), false);
             if (nodeHits.Count != 0)
@@ -57,7 +59,9 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
                 }
 
                 if (hitTriIndex >= 0)
+                {
                     return new MeshRayHit(ray, minT, hitTriIndex, hitTriNormal);
+                }
             }
 
             return null;
@@ -65,24 +69,29 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
 
         public void Build()
         {
-            if (_isReady) return;
+            if (_isReady)
+            {
+                return;
+            }
 
             var meshVerts = _mesh.Vertices;
             for (int triIndex = 0; triIndex < _mesh.NumTriangles; ++triIndex)
             {
                 var triangle = _mesh.GetTriangle(triIndex);
 
-                Vector3 min = meshVerts[triangle.VIndex0];
-                min = Vector3.Min(min, meshVerts[triangle.VIndex1]);
-                min = Vector3.Min(min, meshVerts[triangle.VIndex2]);
+                Vector3 min = meshVerts[triangle.Index0];
+                min = Vector3.Min(min, meshVerts[triangle.Index1]);
+                min = Vector3.Min(min, meshVerts[triangle.Index2]);
 
-                Vector3 max = meshVerts[triangle.VIndex0];
-                max = Vector3.Max(max, meshVerts[triangle.VIndex1]);
-                max = Vector3.Max(max, meshVerts[triangle.VIndex2]);
+                Vector3 max = meshVerts[triangle.Index0];
+                max = Vector3.Max(max, meshVerts[triangle.Index1]);
+                max = Vector3.Max(max, meshVerts[triangle.Index2]);
 
-                var node = new BVHNodeAABB<NodeData>(new NodeData() { TriangleIndex = triIndex });
-                node.Size = (max - min);
-                node.Position = (min + max) * 0.5f;
+                var node = new BVHNodeAABB<NodeData>(new NodeData() { TriangleIndex = triIndex })
+                {
+                    Size = (max - min),
+                    Position = (min + max) * 0.5f
+                };
 
                 _tree.InsertLeafNode(node);
             }
@@ -93,14 +102,20 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Mesh
 #if UNITY_EDITOR
         public void DrawRaycast(Ray ray, Matrix4x4 transformMtx, Color lineColor)
         {
-            if (!_isReady) Build();
+            if (!_isReady)
+            {
+                Build();
+            }
 
             _tree.DrawRaycast(transformMtx.inverse.TransformRay(ray), transformMtx, lineColor);
         }
 
         public void DrawAllCells(Matrix4x4 transformMtx, Color lineColor)
         {
-            if (!_isReady) Build();
+            if (!_isReady)
+            {
+                Build();
+            }
 
             _tree.DrawAllCells(transformMtx, lineColor);
         }

@@ -19,7 +19,7 @@
 using System;
 using System.Threading;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     public interface ICache : IDisposable
     {
@@ -41,8 +41,6 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
     {
         private static readonly bool IsNotificationReceiver = typeof(ICacheNotificationReceiver).IsAssignableFrom(typeof(T));
         private static object[] FreeValues = new object[4];
-
-        private bool isFree;
 
         private static volatile int THREAD_LOCK_TOKEN = 0;
 
@@ -70,7 +68,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
         private Cache()
         {
             this.Value = new T();
-            this.isFree = false;
+            this.IsFree = false;
         }
 
         /// <summary>
@@ -84,7 +82,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
         /// <value>
         ///   <c>true</c> if this cached value is free; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFree { get { return this.isFree; } }
+        public bool IsFree { get; private set; }
 
         object ICache.Value { get { return this.Value; } }
 
@@ -120,7 +118,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
                 if (!object.ReferenceEquals(result, null))
                 {
                     freeValues[i] = null;
-                    result.isFree = false;
+                    result.IsFree = false;
                     break;
                 }
             }
@@ -153,7 +151,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
                 throw new ArgumentNullException("cache");
             }
 
-            if (cache.isFree) return;
+            if (cache.IsFree) return;
 
             // No need to call this method inside the lock, which might do heavy work
             //  there is a thread safety hole here, actually - if several different threads
@@ -174,7 +172,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
 
             // We now hold the lock
 
-            if (cache.isFree)
+            if (cache.IsFree)
             {
                 // Release the lock and leave - job's done already
                 THREAD_LOCK_TOKEN = 0;
@@ -182,7 +180,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
             }
 
 
-            cache.isFree = true;
+            cache.IsFree = true;
 
             var freeValues = FreeValues;
             var length = freeValues.Length;

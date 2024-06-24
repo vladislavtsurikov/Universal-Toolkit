@@ -2,20 +2,20 @@
 using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
-namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Raycast")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Raycast")]
 	public class Raycast : Action
     {
-        private ShortcutCombo.Editor.ShortcutCombo _shortcutCombo;
+        private ShortcutCombo _shortcutCombo;
 
         public float RaycastPositionOffset = 0;
         public LayerMask GroundLayers = 1;
@@ -33,7 +33,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements
         
         private void InitShortcutCombo()
         {
-            _shortcutCombo = new ShortcutCombo.Editor.ShortcutCombo();
+            _shortcutCombo = new ShortcutCombo();
             _shortcutCombo.AddKey(KeyCode.W);
         }
 

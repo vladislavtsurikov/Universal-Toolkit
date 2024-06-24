@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 
-namespace VladislavTsurikov.SceneManagerTool.Editor.Utility
+namespace VladislavTsurikov.SceneManagerTool.Editor
 {
     public static class SceneManagerEditorUtility
     {

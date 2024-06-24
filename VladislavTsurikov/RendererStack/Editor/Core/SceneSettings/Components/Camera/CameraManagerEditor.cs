@@ -2,13 +2,13 @@
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
-using CameraType = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraType;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
+using CameraType = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraType;
 
-namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera
 {
 	[ElementEditor(typeof(CameraManager))]
     public class CameraManagerEditor : IMGUIElementEditor

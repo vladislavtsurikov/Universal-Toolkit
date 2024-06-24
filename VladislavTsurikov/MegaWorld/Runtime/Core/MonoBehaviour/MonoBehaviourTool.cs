@@ -1,7 +1,7 @@
 ﻿using System;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 {

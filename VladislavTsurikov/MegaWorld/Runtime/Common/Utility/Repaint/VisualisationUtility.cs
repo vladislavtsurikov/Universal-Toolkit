@@ -6,7 +6,7 @@ using UnityEngine.Experimental.TerrainAPI;
 #endif
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
@@ -33,7 +33,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint
             Color color = PreferenceElementSingleton<VisualisationBrushHandlesPreference>.Instance.CircleColor;
             float thickness = PreferenceElementSingleton<VisualisationBrushHandlesPreference>.Instance.CirclePixelWidth;
             
-            VladislavTsurikov.Utility.Runtime.DrawHandles.DrawCircleWithoutZTest(localTransform, Matrix4x4.TRS(Vector3.zero, Quaternion.AngleAxis(90, Vector3.right), Vector3.one), color, thickness);
+            UnityUtility.Editor.DrawHandles.DrawCircleWithoutZTest(localTransform, Matrix4x4.TRS(Vector3.zero, Quaternion.AngleAxis(90, Vector3.right), Vector3.one), color, thickness);
         }
     }
 }

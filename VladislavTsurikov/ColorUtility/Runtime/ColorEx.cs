@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ColorUtility.Runtime.Models;
 
 namespace VladislavTsurikov.ColorUtility.Runtime
 {

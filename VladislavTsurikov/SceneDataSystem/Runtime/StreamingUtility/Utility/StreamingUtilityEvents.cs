@@ -1,4 +1,4 @@
-﻿namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility
+﻿namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public static class StreamingUtilityEvents
     {

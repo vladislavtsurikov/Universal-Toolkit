@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility

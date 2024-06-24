@@ -4,9 +4,8 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
 using VladislavTsurikov.SceneUtility.Runtime;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
@@ -22,7 +21,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
         DoNotOpen
     }
     
-    public abstract class SceneType : Component
+    public abstract class SceneType : ComponentStack.Runtime.Core.Component
     {
         private SceneCollection _loadSceneCollection;
         

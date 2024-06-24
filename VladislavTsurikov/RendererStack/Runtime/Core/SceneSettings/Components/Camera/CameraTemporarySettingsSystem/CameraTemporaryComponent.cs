@@ -1,6 +1,6 @@
-using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem
 {
     public class CameraTemporaryComponent : Component
     {

@@ -1,7 +1,8 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.Math.Runtime;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
@@ -14,7 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 
     [Serializable]
     [MenuItem("Pin Tool Settings")]
-    public class PinToolSettings : ComponentStack.Runtime.Component
+    public class PinToolSettings : Component
     {
         #region Position
         public float Offset;

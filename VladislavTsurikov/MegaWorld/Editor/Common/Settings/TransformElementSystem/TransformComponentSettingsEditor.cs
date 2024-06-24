@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 
@@ -15,7 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
         public override void OnEnable()
         {
             _transformComponentSettings = (TransformComponentSettings)Target;
-            _transformEditor = new TransformStackEditor(new GUIContent("Transform Component Stack"), _transformComponentSettings.Stack);
+            _transformEditor = new TransformStackEditor(new GUIContent("Transform Component Stack"), _transformComponentSettings.TransformComponentStack);
         }
         
         public override void OnGUI() 

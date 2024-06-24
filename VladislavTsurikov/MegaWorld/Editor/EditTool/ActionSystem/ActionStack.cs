@@ -1,7 +1,5 @@
 #if UNITY_EDITOR
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.Attributes;
-using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem.Elements;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {

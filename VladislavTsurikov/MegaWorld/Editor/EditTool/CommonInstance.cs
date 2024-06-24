@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using System;
 using UnityEngine;
-using VladislavTsurikov.GameObjectCollider.Runtime.Utility;
+using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool

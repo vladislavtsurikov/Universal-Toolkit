@@ -1,13 +1,12 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Components;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
 {
     [ElementEditor(typeof(RandomPoint))]
     public class RandomPointEditor : ReorderableListComponentEditor

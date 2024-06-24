@@ -3,12 +3,13 @@ using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
     public enum RotationMode
     {
@@ -25,15 +26,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
         Offset
     }
     
-    [ComponentStack.Runtime.Attributes.MenuItem("Rotation")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Rotation")]
     public class Rotation : MouseAction
     {
         private RotationMode _rotationMode;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseRotateAroundY;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseRotateAroundX;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseRotateAroundZ;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseFreeRotate;
-        private ShortcutCombo.Editor.ShortcutCombo _mouseFreeScreen;
+        private ShortcutCombo _mouseRotateAroundY;
+        private ShortcutCombo _mouseRotateAroundX;
+        private ShortcutCombo _mouseRotateAroundZ;
+        private ShortcutCombo _mouseFreeRotate;
+        private ShortcutCombo _mouseFreeScreen;
         private float _rotationDist;
         private Quaternion _startRotation;
         private Quaternion _сurrentRotation;
@@ -61,22 +62,22 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Eleme
 
         private void InitShortcutCombo()
         {
-            _mouseRotateAroundY = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseRotateAroundY = new ShortcutCombo();
             _mouseRotateAroundY.AddKey(KeyCode.LeftShift);
 
-            _mouseRotateAroundX = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseRotateAroundX = new ShortcutCombo();
             _mouseRotateAroundX.AddKey(KeyCode.X);
             _mouseRotateAroundX.AddShortcutCombo(_mouseRotateAroundY);
 
-            _mouseRotateAroundZ = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseRotateAroundZ = new ShortcutCombo();
             _mouseRotateAroundZ.AddKey(KeyCode.Z);
             _mouseRotateAroundZ.AddShortcutCombo(_mouseRotateAroundY);
 
-            _mouseFreeRotate = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseFreeRotate = new ShortcutCombo();
             _mouseFreeRotate.AddKey(KeyCode.F);
             _mouseFreeRotate.AddShortcutCombo(_mouseRotateAroundY);
 
-            _mouseFreeScreen = new ShortcutCombo.Editor.ShortcutCombo();
+            _mouseFreeScreen = new ShortcutCombo();
             _mouseFreeScreen.AddKey(KeyCode.S);
             _mouseFreeScreen.AddShortcutCombo(_mouseRotateAroundY);
         }

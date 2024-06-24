@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 
-namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings.Components
+namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings
 {
     [ElementEditor(typeof(Shadow))]
     public class ShadowEditor : PrototypeComponentEditor

@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
@@ -15,8 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
     {
         private bool _hotkeysFoldout;
         private EditToolSettings _editToolSettings;
-        private ActionStackEditor _actionStackEditor;
-        
+
         private static GUIStyle TitleStyle
         {
             get
@@ -30,17 +29,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             }
         }
 
-        public ActionStackEditor ActionStackEditor => _actionStackEditor;
+        public ActionStackEditor ActionStackEditor { get; private set; }
 
         public override void OnEnable()
         {
             _editToolSettings = (EditToolSettings)Target;
-            _actionStackEditor = new ActionStackEditor(_editToolSettings.ActionStack);
+            ActionStackEditor = new ActionStackEditor(_editToolSettings.ActionStack);
         }
 
         public override void OnGUI() 
         {
-            _actionStackEditor.DrawSettings();
+            ActionStackEditor.DrawSettings();
 
             HotKeys();
         }

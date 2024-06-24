@@ -88,7 +88,7 @@ Shader "RendererStack/Standard"
             #pragma fragment fragBase
             #include "UnityStandardCoreForward.cginc"
             
-            #include "Assets/VladislavTsurikov/RendererStack/Shaders/Include/GPUInstancedIndirectInclude.cginc"
+            #include "Assets/VladislavTsurikov/RendererStack/Runtime/Shaders/Include/GPUInstancedIndirectInclude.cginc"
             #pragma instancing_options procedural:setupGPUInstancedIndirect
             #pragma multi_compile_instancing
             ENDCG
@@ -123,7 +123,7 @@ Shader "RendererStack/Standard"
             #pragma fragment fragAdd
             #include "UnityStandardCoreForward.cginc"
 
-            #include "Assets/VladislavTsurikov/RendererStack/Shaders/Include/GPUInstancedIndirectInclude.cginc"
+            #include "Assets/VladislavTsurikov/RendererStack/Runtime/Shaders/Include/GPUInstancedIndirectInclude.cginc"
             #pragma instancing_options procedural:setupGPUInstancedIndirect
             #pragma multi_compile_instancing
             ENDCG
@@ -150,7 +150,7 @@ Shader "RendererStack/Standard"
 
             #include "UnityStandardShadow.cginc"
 
-            #include "Assets/VladislavTsurikov/RendererStack/Shaders/Include/GPUInstancedIndirectInclude.cginc"
+            #include "Assets/VladislavTsurikov/RendererStack/Runtime/Shaders/Include/GPUInstancedIndirectInclude.cginc"
             #pragma instancing_options procedural:setupGPUInstancedIndirect
             #pragma multi_compile_instancing
             ENDCG
@@ -178,7 +178,7 @@ Shader "RendererStack/Standard"
 
             #include "UnityStandardMeta.cginc"
 
-            #include "Assets/VladislavTsurikov/RendererStack//Shaders/Include/GPUInstancedIndirectInclude.cginc"
+            #include "Assets/VladislavTsurikov/RendererStack/Runtime/Shaders/Include/GPUInstancedIndirectInclude.cginc"
             #pragma instancing_options procedural:setupGPUInstancedIndirect
             #pragma multi_compile_instancing
             ENDCG

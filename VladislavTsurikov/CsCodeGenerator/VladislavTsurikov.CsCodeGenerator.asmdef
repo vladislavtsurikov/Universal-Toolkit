@@ -1,3 +1,14 @@
 {
-	"name": "VladislavTsurikov.ShaderVariantCollection"
+    "name": "VladislavTsurikov.CsCodeGenerator",
+    "rootNamespace": "",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

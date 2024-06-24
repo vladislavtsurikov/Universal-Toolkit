@@ -2,11 +2,11 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSystem
 {
     [Serializable]
     [ElementEditor(typeof(AdditionalRotation))]

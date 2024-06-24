@@ -1,12 +1,12 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 
-namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
 {
     [ElementEditor(typeof(ActiveScene))]
     public class ActiveSceneEditor : ReorderableListComponentEditor

@@ -1,6 +1,6 @@
 using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddSceneComponentsAttribute : Attribute

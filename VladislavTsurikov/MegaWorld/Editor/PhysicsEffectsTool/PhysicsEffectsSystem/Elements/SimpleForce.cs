@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Simple Force")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Simple Force")]
 	public class SimpleForce : PhysicsEffect
     {
         public float MaxForce => 500;

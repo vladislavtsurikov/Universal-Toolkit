@@ -1,4 +1,4 @@
-﻿namespace VladislavTsurikov.CsCodeGenerator.Runtime.Enums
+﻿namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public enum IndentType
     {

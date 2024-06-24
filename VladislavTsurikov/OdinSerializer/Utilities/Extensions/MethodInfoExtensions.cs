@@ -21,9 +21,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Various extensions for MethodInfo.

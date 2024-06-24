@@ -9,16 +9,15 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
     public class SimulatedBody 
     {
         protected readonly GameObject _gameObject;
-        private Rigidbody _addedRigidbody;
         private Collider _addedCollider;
         private List<Collider> _nonConvexColliders;
         
-        private readonly List<OnDisableSimulatedBodyAction> _onDisablePhysicsActions = new List<OnDisableSimulatedBodyAction>();
+        private readonly List<OnDisableSimulatedBodyEvent> _onDisablePhysicsEvents = new List<OnDisableSimulatedBodyEvent>();
         
-        protected internal delegate void OnAddToSimulatedBodyStackDelegate();
-        protected internal OnAddToSimulatedBodyStackDelegate OnAddToSimulatedBodyStack;
+        protected internal Action OnAddToSimulatedBodyStack;
 
-        public Rigidbody Rigidbody => _addedRigidbody;
+        public Rigidbody Rigidbody { get; private set; }
+
         public GameObject GameObject => _gameObject;
 
         public SimulatedBody(GameObject gameObject)
@@ -31,26 +30,26 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
                     SimulatedBody = this
                 };
 
-            _onDisablePhysicsActions.Insert(0, applyPositionDown);
+            _onDisablePhysicsEvents.Insert(0, applyPositionDown);
 
             AddPhysicsSupport();
         }
         
-        public SimulatedBody(GameObject gameObject, List<OnDisableSimulatedBodyAction> onDisablePhysicsActions)
+        public SimulatedBody(GameObject gameObject, List<OnDisableSimulatedBodyEvent> onDisablePhysicsEvents)
         {
             _gameObject = gameObject;
 
-            if (onDisablePhysicsActions == null)
+            if (onDisablePhysicsEvents == null)
             {
-                onDisablePhysicsActions = new List<OnDisableSimulatedBodyAction>();
+                onDisablePhysicsEvents = new List<OnDisableSimulatedBodyEvent>();
             }
 
-            foreach (var onDisablePhysicsAction in onDisablePhysicsActions)
+            foreach (var onDisablePhysicsAction in onDisablePhysicsEvents)
             {
                 onDisablePhysicsAction.SimulatedBody = this;
             }
             
-            _onDisablePhysicsActions = onDisablePhysicsActions;
+            _onDisablePhysicsEvents = onDisablePhysicsEvents;
             
             ApplyPositionDown applyPositionDown =
                 new ApplyPositionDown(PhysicsSimulatorSettings.Instance.AutoPositionDownSettings)
@@ -58,7 +57,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
                     SimulatedBody = this
                 };
             
-            _onDisablePhysicsActions.Insert(0, applyPositionDown);
+            _onDisablePhysicsEvents.Insert(0, applyPositionDown);
             
             AddPhysicsSupport();
         }
@@ -70,7 +69,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
                 return true;
             }
 
-            if(_addedRigidbody == null || _addedRigidbody.IsSleeping())
+            if(Rigidbody == null || Rigidbody.IsSleeping())
             {
                 return true;
             }
@@ -121,7 +120,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
             
             try
             {
-                foreach (var onDisablePhysicsAction in _onDisablePhysicsActions)
+                foreach (var onDisablePhysicsAction in _onDisablePhysicsEvents)
                 {
                     onDisablePhysicsAction.OnDisablePhysicsInternal();
                 }
@@ -157,7 +156,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
                 rigidbody.mass = 1;
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
 
-                _addedRigidbody = rigidbody;
+                Rigidbody = rigidbody;
             }
 
             if (!_gameObject.GetComponent<Collider>())
@@ -175,9 +174,9 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
 
         private void RemoveAddedComponents()
         {
-            if(_addedRigidbody != null)
+            if(Rigidbody != null)
             {
-                Object.DestroyImmediate(_addedRigidbody);
+                Object.DestroyImmediate(Rigidbody);
             }
 
             if(_addedCollider != null)

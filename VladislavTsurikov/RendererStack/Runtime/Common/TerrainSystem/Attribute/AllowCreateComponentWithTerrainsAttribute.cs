@@ -1,8 +1,7 @@
 using VladislavTsurikov.SceneDataSystem.Runtime;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute
+namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     internal class AllowCreateComponentWithTerrainsAttribute : AllowCreateComponentAttribute
     {

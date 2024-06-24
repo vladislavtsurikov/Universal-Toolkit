@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using Group = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Group;
 
@@ -45,7 +46,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
             {
                 if (terrainMask != null && terrainMask.IsFit() && terrainMask.Group == group)
                 {
-                    maskFitness = GrayscaleFromTexture.GetFromWorldPosition(terrainBounds, point, terrainMask.Mask);
+                    maskFitness = TextureUtility.GetFromWorldPosition(terrainBounds, point, terrainMask.Mask);
                     break;
                 }
             }

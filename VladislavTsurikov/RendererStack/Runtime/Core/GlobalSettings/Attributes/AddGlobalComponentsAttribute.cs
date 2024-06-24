@@ -1,6 +1,6 @@
 using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddGlobalComponentsAttribute : Attribute

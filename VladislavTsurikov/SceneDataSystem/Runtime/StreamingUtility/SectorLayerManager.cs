@@ -2,12 +2,11 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.SceneDataSystem.Runtime.Attributes;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
-    [SceneType(SceneType.ParentScene)]
+    [RequiredSceneType(SceneType.ParentScene)]
     public class SectorLayerManager : SingletonSceneData<SectorLayerManager>
     {
         private static Sector _activeSceneSector;

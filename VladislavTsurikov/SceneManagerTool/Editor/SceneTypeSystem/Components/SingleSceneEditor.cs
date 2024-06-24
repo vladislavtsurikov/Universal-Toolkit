@@ -1,11 +1,11 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Components;
+using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 
-namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
 {
     [ElementEditor(typeof(Single))]
     public class SingleSceneEditor : SceneTypeEditor

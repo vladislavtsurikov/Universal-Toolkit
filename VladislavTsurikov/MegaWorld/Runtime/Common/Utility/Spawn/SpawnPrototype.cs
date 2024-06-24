@@ -4,7 +4,7 @@ using UnityEngine.TerrainTools;
 using UnityEngine.Experimental.TerrainAPI;
 #endif
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
@@ -14,18 +14,19 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
+
 #if RENDERER_STACK
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.PrototypeTerrainObject;
 #endif
 #if UNITY_EDITOR
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
@@ -37,14 +38,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 #if RENDERER_STACK
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
             {
-                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale, instance.Rotation);
                 
 #if UNITY_EDITOR
                 if(supportUndo)
@@ -60,18 +61,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
         {
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            Transform transform = new Transform(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            transformComponentSettings.Stack.ManipulateTransform(ref transform, fitness, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
             {
-                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
+                GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
                 group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(gameObject);
 
 #if UNITY_EDITOR
-                GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  
+                GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene(gameObject);  
                 
                 if(supportUndo)
                 {
@@ -127,7 +128,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 
                     if (maskFilterComponentSettings.MaskFilterStack.ElementList.Count > 0)
 			        {
-                        fitness = GrayscaleFromTexture.GetFromWorldPosition(boxArea.Bounds, new Vector3(worldPosition.x, 0, worldPosition.y), maskFilterComponentSettings.FilterMaskTexture2D);
+                        fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, new Vector3(worldPosition.x, 0, worldPosition.y), maskFilterComponentSettings.FilterMaskTexture2D);
                     }
                     
                     float maskFitness = boxArea.GetAlpha(current + offset, spawnSize);

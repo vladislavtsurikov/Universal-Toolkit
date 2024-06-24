@@ -21,11 +21,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
 
 #if UNITY_EDITOR
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Defines how an assembly's import settings should be configured.

@@ -4,10 +4,8 @@ namespace VladislavTsurikov.Math.Runtime
 {
     public struct Sphere
     {
-        private bool _isValid;
+        public bool IsValid { get; }
 
-        public bool IsValid => _isValid;
-        
         public Vector3 Center;
         public float Radius;
 
@@ -15,7 +13,7 @@ namespace VladislavTsurikov.Math.Runtime
         {
             Center = center;
             Radius = radius;
-            _isValid = true;
+            IsValid = true;
         }
         
         public bool Contains(Vector3 point)

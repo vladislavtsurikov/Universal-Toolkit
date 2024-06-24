@@ -25,8 +25,7 @@ using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Binary;
 using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Json;
 using VladislavTsurikov.OdinSerializer.Core.Serializers;
 using VladislavTsurikov.OdinSerializer.Unity_Integration;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {

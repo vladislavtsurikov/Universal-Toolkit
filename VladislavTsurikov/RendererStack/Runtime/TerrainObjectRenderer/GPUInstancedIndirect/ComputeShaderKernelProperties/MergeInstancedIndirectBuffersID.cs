@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
-using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using PrototypeRenderData = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Components.ObjectCameraRender.PrototypeRenderData;
+using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using PrototypeRenderData = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender.PrototypeRenderData;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect.ComputeShaderKernelProperties
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect
 {
     public static class MergeInstancedIndirectBuffersID
     {
@@ -109,7 +109,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
                 BatchAdd batch = new BatchAdd()
                 {
-                    Instances = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).TemporaryInstanceData.ComputeBufferRenderData.ComputeBufferProperty.ComputeBuffer,
+                    Instances = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).TemporaryInstances.ComputeBufferRenderData.ComputeBufferProperty.ComputeBuffer,
                     Count = instanceCount,
                 };
 

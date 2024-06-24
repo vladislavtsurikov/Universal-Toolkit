@@ -3,9 +3,9 @@ using System.Runtime.Serialization;
 using UnityEditor;
 using UnityEngine;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Cameras")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Cameras")]
     public partial class CameraManager : SceneComponent
     {
         public List<VirtualCamera> VirtualCameraList = new List<VirtualCamera>();

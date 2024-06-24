@@ -1,23 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public class Method : BaseElement
     {
-        public Method() { }
-
-        public Method(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name) { }
-
-        public Method(Type customDataType, string name) : base(customDataType, name) { }
-
-        public Method(AccessModifier accessModifier, KeyWord singleKeyWord, BuiltInDataType builtInDataType, string name) : base(builtInDataType, name)
-        {
-            AccessModifier = accessModifier;
-            KeyWords.Add(singleKeyWord);
-        }
-
         public virtual bool IsVisible { get; set; } = true;
 
         public List<Parameter> Parameters { get; set; } = new List<Parameter>();
@@ -30,14 +17,26 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         public List<string> BodyLines { get; set; } = new List<string>();
 
         public override string Signature => base.Signature + Parameters.ToStringList();
+        
+        public Method() { }
+
+        public Method(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name) { }
+
+        public Method(Type customDataType, string name) : base(customDataType, name) { }
+
+        public Method(AccessModifier accessModifier, KeyWord singleKeyWord, BuiltInDataType builtInDataType, string name) : base(builtInDataType, name)
+        {
+            AccessModifier = accessModifier;
+            KeyWords.Add(singleKeyWord);
+        }
 
         public override string ToString()
         {
             if (!IsVisible)
                 return "";
             string result = base.ToString() + BaseParametersFormated;
-            string bracesPrefix = BracesInNewLine ? (Util.NewLine + Indent) : " ";
-            string curentIndent = Util.NewLine + Indent + CsGenerator.IndentSingle;
+            string bracesPrefix = BracesInNewLine ? (Constants.NewLine + Indent) : " ";
+            string curentIndent = Constants.NewLine + Indent + CsGenerator.IndentSingle;
             result += bracesPrefix + "{";
             result += BodyLines.Count == 0 ? "" : (BracesInNewLine ? curentIndent : " ") + String.Join(curentIndent, BodyLines);
             result += bracesPrefix + "}";

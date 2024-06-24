@@ -23,9 +23,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Type method extensions.

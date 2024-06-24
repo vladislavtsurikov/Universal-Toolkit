@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
 {
     public class Area
     {
-        private Vector3 _center;
         private Vector3 _size;
         
         public float Rotation = 0;
@@ -40,18 +39,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
         public float CosAngle => Mathf.Cos(Rotation * Mathf.Deg2Rad);
         public float SinAngle => Mathf.Sin(Rotation * Mathf.Deg2Rad);
         
-        public Vector3 Center => _center;
+        public Vector3 Center { get; }
 
         public Bounds Bounds =>
             new()
             {
                 size = new Vector3(Size.x, Size.y, Size.z),
-                center = _center
+                center = Center
             };
 
         protected Area(Vector3 center, Vector3 size)
         {
-            _center = center;
+            Center = center;
             _size = size;
         }
 

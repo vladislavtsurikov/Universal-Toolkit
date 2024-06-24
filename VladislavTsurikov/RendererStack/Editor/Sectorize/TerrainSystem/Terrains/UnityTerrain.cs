@@ -2,9 +2,9 @@
 using System;
 using UnityEngine;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
+using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
 
-namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem.Terrains
+namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 {
     [Serializable]
     [TerrainHelper(typeof(Terrain), "Unity terrain")]

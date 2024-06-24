@@ -1,6 +1,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.PrototypeSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
@@ -11,9 +11,10 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.UnityUtility.Runtime;
+using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     public static class PlaceObjectUtility 
     {
@@ -50,21 +51,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
-            Transform transform = GetInstancedDataForSpawn(proto, rayHit, settings.RememberPastTransform);
+            Instance instance = GetInstancedDataForSpawn(proto, rayHit, settings.RememberPastTransform);
 
-            if(!CanPlace(proto, transform))
+            if(!CanPlace(proto, instance))
             {
                 return null;
             }
 
-            return Place(group, proto, rayHit, transform);
+            return Place(group, proto, rayHit, instance);
         }
 
-        private static PlacedObjectData Place(Group group, PlacedObjectPrototype proto, RayHit rayHit, Transform transform)
+        private static PlacedObjectData Place(Group group, PlacedObjectPrototype proto, RayHit rayHit, Instance instance)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
-            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, transform.Position, transform.Scale, transform.Rotation);
+            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
@@ -85,11 +86,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
         public static bool CanPlace(PlacedObjectPrototype proto, GameObject go)
         {
-            Transform transform = new Transform(go);
-            return CanPlace(proto, transform);
+            Instance instance = new Instance(go);
+            return CanPlace(proto, instance);
         }
 
-        private static bool CanPlace(PlacedObjectPrototype proto, Transform transform)
+        private static bool CanPlace(PlacedObjectPrototype proto, Instance instance)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
             
@@ -99,14 +100,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
 
                 if(proto is PrototypeGameObject)
                 {
-                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
                     {
                         return false;
                     }
                 }
                 else
                 {
-                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+                    if(!OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
                     {
                         return false;
                     }
@@ -116,7 +117,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
             return true;
         }
         
-        private static Transform GetInstancedDataForSpawn(PlacedObjectPrototype proto, RayHit rayHit, bool rememberPastTransform)
+        private static Instance GetInstancedDataForSpawn(PlacedObjectPrototype proto, RayHit rayHit, bool rememberPastTransform)
         {
             PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
 
@@ -129,15 +130,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility
                 rotation = proto.PastTransform.Rotation;
             }
 
-            Transform transform = new Transform(rayHit.Point, scaleFactor, rotation);
+            Instance instance = new Instance(rayHit.Point, scaleFactor, rotation);
 
             if(settings.UseTransformComponents)
             {
                 TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-                transformComponentSettings.Stack.ManipulateTransform(ref transform, 1, rayHit.Normal);
+                transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, 1, rayHit.Normal); 
             }
 
-            return transform;
+            return instance;
         }
     }
 }

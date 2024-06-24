@@ -1,23 +1,23 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting
 {
-    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting.Scripting))]
+    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting.Scripting))]
     public class ScriptingEditor : PrototypeComponentEditor
     {
         private ScriptStackEditor _settingsStackEditor;
-        private Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting.Scripting _scripting;
+        private Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting.Scripting _scripting;
         
         public override void OnEnable()
         {
-            _scripting = (Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting.Scripting)Target;
+            _scripting = (Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting.Scripting)Target;
             _settingsStackEditor = new ScriptStackEditor(_scripting.ScriptStack);
         }
         

@@ -4,14 +4,14 @@ using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Editor.TextureStamperTool;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 
 namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 {
-	[ComponentStack.Runtime.Attributes.MenuItem("Terrain Spawner")]
+	[ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Terrain Spawner")]
     [CustomEditor(typeof(Runtime.TerrainSpawner.TerrainSpawner))]
 	public sealed class TerrainSpawnerEditor : MonoBehaviourToolEditor
     {

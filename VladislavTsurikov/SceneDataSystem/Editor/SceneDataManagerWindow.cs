@@ -1,21 +1,20 @@
 #if UNITY_EDITOR
-#if !DISABLE_UIELEMENTS
+#if !DISABLE_VISUAL_ELEMENTS
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 using VladislavTsurikov.IMGUIUtility.Editor;
+using VladislavTsurikov.SceneDataSystem.Editor.VisualElements;
 using VladislavTsurikov.SceneDataSystem.Runtime;
-using VladislavTsurikov.UIElementsUtility.Editor.EditorUI;
-using VladislavTsurikov.UIElementsUtility.Editor.EditorUI.Components;
-using VladislavTsurikov.UIElementsUtility.Editor.EditorUI.Enums;
-using VladislavTsurikov.UIElementsUtility.Editor.Utility;
-using VladislavTsurikov.Utility.Runtime.Extensions;
-using Button = VladislavTsurikov.UIElementsUtility.Editor.EditorUI.Components.Button;
-using ButtonStyle = VladislavTsurikov.UIElementsUtility.Editor.EditorUI.Enums.ButtonStyle;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
-using ListView = VladislavTsurikov.UIElementsUtility.Editor.EditorUI.Components.ListView;
+using VladislavTsurikov.UIElementsUtility;
+using VladislavTsurikov.UIElementsUtility.Runtime;
+using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
+using Button = VladislavTsurikov.SceneDataSystem.Editor.VisualElements.Button;
+using ButtonStyle = VladislavTsurikov.UIElementsUtility.Runtime.ButtonStyle;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
+using ListView = VladislavTsurikov.SceneDataSystem.Editor.VisualElements.ListView;
+using VisualElementExtensions = VladislavTsurikov.UIElementsUtility.Runtime.Utility.VisualElementExtensions;
 
 namespace VladislavTsurikov.SceneDataSystem.Editor
 {
@@ -34,8 +33,6 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 		
 		protected override void OnEnable()
 		{
-			base.OnEnable();
-			
 			FindAllSceneDataManager();
 
 			Reload();
@@ -43,19 +40,18 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 		
 		internal static void Reload()
 		{
-			Instance.InitializeEditor();
+			Instance.InitializeEditor(); 
 
-			Instance.Root
-				.AddPaddingSpace(5, DesignUtils.k_Spacing * 2, 5, 0)
-				.AddChild
-				(
-					DesignUtils.row
-						.AddChild(DesignUtils.flexibleSpace)
-						.AddChild(Instance._loadFilesFromFolderButton)
-						.AddChild(DesignUtils.flexibleSpace)
-				)
-				.AddSpace(0, DesignUtils.k_Spacing * 2)
-				.AddChild(Instance._listView);
+			VisualElementExtensions.AddChild(Instance.Root
+					.AddPaddingSpace(5, ConstantVisualElements.Spacing * 2, 5, 0)
+					.AddChild
+					(
+						ConstantVisualElements.Row
+							.AddChild(ConstantVisualElements.FlexibleSpace)
+							.AddChild(Instance._loadFilesFromFolderButton)
+							.AddChild(ConstantVisualElements.FlexibleSpace)
+					)
+					.AddSpace(0, ConstantVisualElements.Spacing * 2), Instance._listView);
 		}
 		
 	    private void InitializeEditor()
@@ -64,7 +60,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 		    
 		    _loadFilesFromFolderButton = new Button()
 			    .SetLabelText("Find Scene Data Managers")
-			    .SetAccentColor(EditorSelectableColors.EditorUI.Amber)
+			    .SetAccentColor(GetSelectableColor.Default.Amber)
 			    .SetButtonStyle(ButtonStyle.Contained)
 			    .SetElementSize(ElementSize.Normal)
 			    .SetOnClick(Instance.FindAllSceneDataManager);
@@ -83,7 +79,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 		    {
 			    SceneDataManager sceneDataManager = _sceneDataManagerList[i];
 			    
-			    VisualElement raw = DesignUtils.column;
+			    VisualElement raw = ConstantVisualElements.Column;
 
 			    EnumField enumField = new EnumField("Scene Type", sceneDataManager.SceneType);
 			    enumField.RegisterValueChangedCallback(evt =>
@@ -91,13 +87,12 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 				    sceneDataManager.SceneType = (SceneType)evt.newValue;
 			    });
 
-			    Label label = new Label(sceneDataManager.Scene.name)
-				    .SetStyleUnityFont(EditorFonts.Ubuntu.Light)
-				    .SetStyleFontSize(12)
-				    .SetStyleUnityFontStyle(FontStyle.Bold);
+			    Label label = VisualElementExtensions.SetStyleUnityFontStyle(new Label(sceneDataManager.Scene.name)
+					    .SetStyleUnityFont(GetFont.Ubuntu.Light)
+					    .SetStyleFontSize(12), FontStyle.Bold);
 
 			    raw.Add(label);
-			    raw.AddSpace(0, DesignUtils.k_Spacing * 2);
+			    VisualElementExtensions.AddSpace(raw, 0, ConstantVisualElements.Spacing * 2);
 			    raw.Add(enumField);
 
 			    VisualElementListViewItem sceneManagerItem = new VisualElementListViewItem(raw, i, _listView)
@@ -119,10 +114,9 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 			    {
 				    SceneData sceneData = sceneDataManager.SceneDataStack.ElementList[j];
 					    
-				    Label sceneDataLabel = new Label(sceneData.Name)
-					    .SetStyleUnityFont(EditorFonts.Ubuntu.Light)
-					    .SetStyleFontSize(12)
-					    .SetStyleUnityFontStyle(FontStyle.Bold);
+				    Label sceneDataLabel = VisualElementExtensions.SetStyleUnityFontStyle(new Label(sceneData.Name)
+						    .SetStyleUnityFont(GetFont.Ubuntu.Light)
+						    .SetStyleFontSize(12), FontStyle.Bold);
 
 				    var index = j;
 				    VisualElementListViewItem sceneDataItem = new VisualElementListViewItem(sceneDataLabel, index, _listView)
@@ -141,7 +135,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 			    raw.Add(sceneDatasListView);
 			    
 			    listViewItems.Add(sceneManagerItem);
-			    listViewItems.Add(new VisualElement().SetName("Space").SetStyleSize(0, DesignUtils.k_Spacing * 2));
+			    listViewItems.Add(VisualElementExtensions.SetStyleSize(new VisualElement().SetName("Space"), 0, ConstantVisualElements.Spacing * 2));
 		    }
 
 		    _listView.AddListViewItems(listViewItems);

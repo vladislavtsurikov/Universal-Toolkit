@@ -1,8 +1,7 @@
-﻿using System;
-using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+﻿using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [MenuItem("Smooth")]
     public class SmoothFilter : MaskFilter 

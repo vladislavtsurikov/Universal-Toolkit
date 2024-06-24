@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
@@ -8,7 +7,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     {
         public InterfaceModel(string name = null)
         {
-            base.CustomDataType = Util.Interface;
+            base.CustomDataType = Constants.Interface;
             base.Name = name;
         }
         
@@ -25,14 +24,14 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         public override string ToString()
         {
             string result = base.ToString();
-            result += Util.NewLine + Indent + "{";
+            result += Constants.NewLine + Indent + "{";
 
             result += String.Join("", Properties);
             bool hasPropertiesAndMethods = Properties.Count > 0 && Methods.Count > 0;
-            result += hasPropertiesAndMethods ? Util.NewLine : "";
-            result += String.Join(Util.NewLine, Methods);
+            result += hasPropertiesAndMethods ? Constants.NewLine : "";
+            result += String.Join(Constants.NewLine, Methods);
 
-            result += Util.NewLine + Indent + "}";
+            result += Constants.NewLine + Indent + "}";
             result = result.Replace(AccessModifier.Public.ToTextLower() + " ", "");
             result = result.Replace("\r\n        {\r\n        }", ";");
             return result;

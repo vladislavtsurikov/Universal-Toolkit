@@ -19,7 +19,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Various LinQ extensions.

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 {
     public class SpawnVisualizerPixel
     {

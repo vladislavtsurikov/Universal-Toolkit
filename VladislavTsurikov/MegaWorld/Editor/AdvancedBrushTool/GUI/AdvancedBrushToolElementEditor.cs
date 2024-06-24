@@ -1,13 +1,13 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 
-namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool.GUI
+namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
     [DontDrawFoldout]
     [ElementEditor(typeof(AdvancedBrushToolSettings))]

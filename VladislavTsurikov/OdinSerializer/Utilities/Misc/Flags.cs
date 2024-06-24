@@ -18,7 +18,7 @@
 
 using System.Reflection;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// This class encapsulates common <see cref="BindingFlags"/> combinations.

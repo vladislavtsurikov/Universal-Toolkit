@@ -1,14 +1,14 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Camera;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.SceneSettings.Components.Camera
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.SceneSettings.Camera
 {
     [ElementEditor(typeof(TerrainObjectRendererCameraSettings))]
     public class TerrainObjectRendererCameraSettingsEditor : ReorderableListComponentEditor

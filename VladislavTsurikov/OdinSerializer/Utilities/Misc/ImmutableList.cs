@@ -21,7 +21,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Interface for immutable list.

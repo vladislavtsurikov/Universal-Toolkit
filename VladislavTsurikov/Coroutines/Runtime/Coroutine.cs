@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Reflection;
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 #if SCENE_MANAGER_ADDRESSABLES
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
@@ -13,10 +12,10 @@ namespace VladislavTsurikov.Coroutines.Runtime
 	public class Coroutine
 	{
 		public ICoroutineYield CurrentYield;
-        public IEnumerator Routine;
-        public bool Finished;
-        
-        public WeakReference Owner;
+		public bool Finished;
+		
+        public readonly IEnumerator Routine;
+        public readonly WeakReference Owner;
         
         internal Coroutine(IEnumerator routine)
         {
@@ -127,7 +126,7 @@ namespace VladislavTsurikov.Coroutines.Runtime
         {
 	        BindingFlags bindFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
 	        FieldInfo field = type.GetField(fieldName, bindFlags);
-	        return field.GetValue(instance);
+	        return field?.GetValue(instance);
         }
 
         public void Cancel()

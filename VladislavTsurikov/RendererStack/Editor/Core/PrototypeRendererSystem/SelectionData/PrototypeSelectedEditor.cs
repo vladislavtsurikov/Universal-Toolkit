@@ -3,12 +3,13 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Core.Runtime.IconStack;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.IconStack;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.SelectionData
 {
@@ -16,9 +17,9 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
     {
 		private readonly ClipboardPrototype _clipboardPrototype = new ClipboardPrototype();
 		private readonly IconStackEditor _iconStackEditor = new IconStackEditor(false);
-		private readonly Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData _selectionData;
+		private readonly Runtime.Core.PrototypeRendererSystem.SelectionData _selectionData;
 
-		public PrototypeSelectedEditor(Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData selectionData)
+		public PrototypeSelectedEditor(Runtime.Core.PrototypeRendererSystem.SelectionData selectionData)
 		{
 			_selectionData = selectionData;
 
@@ -53,16 +54,16 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
 
             if(prototypeObject != null)
             {
-                menu.AddItem(new GUIContent("Reveal in Project"), false, GUIUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(prototypeObject)));
+                menu.AddItem(new GUIContent("Reveal in Project"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => EditorGUIUtility.PingObject(prototypeObject)));
                 menu.AddSeparator ("");
             }
 
-            menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() =>  _selectionData.RemovePrototypes(_selectionData.SelectedData.SelectedProtoList)));
-			menu.AddItem(new GUIContent("Delete From All Scenes"), false, GUIUtility.ContextMenuCallback, new Action(() =>  _selectionData.RemovePrototypes(_selectionData.SelectedData.SelectedProtoList, true)));
+            menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() =>  _selectionData.RemovePrototypes(_selectionData.SelectedData.SelectedProtoList)));
+			menu.AddItem(new GUIContent("Delete From All Scenes"), false, ContextMenuUtility.ContextMenuCallback, new Action(() =>  _selectionData.RemovePrototypes(_selectionData.SelectedData.SelectedProtoList, true)));
 			
             menu.AddSeparator ("");
             
-            menu.AddItem(new GUIContent("Active"), proto.Active, GUIUtility.ContextMenuCallback, 
+            menu.AddItem(new GUIContent("Active"), proto.Active, ContextMenuUtility.ContextMenuCallback, 
 	            new Action(() => _selectionData.SelectedData.SelectedProtoList.ForEach (localProto => { localProto.Active = !localProto.Active;})));
 
             _clipboardPrototype.PrototypeMenu(menu, _selectionData.SelectedData);
@@ -71,7 +72,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
 			return menu;
         }
 
-		private void GroupMenu(GenericMenu menu, Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData selectionData)
+		private void GroupMenu(GenericMenu menu, Runtime.Core.PrototypeRendererSystem.SelectionData selectionData)
 		{
 			if(selectionData.GroupList.Count == 1)
 			{
@@ -86,12 +87,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
             {
                 Group group = selectionData.GroupList[i];
 
-				menu.AddItem(new GUIContent("Group/" + group.Name), selectedGroup == group, GUIUtility.ContextMenuCallback, new Action(() => 
+				menu.AddItem(new GUIContent("Group/" + group.Name), selectedGroup == group, ContextMenuUtility.ContextMenuCallback, new Action(() => 
 			    	ChangePrototypeGroup(group, selectionData)));
             }
 		}
 
-		private void ChangePrototypeGroup(Group group, Runtime.Core.PrototypeRendererSystem.SelectionDatas.SelectionData selectionData)
+		private void ChangePrototypeGroup(Group group, Runtime.Core.PrototypeRendererSystem.SelectionData selectionData)
 		{
 			Group selectedGroup = selectionData.SelectedData.GetLastGroup();
 

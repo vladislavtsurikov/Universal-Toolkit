@@ -5,9 +5,8 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
@@ -24,17 +23,17 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
             
 			if(selectedData.HasOneSelectedProto())
 			{
-				menu.AddItem(new GUIContent("Copy All Settings"), false, GUIUtility.ContextMenuCallback, new Action(() => _clipboardStack.Copy(GetStacks(selectedData.SelectedProtoList))));
+				menu.AddItem(new GUIContent("Copy All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _clipboardStack.Copy(GetStacks(selectedData.SelectedProtoList))));
 			}
 
             if(_clipboardStack.CopiedComponentList.Count != 0)
             {
-                menu.AddItem(new GUIContent("Paste All Settings"), false, GUIUtility.ContextMenuCallback, new Action(() => _clipboardStack.ClipboardAction(GetStacks(selectedData.SelectedProtoList), true)));
+                menu.AddItem(new GUIContent("Paste All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _clipboardStack.ClipboardAction(GetStacks(selectedData.SelectedProtoList), true)));
 
                 foreach (PrototypeComponent baseSettings in _clipboardStack.CopiedComponentList)
                 {
                     string name = baseSettings.GetType().GetAttribute<MenuItemAttribute>().Name;
-                    menu.AddItem(new GUIContent("Paste Settings/" + name), false, GUIUtility.ContextMenuCallback, new Action(() => _clipboardStack.ClipboardAction(GetStacks(selectedData.SelectedProtoList), baseSettings.GetType(), true)));	
+                    menu.AddItem(new GUIContent("Paste Settings/" + name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _clipboardStack.ClipboardAction(GetStacks(selectedData.SelectedProtoList), baseSettings.GetType(), true)));	
                 }
             }
         }

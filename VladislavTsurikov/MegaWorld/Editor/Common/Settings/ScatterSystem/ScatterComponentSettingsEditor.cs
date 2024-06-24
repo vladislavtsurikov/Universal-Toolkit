@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
@@ -15,7 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
         public override void OnEnable()
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)Target;
-            _stackEditor = new ReorderableListStackEditor<Scatter, ReorderableListComponentEditor>(new GUIContent("Scatter Operations"), scatterComponentSettings.Stack, true)
+            _stackEditor = new ReorderableListStackEditor<Scatter, ReorderableListComponentEditor>(new GUIContent("Scatter Operations"), scatterComponentSettings.ScatterStack, true)
             {
                 DisplayHeaderText = false
             };

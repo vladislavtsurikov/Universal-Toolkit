@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility
+namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public static class FindSector
     {

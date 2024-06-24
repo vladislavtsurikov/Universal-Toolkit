@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
@@ -9,7 +8,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     {
         public ClassModel(string name = null)
         {
-            base.CustomDataType = Util.Class;
+            base.CustomDataType = Constants.Class;
             base.Name = name;
             Constructors.Add(new Constructor(Name) { IsVisible = false, BracesInNewLine = false });
         }
@@ -18,7 +17,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public new BuiltInDataType? BuiltInDataType { get; }
 
-        public new string CustomDataType => Util.Class;
+        public new string CustomDataType => Constants.Class;
 
         public new string Name => base.Name;
 
@@ -30,8 +29,8 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public virtual Constructor DefaultConstructor
         {
-            get { return Constructors[0]; }
-            set { Constructors[0] = value; }
+            get => Constructors[0];
+            set => Constructors[0] = value;
         }
         
         public List<EnumModel> Enums { get; set; } = new List<EnumModel>();
@@ -52,34 +51,34 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
             result += BaseClass != null ? BaseClass : "";
             result += (BaseClass != null && Interfaces?.Count > 0) ? $", " : "";
             result += Interfaces?.Count > 0 ? string.Join(", ", Interfaces) : "";
-            result += Util.NewLine + Indent + "{";
+            result += Constants.NewLine + Indent + "{";
             
-            result += String.Join(Util.NewLine, Enums);
+            result += String.Join(Constants.NewLine, Enums);
             result += String.Join("", Fields);
 
             var visibleConstructors = Constructors.Where(a => a.IsVisible);
             bool hasFieldsBeforeConstructor = visibleConstructors.Any() && Fields.Any();
-            result += hasFieldsBeforeConstructor ? Util.NewLine : "";
-            result += String.Join(Util.NewLine, visibleConstructors);
+            result += hasFieldsBeforeConstructor ? Constants.NewLine : "";
+            result += String.Join(Constants.NewLine, visibleConstructors);
             bool hasMembersAfterConstructor = (visibleConstructors.Any() || Fields.Any()) && (Properties.Any() || Methods.Any());
-            result += hasMembersAfterConstructor ? Util.NewLine : "";
+            result += hasMembersAfterConstructor ? Constants.NewLine : "";
 
-            result += String.Join(HasPropertiesSpacing ? Util.NewLine : "", Properties);
+            result += String.Join(HasPropertiesSpacing ? Constants.NewLine : "", Properties);
 
-            result += hasMembersAfterConstructor ? Util.NewLine : "";
-            result += String.Join(Util.NewLine, Methods);
+            result += hasMembersAfterConstructor ? Constants.NewLine : "";
+            result += String.Join(Constants.NewLine, Methods);
 
             for (int i = 0; i < NestedClasses.Count; i++)
             {
                 NestedClasses[i].IncreaseIndentLevel();
                 
-                result += String.Join(Util.NewLine, NestedClasses[i]);
+                result += String.Join(Constants.NewLine, NestedClasses[i]);
                 
                 if(i != NestedClasses.Count - 1)
-                    result += Util.NewLine;
+                    result += Constants.NewLine;
             }
 
-            result += Util.NewLine + Indent + "}";
+            result += Constants.NewLine + Indent + "}";
             return result;
         }
 

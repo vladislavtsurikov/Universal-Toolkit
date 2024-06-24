@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.AttributeUtility.Runtime;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem

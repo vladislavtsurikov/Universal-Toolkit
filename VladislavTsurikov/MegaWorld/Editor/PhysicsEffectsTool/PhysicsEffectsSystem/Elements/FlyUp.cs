@@ -1,12 +1,12 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Fly Up")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Fly Up")]
 	public class FlyUp : PhysicsEffect
     {
         public float MaxForce => 200;

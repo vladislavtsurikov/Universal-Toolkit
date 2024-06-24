@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Utility;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Component;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 #if UNITY_EDITOR
 using UnityEditor;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ElementsSystem;

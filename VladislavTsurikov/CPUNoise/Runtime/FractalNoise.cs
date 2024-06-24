@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.CPUNoise.Runtime.Noises;
 
 namespace VladislavTsurikov.CPUNoise.Runtime
 {

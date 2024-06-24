@@ -1,6 +1,4 @@
-﻿using VladislavTsurikov.CsCodeGenerator.Runtime.Enums;
-
-namespace VladislavTsurikov.CsCodeGenerator.Runtime
+﻿namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public class Constructor : Method
     {
@@ -17,6 +15,6 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         public new BuiltInDataType? BuiltInDataType => base.BuiltInDataType;
         public new string CustomDataType => base.CustomDataType;
 
-        public override string Signature => AccessFormated + Name + Parameters.ToStringList();
+        public override string Signature => AccessFormatted + Name + Parameters.ToStringList();
     }
 }

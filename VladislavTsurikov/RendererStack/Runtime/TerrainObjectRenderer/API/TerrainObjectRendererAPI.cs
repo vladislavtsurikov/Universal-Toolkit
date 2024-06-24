@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-#if UNITY_EDITOR 
+#if UNITY_EDITOR
 using VladislavTsurikov.SceneDataSystem.Editor.Utility;
 #endif
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
     public static class TerrainObjectRendererAPI 
     {

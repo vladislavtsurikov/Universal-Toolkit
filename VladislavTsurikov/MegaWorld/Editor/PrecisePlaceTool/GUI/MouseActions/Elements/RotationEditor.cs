@@ -1,16 +1,16 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions.Elements;
+using VladislavTsurikov.Math.Runtime;
+using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.Utility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI.MouseActions.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI.MouseActions
 {
     [ElementEditor(typeof(Rotation))]
     public class RotationEditor : IMGUIElementEditor

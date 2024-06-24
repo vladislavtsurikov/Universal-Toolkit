@@ -1,10 +1,10 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.Utility
 {

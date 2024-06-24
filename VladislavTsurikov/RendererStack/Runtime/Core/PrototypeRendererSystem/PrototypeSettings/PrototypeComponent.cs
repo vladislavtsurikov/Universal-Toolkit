@@ -1,16 +1,14 @@
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
-    public abstract class PrototypeComponent : ComponentStack.Runtime.Component
+    public abstract class PrototypeComponent : Component
     {
-        private Prototype _prototype;
-
-        public Prototype Prototype => _prototype;
+        public Prototype Prototype { get; private set; }
 
         protected override void SetupElement(object[] args = null)
         {
-            _prototype = (Prototype)args[0];
+            Prototype = (Prototype)args[0];
             SetupPrototypeComponent();
         }
 

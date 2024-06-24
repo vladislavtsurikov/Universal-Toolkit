@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using Object = UnityEngine.Object;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings
 {
     [MenuItem("Additional Data")]
     public class Quality : SceneComponent

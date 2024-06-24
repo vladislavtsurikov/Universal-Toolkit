@@ -5,8 +5,9 @@ using UnityEngine;
 using UnityEngine.Events;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 using DragAndDrop = UnityEditor.DragAndDrop;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
 {
@@ -204,11 +205,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
         {
             GenericMenu menu = new GenericMenu();
 
-			menu.AddItem(new GUIContent("Get Polaris Brushes"), false, GUIUtility.ContextMenuCallback, new Action(() => _target.GetPolarisBrushes()));
+			menu.AddItem(new GUIContent("Get Polaris Brushes"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _target.GetPolarisBrushes()));
 
 			menu.AddSeparator ("");
 
-			menu.AddItem(new GUIContent("Delete All"), false, GUIUtility.ContextMenuCallback, new Action(() => { _target.Masks.Clear(); }));
+			menu.AddItem(new GUIContent("Delete All"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => { _target.Masks.Clear(); }));
 
             return menu;
         }
@@ -217,7 +218,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
         {
             GenericMenu menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => _target.Masks.RemoveAt(selectedAlphaBrush)));
+            menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _target.Masks.RemoveAt(selectedAlphaBrush)));
 
             return menu;
         }

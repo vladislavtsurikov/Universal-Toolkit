@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.Coroutines.Runtime
 {

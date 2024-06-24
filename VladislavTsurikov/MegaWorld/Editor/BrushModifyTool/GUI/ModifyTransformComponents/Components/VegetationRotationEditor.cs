@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
-using VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements;
+using VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransformComponents.Components
+namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransformComponents
 {
     [ElementEditor(typeof(VegetationRotation))]
     public class VegetationRotationEditor : ReorderableListComponentEditor

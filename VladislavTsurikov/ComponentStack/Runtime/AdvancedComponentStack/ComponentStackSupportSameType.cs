@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {

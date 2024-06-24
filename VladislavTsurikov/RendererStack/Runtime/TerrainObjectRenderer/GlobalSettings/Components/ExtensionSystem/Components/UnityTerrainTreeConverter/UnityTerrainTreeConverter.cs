@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.UnityTerrainTreeConverter
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter
 {
     [MenuItem("Unity Terrain Tree Converter")]
     public class UnityTerrainTreeConverter : Extension

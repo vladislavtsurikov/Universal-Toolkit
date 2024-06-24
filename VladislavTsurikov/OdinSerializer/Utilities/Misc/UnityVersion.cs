@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Misc
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// Utility class indicating current Unity version.

@@ -1,7 +1,7 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Undo;
@@ -11,32 +11,33 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
     public static class SpawnPrototype 
     {
+#if RENDERER_STACK
         public static void SpawnTerrainObject(Group group, PrototypeTerrainObject proto, ExplodePhysicsToolSettings settings, RayHit rayHit, Vector3 positionSpawn, Vector3 centerPosition)
         {
-            Transform transform = new Transform(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
-            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, 1, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, 1, rayHit.Normal);
             
             TerrainObjectOnDisablePhysics onDisableSimulatedBodyAction = new TerrainObjectOnDisablePhysics(group, proto.RendererPrototype);
 
             PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
 
             TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
-                transform.Position, transform.Scale, transform.Rotation, new List<OnDisableSimulatedBodyAction>{onDisableSimulatedBodyAction});
+                instance.Position, instance.Scale, instance.Rotation, new List<OnDisableSimulatedBodyEvent>{onDisableSimulatedBodyAction});
                 
             group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
             
             if (!settings.SpawnFromOnePoint) 
             {
-                Vector3 normal = (transform.Position - centerPosition).normalized;
+                Vector3 normal = (instance.Position - centerPosition).normalized;
                 PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
             }
             else
@@ -46,24 +47,25 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
             
             Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObjectSimulatedBody(simulatedBody));
         }
+#endif
         
         public static void SpawnGameObject(Group group, PrototypeGameObject proto, ExplodePhysicsToolSettings settings, RayHit rayHit, Vector3 positionSpawn, Vector3 centerPosition)
         {
-            Transform transform = new Transform(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            Instance instance = new Instance(positionSpawn, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
             PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
-            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref transform, 1, rayHit.Normal);
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, 1, rayHit.Normal);
 
             PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
 
             SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
-                transform.Position, transform.Scale, transform.Rotation);
+                instance.Position, instance.Scale, instance.Rotation);
                 
             group.GetDefaultElement<ContainerForGameObjects>().ParentGameObject(simulatedBody.GameObject);
             
             if (!settings.SpawnFromOnePoint) 
             {
-                Vector3 normal = (transform.Position - centerPosition).normalized;
+                Vector3 normal = (instance.Position - centerPosition).normalized;
                 PhysicsUtility.ApplyForce(simulatedBody.Rigidbody, normal * settings.Force);
             }
             else

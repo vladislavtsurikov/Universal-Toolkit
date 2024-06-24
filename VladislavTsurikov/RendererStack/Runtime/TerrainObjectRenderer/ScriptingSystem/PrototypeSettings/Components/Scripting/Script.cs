@@ -1,11 +1,12 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting
 {
     [Serializable]
-    public abstract class Script : ComponentStack.Runtime.Component
+    public abstract class Script : Component
     {
         [NonSerialized]
         protected TerrainObjectInstance TerrainObjectInstance;

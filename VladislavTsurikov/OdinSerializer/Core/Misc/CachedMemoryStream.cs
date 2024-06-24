@@ -17,7 +17,7 @@
 //-----------------------------------------------------------------------
 
 using System.IO;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {

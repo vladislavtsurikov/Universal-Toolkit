@@ -1,30 +1,29 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ColliderSystem.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
-using VladislavTsurikov.MegaWorld.Editor.PinTool.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Undo.Editor.Actions.GameObject;
-using VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.UnityUtility.Runtime;
+using VladislavTsurikov.Utility.Runtime;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
+using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.PrototypeTerrainObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("Happy Artist/Pin")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Happy Artist/Pin")]
     [AddToolComponents(new []{typeof(PinToolSettings)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
@@ -180,7 +179,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                                 }
                                 else
                                 {
-                                    GameObjectCollider.Runtime.GameObjectCollider.RegisterGameObjectToCurrentScene(_placedObjectData.GameObject);
+                                    GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene(_placedObjectData.GameObject);
                                     Undo.Editor.Undo.RecordUndo(new CreatedGameObject(_placedObjectData.GameObject));
                                 }
                             }
@@ -199,9 +198,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                                 else
                                 {
                                     PrototypeTerrainObject proto = (PrototypeTerrainObject)_placedObjectData.Proto;
-                                    Transform transform = new Transform(_placedObjectData.GameObject);
+                                    Instance instance = new Instance(_placedObjectData.GameObject);
 
-                                    TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, transform.Position, transform.Scale, transform.Rotation);
+                                    TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale, instance.Rotation);
                                     Undo.Editor.Undo.RecordUndo(new CreatedTerrainObject(terrainObjectInstance));
 
                                     Object.DestroyImmediate(_placedObjectData.GameObject);
@@ -238,7 +237,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                 {
                     case KeyCode.F:
                         // F key - Frame camera on brush hit point
-                        if (GUIUtility.IsModifierDown(EventModifiers.None) && _currentRayHit != null)
+                        if (EventModifiersUtility.IsModifierDown(EventModifiers.None) && _currentRayHit != null)
                         {
                             SceneView.lastActiveSceneView.LookAt(_currentRayHit.Point, SceneView.lastActiveSceneView.rotation, 15);
                             e.Use();

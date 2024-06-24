@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Attributes;
 using VladislavTsurikov.SceneUtility.Runtime;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
     [MenuItem("Active Scene")]
     [SceneCollectionComponent]

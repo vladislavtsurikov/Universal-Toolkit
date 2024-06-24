@@ -1,14 +1,15 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
-using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation
 {
@@ -65,7 +66,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation
 
         private static void DrawInitialHandle(Vector3 position, Color color)
         {
-            VladislavTsurikov.Utility.Runtime.DrawHandles.HandleButton(0, position, color, color, 0.4f);
+            UnityUtility.Editor.DrawHandles.HandleButton(0, position, color, color, 0.4f);
         }
 
         private static Color GetCurrentColorFromFitness(Vector3 position, RayHit rayHit)
@@ -84,13 +85,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.Visualisation
                 Vector3 scale = ActiveObjectController.PlacedObjectData.GameObject.transform.localScale;
                 Quaternion rotation = ActiveObjectController.PlacedObjectData.GameObject.transform.rotation;
 
-                Transform transform = new Transform(position, scale, rotation);
+                Instance instance = new Instance(position, scale, rotation);
 
                 PlacedObjectPrototype proto = ActiveObjectController.PlacedObjectData.Proto;
 
                 OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-                if(!OverlapCheckSettings.RunOverlapCheck(ActiveObjectController.PlacedObjectData.Proto.GetType(), overlapCheckSettings, proto.Extents, transform))
+                if(!OverlapCheckSettings.RunOverlapCheck(ActiveObjectController.PlacedObjectData.Proto.GetType(), overlapCheckSettings, proto.Extents, instance))
                 {
                     return Color.red;
                 }

@@ -3,6 +3,7 @@ using UnityEditor;
 using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {

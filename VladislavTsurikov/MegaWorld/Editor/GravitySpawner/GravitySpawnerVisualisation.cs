@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
-using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
+using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;

@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 
-namespace VladislavTsurikov.Undo.Editor.Actions.TerrainObjectRenderer
+namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 {
     public class CreatedTerrainObject : UndoRecord
     {

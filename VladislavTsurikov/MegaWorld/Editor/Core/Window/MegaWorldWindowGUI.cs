@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings;
-using VladislavTsurikov.ShortcutCombo.Editor;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {

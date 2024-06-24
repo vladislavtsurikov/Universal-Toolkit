@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.CPUNoise.Runtime;
-using VladislavTsurikov.CPUNoise.Runtime.Noises;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
 {

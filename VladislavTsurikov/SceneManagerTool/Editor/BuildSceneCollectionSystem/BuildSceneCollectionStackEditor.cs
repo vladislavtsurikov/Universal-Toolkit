@@ -6,12 +6,13 @@ using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.Components;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 using Object = System.Object;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
@@ -52,11 +53,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
         {
             GenericMenu menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => {Stack.Remove(currentTabIndex);}));
+            menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => {Stack.Remove(currentTabIndex);}));
             
             menu.AddSeparator("");
             
-            menu.AddItem(new GUIContent("Active"), _buildSceneCollectionStack.ActiveBuildSceneCollection == Stack.ElementList[currentTabIndex], GUIUtility.ContextMenuCallback, new Action(() =>
+            menu.AddItem(new GUIContent("Active"), _buildSceneCollectionStack.ActiveBuildSceneCollection == Stack.ElementList[currentTabIndex], ContextMenuUtility.ContextMenuCallback, new Action(() =>
             {
                 BuildSceneCollectionStack buildSceneCollectionStack = (BuildSceneCollectionStack)Stack;
                 buildSceneCollectionStack.ActiveBuildSceneCollection = Stack.ElementList[currentTabIndex];

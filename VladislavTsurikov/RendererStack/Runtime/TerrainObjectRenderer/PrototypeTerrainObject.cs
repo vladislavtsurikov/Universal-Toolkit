@@ -1,15 +1,12 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime.IconStack.Attributes;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData.Utility;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
-using MeshUtility = VladislavTsurikov.Utility.Runtime.MeshUtility;
+using VladislavTsurikov.UnityUtility.Runtime;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
-#if UNITY_EDITOR
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
-#endif
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
@@ -44,7 +41,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             {
                 if (Prefab != null)
                 {
-                    return GUIUtility.GetPrefabPreviewTexture(Prefab);
+                    return TextureUtility.GetPrefabPreviewTexture(Prefab);
                 }
 
                 return null;
@@ -55,7 +52,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
         protected override void InitPrototype(Object obj)
         {
             Prefab = (GameObject)obj;
-            Bounds = MeshUtility.CalculateBoundsInstantiate(Prefab);      
+            Bounds = GameObjectUtility.CalculateBoundsInstantiate(Prefab);      
         }
 
         public override MeshRenderer[] GetMeshRenderers()

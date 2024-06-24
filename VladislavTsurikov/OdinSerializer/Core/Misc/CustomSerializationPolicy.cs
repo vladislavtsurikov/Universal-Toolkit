@@ -26,8 +26,6 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
     /// </summary>
     public class CustomSerializationPolicy : ISerializationPolicy
     {
-        private string id;
-        private bool allowNonSerializableTypes;
         private Func<MemberInfo, bool> shouldSerializeFunc;
 
         /// <summary>
@@ -51,8 +49,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
                 throw new ArgumentNullException("shouldSerializeFunc");
             }
 
-            this.id = id;
-            this.allowNonSerializableTypes = allowNonSerializableTypes;
+            this.ID = id;
+            this.AllowNonSerializableTypes = allowNonSerializableTypes;
             this.shouldSerializeFunc = shouldSerializeFunc;
         }
 
@@ -62,7 +60,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The identifier of the policy.
         /// </value>
-        public string ID { get { return this.id; } }
+        public string ID { get; }
 
         /// <summary>
         /// Gets a value indicating whether to allow non serializable types. (Types which are not decorated with <see cref="System.SerializableAttribute" />.)
@@ -70,7 +68,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// <c>true</c> if serializable types are allowed; otherwise, <c>false</c>.
         /// </value>
-        public bool AllowNonSerializableTypes { get { return this.allowNonSerializableTypes; } }
+        public bool AllowNonSerializableTypes { get; }
 
         /// <summary>
         /// Gets a value indicating whether a given <see cref="MemberInfo" /> should be serialized or not.

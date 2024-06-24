@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace VladislavTsurikov.ColorUtility.Runtime.Models
+namespace VladislavTsurikov.ColorUtility.Runtime
 {
     [Serializable]
     public struct RGB

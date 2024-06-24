@@ -1,4 +1,4 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings

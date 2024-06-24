@@ -1,4 +1,5 @@
 ﻿using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem
 {

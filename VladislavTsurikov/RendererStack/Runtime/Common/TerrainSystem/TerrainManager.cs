@@ -4,7 +4,6 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem.Attribute;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
@@ -170,7 +169,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         public void NewTerrainAction(SceneDataManager sceneDataManager)
         {
 #if UNITY_EDITOR
-            SceneDataStackUtility.Setup<GameObjectCollider.Runtime.GameObjectCollider>(true);
+            SceneDataStackUtility.Setup<GameObjectCollider.Editor.GameObjectCollider>(true);
 #endif
         }
         

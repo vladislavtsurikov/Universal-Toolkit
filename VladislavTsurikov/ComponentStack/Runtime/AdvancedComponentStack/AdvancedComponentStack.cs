@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack

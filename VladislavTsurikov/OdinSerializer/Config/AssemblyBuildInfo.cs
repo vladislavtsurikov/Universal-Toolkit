@@ -15,13 +15,11 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
+#if UNITY_EDITOR
 using System;
 using System.Linq;
 using UnityEditor;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-
-#if UNITY_EDITOR
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Config
 {

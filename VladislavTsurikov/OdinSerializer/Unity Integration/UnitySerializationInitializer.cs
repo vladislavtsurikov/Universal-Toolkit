@@ -28,9 +28,8 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
     public static class UnitySerializationInitializer
     {
         private static readonly object LOCK = new object();
-        private static bool initialized = false;
 
-        public static bool Initialized { get { return initialized; } }
+        public static bool Initialized { get; private set; } = false;
 
         public static RuntimePlatform CurrentPlatform { get; private set; }
         
@@ -39,11 +38,11 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
         /// </summary>
         public static void Initialize()
         {
-            if (!initialized)
+            if (!Initialized)
             {
                 lock (LOCK)
                 {
-                    if (!initialized)
+                    if (!Initialized)
                     {
                         try
                         {
@@ -77,7 +76,7 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
                         }
                         finally
                         {
-                            initialized = true;
+                            Initialized = true;
                         }
                     }
                 }

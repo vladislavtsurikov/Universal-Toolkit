@@ -1,11 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
     [MenuItem("Group")]
     public class Group : SceneType

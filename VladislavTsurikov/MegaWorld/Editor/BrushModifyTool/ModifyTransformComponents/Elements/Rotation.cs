@@ -1,8 +1,8 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using Transform = VladislavTsurikov.Core.Runtime.Transform;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents.Elements
+namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
     [MenuItem("Rotation")]
     public class Rotation : ModifyTransformComponent
@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
         public Vector3 ModifyRandomRotationValues = new Vector3(1, 1, 1);
         public Vector3 ModifyRotationValues = new Vector3(1, 1, 1);
 
-        public override void ModifyTransform(ref Transform spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void ModifyTransform(ref Instance spawnInfo, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
         {
             Vector3 modifyRotation = GetModifyRotation(modifyInfo);
 

@@ -2,13 +2,11 @@
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.TemplatesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem.Components;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem.Components;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
@@ -26,9 +24,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Templates
 			ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
 
 			#region Scatter Settings
-			scatterComponentSettings.Stack.Clear();
+			scatterComponentSettings.ScatterStack.Clear();
 
-            RandomGrid randomGrid = (RandomGrid)scatterComponentSettings.Stack.CreateIfMissingType(typeof(RandomGrid));
+            RandomGrid randomGrid = (RandomGrid)scatterComponentSettings.ScatterStack.CreateIfMissingType(typeof(RandomGrid));
             randomGrid.RandomisationType = RandomisationType.Square;
     		randomGrid.Vastness = 1;
     		randomGrid.GridStep = new Vector2(1.3f, 1.3f);
@@ -70,14 +68,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Templates
             OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
     		#region Transform Components
-    		transformComponentSettings.Stack.Clear();
+    		transformComponentSettings.TransformComponentStack.Clear();
 
-            Rotation rotation = (Rotation)transformComponentSettings.Stack.CreateIfMissingType(typeof(Rotation));
+            Rotation rotation = (Rotation)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Rotation));
     		rotation.RandomizeOrientationX = 100;
     		rotation.RandomizeOrientationY = 100;
     		rotation.RandomizeOrientationZ = 100;
 
-            Scale scale = (Scale)transformComponentSettings.Stack.CreateIfMissingType(typeof(Scale)); 
+            Scale scale = (Scale)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Scale)); 
 			scale.MinScale = new Vector3(0.8f, 0.8f, 0.8f);
     		scale.MaxScale = new Vector3(1.2f, 1.2f, 1.2f);
     		#endregion

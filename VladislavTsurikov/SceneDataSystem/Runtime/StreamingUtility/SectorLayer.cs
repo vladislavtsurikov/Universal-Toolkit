@@ -6,7 +6,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
 
 #if UNITY_EDITOR
 using VladislavTsurikov.SceneUtility.Editor;
@@ -20,16 +19,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
     [Serializable]
     public class SectorLayer 
     {
-        private SectorBVHTree _sectorBvhTree = new SectorBVHTree();
-        private ObjectBoundsBVHTree _objectBoundsBvhTree = new ObjectBoundsBVHTree();
-        
         public string Tag;
         
         [OdinSerialize] 
         public List<Sector> SectorList = new List<Sector>();
-        public SectorBVHTree SectorBvhTree => _sectorBvhTree;
-        public ObjectBoundsBVHTree ObjectBoundsBvhTree => _objectBoundsBvhTree;
-        
+        public SectorBVHTree SectorBvhTree { get; private set; } = new SectorBVHTree();
+
+        public ObjectBoundsBVHTree ObjectBoundsBvhTree { get; private set; } = new ObjectBoundsBVHTree();
+
         public SectorLayer(string tag)
         {
             Tag = tag;
@@ -38,8 +35,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         [OnDeserializing]
         private void Initialize()
         {
-            _sectorBvhTree = new SectorBVHTree();
-            _objectBoundsBvhTree = new ObjectBoundsBVHTree();
+            SectorBvhTree = new SectorBVHTree();
+            ObjectBoundsBvhTree = new ObjectBoundsBVHTree();
         }
         
         public void Setup()
@@ -48,8 +45,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             SectorList.RemoveAll(sector => sector == null || !sector.IsValid());
 #endif
             
-            _sectorBvhTree.Clear();
-            _objectBoundsBvhTree.Clear();
+            SectorBvhTree.Clear();
+            ObjectBoundsBvhTree.Clear();
 
             foreach (var sector in SectorList)
             {
@@ -79,7 +76,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 {
                     if (sector.SceneReference.SceneName == scene.name)
                     {
-                        sectorLayer._objectBoundsBvhTree.ChangeNodeSize(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
+                        sectorLayer.ObjectBoundsBvhTree.ChangeNodeSize(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
                     }
                 }
             }

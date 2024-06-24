@@ -1,13 +1,14 @@
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
     [MenuItem("Brush Settings")]
-    public class BrushSettings : ComponentStack.Runtime.Component
+    public class BrushSettings : Component
     {
         [OdinSerialize]
         private float _brushSpacing = 30; 

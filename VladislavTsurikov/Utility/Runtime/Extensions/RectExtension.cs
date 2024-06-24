@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace VladislavTsurikov.Utility.Runtime.Extensions
+namespace VladislavTsurikov.Utility.Runtime
 {
     public static class RectExtension
     {

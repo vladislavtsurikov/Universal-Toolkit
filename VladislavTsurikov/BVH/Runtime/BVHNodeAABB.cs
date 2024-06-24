@@ -1,26 +1,27 @@
-﻿using System;
-using UnityEngine;
-using VladislavTsurikov.Math.Runtime.PrimitiveMath;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+﻿using UnityEngine;
+using VladislavTsurikov.Math.Runtime;
 
 namespace VladislavTsurikov.BVH.Runtime
 {
-    [Serializable]
     public class BVHNodeAABB<TData> : BVHNode<TData>
         where TData : class
     {
-        [OdinSerialize]
         private Vector3 _min;
 
-        [OdinSerialize]
         private Vector3 _max;
 
-        public Vector3 Min { get => _min;
+        public Vector3 Min 
+        { 
+            get => _min;
             set => _min = value;
         }
-        public Vector3 Max { get => _max;
+        
+        public Vector3 Max 
+        { 
+            get => _max;
             set => _max = value;
         }
+        
         public override Vector3 Position
         {
             get => (_min + _max) * 0.5f;
@@ -49,8 +50,7 @@ namespace VladislavTsurikov.BVH.Runtime
 
         }
 
-        public BVHNodeAABB(TData data)
-            :base(data)
+        public BVHNodeAABB(TData data) :base(data)
         {
 
         }
@@ -78,13 +78,35 @@ namespace VladislavTsurikov.BVH.Runtime
             Vector3 aabbMin = aabbNode.Min;
             Vector3 aabbMax = aabbNode.Max;
 
-            if (_min.x > aabbMin.x) _min.x = aabbMin.x;
-            if (_min.y > aabbMin.y) _min.y = aabbMin.y;
-            if (_min.z > aabbMin.z) _min.z = aabbMin.z;
+            if (_min.x > aabbMin.x)
+            {
+                _min.x = aabbMin.x;
+            }
 
-            if (_max.x < aabbMax.x) _max.x = aabbMax.x;
-            if (_max.y < aabbMax.y) _max.y = aabbMax.y;
-            if (_max.z < aabbMax.z) _max.z = aabbMax.z;
+            if (_min.y > aabbMin.y)
+            {
+                _min.y = aabbMin.y;
+            }
+
+            if (_min.z > aabbMin.z)
+            {
+                _min.z = aabbMin.z;
+            }
+
+            if (_max.x < aabbMax.x)
+            {
+                _max.x = aabbMax.x;
+            }
+
+            if (_max.y < aabbMax.y)
+            {
+                _max.y = aabbMax.y;
+            }
+
+            if (_max.z < aabbMax.z)
+            {
+                _max.z = aabbMax.z;
+            }
         } 
     }
 }

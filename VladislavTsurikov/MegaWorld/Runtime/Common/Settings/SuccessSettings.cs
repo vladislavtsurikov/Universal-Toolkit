@@ -1,9 +1,10 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
 {
     [MenuItem("Success")]
-    public class SuccessSettings : ComponentStack.Runtime.Component
+    public class SuccessSettings : Component
     {
         public float SuccessValue = 100f;
     }

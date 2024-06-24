@@ -1,6 +1,7 @@
-﻿using System.Collections;
+﻿#if RENDERER_STACK
+using System.Collections;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
@@ -8,13 +9,12 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
 {
-    public class TerrainObjectOnDisablePhysics : OnDisableSimulatedBodyAction
+    public class TerrainObjectOnDisablePhysics : OnDisableSimulatedBodyEvent
     {
         protected readonly Group _group;
         protected readonly PrototypeTerrainObject _proto;
@@ -92,3 +92,4 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
         }
     }
 }
+#endif

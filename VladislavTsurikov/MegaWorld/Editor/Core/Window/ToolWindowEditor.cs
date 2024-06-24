@@ -6,6 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
@@ -15,11 +16,12 @@ using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceController;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Attributes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
@@ -72,9 +74,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             }
 
 #if !RENDERER_STACK
-			if(BasicData.SelectedVariables.HasOneSelectedGroup())
+			if(SelectionData.SelectedData.HasOneSelectedGroup())
             {
-                if(BasicData.SelectedVariables.SelectedGroup.PrototypeType == typeof(PrototypeTerrainObject))
+                if(SelectionData.SelectedData.SelectedGroup.PrototypeType == typeof(PrototypeTerrainObject))
 				{
 					CustomEditorGUILayout.HelpBox("Terrain Object Renderer is a free hyper optimization tool that is by far the best alternative to Unity Terrain Tree."); 
 

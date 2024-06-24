@@ -1,8 +1,7 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
-using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Attributes;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
     [MenuItem("Scene Behavior")]
     [SceneComponent]

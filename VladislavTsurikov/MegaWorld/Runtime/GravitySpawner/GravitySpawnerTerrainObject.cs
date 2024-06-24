@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+﻿#if RENDERER_STACK
+using UnityEngine;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
@@ -36,3 +37,4 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
         }
     }
 }
+#endif

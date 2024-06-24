@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddCameraTemporaryComponentsAttribute : Attribute

@@ -1,21 +1,21 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.UnityTerrainTreeConverter
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter
 {
-	[ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.UnityTerrainTreeConverter.UnityTerrainTreeConverter))]
+	[ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter.UnityTerrainTreeConverter))]
 	[IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes.ContextMenu("Converter/UnityTerrainTree Converter")]
     public class UnityTerrainTreeConverterEditor : ReorderableListComponentEditor
     {
-        public Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.UnityTerrainTreeConverter.UnityTerrainTreeConverter UnityTerrainTreeConverter;
+        public Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter.UnityTerrainTreeConverter UnityTerrainTreeConverter;
 
         public override void OnEnable()
         {
-            UnityTerrainTreeConverter = (Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.UnityTerrainTreeConverter.UnityTerrainTreeConverter)Target;
+            UnityTerrainTreeConverter = (Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter.UnityTerrainTreeConverter)Target;
         }
 
         public override void OnGUI(Rect rect, int index)

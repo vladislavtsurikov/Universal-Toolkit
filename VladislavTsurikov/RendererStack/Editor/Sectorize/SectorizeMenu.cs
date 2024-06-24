@@ -4,7 +4,8 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
+using VladislavTsurikov.UnityUtility.Editor;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 {
@@ -14,10 +15,10 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
         {
             Runtime.Sectorize.Sectorize renderer = (Runtime.Sectorize.Sectorize)customRenderer;
 
-            menu.AddItem(new GUIContent("Debug/All Cells"), renderer.DebugAllCells, GUIUtility.ContextMenuCallback, new Action(() => 
+            menu.AddItem(new GUIContent("Debug/All Cells"), renderer.DebugAllCells, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                 renderer.DebugAllCells = !renderer.DebugAllCells));
             
-            menu.AddItem(new GUIContent("Debug/Visible Cells"), renderer.DebugVisibleCells, GUIUtility.ContextMenuCallback, new Action(() => 
+            menu.AddItem(new GUIContent("Debug/Visible Cells"), renderer.DebugVisibleCells, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                 renderer.DebugVisibleCells = !renderer.DebugVisibleCells));
         }
     }

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.Core.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 {

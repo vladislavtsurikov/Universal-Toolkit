@@ -2,10 +2,8 @@
 using UnityEngine;
 using VladislavTsurikov.BVH.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.Math.Runtime.PrimitiveMath;
-using VladislavTsurikov.Utility.Runtime.Extensions;
 
-namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
+namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class BVHObjectTree<T> where T: ColliderObject
     {
@@ -14,8 +12,11 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
         public List<T> FindAllInstance(List<object> pathDatas = null)
         {
             List<BVHNode<T>> overlappedNodes = Tree.FindAllLeafNode();
-            if (overlappedNodes.Count == 0) return new List<T>();
-            
+            if (overlappedNodes.Count == 0)
+            {
+                return new List<T>();
+            }
+
             var overlappedObjects = new List<T>();
 
             foreach (var node in overlappedNodes)
@@ -30,19 +31,26 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
         public List<T> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool checkOBBIntersection = false, List<object> pathDatas = null)
         {
             List<BVHNode<T>> overlappedNodes = Tree.OverlapBox(boxCenter, boxSize, boxRotation);
-            if (overlappedNodes.Count == 0) return new List<T>();
-            
+            if (overlappedNodes.Count == 0)
+            {
+                return new List<T>();
+            }
+
             var overlappedObjects = new List<T>();
 
             foreach(var node in overlappedNodes)
             {
                 if(!node.Data.IsValid())
+                {
                     continue;
+                }
 
                 if (objectFilter != null)
                 {
                     if(!objectFilter.Filter(node.Data))
+                    {
                         continue;
+                    }
                 }
                 
                 if (checkOBBIntersection)
@@ -71,8 +79,11 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
         public List<T> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool checkOBBIntersection = false, List<object> pathDatas = null)
         {
             var overlappedNodes = Tree.OverlapSphere(sphereCenter, sphereRadius);
-            if (overlappedNodes.Count == 0) return new List<T>();
-            
+            if (overlappedNodes.Count == 0)
+            {
+                return new List<T>();
+            }
+
             float radiusSqr = sphereRadius * sphereRadius;
             var overlappedObjects = new List<T>();
 
@@ -129,7 +140,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime.Scene
         public List<RayHit> RaycastAll(Ray ray, ObjectFilter objectFilter, List<object> pathDatas = null)
         {
             var nodeHits = Tree.RaycastAll(ray, false);
-            if (nodeHits.Count == 0) return new List<RayHit>();
+            if (nodeHits.Count == 0)
+            {
+                return new List<RayHit>();
+            }
 
             List<RayHit> sortedObjectHits = new List<RayHit>(20);
             foreach (var hit in nodeHits)

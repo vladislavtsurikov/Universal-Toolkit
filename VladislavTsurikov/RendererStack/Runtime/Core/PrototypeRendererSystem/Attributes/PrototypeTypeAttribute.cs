@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Attributes
+namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class PrototypeTypeAttribute : Attribute

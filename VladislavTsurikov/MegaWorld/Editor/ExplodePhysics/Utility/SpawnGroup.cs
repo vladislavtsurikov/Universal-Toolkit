@@ -1,14 +1,14 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
-using VladislavTsurikov.Core.Runtime.Utility;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
+namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
     public static class SpawnGroup
     {
@@ -36,6 +36,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
             RandomUtility.ChangeRandomSeed();
         }
         
+#if RENDERER_STACK
         public static void SpawnTerrainObject(Group group, RayHit rayHit)
         {
             ExplodePhysicsToolSettings settings = (ExplodePhysicsToolSettings)ToolsComponentStack.GetElement(typeof(ExplodePhysicsTool), typeof(ExplodePhysicsToolSettings));
@@ -59,6 +60,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics.Utility
             
             RandomUtility.ChangeRandomSeed();
         }
+#endif
     }
 }
 #endif

@@ -2,12 +2,12 @@
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.RenderModes.GPUInstancedIndirect;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 #if BillboardSystem
 using VladislavTsurikov.InstantRenderer.LargeObjectRenderer.Scripts.RendererData.BillboardSystem;
 #endif
@@ -72,10 +72,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager
                     float maxDistance = Utility.Utility.GetMaxDistance(rendererType, cameraManager.VirtualCameraList[cameraIndex], distanceCulling);
 
 #if BillboardSystem
-                    RenderImposterCells.Render(prototypesPackage, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
-#else
-                    _gpuInstancedIndirectRenderer.Render(selectionData, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
+                    RenderImposterCells.Render(selectionData, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
 #endif
+                    
+                    _gpuInstancedIndirectRenderer.Render(selectionData, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
                 }
             }
             

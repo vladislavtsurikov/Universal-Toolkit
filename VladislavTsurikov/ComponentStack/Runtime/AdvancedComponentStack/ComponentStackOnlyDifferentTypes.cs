@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {

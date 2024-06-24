@@ -23,8 +23,7 @@ using System.Linq;
 using System.Reflection;
 using VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport;
 using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {

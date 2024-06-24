@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ColliderSystem.Runtime.Scene;
+using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
@@ -24,13 +24,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             
-            scatterComponentSettings.Stack.SetWaitingNextFrame(displayProgressBar
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(displayProgressBar
                 ? new DefaultWaitingNextFrame(0.2f)
                 : null);
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
-            yield return scatterComponentSettings.Stack.Samples(boxArea, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
                 if(rayHit != null)
@@ -57,18 +57,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
             });
         }
         
+#if RENDERER_STACK
         public static IEnumerator SpawnTerrainObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {            
-#if RENDERER_STACK
+
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             
-            scatterComponentSettings.Stack.SetWaitingNextFrame(displayProgressBar
+            scatterComponentSettings.ScatterStack.SetWaitingNextFrame(displayProgressBar
                 ? new DefaultWaitingNextFrame(0.2f)
                 : null);
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
-            yield return scatterComponentSettings.Stack.Samples(boxArea, sample =>
+            yield return scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
                 if(rayHit != null)
@@ -93,8 +94,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                     }
                 }
             });
-#endif
         }
+#endif
 
         public static IEnumerator SpawnTerrainDetails(Group group, IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {

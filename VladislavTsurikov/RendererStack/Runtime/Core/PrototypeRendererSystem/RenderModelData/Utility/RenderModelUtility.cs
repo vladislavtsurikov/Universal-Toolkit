@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
+using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Console;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.SelectionDatas;
-using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.RenderModes.GPUInstancedIndirect.GPUISupport;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData.Utility
 {
@@ -72,7 +72,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.R
                 AddLod(prototype, renderModel, meshRenderer);
             }
 
-            renderModel.BoundingSphereRadius = MeshUtility.CalculateBoundsInstantiate(renderModel.Prefab).extents.magnitude;
+            renderModel.BoundingSphereRadius = GameObjectUtility.CalculateBoundsInstantiate(renderModel.Prefab).extents.magnitude;
 
             return renderModel;
         }

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ObjectPool.Runtime;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem
 {

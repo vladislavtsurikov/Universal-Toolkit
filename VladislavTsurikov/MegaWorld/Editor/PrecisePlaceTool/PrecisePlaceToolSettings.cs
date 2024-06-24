@@ -1,14 +1,15 @@
 ﻿#if UNITY_EDITOR
 using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     [Serializable]
     [MenuItem("Precise Place Tool Settings")]
-    public class PrecisePlaceToolSettings : ComponentStack.Runtime.Component
+    public class PrecisePlaceToolSettings : Component
     {
         public MouseActionStack MouseActionStack = new MouseActionStack();
 

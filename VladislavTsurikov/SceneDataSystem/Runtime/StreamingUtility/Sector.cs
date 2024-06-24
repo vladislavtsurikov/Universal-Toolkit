@@ -7,9 +7,8 @@ using UnityEngine.SceneManagement;
 using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility;
 using VladislavTsurikov.SceneUtility.Runtime;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {

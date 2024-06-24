@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
-namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.Components
+namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
     [MenuItem("User Data")]
     public class UserData : SettingsComponent

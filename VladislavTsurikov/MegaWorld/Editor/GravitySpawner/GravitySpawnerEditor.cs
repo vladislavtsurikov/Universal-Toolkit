@@ -5,7 +5,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Editor.TextureStamperTool;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
@@ -13,7 +13,7 @@ using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 {
-	[ComponentStack.Runtime.Attributes.MenuItem("Gravity Spawner")]
+	[ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Gravity Spawner")]
     [CustomEditor(typeof(Runtime.GravitySpawner.GravitySpawner))]
 	public sealed class GravitySpawnerEditor : MonoBehaviourToolEditor
     {

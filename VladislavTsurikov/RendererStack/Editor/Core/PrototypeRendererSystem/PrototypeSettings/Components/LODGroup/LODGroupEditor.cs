@@ -1,19 +1,19 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 
-namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup
+namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup
 {
-	[ElementEditor(typeof(Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup))]
+	[ElementEditor(typeof(Runtime.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup))]
     public class LODGroupEditor : PrototypeComponentEditor
     {
-		private Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup _lodGroup;
+		private Runtime.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup _lodGroup;
 
 		public override void OnEnable()
 		{
-			_lodGroup = (Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup)Target;
+			_lodGroup = (Runtime.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup)Target;
 		}
 
 		public override void OnGUI(Rect rect, int index)
@@ -54,14 +54,14 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
 			_lodGroup.LODBias = CustomEditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("LOD Bias"), _lodGroup.LODBias, 0.1f, 5f);
 			rect.y += CustomEditorGUI.SingleLineHeight;
 			
-			Lodgui.DrawLODSettingsStack(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), RendererType, Prototype, Prototype.RenderModel);
-			rect.y += CustomEditorGUI.SingleLineHeight * 2;
-
-			if(QualitySettings.lodBias != 1)
-			{
-				EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),"Active QualitySettings.lodBias is " + QualitySettings.lodBias.ToString("F2") + ". Distances are adjusted accordingly.", MessageType.Warning);
-				rect.y += CustomEditorGUI.SingleLineHeight;
-			}
+			// LODEditorUtility.DrawLODSettingsStack(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), RendererType, Prototype, Prototype.RenderModel);
+			// rect.y += CustomEditorGUI.SingleLineHeight * 2;
+			//
+			// if(QualitySettings.lodBias != 1)
+			// {
+			// 	EditorGUI.HelpBox(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),"Active QualitySettings.lodBias is " + QualitySettings.lodBias.ToString("F2") + ". Distances are adjusted accordingly.", MessageType.Warning);
+			// 	rect.y += CustomEditorGUI.SingleLineHeight;
+			// }
 		}
 
 		public override float GetElementHeight(int index)
@@ -92,12 +92,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
 			height += CustomEditorGUI.SingleLineHeight;
 			height += CustomEditorGUI.SingleLineHeight;
 			
-			height += CustomEditorGUI.SingleLineHeight * 2;
-			
-			if(QualitySettings.lodBias != 1)
-			{
-				height += CustomEditorGUI.SingleLineHeight;
-			}
+			// height += CustomEditorGUI.SingleLineHeight * 2;
+			//
+			// if(QualitySettings.lodBias != 1)
+			// {
+			// 	height += CustomEditorGUI.SingleLineHeight;
+			// }
 
 			return height;
 		}

@@ -1,21 +1,21 @@
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 
-namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.SnapToObject
+namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject
 {
-    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.SnapToObject.SnapToObject))]
+    [ElementEditor(typeof(Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject.SnapToObject))]
     public class SnapToObjectEditor : ReorderableListComponentEditor
     {
-        private Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.SnapToObject.SnapToObject _snapToObject;
+        private Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject.SnapToObject _snapToObject;
         private bool _selectAdvancedSettingsFoldout = true;
 
         public override void OnEnable()
         {
-            _snapToObject = (Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.SnapToObject.SnapToObject)Target;
+            _snapToObject = (Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject.SnapToObject)Target;
         }
         
         public override void OnGUI(Rect rect, int index)

@@ -1,5 +1,5 @@
-﻿#if UNITY_EDITOR 
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+﻿#if UNITY_EDITOR
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 

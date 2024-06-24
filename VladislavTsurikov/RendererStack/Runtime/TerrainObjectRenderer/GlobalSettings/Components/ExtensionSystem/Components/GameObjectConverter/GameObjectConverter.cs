@@ -1,15 +1,14 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.API;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData.ColliderSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-using GameObjectUtility = VladislavTsurikov.Utility.Runtime.GameObjectUtility;
+using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem.Components.GameObjectConverter
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter
 {
-    [ComponentStack.Runtime.Attributes.MenuItem("GameObject Converter")]
+    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("GameObject Converter")]
     public class GameObjectConverter : Extension
     {
 #if UNITY_EDITOR

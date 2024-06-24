@@ -6,17 +6,17 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.TerrainTools;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
-using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 #if UNITY_2021_2_OR_NEWER
 #else
 using UnityEngine.Experimental.TerrainAPI;
 #endif
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Components 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
     [MenuItem("Textures")]

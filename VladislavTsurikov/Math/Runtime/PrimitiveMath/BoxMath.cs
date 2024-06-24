@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace VladislavTsurikov.Math.Runtime.PrimitiveMath
+namespace VladislavTsurikov.Math.Runtime
 {
     public enum BoxCorner
     {

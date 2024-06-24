@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
-using VladislavTsurikov.Utility.Runtime.Extensions;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.SceneUtility.Editor
 {

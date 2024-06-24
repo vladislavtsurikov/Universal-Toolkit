@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Editor.Attributes;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings.Components;
+using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 
-namespace VladislavTsurikov.RendererStack.Editor.Common.GlobalSettings.Components
+namespace VladislavTsurikov.RendererStack.Editor.Common.GlobalSettings
 {
 	[ElementEditor(typeof(Quality))]
     public class QualityEditor : IMGUIElementEditor

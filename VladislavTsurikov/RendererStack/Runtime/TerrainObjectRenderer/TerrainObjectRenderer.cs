@@ -1,30 +1,29 @@
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
-using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings.Components;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core;
-using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings.Attributes;
+using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraSettingsSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Components.Camera.CameraTemporarySettingsSystem.Components.ObjectCameraRender;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.Components.ExtensionSystem;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect.ComputeShaderKernelProperties;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.RendererData;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Components.Camera;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Components.Scripting;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.SceneSettings.Components.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
+using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.Attributes;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings.Camera;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.SceneSettings.Camera;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
-using LODGroup = VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.Components.LODGroup;
+using LODGroup = VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings.LODGroup;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
@@ -35,7 +34,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
     [AddCameraTemporaryComponents(new[] { typeof(ObjectCameraRender), typeof(CameraCollidersController)})]
     [AddCameraComponents(new[] { typeof(TerrainObjectRendererCameraSettings)})]
     [AddSceneComponents(new[] { typeof(CameraManager), typeof(Quality) })]
-    [AddGlobalComponents(new[] { typeof(Common.GlobalSettings.Components.Quality), typeof(ExtensionSystem) })]
+    [AddGlobalComponents(new[] { typeof(Common.GlobalSettings.Quality), typeof(ExtensionSystem) })]
     [AddPrototypeComponents(new[] { typeof(LODGroup), typeof(Shadow), typeof(DistanceCulling), typeof(FrustumCulling), typeof(Colliders), typeof(Scripting) })]
     public partial class TerrainObjectRenderer : PrototypeRenderer
     {

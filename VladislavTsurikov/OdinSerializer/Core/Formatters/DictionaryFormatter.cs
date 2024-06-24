@@ -24,7 +24,7 @@ using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
 using VladislavTsurikov.OdinSerializer.Core.Formatters;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 [assembly: RegisterFormatter(typeof(DictionaryFormatter<,>), weakFallback: typeof(WeakDictionaryFormatter))]
 

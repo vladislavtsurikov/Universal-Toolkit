@@ -1,6 +1,6 @@
 using VladislavTsurikov.Math.Runtime;
 
-namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility.Utility
+namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public static class SceneObjectsBoundsUtility
     {

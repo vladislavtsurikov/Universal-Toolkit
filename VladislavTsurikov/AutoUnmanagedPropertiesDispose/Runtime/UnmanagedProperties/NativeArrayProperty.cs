@@ -1,6 +1,6 @@
 using Unity.Collections;
 
-namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime.UnmanagedProperties
+namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 {
     public class NativeArrayProperty<T> : AutoDisposeProperty where T : unmanaged
     {

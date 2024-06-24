@@ -6,7 +6,7 @@ using VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn.Actions;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool;

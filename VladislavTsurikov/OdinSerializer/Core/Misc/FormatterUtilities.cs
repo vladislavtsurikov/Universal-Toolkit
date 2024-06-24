@@ -23,8 +23,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Utilities.Extensions;
-using VladislavTsurikov.OdinSerializer.Utilities.Misc;
+using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.OdinSerializer.Core.Misc
 {

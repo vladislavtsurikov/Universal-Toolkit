@@ -18,7 +18,7 @@
 
 using System.IO;
 
-namespace VladislavTsurikov.OdinSerializer.Utilities.Extensions
+namespace VladislavTsurikov.OdinSerializer.Utilities
 {
     /// <summary>
     /// DirectoryInfo method extensions.

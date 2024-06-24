@@ -4,14 +4,15 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Attributes;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
+using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.Utility.Runtime;
-using GUIUtility = VladislavTsurikov.Utility.Runtime.GUIUtility;
 using Object = System.Object;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
@@ -104,13 +105,13 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
         {
             GenericMenu menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Delete"), false, GUIUtility.ContextMenuCallback, new Action(() => {Stack.Remove(currentTabIndex);}));
+            menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => {Stack.Remove(currentTabIndex);}));
             
             menu.AddSeparator ("");
             
-            menu.AddItem(new GUIContent("Refresh"), false, GUIUtility.ContextMenuCallback, new Action(() => {RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);}));
+            menu.AddItem(new GUIContent("Refresh"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => {RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);}));
             
-            menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, GUIUtility.ContextMenuCallback, new Action(() =>
+            menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, ContextMenuUtility.ContextMenuCallback, new Action(() =>
             {
                 Stack.ElementList[currentTabIndex].Active = !Stack.ElementList[currentTabIndex].Active;
             }));
@@ -123,7 +124,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
                 editor.GetRendererMenu().ShowGenericMenu(menu, editor.CustomRendererTarget);
             }
             
-            menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, GUIUtility.ContextMenuCallback, new Action(() =>
+            menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, ContextMenuUtility.ContextMenuCallback, new Action(() =>
             {
                 Stack.ElementList[currentTabIndex].Active = !Stack.ElementList[currentTabIndex].Active;
             }));
@@ -132,7 +133,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             {
                 menu.AddSeparator ("");
                 
-                menu.AddItem(new GUIContent("Global Settings/Editor Play Mode Simulation"), RendererStackManager.Instance.EditorPlayModeSimulation, GUIUtility.ContextMenuCallback, new Action(() =>
+                menu.AddItem(new GUIContent("Global Settings/Editor Play Mode Simulation"), RendererStackManager.Instance.EditorPlayModeSimulation, ContextMenuUtility.ContextMenuCallback, new Action(() =>
                 {
                     RendererStackManager.Instance.EditorPlayModeSimulation = !RendererStackManager.Instance.EditorPlayModeSimulation;
                 }));
