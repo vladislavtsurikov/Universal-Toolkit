@@ -8,13 +8,12 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.Utility.Runtime;
 using GUIUtility = UnityEngine.GUIUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
 {
 #if UNITY_EDITOR
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Happy Artist/Edit")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Happy Artist/Edit")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]

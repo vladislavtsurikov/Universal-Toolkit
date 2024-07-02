@@ -1,5 +1,4 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
@@ -12,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings
         MaskFilter
     }
     
-    [MenuItem("Filter Settings")]
+    [Name("Filter Settings")]
     public class FilterSettings : Component
     {
         public FilterType FilterType = FilterType.MaskFilter;

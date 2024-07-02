@@ -10,7 +10,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings
 {
     [Serializable]
-    [MenuItem("Simple Filter Settings")]
+    [Name("Simple Filter Settings")]
     public class SimpleFilter : Component
     {
         [SerializeField]

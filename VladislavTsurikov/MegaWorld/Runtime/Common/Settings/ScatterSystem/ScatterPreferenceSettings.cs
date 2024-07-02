@@ -3,7 +3,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
-    [MenuItem("Scatter")]
+    [Name("Scatter")]
     public class ScatterPreferenceSettings : PreferenceSettings
     {
         public int MaxChecks = 100;

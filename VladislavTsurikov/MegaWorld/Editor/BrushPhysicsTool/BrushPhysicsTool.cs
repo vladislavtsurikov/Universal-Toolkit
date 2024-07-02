@@ -1,9 +1,8 @@
 ﻿#if UNITY_EDITOR
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -20,13 +19,13 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {
-    [MenuItem("PhysX Painter/Brush Physics")]
+    [Name("PhysX Painter/Brush Physics")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]
@@ -70,7 +69,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 
                 if (area.RayHit != null)
                 {
-                    CoroutineRunner.StartCoroutine(PaintGroup(group, area));
+                    PaintGroup(group, area).Forget();
                 }
             }
         }
@@ -87,7 +86,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 
                     if (area.RayHit != null)
                     {
-                        CoroutineRunner.StartCoroutine(PaintGroup(group, area));
+                        PaintGroup(group, area).Forget();
                     }
                 }
             }
@@ -99,29 +98,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             BrushPhysicsToolVisualisation.Draw(area);
         }
         
-        private IEnumerator PaintGroup(Group group, BoxArea area)
+        private async UniTask PaintGroup(Group group, BoxArea area)
         {
-            ScriptingSystem.SetColliders(new Sphere(area.Center, area.Size.x / 2 * 5), area);
-            
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
-                yield return SpawnGroup.SpawnGameObject(group, area);
+                await SpawnGroup.SpawnGameObject(group, area);
             }
 #if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                yield return SpawnGroup.SpawnTerrainObject(group, area);
+                await SpawnGroup.SpawnTerrainObject(group, area);
             }
 #endif
-            
-            yield return new YieldCustom(IsDone);
-            
-            bool IsDone()
-            {
-                return SimulatedBodyStack.Count == 0;
-            }
-            
-            ScriptingSystem.RemoveColliders(area);
         }
     }
 }

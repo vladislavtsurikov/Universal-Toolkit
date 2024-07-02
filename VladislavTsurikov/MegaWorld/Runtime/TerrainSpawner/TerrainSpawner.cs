@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Runtime.Serialization;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
@@ -31,7 +32,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 {
     [ExecuteInEditMode]
-    [MenuItem("Terrain Spawner")]
+    [Name("Terrain Spawner")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)})]
     [AddMonoBehaviourComponents(new[]{typeof(Area), typeof(StamperControllerSettings)})]
@@ -109,20 +110,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn(bool displayProgressBar)
+        protected override async UniTask Spawn(CancellationToken token, bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
             
             for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
             {
-                if (IsCancelSpawn)
-                {
-                    break;
-                }
+                token.ThrowIfCancellationRequested();
 #if UNITY_EDITOR
-                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name,
-                    completedTypes / (float)maxTypes);
+                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name);
 #endif
 
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[typeIndex].PrototypeType));
@@ -134,16 +131,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 
                 BoxArea boxArea = Area.GetAreaVariables(rayHit);
 
-                yield return SpawnGroup(Data.GroupList[typeIndex], boxArea, displayProgressBar);
+                await SpawnGroup(token, Data.GroupList[typeIndex], boxArea, displayProgressBar);
                 
                 completedTypes++;
                 SpawnProgress = completedTypes / (float)maxTypes;
             }
-
-            SpawnProgress = completedTypes / (float)maxTypes;
         }
 
-        private IEnumerator SpawnGroup(Group group, BoxArea boxArea, bool displayProgressBar)
+        private async UniTask SpawnGroup(CancellationToken token, Group group, BoxArea boxArea, bool displayProgressBar)
         {
             if(group.HasAllActivePrototypes())
             {
@@ -152,7 +147,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnGameObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
+                    await Utility.SpawnGroup.SpawnGameObject(token, group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
 #if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
@@ -160,12 +155,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnTerrainObject(group, _terrainsMaskManager, boxArea, displayProgressBar);
+                    await Utility.SpawnGroup.SpawnTerrainObject(token, group, _terrainsMaskManager, boxArea, displayProgressBar);
                 }
 #endif
                 else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
-                    yield return Utility.SpawnGroup.SpawnTerrainDetails(group, group.PrototypeList, _terrainsMaskManager, boxArea);
+                    await Utility.SpawnGroup.SpawnTerrainDetails(token, group, group.PrototypeList, _terrainsMaskManager, boxArea);
                 }
             }
             

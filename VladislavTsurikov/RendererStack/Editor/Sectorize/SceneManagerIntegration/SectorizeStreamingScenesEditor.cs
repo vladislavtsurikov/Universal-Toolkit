@@ -5,16 +5,17 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
+using VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegration;
 using VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.SceneManagerIntegration
 {
     [DontDrawForAddButton]
-    [ElementEditor(typeof(Runtime.Sectorize.SceneManagerIntegration.Sectorize))]
-    public class SectorizeEditor : SceneTypeEditor
+    [ElementEditor(typeof(SectorizeStreamingScenes))]
+    public class SectorizeStreamingScenesEditor : SceneTypeEditor
     {
-        private Runtime.Sectorize.SceneManagerIntegration.Sectorize _sectorize;
+        private SectorizeStreamingScenes _sectorizeStreamingScenes;
         
         private ReorderableList _reorderableList;
         
@@ -22,9 +23,9 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.SceneManagerIntegrati
         {
             base.OnEnable();
 
-            _sectorize = (Runtime.Sectorize.SceneManagerIntegration.Sectorize)Target;
+            _sectorizeStreamingScenes = (SectorizeStreamingScenes)Target;
             
-            _reorderableList = new ReorderableList(_sectorize.SubScenes, typeof(SceneReference), false, true, false, false)
+            _reorderableList = new ReorderableList(_sectorizeStreamingScenes.SubScenes, typeof(SceneReference), false, true, false, false)
             {
                 drawHeaderCallback = DrawHeader,
                 drawElementCallback = DrawElement
@@ -36,7 +37,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.SceneManagerIntegrati
             _reorderableList.DoList(rect);
             
             rect.y += CustomEditorGUI.SingleLineHeight * 2;
-            rect.y += _sectorize.SubScenes.Count * CustomEditorGUI.SingleLineHeight;
+            rect.y += _sectorizeStreamingScenes.SubScenes.Count * CustomEditorGUI.SingleLineHeight;
 
             base.OnGUI(rect, index);
         }
@@ -46,7 +47,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.SceneManagerIntegrati
             float height = 0;
 
             height += CustomEditorGUI.SingleLineHeight * 2;
-            height += _sectorize.SubScenes.Count * CustomEditorGUI.SingleLineHeight;
+            height += _sectorizeStreamingScenes.SubScenes.Count * CustomEditorGUI.SingleLineHeight;
 
             height += base.GetElementHeight(index);
             height += CustomEditorGUI.SingleLineHeight;
@@ -61,9 +62,9 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.SceneManagerIntegrati
                 Rect rectField = totalRect;
                 rectField.width -= 14;
             
-                _sectorize.SubScenes[index].SceneAsset = (SceneAsset)CustomEditorGUI.ObjectField(
+                _sectorizeStreamingScenes.SubScenes[index].SceneAsset = (SceneAsset)CustomEditorGUI.ObjectField(
                     new Rect(rectField.x, rectField.y, rectField.width, EditorGUIUtility.singleLineHeight),
-                    null, _sectorize.SubScenes[index].SceneAsset, typeof(SceneAsset));
+                    null, _sectorizeStreamingScenes.SubScenes[index].SceneAsset, typeof(SceneAsset));
             }
         }
 

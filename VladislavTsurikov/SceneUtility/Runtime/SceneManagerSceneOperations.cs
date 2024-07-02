@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -16,24 +17,28 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         public override float LoadingProgress()
         {
             if (_loadSceneAsyncOperation != null)
+            {
                 return _loadSceneAsyncOperation.progress;
+            }
 
             return SceneReference.Scene.isLoaded ? 1 : 0;
         }
 
-        protected override IEnumerator LoadSceneOverride()
+        protected override async UniTask LoadScene()
         {
             _loadSceneAsyncOperation = SceneManager.LoadSceneAsync(SceneReference.SceneName, LoadSceneMode.Additive);
 
-            yield return _loadSceneAsyncOperation;
+            await _loadSceneAsyncOperation;
             
         }
 
-        protected override IEnumerator UnloadSceneOverride()
+        protected override async UniTask UnloadScene()
         {
+            _loadSceneAsyncOperation = null;
+            
             _unloadSceneAsyncOperation = SceneManager.UnloadSceneAsync(SceneReference.SceneName);
 
-            yield return _unloadSceneAsyncOperation;
+            await _unloadSceneAsyncOperation;
         }
         
         public override bool IsLoading()

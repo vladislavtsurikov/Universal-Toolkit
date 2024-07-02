@@ -26,7 +26,7 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.Scripting
             {
                 System.Type extensionType = item.Key;
 
-                string context = extensionType.GetAttribute<MenuItemAttribute>().Name;
+                string context = extensionType.GetAttribute<NameAttribute>().Name;
 
                 ContextMenuAttribute contextMenuAttribute = item.Value.GetAttribute<ContextMenuAttribute>();
 

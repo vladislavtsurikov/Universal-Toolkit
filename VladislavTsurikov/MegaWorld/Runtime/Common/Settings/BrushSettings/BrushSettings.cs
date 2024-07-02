@@ -21,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
     }
 
 
-    [MenuItem("Brush Settings")]
+    [Name("Brush Settings")]
     public class BrushSettings : Component
     {
         [OdinSerialize]

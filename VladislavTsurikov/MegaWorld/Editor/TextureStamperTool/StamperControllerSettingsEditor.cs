@@ -41,7 +41,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 						if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 						{
 							UnspawnUtility.UnspawnGroups(TextureStamper.Data.GroupList, false);
-							TextureStamper.StamperSpawn();
+							TextureStamper.SpawnStamper();
 						}
 						GUILayout.Space(5);
 					}
@@ -64,7 +64,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
 		private void DrawSpawnControls()
         {
-            if (TextureStamper.SpawnProgress > 0f && TextureStamper.SpawnProgress < 1f)
+            if (TextureStamper.IsSpawning)
            	{
 				GUILayout.BeginHorizontal();
          		{
@@ -89,7 +89,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 						if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 						{
 							UnspawnUtility.UnspawnGroups(TextureStamper.Data.GroupList, false);
-							TextureStamper.StamperSpawn();
+							TextureStamper.SpawnStamper();
 						}
 
 						GUILayout.Space(5);
@@ -104,7 +104,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 					GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 					if(CustomEditorGUILayout.ClickButton("Spawn", ButtonStyle.Add))
 					{
-						TextureStamper.StamperSpawn();
+						TextureStamper.SpawnStamper();
 					}
 					GUILayout.Space(5);
 				}
@@ -116,7 +116,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.TextureStamperTool
 
 		private void DrawSpawnWithCellsControls()
         {
-			if (TextureStamper.SpawnProgress > 0f && TextureStamper.SpawnProgress < 1f)
+			if (TextureStamper.IsSpawning)
            	{
 				GUILayout.BeginHorizontal();
          		{

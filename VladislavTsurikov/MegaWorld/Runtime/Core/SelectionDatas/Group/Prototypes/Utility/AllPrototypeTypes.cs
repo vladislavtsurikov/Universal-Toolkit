@@ -2,7 +2,6 @@
 using System.Linq;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ReflectionUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility
 {
@@ -14,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             var types = AllTypesDerivedFrom<Prototype>.TypeList
                 .Where(
-                    t => t.IsDefined(typeof(MenuItemAttribute), false) && !t.IsAbstract
+                    t => t.IsDefined(typeof(NameAttribute), false) && !t.IsAbstract
                 );
 
             TypeList = types.ToList();

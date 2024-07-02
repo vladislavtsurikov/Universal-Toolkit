@@ -1,5 +1,4 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Core;
+﻿using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem
 {
@@ -7,9 +6,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultC
     {
         protected Group Group;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            Group = (Group)args[0];
+            Group = (Group)setupData[0];
         }
     }
 }

@@ -15,7 +15,7 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [MenuItem("Rotate")]
+    [Name("Rotate")]
 	public class Rotate : Action
     {
         private ShortcutCombo _shortcutCombo;

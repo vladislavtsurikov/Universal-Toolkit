@@ -19,7 +19,7 @@ using UnityEngine.Experimental.TerrainAPI;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Textures")]
+    [Name("Textures")]
     public class TexturesFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

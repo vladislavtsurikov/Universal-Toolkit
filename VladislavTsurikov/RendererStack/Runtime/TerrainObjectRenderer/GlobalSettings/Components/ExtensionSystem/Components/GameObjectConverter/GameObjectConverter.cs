@@ -8,7 +8,7 @@ using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtili
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.GameObjectConverter
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("GameObject Converter")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("GameObject Converter")]
     public class GameObjectConverter : Extension
     {
 #if UNITY_EDITOR

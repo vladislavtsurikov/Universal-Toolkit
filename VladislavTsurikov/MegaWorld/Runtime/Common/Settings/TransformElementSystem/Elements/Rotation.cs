@@ -8,7 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 {
     [Serializable]
     [Simple]  
-    [MenuItem("Rotation")]
+    [Name("Rotation")]
     public class Rotation : TransformComponent
     {
         public float RandomizeOrientationX = 5;

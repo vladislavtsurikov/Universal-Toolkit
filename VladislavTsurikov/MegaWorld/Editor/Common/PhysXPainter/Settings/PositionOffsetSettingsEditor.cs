@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings
 {

@@ -4,7 +4,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Proto
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings
 {
-    [MenuItem("Shadow")]
+    [Name("Shadow")]
     public class Shadow : PrototypeComponent
     {
         [SerializeField]

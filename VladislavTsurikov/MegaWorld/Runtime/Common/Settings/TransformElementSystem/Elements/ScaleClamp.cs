@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Scale Clamp")]
+    [Name("Scale Clamp")]
     public class ScaleClamp : TransformComponent
     {
         public float MaxScale = 2;

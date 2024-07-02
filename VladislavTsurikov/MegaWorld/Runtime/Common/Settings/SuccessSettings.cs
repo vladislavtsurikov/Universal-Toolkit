@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
 {
-    [MenuItem("Success")]
+    [Name("Success")]
     public class SuccessSettings : Component
     {
         public float SuccessValue = 100f;

@@ -1,12 +1,11 @@
 ﻿using System;
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 {
-    [MenuItem("Stamper Tool Controller")]
+    [Name("Stamper Tool Controller")]
     public class StamperControllerSettings : Component
     {
         public bool Visualisation = true;
@@ -16,9 +15,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
         [NonSerialized]
         public StamperTool StamperTool;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            StamperTool = (StamperTool)args[0];
+            StamperTool = (StamperTool)setupData[0];
         }
     }
 }

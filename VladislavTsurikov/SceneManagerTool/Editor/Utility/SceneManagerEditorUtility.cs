@@ -1,10 +1,11 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor
@@ -24,22 +25,22 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         {
             SceneManagerData.MaskAsDirty();
             
-            CoroutineRunner.StartCoroutine(Coroutine(), SceneManagerData.Instance); 
+            EnterPlaymodeAsync().Forget();
             
-            return;
-
-            IEnumerator Coroutine()
+            async UniTask EnterPlaymodeAsync()
             {
                 while (EditorApplication.isCompiling)
-                    yield return null;
+                {
+                    await UniTask.Yield();
+                }
                 
                 EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo();
                 
                 SceneManagerData.Instance.SceneManagerEditorData.SceneSetupManager.SaveSceneSetup();
                 StartupScene.Open();
                 
-                yield return new WaitForSeconds(0.1f);
-
+                await UniTask.Delay(TimeSpan.FromSeconds(0.1f), ignoreTimeScale: true);
+                
                 EditorApplication.EnterPlaymode();
                 SceneManagerData.Instance.SceneManagerEditorData.RunAsBuildMode = true;
             }

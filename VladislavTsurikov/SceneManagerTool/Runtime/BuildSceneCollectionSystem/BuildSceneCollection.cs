@@ -23,7 +23,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
 
         protected override void OnCreate()
         {
-            _name = GetType().GetAttribute<MenuItemAttribute>().Name.Split('/').Last();
+            _name = GetType().GetAttribute<NameAttribute>().Name.Split('/').Last();
 
             if (SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList.Count == 1)
             {

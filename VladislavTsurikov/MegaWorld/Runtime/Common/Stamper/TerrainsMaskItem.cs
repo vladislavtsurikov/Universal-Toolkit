@@ -7,7 +7,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFil
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using Group = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Group;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper

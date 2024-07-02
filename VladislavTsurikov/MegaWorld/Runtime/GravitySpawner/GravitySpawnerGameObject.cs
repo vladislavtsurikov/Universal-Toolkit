@@ -7,7 +7,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 {

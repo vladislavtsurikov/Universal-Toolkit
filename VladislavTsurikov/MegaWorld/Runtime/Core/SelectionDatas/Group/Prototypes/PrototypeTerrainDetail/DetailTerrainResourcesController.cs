@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail

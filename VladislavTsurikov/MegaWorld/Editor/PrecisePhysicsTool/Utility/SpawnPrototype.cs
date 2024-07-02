@@ -1,7 +1,9 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Undo;
@@ -9,8 +11,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.UnityUtility.Runtime;
 
@@ -28,7 +30,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
             PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
             transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, 1, rayHit.Normal);
             
-            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+            PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+            PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
             SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
                 instance.Position, instance.Scale, instance.Rotation);
@@ -41,8 +44,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
         }
         
 #if RENDERER_STACK
-        public static void SpawnTerrainObject(Group group, PrototypeTerrainObject proto, RayHit rayHit) 
+        public static async UniTask SpawnTerrainObject(Group group, PrototypeTerrainObject proto, RayHit rayHit) 
         {
+            ScriptingSystem.SetColliders(new Sphere(rayHit.Point, 500), rayHit);
+            
             PhysicsEffects physicsEffects = (PhysicsEffects)ToolsComponentStack.GetElement(typeof(PrecisePhysicsTool), typeof(PhysicsEffects));
             PrecisePhysicsToolSettings precisePhysicsToolSettings = (PrecisePhysicsToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePhysicsTool), typeof(PrecisePhysicsToolSettings));
             
@@ -52,8 +57,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
             
             PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
             transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, 1, rayHit.Normal);
-
-            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+            
+            PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+            PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
             TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
                 instance.Position, instance.Scale, instance.Rotation, new List<OnDisableSimulatedBodyEvent>{onDisableSimulatedBodyAction});
@@ -63,6 +69,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
             physicsEffects.ApplyForce(simulatedBody.Rigidbody);
 
             Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObjectSimulatedBody(simulatedBody));
+            
+            await UniTask.WaitUntil(() => SimulatedBodyStack.Count == 0);
+
+            ScriptingSystem.RemoveColliders(rayHit);
         }
 #endif
     }

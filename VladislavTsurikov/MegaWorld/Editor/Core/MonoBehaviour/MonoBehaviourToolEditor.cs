@@ -288,7 +288,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour
 
 		private string GetNameToolSettings()
 		{
-			return "Tool Settings (" + Target.GetType().GetAttribute<MenuItemAttribute>().Name + ")";
+			return "Tool Settings (" + Target.GetType().GetAttribute<NameAttribute>().Name + ")";
 		}
     }
 }

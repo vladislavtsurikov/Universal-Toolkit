@@ -89,7 +89,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             List<Object> components = FindObjectsOfType(type, scene, getActiveGameObject);
 
             if(components.Count == 0)
+            {
                 return null;
+            }
 
             return components[0];
         }
@@ -122,7 +124,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 if (getActiveGameObject)
                 {
                     if(!gameObject.activeInHierarchy)
+                    {
                         continue;
+                    }
                 }
 
                 componentList.AddRange(gameObject.GetComponents(type));
@@ -150,18 +154,30 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         {
             Type type = original.GetType();
             var dst = destination.GetComponent(type) as T;
-            if (!dst) dst = destination.AddComponent(type) as T;
+            if (!dst)
+            {
+                dst = destination.AddComponent(type) as T;
+            }
+
             var fields = type.GetFields();
             foreach (var field in fields)
             {
-                if (field.IsStatic) continue;
+                if (field.IsStatic)
+                {
+                    continue;
+                }
+
                 field.SetValue(dst, field.GetValue(original));
             }
 			
             var props = type.GetProperties();
             foreach (var prop in props)
             {
-                if (!prop.CanWrite || prop.Name == "name") continue;
+                if (!prop.CanWrite || prop.Name == "name")
+                {
+                    continue;
+                }
+
                 prop.SetValue(dst, prop.GetValue(original, null), null);
             }
             return dst;
@@ -274,10 +290,17 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             else
             {
                 var meshRenderer = go.GetComponent<MeshRenderer>();
-                if (meshRenderer) return meshRenderer.gameObject;
+                if (meshRenderer)
+                {
+                    return meshRenderer.gameObject;
+                }
 
                 meshRenderer = go.GetComponentInChildren<MeshRenderer>();
-                if (meshRenderer) return meshRenderer.gameObject;
+                if (meshRenderer)
+                {
+                    return meshRenderer.gameObject;
+                }
+
                 return null;
             }
         }

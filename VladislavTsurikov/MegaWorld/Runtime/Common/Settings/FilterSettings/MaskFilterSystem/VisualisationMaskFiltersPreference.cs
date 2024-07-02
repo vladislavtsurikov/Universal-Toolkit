@@ -18,7 +18,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         Heightmap
     }
 
-    [MenuItem("Visualisation Mask Filters")]
+    [Name("Visualisation Mask Filters")]
     public class VisualisationMaskFiltersPreference : PreferenceSettings
     {
         public Color Color = new Color(128, 171, 78, 255);

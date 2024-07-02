@@ -1,11 +1,11 @@
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Utility;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings
 {
-    [MenuItem("Physics Effects")]
+    [Name("Physics Effects")]
     public class PhysicsEffects : Component
     {
         #region Force

@@ -6,7 +6,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Height")]
+    [Name("Height")]
     public class HeightFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

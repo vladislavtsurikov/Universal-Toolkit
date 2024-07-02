@@ -4,13 +4,13 @@ using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem
 {
-    [MenuItem("Extension")]
+    [Name("Extension")]
     public class ExtensionSystem : GlobalComponent
     {
         [OdinSerialize]
         public ComponentStackOnlyDifferentTypes<Extension> ExtensionStack = new ComponentStackOnlyDifferentTypes<Extension>();
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             ExtensionStack.Setup();
         }

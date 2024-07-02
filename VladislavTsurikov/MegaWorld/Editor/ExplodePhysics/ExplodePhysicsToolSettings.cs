@@ -5,7 +5,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
-    [MenuItem("Explode Physics Tool Settings")]
+    [Name("Explode Physics Tool Settings")]
     public class ExplodePhysicsToolSettings : Component
     {
         public float Spacing = 20;

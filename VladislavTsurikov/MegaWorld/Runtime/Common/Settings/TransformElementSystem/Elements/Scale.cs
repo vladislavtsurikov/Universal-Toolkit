@@ -8,7 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 {
     [Serializable]
     [Simple]  
-    [MenuItem("Scale")]
+    [Name("Scale")]
     public class Scale : TransformComponent
     {
         public bool UniformScale = true;

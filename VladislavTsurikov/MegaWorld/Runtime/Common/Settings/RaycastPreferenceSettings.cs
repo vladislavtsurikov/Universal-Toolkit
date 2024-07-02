@@ -9,7 +9,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
         CustomRaycast
     }
     
-    [MenuItem("Raycast")]
+    [Name("Raycast")]
     public class RaycastPreferenceSettings : PreferenceSettings
     {
         public RaycastType RaycastType = RaycastType.UnityRaycast;

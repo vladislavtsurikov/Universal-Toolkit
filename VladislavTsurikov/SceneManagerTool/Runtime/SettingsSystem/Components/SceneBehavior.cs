@@ -3,7 +3,7 @@ using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    [MenuItem("Scene Behavior")]
+    [Name("Scene Behavior")]
     [SceneComponent]
     public class SceneBehavior : SettingsComponent
     {

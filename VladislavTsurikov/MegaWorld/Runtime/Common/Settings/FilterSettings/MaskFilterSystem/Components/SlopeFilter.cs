@@ -6,7 +6,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Slope")]
+    [Name("Slope")]
     public class SlopeFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

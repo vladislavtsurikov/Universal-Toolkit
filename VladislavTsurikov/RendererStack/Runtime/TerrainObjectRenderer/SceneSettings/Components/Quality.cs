@@ -6,7 +6,7 @@ using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSettings
 {
-    [MenuItem("Additional Data")]
+    [Name("Additional Data")]
     public class Quality : SceneComponent
     {
         public Light DirectionalLight;
@@ -15,7 +15,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
         public Vector3 FloatingOriginOffset;
         public Vector3 FloatingOriginStartPosition;
 
-        protected override void SetupElement(object[] args)
+        protected override void SetupComponent(object[] setupData)
         {
             SetupFloatingOrigin();
             

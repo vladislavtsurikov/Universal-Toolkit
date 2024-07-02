@@ -39,7 +39,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         {
             foreach (var item in TerrainHelperList)
             {
-                item.OnDisable();
+                item?.OnDisable();
             }
         }
 
@@ -84,7 +84,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
         public void RemoveTerrains(List<GameObject> terrainList)
         {      
-            if(TerrainGameObjectList.RemoveAll(terrain => terrainList.Contains(terrain)) != 0)
+            if(TerrainGameObjectList.RemoveAll(terrainList.Contains) != 0)
             {
                 RefreshTerrainHelper();
                 ChangedTerrainCountEvent(SceneDataManager);

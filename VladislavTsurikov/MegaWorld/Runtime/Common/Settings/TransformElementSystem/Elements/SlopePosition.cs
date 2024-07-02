@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Slope Position")]  
+    [Name("Slope Position")]  
     public class SlopePosition : TransformComponent
     {
         public float MaxSlope = 90;

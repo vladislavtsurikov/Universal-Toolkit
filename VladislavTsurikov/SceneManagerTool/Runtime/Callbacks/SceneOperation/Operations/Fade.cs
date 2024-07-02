@@ -1,7 +1,7 @@
 ﻿using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation
@@ -13,22 +13,24 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation
         public float Seconds = 1f;
         public Color Color = Color.black;
 
-        public override IEnumerator OnLoad()
+        public override async UniTask OnLoad()
         {
             Image.color = Color;
-            yield return Group.Fade(1, Seconds);
-        }
-
-        public override IEnumerator OnUnload()
-        {
-            yield return Group.Fade(0, Seconds);
-        }
-
-        private void Start()
-        {
             Group.alpha = 0;
-
-            CoroutineRunner.StartCoroutine(OnLoad());
+            await Group.Fade(1, Seconds);
         }
+
+        public override async UniTask OnUnload()
+        {
+            Group.alpha = 1;
+            await Group.Fade(0, Seconds);
+        }
+
+        // private void Start()
+        // {
+        //     Group.alpha = 0;
+        //
+        //     OnLoad().Forget();
+        // }
     }
 }

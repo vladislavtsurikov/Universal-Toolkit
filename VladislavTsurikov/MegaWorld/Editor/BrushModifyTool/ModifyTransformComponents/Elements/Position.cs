@@ -4,7 +4,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Position")]
+    [Name("Position")]
     public class Position : ModifyTransformComponent
     {
         public float Strength = -0.1f;

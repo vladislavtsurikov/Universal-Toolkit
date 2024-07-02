@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
@@ -17,8 +16,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 
         protected override void OnSetup()
         {
-            _addElementsAttributeType = (Type)InitializationDataForElements[0];
-            _prototypeType = (Type)InitializationDataForElements[1];
+            _addElementsAttributeType = (Type)SetupData[0];
+            _prototypeType = (Type)SetupData[1];
         }
 
         protected override void OnCreateElements()

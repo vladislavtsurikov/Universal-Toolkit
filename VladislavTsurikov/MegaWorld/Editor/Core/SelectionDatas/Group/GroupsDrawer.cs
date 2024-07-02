@@ -42,7 +42,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
             
             foreach (var type in ToolUtility.GetSupportedPrototypeTypes(_toolType))
             {
-	            menu.AddItem(new GUIContent("Create Group/" + type.GetAttribute<MenuItemAttribute>().Name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => CreateGroup(Data.GroupList, type)));
+	            menu.AddItem(new GUIContent("Create Group/" + type.GetAttribute<NameAttribute>().Name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => CreateGroup(Data.GroupList, type)));
             }
 
             List<Runtime.Core.SelectionDatas.Group.Group> groups = AllAvailableGroups.GetAllGroups();

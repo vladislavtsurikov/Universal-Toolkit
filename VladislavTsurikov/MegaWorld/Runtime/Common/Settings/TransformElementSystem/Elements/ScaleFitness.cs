@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Scale Fitness")]  
+    [Name("Scale Fitness")]  
     public class ScaleFitness : TransformComponent
     {
         public float OffsetScale = -0.7f;

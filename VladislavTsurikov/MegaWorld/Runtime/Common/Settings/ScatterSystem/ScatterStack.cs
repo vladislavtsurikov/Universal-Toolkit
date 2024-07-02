@@ -1,6 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -11,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
     {
         private WaitingNextFrame _waitingNextFrame;
 
-        public IEnumerator Samples(BoxArea boxArea, Action<Vector2> onAddSample)
+        public async UniTask Samples(BoxArea boxArea, Action<Vector2> onAddSample, CancellationToken token = default(CancellationToken))
         {
             List<Scatter> enabledScatter = new List<Scatter>(_elementList.FindAll(scatter => scatter.Active));
 
@@ -19,8 +20,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 
             for (int i = 0; i < enabledScatter.Count; i++)
             {
-                yield return enabledScatter[i]
-                    .Samples(boxArea, samples, i == enabledScatter.Count - 1 ? onAddSample : null);
+                await enabledScatter[i]
+                    .Samples(token, boxArea, samples, i == enabledScatter.Count - 1 ? onAddSample : null);
             }
         }
 

@@ -11,11 +11,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
         [NonSerialized]
         protected TerrainObjectInstance TerrainObjectInstance;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            if (args != null && args.Length != 0)
+            if (setupData != null && setupData.Length != 0)
             {
-                TerrainObjectInstance = (TerrainObjectInstance)args[0];
+                TerrainObjectInstance = (TerrainObjectInstance)setupData[0];
             }
             
             OnEnable();

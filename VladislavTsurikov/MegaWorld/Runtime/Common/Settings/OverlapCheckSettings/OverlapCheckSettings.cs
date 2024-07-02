@@ -1,7 +1,6 @@
 using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
@@ -18,7 +17,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
         Sphere,
     }
     
-    [MenuItem("Overlap Check Settings")]
+    [Name("Overlap Check Settings")]
     public class OverlapCheckSettings : Component
     {
         public OverlapShapeEnum OverlapShapeEnum = OverlapShapeEnum.Sphere;

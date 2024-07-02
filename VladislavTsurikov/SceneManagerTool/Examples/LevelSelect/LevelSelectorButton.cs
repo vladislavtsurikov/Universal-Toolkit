@@ -1,6 +1,6 @@
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Examples.LevelSelect
@@ -12,7 +12,7 @@ namespace VladislavTsurikov.SceneManagerTool.Examples.LevelSelect
 
         public void OpenLevel()
         {
-            CoroutineRunner.StartCoroutine(Collection.Load());
+            Collection.Load().Forget();
         }
 
         public void ApplyData(string text, SceneCollection collection)

@@ -1,21 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    [MenuItem("Before Unload")]
+    [Name("Before Unload")]
     public class BeforeUnloadOperationsSettings : SettingsComponent
     {
         public ComponentStackSupportSameType<Operation> OperationStack = new ComponentStackSupportSameType<Operation>();
         
-        public IEnumerator DoOperations()
+        public async UniTask DoOperations()
         {
             foreach (var sceneOperation in OperationStack.ElementList)
             {
-                yield return sceneOperation.DoOperation();
+                await sceneOperation.DoOperation();
             }
         }
         

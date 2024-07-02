@@ -1,10 +1,9 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
-    [MenuItem("Simple Transform Settings")]
+    [Name("Simple Transform Settings")]
     public class SimpleTransformComponentSettings : Component
     {
         public TransformComponentStack TransformComponentStack = new TransformComponentStack();

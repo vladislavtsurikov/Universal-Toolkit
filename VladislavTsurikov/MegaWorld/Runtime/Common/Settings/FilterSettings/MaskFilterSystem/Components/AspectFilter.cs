@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Aspect")]
+    [Name("Aspect")]
     public class AspectFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

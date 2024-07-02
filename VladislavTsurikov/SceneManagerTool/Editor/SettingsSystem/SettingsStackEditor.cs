@@ -34,7 +34,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
                 
                 bool exists = ComponentStackOnlyDifferentTypes.GetElement(settingsType) != null;
                 
-                string context = settingsType.GetAttribute<MenuItemAttribute>().Name;
+                string context = settingsType.GetAttribute<NameAttribute>().Name;
 
                 if (_sceneCollection)
                 {

@@ -4,7 +4,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Randomize Scale")]
+    [Name("Randomize Scale")]
     public class RandomizeScale : ModifyTransformComponent
     {
         public bool UniformScale = true;

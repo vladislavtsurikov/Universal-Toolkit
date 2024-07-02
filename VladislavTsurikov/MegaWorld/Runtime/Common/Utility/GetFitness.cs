@@ -4,7 +4,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
 {

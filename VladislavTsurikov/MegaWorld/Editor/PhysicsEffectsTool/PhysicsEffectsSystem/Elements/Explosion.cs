@@ -5,7 +5,7 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Explosion")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Explosion")]
 	public class Explosion : PhysicsEffect
     {
         public float MaxForce => 500;

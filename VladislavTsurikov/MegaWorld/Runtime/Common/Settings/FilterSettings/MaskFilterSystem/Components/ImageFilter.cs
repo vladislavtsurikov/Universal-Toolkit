@@ -7,7 +7,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     public enum FilterMode {GrayScale, Color, RedColorChannel, GreenColorChannel, BlueColorChannel, AlphaChannel }
 
     [Serializable]
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Image")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Image")]
     public class ImageFilter : MaskFilter 
     {
         public BlendMode BlendMode = BlendMode.Multiply;

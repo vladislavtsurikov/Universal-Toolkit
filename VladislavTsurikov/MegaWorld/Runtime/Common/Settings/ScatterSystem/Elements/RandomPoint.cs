@@ -1,27 +1,30 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
-    [MenuItem("Random Point")]  
+    [Name("Random Point")]  
     public class RandomPoint : Scatter
     {
         public int MinChecks = 15;
 		public int MaxChecks = 15;
         
-        public override IEnumerator Samples(BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
+        public override async UniTask Samples(CancellationToken token, BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
         {
             int numberOfChecks = UnityEngine.Random.Range(MinChecks, MaxChecks);
         
             for (int checks = 0; checks < numberOfChecks; checks++)
             {
+                token.ThrowIfCancellationRequested();
+                
                 if (ScatterStack.IsWaitForNextFrame())
                 {
-                    yield return null;
+                    await UniTask.Yield();
                 }
                 
                 Vector2 point = GetRandomPoint(boxArea);

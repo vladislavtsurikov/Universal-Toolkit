@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
@@ -21,73 +21,73 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
         DoNotOpen
     }
     
-    public abstract class SceneType : ComponentStack.Runtime.Core.Component
+    public abstract class SceneType : Component
     {
-        private SceneCollection _loadSceneCollection;
+        private SceneCollection _sceneCollection;
         
         public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new ComponentStackOnlyDifferentTypes<SettingsComponent>();
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            _loadSceneCollection = (SceneCollection)args[0];
+            _sceneCollection = (SceneCollection)setupData[0];
 
             SettingsStack.Setup();
         }
 
-        internal IEnumerator LoadInternal(bool force = false)
+        internal async UniTask LoadInternal(bool force = false)
         {
             SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
             if (!force && sceneBehavior is { SceneOpenBehavior: SceneOpenBehavior.DoNotOpen })
             {
-                yield break;
+                return;
             }
             
             BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
 
             if (beforeLoadOperationsSettings != null)
             {
-                yield return beforeLoadOperationsSettings.DoOperations();
+                await beforeLoadOperationsSettings.DoOperations();
             }
 
-            yield return Load();
+            await Load();
             
             AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
 
             if (afterLoadOperationsSettings != null)
             {
-                yield return afterLoadOperationsSettings.DoOperations();
+                await afterLoadOperationsSettings.DoOperations();
             }
         }
 
-        internal IEnumerator UnloadInternal(SceneCollection nextLoadSceneCollection = null, bool force = false)
+        internal async UniTask UnloadInternal(SceneCollection nextLoadSceneCollection = null, bool force = false)
         {
             SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
             if (!force && sceneBehavior is { SceneCloseBehavior: SceneCloseBehavior.KeepOpenAlways })
             {
-                yield break;
+                return;
             }
             
             BeforeUnloadOperationsSettings beforeUnloadOperationsSettings = (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
 
             if (beforeUnloadOperationsSettings != null)
             {
-                yield return beforeUnloadOperationsSettings.DoOperations();
+                await beforeUnloadOperationsSettings.DoOperations();
             }
 
-            yield return Unload(nextLoadSceneCollection);
+            await Unload(nextLoadSceneCollection);
         }
         
-        internal IEnumerator UnloadSceneReference(SceneCollection nextLoadSceneCollection, SceneReference scene)
+        internal async UniTask UnloadSceneReference(SceneCollection nextLoadSceneCollection, SceneReference scene)
         {
             if (nextLoadSceneCollection == null)
             {
-                yield return scene.UnloadScene();
+                await scene.UnloadScene();
             }
             else if (!nextLoadSceneCollection.HasScene(scene))
             {
-                yield return scene.UnloadScene();
+                await scene.UnloadScene();
             }
         }
 
@@ -105,8 +105,8 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
             return sceneReferences;
         }
 
-        protected abstract IEnumerator Load();
-        protected abstract IEnumerator Unload(SceneCollection nextLoadSceneCollection);
+        protected abstract UniTask Load();
+        protected abstract UniTask Unload(SceneCollection nextLoadSceneCollection);
         public abstract bool HasScene(SceneReference sceneReference);
         protected abstract List<SceneReference> GetSceneReferences();
         public abstract float LoadingProgress();

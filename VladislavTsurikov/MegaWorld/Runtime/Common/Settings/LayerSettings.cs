@@ -7,7 +7,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
 {
-    [MenuItem("Layer Settings")]
+    [Name("Layer Settings")]
     public class LayerSettings : Component
     {
         public LayerMask PaintLayers = 1;

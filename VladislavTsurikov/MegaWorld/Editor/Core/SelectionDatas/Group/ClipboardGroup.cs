@@ -97,15 +97,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 
                     foreach (Component component in GetAllCopiedComponent())
                     {
-                        MenuItemAttribute menuItemAttribute = component.GetType().GetAttribute<MenuItemAttribute>();
+                        NameAttribute nameAttribute = component.GetType().GetAttribute<NameAttribute>();
                         
-                        if (menuItemAttribute == null)
+                        if (nameAttribute == null)
                         {
                             Debug.Log("MenuItem is not found for " + component.Name);
                             continue;
                         }
                         
-                        menu.AddItem(new GUIContent("Paste Settings/" + menuItemAttribute.Name), false, ContextMenuUtility.ContextMenuCallback, 
+                        menu.AddItem(new GUIContent("Paste Settings/" + nameAttribute.Name), false, ContextMenuUtility.ContextMenuCallback, 
                             new Action(() => ClipboardAction(new List<IHasElementStack>(selectedData.SelectedGroupList), component.GetType(), true)));	
                     }
                 }

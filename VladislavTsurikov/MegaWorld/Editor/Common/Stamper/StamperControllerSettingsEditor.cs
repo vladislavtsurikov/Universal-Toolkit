@@ -37,7 +37,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
 		            if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 		            {
 			            UnspawnUtility.UnspawnGroups(_stamperControllerSettings.StamperTool.Data.GroupList, false);
-			            _stamperControllerSettings.StamperTool.StamperSpawn(true);
+			            _stamperControllerSettings.StamperTool.SpawnStamper(true);
 		            }
 		            GUILayout.Space(5);
 	            }
@@ -73,7 +73,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
         
         private void DrawSpawnControls()
         {
-	        if (!_stamperControllerSettings.StamperTool.SpawnComplete)
+	        if (_stamperControllerSettings.StamperTool.IsSpawning)
 	        {
 		        GUILayout.BeginHorizontal();
 		        {
@@ -98,7 +98,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
 				        if(CustomEditorGUILayout.ClickButton("Respawn", ButtonStyle.Add, ButtonSize.ClickButton))
 				        {
 					        UnspawnUtility.UnspawnGroups(_stamperControllerSettings.StamperTool.Data.GroupList, false);
-					        _stamperControllerSettings.StamperTool.StamperSpawn(true);
+					        _stamperControllerSettings.StamperTool.SpawnStamper(true);
 				        }
 
 				        GUILayout.Space(5);
@@ -113,7 +113,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
 			        GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 			        if(CustomEditorGUILayout.ClickButton("Spawn", ButtonStyle.Add))
 			        {
-				        _stamperControllerSettings.StamperTool.StamperSpawn(true);
+				        _stamperControllerSettings.StamperTool.SpawnStamper(true);
 			        }
 			        GUILayout.Space(5);
 		        }

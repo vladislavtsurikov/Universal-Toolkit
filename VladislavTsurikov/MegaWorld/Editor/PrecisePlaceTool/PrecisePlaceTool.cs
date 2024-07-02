@@ -22,7 +22,7 @@ using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSetti
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Happy Artist/Precise Place")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Happy Artist/Precise Place")]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
     [AddToolComponents(new []{typeof(PrecisePlaceToolSettings)})]

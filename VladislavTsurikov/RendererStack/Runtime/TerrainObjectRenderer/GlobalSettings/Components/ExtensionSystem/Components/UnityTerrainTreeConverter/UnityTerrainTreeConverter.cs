@@ -9,7 +9,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter
 {
-    [MenuItem("Unity Terrain Tree Converter")]
+    [Name("Unity Terrain Tree Converter")]
     public class UnityTerrainTreeConverter : Extension
     {
         public void ConvertAllUnityTerrainTreeToTerrainObjectRenderer()

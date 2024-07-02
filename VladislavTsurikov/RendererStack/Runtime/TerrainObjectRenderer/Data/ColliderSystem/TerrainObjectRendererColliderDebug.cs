@@ -593,7 +593,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
         {
             Ray ray = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
 
-            foreach (BVHNodeRayHit<Sector> node in SectorLayer.GetCurrentSectorLayers(Sectorize.Sectorize.GetSectorLayerTag())[0].ObjectBoundsBvhTree.DrawRaycast(ray, NodeColor))
+            foreach (BVHNodeRayHit<Sector> node in SectorLayer.GetCurrentSectorLayers(Sectorize.Sectorize.GetSectorLayerTag())[0].ObjectBoundsBVHTree.DrawRaycast(ray, NodeColor))
             {
                 TerrainObjectRendererData instantRendererCollider = (TerrainObjectRendererData)node.HitNode.Data.SceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
                 if(instantRendererCollider != null)

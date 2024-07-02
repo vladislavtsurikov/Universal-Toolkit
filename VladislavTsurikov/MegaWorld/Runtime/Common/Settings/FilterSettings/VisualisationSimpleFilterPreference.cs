@@ -23,7 +23,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings
         DotCap 
     }
 
-    [MenuItem("Visualisation Simple Filter")]
+    [Name("Visualisation Simple Filter")]
     public class VisualisationSimpleFilterPreference : PreferenceSettings
     {
         public bool EnableSpawnVisualization = true;

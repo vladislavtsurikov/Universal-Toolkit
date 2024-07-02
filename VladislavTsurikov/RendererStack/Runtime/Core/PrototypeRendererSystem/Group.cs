@@ -7,7 +7,7 @@ using VladislavTsurikov.OdinSerializer.Core.Misc;
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
     [Serializable]
-    public class Group : IHasName, ISelected
+    public class Group : IHasName, ISelectable
     {
         [SerializeField]
         private bool _selected;

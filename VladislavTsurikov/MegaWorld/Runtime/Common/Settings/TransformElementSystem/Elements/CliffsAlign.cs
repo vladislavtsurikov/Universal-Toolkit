@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Cliffs Align")]
+    [Name("Cliffs Align")]
     public class CliffsAlign : TransformComponent
     {
         public override void SetInstanceData(ref Instance instance, float fitness, Vector3 normal)

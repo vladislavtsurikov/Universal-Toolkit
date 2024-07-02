@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject
 {
-    [MenuItem("Snap To Object")]
+    [Name("Snap To Object")]
     public class SnapToObject : Extension
     {
         public LayerMask Layers;

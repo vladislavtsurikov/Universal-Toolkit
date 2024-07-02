@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEditor;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
@@ -26,7 +25,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common.Stamper;
 namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 {
     [ExecuteInEditMode]
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Texture Stamper")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Texture Stamper")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainTexture)})]
     [AddMonoBehaviourComponents(new[]{typeof(TextureStamperArea), typeof(StamperControllerSettings)})]
@@ -86,20 +85,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn(bool displayProgressBar)
+        protected override async UniTask Spawn(CancellationToken token, bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
             
             for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
             {
-                if (IsCancelSpawn)
-                {
-                    break;
-                }
+                token.ThrowIfCancellationRequested();
 #if UNITY_EDITOR
-                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name,
-                    completedTypes / (float)maxTypes);
+                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name);
 #endif
 
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[typeIndex].PrototypeType));
@@ -115,18 +110,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 
                 completedTypes++;
                 SpawnProgress = completedTypes / (float)maxTypes;
-                yield return null;
+                await UniTask.Yield();
             }
-
-            SpawnProgress = completedTypes / (float)maxTypes;
         }
 
         public void SpawnWithCells(List<Bounds> cellList)
         {
-            CoroutineRunner.StartCoroutine(RunSpawnCoroutineWithSpawnCells(cellList));
+            SpawnCancellationTokenSource.Cancel();
+            SpawnCancellationTokenSource = new CancellationTokenSource();
+            RunSpawnCoroutineWithSpawnCells(SpawnCancellationTokenSource.Token, cellList).Forget();
         }
 
-        private IEnumerator RunSpawnCoroutineWithSpawnCells(List<Bounds> spawnCellList)
+        private async UniTask RunSpawnCoroutineWithSpawnCells(CancellationToken token, List<Bounds> spawnCellList)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
@@ -139,10 +134,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
 
                 for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
                 {
-                    if (IsCancelSpawn)
-                    {
-                        break;
-                    }
+                    token.ThrowIfCancellationRequested();
 
                     Bounds bounds = spawnCellList[cellIndex];
                     
@@ -154,7 +146,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
                     }
 
 #if UNITY_EDITOR
-                    EditorUtility.DisplayProgressBar("Cell: " + cellProgress + "%" + " (" + cellIndex + "/" + spawnCellList.Count + ")", "Running " + Data.GroupList[typeIndex].name, SpawnProgress);
+                    UpdateDisplayProgressBar(
+                        "Cell: " + cellProgress + "%" + " (" + cellIndex + "/" + spawnCellList.Count + ")",
+                        "Running " + Data.GroupList[typeIndex].name);
 #endif
 
                     Group group = Data.GroupList[typeIndex];
@@ -171,15 +165,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TextureStamperTool
                     Spawn(group, boxArea);
 
                     completedTypes++;
-                    yield return null;
+                    await UniTask.Yield();
                 }
             }
-
-            SpawnProgress = 1;
-
-#if UNITY_EDITOR
-            EditorUtility.ClearProgressBar();
-#endif
         }
         
         public void Spawn(Group group, BoxArea boxArea)

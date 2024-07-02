@@ -5,8 +5,7 @@ using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
@@ -31,7 +30,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
                 return true;
             });
 
-            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<GlobalTimeDisablePhysics>(false);
+            PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = false;
+            PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<GlobalTimeDisablePhysicsMode>();
+            PhysicsSimulator.Runtime.PhysicsSimulator.ResetDisablePhysicsMode();
         }
 
         private void ApplyEffectIfNecessary(GameObject prefabRoot, Vector3 positionOffsetY)

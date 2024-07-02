@@ -13,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         Standard
     }
 
-    [MenuItem("Area Settings")]
+    [Name("Area Settings")]
     public class Area : Component
     {
         public Vector3 PastThisPosition = Vector3.zero;
@@ -30,9 +30,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         public Action OnSetAreaBounds;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            StamperTool = (StamperTool)args[0];
+            StamperTool = (StamperTool)setupData[0];
             SetupArea();
         }
 

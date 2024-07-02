@@ -4,7 +4,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Scale Clamp")]
+    [Name("Scale Clamp")]
     public class ScaleClamp : ModifyTransformComponent
     {
         public float MaxScale = 2;

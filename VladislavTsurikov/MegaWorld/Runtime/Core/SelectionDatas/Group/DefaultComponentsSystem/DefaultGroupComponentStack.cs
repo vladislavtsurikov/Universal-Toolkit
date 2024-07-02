@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
@@ -14,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultC
 
         protected override void OnSetup()
         {
-            _group = (Group)InitializationDataForElements[0];
+            _group = (Group)SetupData[0];
         }
 
         protected override void OnCreateElements()

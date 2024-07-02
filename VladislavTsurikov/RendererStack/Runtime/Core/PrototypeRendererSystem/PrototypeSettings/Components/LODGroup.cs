@@ -4,8 +4,9 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Rende
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
-    [MenuItem("LOD Group")]
+    [Name("LOD Group")]
     [DontShowInAddMenu]
+    [PersistentComponent]
     public class LODGroup : PrototypeComponent
     { 
         [SerializeField]
@@ -28,7 +29,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
     		}
         }
 
-        public override bool IsDeletable()
+        protected override bool IsDeletableComponent()
         {
             return false;
         }

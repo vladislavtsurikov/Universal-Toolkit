@@ -11,7 +11,7 @@ using Object = UnityEngine.Object;
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes
 {
     [Serializable]
-    public abstract class Prototype : IHasElementStack, IShowIcon, IRemoved
+    public abstract class Prototype : IHasElementStack, IShowIcon, IRemovable
     {
         [OdinSerialize] 
         protected int _id;
@@ -72,7 +72,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             OnDisablePrototype();
         }
         
-        void IRemoved.OnRemove()
+        void IRemovable.OnRemove()
         {
             OnDisable();
         }

@@ -209,7 +209,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
                     {
                         case DebugSceneMode.ShowAllCells:
                         {
-                            SectorLayer.GetCurrentSectorLayers()[0].ObjectBoundsBvhTree.DrawAllCells(NodeColor);
+                            SectorLayer.GetCurrentSectorLayers()[0].ObjectBoundsBVHTree.DrawAllCells(NodeColor);
 
                             break;
                         }

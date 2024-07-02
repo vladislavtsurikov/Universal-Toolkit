@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Tree Rotation")]  
+    [Name("Tree Rotation")]  
     public class TreeRotation : TransformComponent
     {
         public float RandomizeOrientationY = 100;

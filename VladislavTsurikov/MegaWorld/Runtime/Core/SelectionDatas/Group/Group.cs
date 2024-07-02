@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
@@ -246,7 +245,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 #if UNITY_EDITOR
         public string GetPrototypeTypeName()
         {
-            return PrototypeType.GetAttribute<MenuItemAttribute>().Name.Split('/').Last();
+            return PrototypeType.GetAttribute<NameAttribute>().Name.Split('/').Last();
         }
         
         public void Save() 

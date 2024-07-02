@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
@@ -57,12 +57,12 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
                     
                     sceneComponents.Add(sceneComponent);
                 }
-                
+
                 return !sceneComponents.Any() ? 1 : sceneComponents.Sum(a => a.LoadingProgress()) / sceneComponents.Count;
             }
         }
         
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             SceneTypeComponentStack.Setup(true, this);
             SettingsStack.Setup();
@@ -74,61 +74,57 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             _name = "Scene Collection";
         }
 
-        public IEnumerator Load()
+        public async UniTask Load()
         {
             SceneCollection pastSceneCollection = Current;
             
             if (Current != null)
             {
-                yield return FadeTransition.LoadFadeIfNecessary(Current.SettingsStack);
-                yield return ActiveScene.UnloadActiveSceneIfNecessary(Current.SettingsStack);
-                yield return Current.Unload(this);
+                await FadeTransition.LoadFadeIfNecessary(Current.SettingsStack);
+                await Current.Unload(this);
             }
 
             if (this == Current)
             {
-                yield break;
+                return;
             }
             
             Current = this;
                 
-            yield return ProgressBar.LoadProgressBarIfNecessary(SettingsStack);
+            await ProgressBar.LoadProgressBarIfNecessary(SettingsStack);
                 
             BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
 
             if (beforeLoadOperationsSettings != null)
             {
-                yield return beforeLoadOperationsSettings.DoOperations();
+                await beforeLoadOperationsSettings.DoOperations();
             }
                 
-            yield return ActiveScene.LoadActiveSceneIfNecessary(SettingsStack);
+            await ActiveScene.LoadActiveSceneIfNecessary(SettingsStack);
 
             foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
             {
-                yield return sceneComponent.LoadInternal();
+                await sceneComponent.LoadInternal();
             }
-
-            while (LoadingProgress != 1)
-            {
-                yield return null;
-            }
+            
+            await UniTask.WaitWhile(() => LoadingProgress != 1);
             
             AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
 
             if (afterLoadOperationsSettings != null)
             {
-                yield return afterLoadOperationsSettings.DoOperations();
+                await afterLoadOperationsSettings.DoOperations();
             }
-                
-            yield return ProgressBar.UnloadProgressBarIfNecessary(SettingsStack);
+
+            await ProgressBar.UnloadProgressBarIfNecessary(SettingsStack);
 
             if (pastSceneCollection != null)
             {
-                yield return FadeTransition.UnloadFadeIfNecessary(pastSceneCollection.SettingsStack);
+                await FadeTransition.UnloadFadeIfNecessary(pastSceneCollection.SettingsStack);
             }
         }
 
-        public IEnumerator Unload(SceneCollection nextLoadSceneCollection)
+        public async UniTask Unload(SceneCollection nextLoadSceneCollection)
         {
             Current = null;
             
@@ -136,19 +132,21 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 
             if (beforeUnloadOperationsSettings != null)
             {
-                yield return beforeUnloadOperationsSettings.DoOperations();
+                await beforeUnloadOperationsSettings.DoOperations();
             }
 
             foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
             {
-                yield return sceneComponent.UnloadInternal(nextLoadSceneCollection);
+                await sceneComponent.UnloadInternal(nextLoadSceneCollection);
             }
+            
+            await ActiveScene.UnloadActiveSceneIfNecessary(SettingsStack);
             
             AfterUnloadOperationsSettings afterUnloadOperationsSettings = (AfterUnloadOperationsSettings)SettingsStack.GetElement(typeof(AfterUnloadOperationsSettings));
 
             if (afterUnloadOperationsSettings != null)
             {
-                yield return afterUnloadOperationsSettings.DoOperations();
+                await afterUnloadOperationsSettings.DoOperations();
             }
         }
 

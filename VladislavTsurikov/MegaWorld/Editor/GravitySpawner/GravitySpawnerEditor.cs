@@ -8,12 +8,11 @@ using VladislavTsurikov.MegaWorld.Editor.TextureStamperTool;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 {
-	[ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Gravity Spawner")]
+	[ComponentStack.Runtime.AdvancedComponentStack.Name("Gravity Spawner")]
     [CustomEditor(typeof(Runtime.GravitySpawner.GravitySpawner))]
 	public sealed class GravitySpawnerEditor : MonoBehaviourToolEditor
     {
@@ -30,7 +29,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 
         public override void DrawFirstSettings()
         {
-	        PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysics>(PhysicsSimulatorSettings.Instance);
+	        PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance);
         }
 
         public override void OnChangeGUIGroup(Group group)

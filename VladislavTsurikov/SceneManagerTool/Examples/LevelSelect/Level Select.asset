@@ -17,8 +17,8 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 102900000, guid: 10dc825b2791b414683a7b23c2cf60b7, type: 3}
-    - {fileID: 102900000, guid: 9e35a9de81c0dcd40b26b01236085e6b, type: 3}
     - {fileID: 102900000, guid: f9d57595056ef644e91991bb17f4c66f, type: 3}
+    - {fileID: 102900000, guid: 9e35a9de81c0dcd40b26b01236085e6b, type: 3}
     - {fileID: 102900000, guid: 8f0b6ae7647648441a1d7cd78e8d83dc, type: 3}
     SerializedBytesString: 
     Prefab: {fileID: 0}
@@ -27,90 +27,93 @@ MonoBehaviour:
     SerializationNodes:
     - Name: BuildSceneCollectionStack
       Entry: 7
-      Data: 0|VladislavTsurikov.SceneManagerTool.Scripts.BuildSceneCollectionSystem.BuildSceneCollectionStack,
+      Data: 0|VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.BuildSceneCollectionStack,
         VladislavTsurikov.SceneManagerTool
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 1|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.BuildSceneCollectionSystem.BuildSceneCollection,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 1|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.BuildSceneCollection,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 2|VladislavTsurikov.SceneManagerTool.Scripts.BuildSceneCollectionSystem.Components.DefaultBuildSceneCollection,
+      Data: 2|VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem.DefaultBuildSceneCollection,
         VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
     - Name: _selected
       Entry: 5
       Data: true
     - Name: _active
       Entry: 5
       Data: true
-    - Name: SelectSettingsFoldout
-      Entry: 5
-      Data: true
-    - Name: Name
+    - Name: _name
       Entry: 1
-      Data: Game
+      Data: Build Scene Collection
     - Name: SceneCollectionStack
       Entry: 7
-      Data: 3|VladislavTsurikov.SceneManagerTool.Scripts.SceneCollectionSystem.SceneCollectionStack,
+      Data: 3|VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem.SceneCollectionStack,
         VladislavTsurikov.SceneManagerTool
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 4|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SceneCollectionSystem.SceneCollection,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 4|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem.SceneCollection,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 5|VladislavTsurikov.SceneManagerTool.Scripts.SceneCollectionSystem.SceneCollection,
+      Data: 5|VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem.SceneCollection,
         VladislavTsurikov.SceneManagerTool
-    - Name: _selected
-      Entry: 5
-      Data: false
-    - Name: _active
+    - Name: SelectSettingsFoldout
       Entry: 5
       Data: true
-    - Name: SelectSettingsFoldout
+    - Name: _selected
+      Entry: 5
+      Data: true
+    - Name: _active
       Entry: 5
       Data: true
     - Name: _id
       Entry: 3
-      Data: -79417608
-    - Name: SceneComponentStack
+      Data: 1339510036
+    - Name: _name
+      Entry: 1
+      Data: Main Menu
+    - Name: SceneTypeComponentStack
       Entry: 7
-      Data: 6|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneComponentStack,
+      Data: 6|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneTypeComponentStack,
         VladislavTsurikov.SceneManagerTool
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 7|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneType,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 7|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneType,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 8|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.Components.Single,
+      Data: 8|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Single,
         VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
     - Name: _selected
       Entry: 5
       Data: true
     - Name: _active
       Entry: 5
       Data: true
-    - Name: SelectSettingsFoldout
-      Entry: 5
-      Data: true
     - Name: SettingsStack
       Entry: 7
-      Data: 9|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 9|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 10|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 10|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -125,7 +128,7 @@ MonoBehaviour:
       Data: 
     - Name: SceneReference
       Entry: 7
-      Data: 11|VladislavTsurikov.SceneUtility.Scripts.SceneReference, VladislavTsurikov.SceneUtility
+      Data: 11|VladislavTsurikov.SceneUtility.Runtime.SceneReference, VladislavTsurikov.SceneUtility
     - Name: _cachedScene
       Entry: 5
       Data: false
@@ -151,20 +154,17 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Name
-      Entry: 1
-      Data: Main menu
     - Name: Startup
       Entry: 5
       Data: true
     - Name: SettingsStack
       Entry: 7
-      Data: 12|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 12|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 13|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 13|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -182,52 +182,55 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 14|VladislavTsurikov.SceneManagerTool.Scripts.SceneCollectionSystem.SceneCollection,
+      Data: 14|VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem.SceneCollection,
         VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
     - Name: _selected
       Entry: 5
       Data: false
     - Name: _active
       Entry: 5
       Data: true
-    - Name: SelectSettingsFoldout
-      Entry: 5
-      Data: true
     - Name: _id
       Entry: 3
-      Data: 516063808
-    - Name: SceneComponentStack
+      Data: -1072671790
+    - Name: _name
+      Entry: 1
+      Data: Level 1
+    - Name: SceneTypeComponentStack
       Entry: 7
-      Data: 15|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneComponentStack,
+      Data: 15|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneTypeComponentStack,
         VladislavTsurikov.SceneManagerTool
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneType,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 16|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneType,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 17|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.Components.Single,
+      Data: 17|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Single,
         VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
     - Name: _selected
       Entry: 5
-      Data: true
+      Data: false
     - Name: _active
-      Entry: 5
-      Data: true
-    - Name: SelectSettingsFoldout
       Entry: 5
       Data: true
     - Name: SettingsStack
       Entry: 7
-      Data: 18|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 18|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 19|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -242,64 +245,13 @@ MonoBehaviour:
       Data: 
     - Name: SceneReference
       Entry: 7
-      Data: 20|VladislavTsurikov.SceneUtility.Scripts.SceneReference, VladislavTsurikov.SceneUtility
+      Data: 20|VladislavTsurikov.SceneUtility.Runtime.SceneReference, VladislavTsurikov.SceneUtility
     - Name: _cachedScene
       Entry: 5
       Data: false
     - Name: _sceneAsset
       Entry: 10
       Data: 1
-    - Name: _scenePath
-      Entry: 1
-      Data: Assets/VladislavTsurikov/SceneManagerTool/Examples/LevelSelect/Scenes/UI.unity
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 21|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.Components.Single,
-        VladislavTsurikov.SceneManagerTool
-    - Name: _selected
-      Entry: 5
-      Data: false
-    - Name: _active
-      Entry: 5
-      Data: true
-    - Name: SelectSettingsFoldout
-      Entry: 5
-      Data: true
-    - Name: SettingsStack
-      Entry: 7
-      Data: 22|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
-      Entry: 7
-      Data: 23|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SceneReference
-      Entry: 7
-      Data: 24|VladislavTsurikov.SceneUtility.Scripts.SceneReference, VladislavTsurikov.SceneUtility
-    - Name: _cachedScene
-      Entry: 5
-      Data: false
-    - Name: _sceneAsset
-      Entry: 10
-      Data: 2
     - Name: _scenePath
       Entry: 1
       Data: Assets/VladislavTsurikov/SceneManagerTool/Examples/LevelSelect/Scenes/Level1/Level1_Environment.unity
@@ -310,91 +262,26 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Name
-      Entry: 1
-      Data: Level 1
-    - Name: Startup
-      Entry: 5
-      Data: false
-    - Name: SettingsStack
       Entry: 7
-      Data: 25|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
-      Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 27|VladislavTsurikov.SceneManagerTool.Scripts.SceneCollectionSystem.SceneCollection,
+      Data: 21|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Single,
         VladislavTsurikov.SceneManagerTool
-    - Name: _selected
-      Entry: 5
-      Data: false
-    - Name: _active
-      Entry: 5
-      Data: true
     - Name: SelectSettingsFoldout
       Entry: 5
       Data: true
-    - Name: _id
-      Entry: 3
-      Data: 328871744
-    - Name: SceneComponentStack
-      Entry: 7
-      Data: 28|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneComponentStack,
-        VladislavTsurikov.SceneManagerTool
-    - Name: ComponentList
-      Entry: 7
-      Data: 29|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.SceneType,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 30|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.Components.Single,
-        VladislavTsurikov.SceneManagerTool
     - Name: _selected
       Entry: 5
       Data: true
     - Name: _active
       Entry: 5
       Data: true
-    - Name: SelectSettingsFoldout
-      Entry: 5
-      Data: true
     - Name: SettingsStack
       Entry: 7
-      Data: 31|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 22|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 32|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 23|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -409,13 +296,13 @@ MonoBehaviour:
       Data: 
     - Name: SceneReference
       Entry: 7
-      Data: 33|VladislavTsurikov.SceneUtility.Scripts.SceneReference, VladislavTsurikov.SceneUtility
+      Data: 24|VladislavTsurikov.SceneUtility.Runtime.SceneReference, VladislavTsurikov.SceneUtility
     - Name: _cachedScene
       Entry: 5
       Data: false
     - Name: _sceneAsset
       Entry: 10
-      Data: 1
+      Data: 2
     - Name: _scenePath
       Entry: 1
       Data: Assets/VladislavTsurikov/SceneManagerTool/Examples/LevelSelect/Scenes/UI.unity
@@ -426,26 +313,91 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Startup
+      Entry: 5
+      Data: false
+    - Name: SettingsStack
       Entry: 7
-      Data: 34|VladislavTsurikov.SceneManagerTool.Scripts.SceneTypeSystem.Components.Single,
+      Data: 25|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
+    - Name: _elementList
+      Entry: 7
+      Data: 26|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 27|VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem.SceneCollection,
         VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
     - Name: _selected
       Entry: 5
       Data: false
     - Name: _active
       Entry: 5
       Data: true
+    - Name: _id
+      Entry: 3
+      Data: -760376220
+    - Name: _name
+      Entry: 1
+      Data: Level 2
+    - Name: SceneTypeComponentStack
+      Entry: 7
+      Data: 28|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneTypeComponentStack,
+        VladislavTsurikov.SceneManagerTool
+    - Name: _elementList
+      Entry: 7
+      Data: 29|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.SceneType,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 30|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Single,
+        VladislavTsurikov.SceneManagerTool
     - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
+    - Name: _selected
+      Entry: 5
+      Data: false
+    - Name: _active
       Entry: 5
       Data: true
     - Name: SettingsStack
       Entry: 7
-      Data: 35|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 31|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 32|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -460,7 +412,7 @@ MonoBehaviour:
       Data: 
     - Name: SceneReference
       Entry: 7
-      Data: 37|VladislavTsurikov.SceneUtility.Scripts.SceneReference, VladislavTsurikov.SceneUtility
+      Data: 33|VladislavTsurikov.SceneUtility.Runtime.SceneReference, VladislavTsurikov.SceneUtility
     - Name: _cachedScene
       Entry: 5
       Data: false
@@ -477,6 +429,30 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 34|VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem.Single,
+        VladislavTsurikov.SceneManagerTool
+    - Name: SelectSettingsFoldout
+      Entry: 5
+      Data: true
+    - Name: _selected
+      Entry: 5
+      Data: true
+    - Name: _active
+      Entry: 5
+      Data: true
+    - Name: SettingsStack
+      Entry: 7
+      Data: 35|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
+    - Name: _elementList
+      Entry: 7
+      Data: 36|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -485,20 +461,44 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: Name
+    - Name: SceneReference
+      Entry: 7
+      Data: 37|VladislavTsurikov.SceneUtility.Runtime.SceneReference, VladislavTsurikov.SceneUtility
+    - Name: _cachedScene
+      Entry: 5
+      Data: false
+    - Name: _sceneAsset
+      Entry: 10
+      Data: 2
+    - Name: _scenePath
       Entry: 1
-      Data: Level 2
+      Data: Assets/VladislavTsurikov/SceneManagerTool/Examples/LevelSelect/Scenes/UI.unity
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: Startup
       Entry: 5
       Data: false
     - Name: SettingsStack
       Entry: 7
-      Data: 38|VladislavTsurikov.ComponentStack.Scripts.ComponentStack`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
+      Data: 38|VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack.ComponentStackOnlyDifferentTypes`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
         VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
-    - Name: ComponentList
+    - Name: _elementList
       Entry: 7
-      Data: 39|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.Scripts.SettingsSystem.SettingsComponent,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
+      Data: 39|VladislavTsurikov.ComponentStack.Runtime.Core.AdvancedElementList`1[[VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.SettingsComponent,
+        VladislavTsurikov.SceneManagerTool]], VladislavTsurikov.ComponentStack
     - Name: 
       Entry: 12
       Data: 0
@@ -540,28 +540,8 @@ MonoBehaviour:
       Data: 
     - Name: BuildSceneCollectionStackEditor
       Entry: 7
-      Data: 40|VladislavTsurikov.SceneManagerTool.ScriptsEditor.BuildSceneCollectionSystem.BuildSceneCollectionStackEditor,
+      Data: 40|VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem.BuildSceneCollectionStackEditor,
         VladislavTsurikov.SceneManagerTool
-    - Name: Editors
-      Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[VladislavTsurikov.SceneManagerTool.ScriptsEditor.BuildSceneCollectionSystem.DefaultBuildSceneCollectionEditor,
-        VladislavTsurikov.SceneManagerTool]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 42|VladislavTsurikov.SceneManagerTool.ScriptsEditor.BuildSceneCollectionSystem.DefaultBuildSceneCollectionEditor,
-        VladislavTsurikov.SceneManagerTool
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
     - Name: 
       Entry: 8
       Data: 

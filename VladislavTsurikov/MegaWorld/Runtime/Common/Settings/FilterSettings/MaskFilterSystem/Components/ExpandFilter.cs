@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
-    [MenuItem("Expand")]
+    [Name("Expand")]
     public class ExpandFilter : MaskFilter 
     {
         private const float MaxKernelSizeForNextIteration = 1;

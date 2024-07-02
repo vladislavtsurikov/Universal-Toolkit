@@ -5,13 +5,13 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
 {
     [Serializable]
-    public class RendererStack : ComponentStackOnlyDifferentTypes<CustomRenderer>
+    public class RendererStack : ComponentStackOnlyDifferentTypes<Renderer>
     {
         public void CheckChanges()
         {
             if (!Application.isPlaying)
             {
-                foreach (CustomRenderer setting in _elementList)
+                foreach (Renderer setting in _elementList)
                 {
                     setting?.CheckChanges(); 
                 }

@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
-    [MenuItem("Smooth")]
+    [Name("Smooth")]
     public class SmoothFilter : MaskFilter 
     {
         public float SmoothVerticality;

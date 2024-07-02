@@ -23,7 +23,7 @@ using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.Selectio
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Happy Artist/Pin")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Happy Artist/Pin")]
     [AddToolComponents(new []{typeof(PinToolSettings)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]

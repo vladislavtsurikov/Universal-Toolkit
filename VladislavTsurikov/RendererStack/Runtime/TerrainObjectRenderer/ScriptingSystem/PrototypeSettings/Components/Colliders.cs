@@ -4,7 +4,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Proto
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings
 {
-    [MenuItem("Colliders")]
+    [Name("Colliders")]
     public class Colliders : PrototypeComponent
     {
         [SerializeField]

@@ -7,7 +7,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
-    [MenuItem("Brush Settings")]
+    [Name("Brush Settings")]
     public class BrushSettings : Component
     {
         [OdinSerialize]

@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn
         {
             UnspawnUtility.UnspawnGroups(StamperTool.Data.SelectedData.SelectedGroupList, false);
             
-            StamperTool.StamperSpawn();
+            StamperTool.SpawnStamper();
         }
     }
 }

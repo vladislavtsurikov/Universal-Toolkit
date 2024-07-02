@@ -8,7 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 {
     [Serializable]
     [Simple]  
-    [MenuItem("Position Offset")]
+    [Name("Position Offset")]
     public class PositionOffset : TransformComponent
     {
         public float MinPositionOffsetY = -0.15f;

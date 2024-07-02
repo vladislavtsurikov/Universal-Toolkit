@@ -1,9 +1,8 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     [Serializable]
     public class AutoPositionDownSettings
@@ -35,7 +34,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
             _autoPositionDownSettings = autoPositionDownSettings;
         }
 
-        protected override void OnDisablePhysics()
+        protected internal override void OnDisablePhysics()
         {
             _autoPositionDownSettings.ApplyOffset(SimulatedBody.GameObject);
         }

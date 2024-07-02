@@ -6,9 +6,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
     {
         protected VirtualCamera VirtualCamera;
         
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            VirtualCamera = (VirtualCamera)args[0];
+            VirtualCamera = (VirtualCamera)setupData[0];
             
             SetupCameraTemporaryComponent();
         }

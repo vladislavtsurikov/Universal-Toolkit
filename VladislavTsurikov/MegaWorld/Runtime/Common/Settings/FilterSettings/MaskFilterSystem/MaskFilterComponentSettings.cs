@@ -6,7 +6,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
-    [MenuItem("Mask Filter Settings")]
+    [Name("Mask Filter Settings")]
     public class MaskFilterComponentSettings : Component
     {
 	    [OdinSerialize]

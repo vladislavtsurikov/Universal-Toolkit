@@ -1,5 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -20,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
     public static class SpawnGroup 
     {
-        public static IEnumerator SpawnGameObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
+        public static async UniTask SpawnGameObject(CancellationToken token, Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             
@@ -30,7 +31,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
-            yield return scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
+            await scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
                 if(rayHit != null)
@@ -54,13 +55,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                         Common.Utility.Spawn.SpawnPrototype.SpawnGameObject(group, proto, rayHit, fitness);
                     }
                 }
-            });
+            }, token);
         }
         
 #if RENDERER_STACK
-        public static IEnumerator SpawnTerrainObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
-        {            
-
+        public static async UniTask SpawnTerrainObject(CancellationToken token, Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
+        {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(displayProgressBar
@@ -69,7 +69,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
             
-            yield return scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
+            await UniTask.Delay(1000);
+            
+            await scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
                 if(rayHit != null)
@@ -93,15 +95,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                         Common.Utility.Spawn.SpawnPrototype.SpawnTerrainObject(proto, rayHit, fitness);
                     }
                 }
-            });
+            }, token);
         }
 #endif
 
-        public static IEnumerator SpawnTerrainDetails(Group group, IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
+        public static async UniTask SpawnTerrainDetails(CancellationToken token, Group group, IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {
             if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
-                yield break;
+                return;
             }
             
             foreach (Terrain terrain in Terrain.activeTerrains)
@@ -124,11 +126,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
                         }
                         
                         SpawnPrototype.SpawnTerrainDetails(group, proto, terrainsMaskManager, boxArea, terrain);
-                        
-                        yield return null;
+
+                        await UniTask.Yield();
                     }
                     
-                    yield return null;
+                    await UniTask.Yield();
                 }
             }
         }

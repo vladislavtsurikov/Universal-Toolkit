@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
-    [MenuItem("Single Scene")]
+    [Name("Single Scene")]
     public class Single : SceneType
     {
         public SceneReference SceneReference = new SceneReference();
@@ -26,14 +27,14 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
             }
         }
         
-        protected override IEnumerator Load()
+        protected override async UniTask Load()
         {
-            yield return SceneReference.LoadScene();
+            await SceneReference.LoadScene();
         }
 
-        protected override IEnumerator Unload(SceneCollection nextLoadSceneCollection)   
+        protected override async UniTask Unload(SceneCollection nextLoadSceneCollection)   
         {
-            yield return UnloadSceneReference(nextLoadSceneCollection, SceneReference);
+            await UnloadSceneReference(nextLoadSceneCollection, SceneReference);
         }
         
         public override bool HasScene(SceneReference sceneReference)

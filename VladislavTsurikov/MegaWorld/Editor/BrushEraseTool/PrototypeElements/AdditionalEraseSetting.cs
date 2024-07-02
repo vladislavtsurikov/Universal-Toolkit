@@ -7,7 +7,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.PrototypeElements
 {
     [Serializable]
-    [MenuItem("Additional Erase Settings")]
+    [Name("Additional Erase Settings")]
     public class AdditionalEraseSetting : Component
     {
         [Range (0, 100)]

@@ -1,6 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
@@ -9,8 +10,8 @@ using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegration
 {
-    [MenuItem("Sectorize")]
-    public class Sectorize : SceneType
+    [Name("Sectorize")]
+    public class SectorizeStreamingScenes : SceneType
     {
         private List<Sector> _loadSectors;
         
@@ -18,22 +19,23 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
         
         public static bool StartupLoadComplete { get; private set; }
 
-        protected override IEnumerator Load()
+        protected override async UniTask Load()
         {
-            _loadSectors = Runtime.Sectorize.Sectorize.Instance.GetLoadSectorsForSceneManager();
+            _loadSectors = Sectorize.Instance.GetLoadSectorsForSceneManager();
             
             foreach (var sector in _loadSectors)
             {
-                yield return sector.SceneReference.LoadScene();
+                await sector.SceneReference.LoadScene();
             }
             
             StartupLoadComplete = true;
         }
 
-        protected override IEnumerator Unload(SceneCollection nextLoadSceneCollection)   
+        protected override async UniTask Unload(SceneCollection nextLoadSceneCollection)   
         {
-            yield return StreamingUtility.UnloadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag());
             StartupLoadComplete = false;
+            _loadSectors = null;
+            await StreamingUtility.UnloadAllScenes(Sectorize.GetSectorLayerTag());
         }
         
         public override bool HasScene(SceneReference sceneReference)

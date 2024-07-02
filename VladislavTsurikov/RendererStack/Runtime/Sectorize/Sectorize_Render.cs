@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
-using Coroutine = VladislavTsurikov.Coroutines.Runtime.Coroutine;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
     public partial class Sectorize
     {
-        private Coroutine _pauseLoadCoroutine;
+        private Scene _lastLoadedScene;
 
         public override void Render()
         {
             if (Application.isPlaying)
             {
-                if (!SceneManagerIntegration.Sectorize.StartupLoadComplete)
+                if (!SceneManagerIntegration.SectorizeStreamingScenes.StartupLoadComplete)
                 {
                     return;
                 }
@@ -49,7 +50,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                     
                 foreach (var sector in loadSectors)
                 {
-                    sector.SceneReference.UnloadSceneCoroutine?.Cancel();
+                    sector.SceneReference.UnloadSceneCancellationTokenSource?.Cancel();
 
                     if (sector.IsLoaded)
                     {
@@ -63,11 +64,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                         sector.LoadScene();
                         continue;
                     }
-                                    
-                    if (_pauseLoadCoroutine == null || _pauseLoadCoroutine.Finished)
+                    
+                    if (!_lastLoadedScene.IsValid() || _lastLoadedScene.isLoaded)
                     {
                         sector.LoadScene(CalculateMaximumPauseBeforeLoadingScene(sector, cam.Camera.transform.position, streamingRules));
-                        _pauseLoadCoroutine = sector.SceneReference.LoadSceneCoroutine;
+                        _lastLoadedScene = sector.SceneReference.Scene;
                     }
                 }
                         

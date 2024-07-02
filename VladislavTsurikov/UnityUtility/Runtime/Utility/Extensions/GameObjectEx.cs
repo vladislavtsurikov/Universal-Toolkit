@@ -12,7 +12,10 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
             foreach (var child in childTransforms)
             {
-                if (child.gameObject != gameObject) allChildren.Add(child.gameObject);
+                if (child.gameObject != gameObject)
+                {
+                    allChildren.Add(child.gameObject);
+                }
             }
 
             return allChildren;
@@ -49,10 +52,16 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         public static Mesh GetMesh(this GameObject gameObject)
         {
             MeshFilter meshFilter = gameObject.GetComponent<MeshFilter>();
-            if (meshFilter != null && meshFilter.sharedMesh != null) return meshFilter.sharedMesh;
+            if (meshFilter != null && meshFilter.sharedMesh != null)
+            {
+                return meshFilter.sharedMesh;
+            }
 
             SkinnedMeshRenderer skinnedMeshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
-            if (skinnedMeshRenderer != null && skinnedMeshRenderer.sharedMesh != null) return skinnedMeshRenderer.sharedMesh;
+            if (skinnedMeshRenderer != null && skinnedMeshRenderer.sharedMesh != null)
+            {
+                return skinnedMeshRenderer.sharedMesh;
+            }
 
             return null;
         }
@@ -60,10 +69,16 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         public static bool IsRendererEnabled(this GameObject gameObject)
         {
             MeshRenderer meshRenderer = gameObject.GetComponent<MeshRenderer>();
-            if (meshRenderer != null) return meshRenderer.enabled;
+            if (meshRenderer != null)
+            {
+                return meshRenderer.enabled;
+            }
 
             SkinnedMeshRenderer skinnedRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
-            if (skinnedRenderer != null) return skinnedRenderer.enabled;
+            if (skinnedRenderer != null)
+            {
+                return skinnedRenderer.enabled;
+            }
 
             return false;
         }

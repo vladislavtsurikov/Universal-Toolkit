@@ -12,7 +12,7 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [MenuItem("Move Up/Down")]
+    [Name("Move Up/Down")]
 	public class MoveAlongDirection : Action
     {
         private ShortcutCombo _shortcutCombo;

@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
@@ -10,11 +11,11 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.StreamingUtility
 {
     public static class StreamingUtilityEditor
     {
-        public static IEnumerator CreateScene(string tag, string sceneName, Bounds bounds, List<GameObject> moveGameObjectToScene)
+        public static async UniTask CreateScene(string tag, string sceneName, Bounds bounds, List<GameObject> moveGameObjectToScene)
         {
             SceneReference sceneReference = SectorLayerManager.Instance.CreateScene(tag, sceneName, bounds);
 
-            yield return sceneReference.LoadScene();
+            await sceneReference.LoadScene();
 
             foreach (var gameObject in moveGameObjectToScene)
             {
@@ -24,10 +25,9 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.StreamingUtility
             }
             
             StreamingUtilityEvents.CreateSceneAfterEvent?.Invoke();
-            yield return null;
         }
         
-        public static SceneReference CreateScene(string sceneName, string tag, Bounds bounds)
+        public static SceneReference CreateScene(string tag, string sceneName, Bounds bounds)
         {
             SceneReference sceneReference = SectorLayerManager.Instance.CreateScene(tag, sceneName, bounds);
             

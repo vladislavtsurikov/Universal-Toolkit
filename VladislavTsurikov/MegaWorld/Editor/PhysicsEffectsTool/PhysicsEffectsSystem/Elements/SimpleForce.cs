@@ -5,7 +5,7 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Simple Force")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Simple Force")]
 	public class SimpleForce : PhysicsEffect
     {
         public float MaxForce => 500;

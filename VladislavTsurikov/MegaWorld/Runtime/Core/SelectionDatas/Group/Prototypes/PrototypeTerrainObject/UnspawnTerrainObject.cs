@@ -2,7 +2,6 @@
 using UnityEngine;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {

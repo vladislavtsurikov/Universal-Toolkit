@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Modify Transform Components")]
+    [Name("Modify Transform Components")]
     public class ModifyTransformSettings : ComponentStack.Runtime.Core.Component
     {
         public ComponentStackOnlyDifferentTypes<ModifyTransformComponent> ModifyTransformComponentStack = new ComponentStackOnlyDifferentTypes<ModifyTransformComponent>();

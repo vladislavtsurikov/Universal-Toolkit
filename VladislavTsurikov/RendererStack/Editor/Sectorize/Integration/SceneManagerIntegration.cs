@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegration;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.SceneManagerTool.Editor;
 using VladislavTsurikov.SceneManagerTool.Runtime;
@@ -47,12 +48,11 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
                 ActiveScene activeSceneSettings = (ActiveScene)sceneCollection.SettingsStack.CreateIfMissingType(typeof(ActiveScene));
                 activeSceneSettings.SceneReference = new SceneReference(scene);
 
-                Runtime.Sectorize.SceneManagerIntegration.Sectorize sectorizeComponent = (Runtime.Sectorize.SceneManagerIntegration.Sectorize)sceneCollection.SceneTypeComponentStack.CreateComponentIfMissingType(
-                    typeof(Runtime.Sectorize.SceneManagerIntegration.Sectorize));
+                SectorizeStreamingScenes sectorizeStreamingScenesComponent = (SectorizeStreamingScenes)sceneCollection.SceneTypeComponentStack.CreateComponentIfMissingType(typeof(SectorizeStreamingScenes));
             
                 foreach (var sector in StreamingUtility.GetAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()))
                 {
-                    sectorizeComponent.AddSubScene(sector.SceneReference);
+                    sectorizeStreamingScenesComponent.AddSubScene(sector.SceneReference);
                 }
             }
         }
@@ -86,7 +86,15 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.Integration
 
             foreach (var sceneCollection in buildSceneCollection.SceneCollectionStack.ElementList)
             {
-                if (((IHasName)sceneCollection).Name == scene.name)
+                ActiveScene activeScene = (ActiveScene)sceneCollection.SettingsStack.GetElement(typeof(ActiveScene));
+                SectorizeStreamingScenes sectorizeStreamingScenes = (SectorizeStreamingScenes)sceneCollection.SceneTypeComponentStack.GetElement(typeof(SectorizeStreamingScenes));
+
+                if (activeScene == null || sectorizeStreamingScenes == null)
+                {
+                    continue;
+                }
+
+                if (activeScene.SceneReference.SceneName == scene.name)
                 {
                     return sceneCollection;
                 }

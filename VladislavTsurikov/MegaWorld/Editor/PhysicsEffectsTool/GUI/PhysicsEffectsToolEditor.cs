@@ -4,8 +4,7 @@ using VladislavTsurikov.MegaWorld.Editor.Common;
 using VladislavTsurikov.MegaWorld.Editor.Common.PhysXPainter.Settings;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.GUI
 {
@@ -22,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.GUI
 	    
 	    public override void DrawFirstSettings()
 	    {
-		    PhysicsSimulatorSettingsEditor.OnGUI<GlobalTimeDisablePhysics>(PhysicsSimulatorSettings.Instance, false);
+		    PhysicsSimulatorSettingsEditor.OnGUI<GlobalTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance, false);
 	    }
     }
 }

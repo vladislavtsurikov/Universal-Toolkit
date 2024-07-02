@@ -28,7 +28,7 @@ using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSetti
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
-    [MenuItem("Spray Brush")]
+    [Name("Spray Brush")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]

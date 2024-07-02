@@ -27,7 +27,7 @@ using LODGroup = VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererS
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
-    [MenuItem("Terrain Object Renderer")]
+    [Name("Terrain Object Renderer")]
     [PrototypeType(typeof(PrototypeTerrainObject))]
     [GenerateGPUInstancedIndirectShaders]
     [AddSceneData(new[] { typeof(TerrainObjectRendererData), typeof(TerrainManager)})]
@@ -38,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
     [AddPrototypeComponents(new[] { typeof(LODGroup), typeof(Shadow), typeof(DistanceCulling), typeof(FrustumCulling), typeof(Colliders), typeof(Scripting) })]
     public partial class TerrainObjectRenderer : PrototypeRenderer
     {
-        private static TerrainObjectRenderer _sInstance;
+        private static TerrainObjectRenderer s_instance;
 
         public static TerrainObjectRenderer Instance
         {
@@ -49,14 +49,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
                     return null;
                 }
 
-                _sInstance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
+                s_instance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
 
-                if (_sInstance == null)
+                if (s_instance == null)
                 {
-                    _sInstance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.CreateIfMissingType(typeof(TerrainObjectRenderer));
+                    s_instance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.CreateIfMissingType(typeof(TerrainObjectRenderer));
                 }
 
-                return _sInstance;
+                return s_instance;
             }
         }
 
@@ -92,7 +92,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             GPUFrustumCullingID.Dispose();
         }
 
-        public void NewTerrainAction(SceneDataManager sceneDataManager)
+        private void NewTerrainAction(SceneDataManager sceneDataManager)
         {
             if (SceneManager.sceneCount == 1)
             {

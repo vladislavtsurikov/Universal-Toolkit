@@ -92,7 +92,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             
             foreach (var sectorLayer in sectorLayers)
             {
-                foreach (var sector in sectorLayer.ObjectBoundsBvhTree.RaycastAll(ray))
+                foreach (var sector in sectorLayer.ObjectBoundsBVHTree.RaycastAll(ray))
                 {
                     if (sector.IsLoaded)
                     {

@@ -6,13 +6,13 @@ using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
 {
-    [MenuItem("Build Scene Collection")]
+    [Name("Build Scene Collection")]
     public class DefaultBuildSceneCollection : BuildSceneCollection
     {
         [OdinSerialize] 
         public SceneCollectionStack SceneCollectionStack = new SceneCollectionStack();
         
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             SceneCollectionStack.Setup();
         }

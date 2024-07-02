@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Concavity")]
+    [Name("Concavity")]
     public class ConcavityFilter : MaskFilter 
     {
         public enum ConcavityMode 

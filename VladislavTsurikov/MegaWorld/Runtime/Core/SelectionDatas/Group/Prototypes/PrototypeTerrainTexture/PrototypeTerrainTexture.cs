@@ -10,7 +10,7 @@ using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.Pr
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture
 {
     [Serializable]
-    [MenuItem("Unity/Terrain Texture")]
+    [Name("Unity/Terrain Texture")]
     [MissingIconsWarning("Drag & Drop Texture or Terrain Layers Here")]
     [DropObjects(new[]{typeof(Texture2D), typeof(TerrainLayer)})]
     public class PrototypeTerrainTexture : Prototype

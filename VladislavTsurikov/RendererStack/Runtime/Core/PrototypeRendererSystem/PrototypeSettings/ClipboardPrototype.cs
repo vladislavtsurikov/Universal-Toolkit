@@ -32,7 +32,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
 
                 foreach (PrototypeComponent baseSettings in _clipboardStack.CopiedComponentList)
                 {
-                    string name = baseSettings.GetType().GetAttribute<MenuItemAttribute>().Name;
+                    string name = baseSettings.GetType().GetAttribute<NameAttribute>().Name;
                     menu.AddItem(new GUIContent("Paste Settings/" + name), false, ContextMenuUtility.ContextMenuCallback, new Action(() => _clipboardStack.ClipboardAction(GetStacks(selectedData.SelectedProtoList), baseSettings.GetType(), true)));	
                 }
             }

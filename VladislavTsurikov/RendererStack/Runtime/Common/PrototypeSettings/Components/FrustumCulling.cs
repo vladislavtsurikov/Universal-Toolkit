@@ -11,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings
         DirectionLightShadowVisible
     }
     
-    [MenuItem("Frustum Culling Settings")]
+    [Name("Frustum Culling Settings")]
     public class FrustumCulling : PrototypeComponent
     {
         public GetAdditionalShadow GetAdditionalShadow = GetAdditionalShadow.DirectionLightShadowVisible;

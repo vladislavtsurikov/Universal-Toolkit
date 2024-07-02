@@ -62,7 +62,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             DoTool();
         }
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
 	        OnEnable();
         }

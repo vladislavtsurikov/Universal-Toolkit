@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Console
 {
@@ -10,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.C
 
         public static void Log(Prototype prototype, PrototypeLog prototypeLog)
         {
-            foreach (CustomRenderer customRenderer in RendererStackManager.Instance.RendererStack.ElementList)
+            foreach (Renderer customRenderer in RendererStackManager.Instance.RendererStack.ElementList)
             {
                 if (customRenderer is PrototypeRenderer prototypeRenderer)
                 {

@@ -1,20 +1,17 @@
 using System;
-using System.Collections;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.Profiling;
+using UnityEngine.SceneManagement;
+using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility.Runtime;
+using Object = UnityEngine.Object;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
-using UnityEngine;
-using UnityEngine.Profiling;
-using UnityEngine.SceneManagement;
-using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.Coroutines.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.ReflectionUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
-using Coroutine = VladislavTsurikov.Coroutines.Runtime.Coroutine;
-using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.SceneUtility.Runtime
 {
@@ -27,9 +24,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         [OdinSerialize] private bool _cachedScene;
         private SceneOperations _sceneOperations;
         
-        public Coroutine UnloadSceneCoroutine { get; private set; }
-        public Coroutine LoadSceneCoroutine { get; private set; }
-        public Coroutine KeepCachedSceneCoroutine { get; private set; }
+        public CancellationTokenSource UnloadSceneCancellationTokenSource { get; private set; }
+        public CancellationTokenSource LoadSceneCancellationTokenSource { get; private set; }
+        public CancellationTokenSource KeepCachedSceneCancellationTokenSource { get; private set; }
 
         public SceneOperations SceneOperations
         {
@@ -193,29 +190,29 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         }
 #endif
 
-        public IEnumerator LoadScene(float waitForSeconds = 0)
+        public async UniTask LoadScene(float waitForSeconds = 0)
         {
             if (!IsValid())
             {
-                yield break;
+                return;
             }
 
             if (IsLoaded || SceneOperations.IsLoading())
             {
-                yield break;
+                return;
             }
             
-            UnloadSceneCoroutine?.Cancel();
-            KeepCachedSceneCoroutine?.Cancel();
-
-            LoadSceneCoroutine = CoroutineRunner.StartCoroutine(Coroutine());
-            yield return LoadSceneCoroutine;
+            UnloadSceneCancellationTokenSource?.Cancel();
+            KeepCachedSceneCancellationTokenSource?.Cancel();
             
-            IEnumerator Coroutine()
+            LoadSceneCancellationTokenSource = new CancellationTokenSource();
+            await Load(LoadSceneCancellationTokenSource.Token);
+
+            async UniTask Load(CancellationToken token)
             {
                 if (waitForSeconds != 0)
                 {
-                    yield return new WaitForSeconds(waitForSeconds);
+                    await UniTask.WaitForSeconds(waitForSeconds, cancellationToken: token);
                 }
 
                 if (_cachedScene)
@@ -227,41 +224,41 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 #if UNITY_EDITOR
                 if (Application.isPlaying)
                 {
-                    yield return SceneOperations.LoadScene();
+                    await SceneOperations.LoadSceneInternal();
                 }
                 else
                 {
                     EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Additive);
                 }
 #else
-                yield return SceneOperations.LoadScene();
+                await SceneOperations.LoadSceneInternal();
 #endif
             }
         }
         
-        public IEnumerator UnloadScene(float waitForSeconds = 0)
+        public async UniTask UnloadScene(float waitForSeconds = 0)
         {
             if (!IsValid())
             {
-                yield break;
+                return;
             }
 
             if (!IsLoaded || SceneOperations.IsUnloading())
             {
-                yield break;
+                return;
             }
             
-            LoadSceneCoroutine?.Cancel();
-            KeepCachedSceneCoroutine?.Cancel();
+            LoadSceneCancellationTokenSource?.Cancel();
+            KeepCachedSceneCancellationTokenSource?.Cancel();
             
-            UnloadSceneCoroutine = CoroutineRunner.StartCoroutine(Coroutine());
-            yield return UnloadSceneCoroutine;
+            UnloadSceneCancellationTokenSource = new CancellationTokenSource();
+            await Unload(UnloadSceneCancellationTokenSource.Token);
 
-            IEnumerator Coroutine()
+            async UniTask Unload(CancellationToken token)
             {
                 if (waitForSeconds != 0)
                 {
-                    yield return new WaitForSeconds(waitForSeconds);
+                    await UniTask.WaitForSeconds(waitForSeconds, cancellationToken: token);
                 }
 
                 if (_cachedScene)
@@ -273,7 +270,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 #if UNITY_EDITOR
                 if (Application.isPlaying)
                 {
-                    yield return SceneOperations.UnloadScene();
+                    await SceneOperations.UnloadSceneInternal();
                 }
                 else
                 {
@@ -285,34 +282,37 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     EditorSceneManager.CloseScene(Scene, true);
                 }
 #else
-                yield return SceneOperations.UnloadScene();
+                await SceneOperations.UnloadSceneInternal();
 #endif
             }
         }
 
         public void CacheScene(float waitForSeconds = 0, float keepScene = 0)
         {
-            if (IsLoaded)
+            if (!IsLoaded)
             {
-                if (keepScene == 0 || Profiler.GetTotalReservedMemoryLong() > StreamingUtilitySettings.Instance.GetCacheMemoryThresholdInBytes())
-                {
-                    CoroutineRunner.StartCoroutine(UnloadScene());
-                }
-                else
-                {
-                    UnloadSceneCoroutine = CoroutineRunner.StartCoroutine(Coroutine());
+                return;
+            }
+            
+            if (keepScene == 0 || Profiler.GetTotalReservedMemoryLong() > StreamingUtilitySettings.Instance.GetCacheMemoryThresholdInBytes())
+            {
+                UnloadScene().Forget();
+            }
+            else
+            {
+                KeepCachedSceneCancellationTokenSource = new CancellationTokenSource();
+                Unload(KeepCachedSceneCancellationTokenSource.Token).Forget();
                     
-                    IEnumerator Coroutine()
-                    {
-                        yield return new WaitForSeconds(waitForSeconds);
+                async UniTask Unload(CancellationToken token)
+                {
+                    await UniTask.WaitForSeconds(waitForSeconds, cancellationToken: token);
                         
-                        SetActiveGameObjects(false);
-                        _cachedScene = true;
+                    SetActiveGameObjects(false);
+                    _cachedScene = true;
                         
-                        yield return new WaitForSeconds(keepScene);
-
-                        KeepCachedSceneCoroutine = CoroutineRunner.StartCoroutine(UnloadScene(), this);
-                    }
+                    await UniTask.WaitForSeconds(keepScene, cancellationToken: token);
+                        
+                    await UnloadScene();
                 }
             }
         }

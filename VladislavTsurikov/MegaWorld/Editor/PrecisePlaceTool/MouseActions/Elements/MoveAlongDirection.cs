@@ -13,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         Y
     }
     
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Move Along Direction")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Move Along Direction")]
     public class MoveAlongDirection : MouseAction
     {
         private ShortcutCombo _mainShortcutCombo;

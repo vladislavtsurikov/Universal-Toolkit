@@ -9,7 +9,7 @@ using VladislavTsurikov.OdinSerializer.Core.Misc;
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
 {
     [Serializable]
-    [MenuItem("Edit Tool Settings")]
+    [Name("Edit Tool Settings")]
     public class EditToolSettings : Component 
     {
         [OdinSerialize]
@@ -27,7 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
 		public float SphereSize = 40;
         public float MaxDistance = 200;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
 	        _actionStack.Setup();
         }

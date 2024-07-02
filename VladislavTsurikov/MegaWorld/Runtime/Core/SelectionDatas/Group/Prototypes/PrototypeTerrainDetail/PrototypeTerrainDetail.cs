@@ -3,7 +3,6 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail
@@ -15,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     }
     
     [Serializable]
-    [MenuItem("Unity/Terrain Detail")]
+    [Name("Unity/Terrain Detail")]
     [MissingIconsWarning("Drag & Drop Prefabs or Textures Here")]
     [DropObjects(new[]{typeof(Texture2D), typeof(GameObject)})]
     public class PrototypeTerrainDetail : Prototype

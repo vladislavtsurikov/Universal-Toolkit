@@ -1,24 +1,27 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
-    [MenuItem("Failure Rate")]  
+    [Name("Failure Rate")]  
     public class FailureRate : Scatter
     {
         public float Value = 70;
-        
-        public override IEnumerator Samples(BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
+
+        public override async UniTask Samples(CancellationToken token, BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
         {
             for (int i = samples.Count - 1; i >= 0 ; i--)
             {
+                token.ThrowIfCancellationRequested();
+                
                 if (ScatterStack.IsWaitForNextFrame())
                 {
-                    yield return null;
+                    await UniTask.Yield();
                 }
                 
                 if(UnityEngine.Random.Range(0f, 100f) < Value)

@@ -11,7 +11,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 
 namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 {
-	[ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Terrain Spawner")]
+	[ComponentStack.Runtime.AdvancedComponentStack.Name("Terrain Spawner")]
     [CustomEditor(typeof(Runtime.TerrainSpawner.TerrainSpawner))]
 	public sealed class TerrainSpawnerEditor : MonoBehaviourToolEditor
     {

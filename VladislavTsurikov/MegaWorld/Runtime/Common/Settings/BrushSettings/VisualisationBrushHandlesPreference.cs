@@ -4,7 +4,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
 {
-    [MenuItem("Visualisation Brush Handles")]
+    [Name("Visualisation Brush Handles")]
     public class VisualisationBrushHandlesPreference : PreferenceSettings
     {
         public bool DrawSolidDisc = true;

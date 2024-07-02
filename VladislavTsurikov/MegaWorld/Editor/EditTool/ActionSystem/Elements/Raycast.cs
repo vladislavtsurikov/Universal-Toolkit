@@ -12,7 +12,7 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Raycast")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Raycast")]
 	public class Raycast : Action
     {
         private ShortcutCombo _shortcutCombo;

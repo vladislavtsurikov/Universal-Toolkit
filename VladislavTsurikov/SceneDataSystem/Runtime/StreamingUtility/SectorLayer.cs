@@ -2,11 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
-
 #if UNITY_EDITOR
 using VladislavTsurikov.SceneUtility.Editor;
 using UnityEditor;
@@ -25,7 +24,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         public List<Sector> SectorList = new List<Sector>();
         public SectorBVHTree SectorBvhTree { get; private set; } = new SectorBVHTree();
 
-        public ObjectBoundsBVHTree ObjectBoundsBvhTree { get; private set; } = new ObjectBoundsBVHTree();
+        public ObjectBoundsBVHTree ObjectBoundsBVHTree { get; private set; } = new ObjectBoundsBVHTree();
 
         public SectorLayer(string tag)
         {
@@ -36,7 +35,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         private void Initialize()
         {
             SectorBvhTree = new SectorBVHTree();
-            ObjectBoundsBvhTree = new ObjectBoundsBVHTree();
+            ObjectBoundsBVHTree = new ObjectBoundsBVHTree();
         }
         
         public void Setup()
@@ -46,14 +45,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 #endif
             
             SectorBvhTree.Clear();
-            ObjectBoundsBvhTree.Clear();
+            ObjectBoundsBVHTree.Clear();
 
             foreach (var sector in SectorList)
             {
-                sector.Setup(ObjectBoundsBvhTree);
+                sector.Setup(ObjectBoundsBVHTree);
                 
                 SectorBvhTree.RegisterSector(sector); 
-                ObjectBoundsBvhTree.RegisterSector(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
+                ObjectBoundsBVHTree.RegisterSector(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
             }
         }
 
@@ -76,7 +75,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 {
                     if (sector.SceneReference.SceneName == scene.name)
                     {
-                        sectorLayer.ObjectBoundsBvhTree.ChangeNodeSize(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
+                        sectorLayer.ObjectBoundsBVHTree.ChangeNodeSize(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
                     }
                 }
             }
@@ -127,7 +126,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 #if UNITY_EDITOR
         private Sector AddSector(SceneAsset sceneAsset, Bounds bounds)
         {
-            Sector sector = new Sector(sceneAsset, bounds, ObjectBoundsBvhTree); 
+            Sector sector = new Sector(sceneAsset, bounds, ObjectBoundsBVHTree); 
             SectorList.Add(sector);
             SectorBvhTree.RegisterSector(sector);
             
@@ -168,13 +167,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 SceneManager.MoveGameObjectToScene(gameObject, activeScene);
             }
             
-            CoroutineRunner.StartCoroutine(Coroutine());
+            Async().Forget();
             
-            return;
-            
-            IEnumerator Coroutine()
+            async UniTask Async()
             {
-                yield return sector.SceneReference.UnloadScene();
+                await sector.SceneReference.UnloadScene();
                 sector.SceneReference.DeleteAsset();
             }
         }

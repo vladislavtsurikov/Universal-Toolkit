@@ -1,8 +1,7 @@
 using UnityEditor;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.Settings
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     [LocationAsset("Physics Simulation Settings")]
     public class PhysicsSimulatorSettings : SerializedScriptableObjectSingleton<PhysicsSimulatorSettings>

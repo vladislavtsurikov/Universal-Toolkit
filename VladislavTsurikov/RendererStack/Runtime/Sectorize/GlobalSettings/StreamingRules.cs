@@ -4,7 +4,7 @@ using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings
 {
-    [MenuItem("Streaming Rules")]
+    [Name("Streaming Rules")]
     public class StreamingRules : GlobalComponent
     {
         public float MaxImmediatelyLoadingDistance = 2000;

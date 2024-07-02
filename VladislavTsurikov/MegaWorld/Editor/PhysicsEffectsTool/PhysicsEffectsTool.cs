@@ -14,7 +14,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool
 {
-    [MenuItem("PhysX Painter/Physics Effects")]
+    [Name("PhysX Painter/Physics Effects")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeGameObject)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]

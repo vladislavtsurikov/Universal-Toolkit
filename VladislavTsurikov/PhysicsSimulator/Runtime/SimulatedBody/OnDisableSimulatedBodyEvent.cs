@@ -1,14 +1,9 @@
-﻿namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
+﻿namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     public abstract class OnDisableSimulatedBodyEvent
     {
         protected internal SimulatedBody SimulatedBody;
 
-        internal void OnDisablePhysicsInternal()
-        {
-            OnDisablePhysics();
-        }
-
-        protected abstract void OnDisablePhysics();
+        protected internal abstract void OnDisablePhysics();
     }
 }

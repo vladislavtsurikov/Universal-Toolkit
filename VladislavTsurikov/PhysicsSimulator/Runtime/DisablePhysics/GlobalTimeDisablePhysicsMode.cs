@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
-    public class GlobalTimeDisablePhysics : DisablePhysics
+    public class GlobalTimeDisablePhysicsMode : DisablePhysicsMode
     {
         private float _timeToFinish;
 
@@ -17,7 +15,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics
             }
         }
 
-        internal override void OnActivate()
+        internal override void Reset()
         {
             _timeToFinish = Time.time + PhysicsSimulatorSettings.Instance.GlobalDisablePhysicsTime;
         }

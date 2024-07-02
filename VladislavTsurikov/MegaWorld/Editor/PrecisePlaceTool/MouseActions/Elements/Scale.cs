@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         UniformScale,
     }
     
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Scale")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Scale")]
     public class Scale : MouseAction
     {
         private ScaleMode _scaleMode;

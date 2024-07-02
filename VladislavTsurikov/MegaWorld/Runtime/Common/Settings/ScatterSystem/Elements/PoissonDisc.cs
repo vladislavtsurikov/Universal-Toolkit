@@ -1,13 +1,14 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
-    [MenuItem("Poisson Disc")]  
+    [Name("Poisson Disc")]  
     public class PoissonDisc : Scatter
     {
         /// Helper struct to calculate the x and y indices of a sample in the grid
@@ -32,14 +33,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
         private float _cellSize;
         private Vector2[,] _grid;
         private List<Vector2> _activeSamples = new List<Vector2>();
-
+        
         /// Create a sampler with the following parameters:
         ///
         /// width:  each sample's x coordinate will be between [0, width]
         /// height: each sample's y coordinate will be between [0, height]
         /// radius: each sample will be at least `radius` units away from any other sample, and at most 2 * `radius`.
-        
-        public override IEnumerator Samples(BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
+        public override async UniTask Samples(CancellationToken token, BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
         {
             Init(boxArea.Bounds.size.z, boxArea.Bounds.size.x, PoissonDiscSize / 2);
 
@@ -48,14 +48,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
             onSpawn?.Invoke(point);
             if (ScatterStack.IsWaitForNextFrame())
             {
-                yield return null;
+                await UniTask.Yield();
             }
 
             while (_activeSamples.Count > 0)
             {
+                token.ThrowIfCancellationRequested();
+                
                 if (ScatterStack.IsWaitForNextFrame())
                 {
-                    yield return null;
+                    await UniTask.Yield();
                 }
                 
                 // Pick a random active sample

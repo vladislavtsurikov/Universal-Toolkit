@@ -7,7 +7,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Snap Rotation")]  
+    [Name("Snap Rotation")]  
     public class SnapRotation : TransformComponent
     {
         [Range(0.1f, 360f)]

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Cameras")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Cameras")]
     public partial class CameraManager : SceneComponent
     {
         public List<VirtualCamera> VirtualCameraList = new List<VirtualCamera>();
@@ -16,7 +16,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
             VirtualCameraList ??= new List<VirtualCamera>();
         }
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             for (int i = VirtualCameraList.Count - 1; i >= 0; i--)
             {

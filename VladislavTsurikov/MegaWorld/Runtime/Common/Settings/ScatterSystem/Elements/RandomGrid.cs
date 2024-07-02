@@ -1,6 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.Math.Runtime;
@@ -15,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
         Sphere,
     }
     
-    [MenuItem("Random Grid")]  
+    [Name("Random Grid")]  
     public class RandomGrid : Scatter
     {
 	    private Vector3 _visualOrigin;
@@ -28,8 +29,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
         public float GridAngle;
         
         public float FailureRate = 20;
-
-        public override IEnumerator Samples(BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
+        
+        public override async UniTask Samples(CancellationToken token, BoxArea boxArea, List<Vector2> samples, Action<Vector2> onSpawn = null)
         {
 	        UpdateGrid(boxArea.Center, boxArea.BoxSize);
 
@@ -44,16 +45,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 	        {
 		        for (position.z = gridOrigin.z; position.z < maxPosition.y; position.z += GridStep.y)
 		        {
-			        if (ScatterStack.IsWaitForNextFrame()) 
+			        token.ThrowIfCancellationRequested();
+			        
+			        if (ScatterStack.IsWaitForNextFrame())
 			        {
-				        yield return null;
+				        await UniTask.Yield();
 			        }
 			        
 			        Vector3 newLocalPosition = Vector3Ex.RotatePointAroundPivot(position, new Vector3(maxPosition.x / 2, 0, maxPosition.z / 2), Quaternion.AngleAxis(GridAngle, Vector3.up));
 			        Vector2 offsetLocalPosition = new Vector2(_visualOrigin.x + newLocalPosition.x, _visualOrigin.z + newLocalPosition.z);
 			        offsetLocalPosition = GetCurrentRandomPosition(offsetLocalPosition);
-                    
-			        if(UnityEngine.Random.Range(0f, 100f) > FailureRate)
+
+			        if (UnityEngine.Random.Range(0f, 100f) > FailureRate)
 			        {
 				        if (boxArea.Contains(offsetLocalPosition))
 				        {

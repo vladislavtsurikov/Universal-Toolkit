@@ -7,7 +7,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFil
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
 {
     [Serializable]
-    [MenuItem("Height Noise")]
+    [Name("Height Noise")]
     public class HeightNoiseFilter : MaskFilter 
     {
 #if UNITY_EDITOR

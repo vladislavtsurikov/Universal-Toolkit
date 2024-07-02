@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -28,7 +28,7 @@ using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSetti
 
 namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
-    [MenuItem("Advanced Brush")]
+    [Name("Advanced Brush")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail), typeof(PrototypeTerrainTexture)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]
@@ -126,11 +126,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
-                CoroutineRunner.StartCoroutine(SpawnGroup.SpawnGroupGameObject(group, area, dragMouse));
+                SpawnGroup.SpawnGroupGameObject(group, area, dragMouse).Forget();
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                CoroutineRunner.StartCoroutine(SpawnGroup.SpawnGroupTerrainObject(group, area, dragMouse));
+                SpawnGroup.SpawnGroupTerrainObject(group, area, dragMouse).Forget();
             }
             else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
             {

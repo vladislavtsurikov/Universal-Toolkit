@@ -5,7 +5,7 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Black Hole")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Black Hole")]
 	public class BlackHole : PhysicsEffect
     {
         public float MaxForce => 500;

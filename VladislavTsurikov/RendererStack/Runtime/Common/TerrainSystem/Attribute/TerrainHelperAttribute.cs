@@ -7,7 +7,7 @@ using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtili
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class TerrainHelperAttribute : System.Attribute
+    public class TerrainHelperAttribute : Attribute
     {
         public readonly Type RequiredСomponent;
         public readonly string Name;

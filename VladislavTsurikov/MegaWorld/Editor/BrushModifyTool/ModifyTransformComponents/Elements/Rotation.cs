@@ -4,7 +4,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Rotation")]
+    [Name("Rotation")]
     public class Rotation : ModifyTransformComponent
     {
         public float ModifyStrengthRotation = 3;

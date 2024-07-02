@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace VladislavTsurikov.SceneUtility.Runtime
 {
@@ -13,26 +15,29 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             SceneReference = sceneReference;
         }
 
-        public IEnumerator LoadScene()
+        internal async UniTask LoadSceneInternal()
         {
             if (SceneReference.Scene.isLoaded || IsLoading())
-                yield break;
+            {
+                return;
+            }
 
-            yield return LoadSceneOverride();
+            await LoadScene();
         }
 
-        public IEnumerator UnloadScene()
+        internal async UniTask UnloadSceneInternal()
         {
             if (!SceneReference.Scene.isLoaded || IsUnloading())
-                yield break;
+            {
+                return;
+            }
             
-            yield return UnloadSceneOverride();
+            await UnloadScene();
         }
         
-        protected abstract IEnumerator LoadSceneOverride();
-        protected abstract IEnumerator UnloadSceneOverride();
+        protected abstract UniTask LoadScene();
+        protected abstract UniTask UnloadScene();
         public abstract float LoadingProgress();
-
         public abstract bool IsLoading();
         public abstract bool IsUnloading();
     }

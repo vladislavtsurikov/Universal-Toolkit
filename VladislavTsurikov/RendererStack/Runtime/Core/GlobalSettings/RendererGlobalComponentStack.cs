@@ -13,7 +13,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
         public ComponentStackOnlyDifferentTypes<GlobalComponent> ComponentStack = 
             new ComponentStackOnlyDifferentTypes<GlobalComponent>();
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             ComponentStack.Setup();
         }

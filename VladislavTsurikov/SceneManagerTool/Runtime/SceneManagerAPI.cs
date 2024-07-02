@@ -1,4 +1,4 @@
-﻿using VladislavTsurikov.Coroutines.Runtime;
+﻿using Cysharp.Threading.Tasks;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 
@@ -8,22 +8,22 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
     {
         public static void UnloadSceneCollection(SceneCollection sceneCollection)
         {
-            CoroutineRunner.StartCoroutine(sceneCollection.Unload(null));
+            sceneCollection.Unload(null).Forget();
         }
 
         public static void LoadSceneCollection(SceneCollection sceneCollection)
         {
-            CoroutineRunner.StartCoroutine(sceneCollection.Load());
+            sceneCollection.Load().Forget();
         }
         
         public static void LoadSceneType(SceneType sceneType)
         {
-            CoroutineRunner.StartCoroutine(sceneType.LoadInternal(true));
+            sceneType.LoadInternal(true).Forget();
         }
 
         public static void UnloadSceneComponent(SceneType sceneType)
         {
-            CoroutineRunner.StartCoroutine(sceneType.UnloadInternal(null, true));
+            sceneType.UnloadInternal(null, true).Forget();
         }
     }
 }

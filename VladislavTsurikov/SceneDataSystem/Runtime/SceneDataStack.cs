@@ -10,7 +10,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
         {
             AllowCreateComponentAttribute allowCreateComponentAttribute = type.GetAttribute<AllowCreateComponentAttribute>();
 
-            if (allowCreateComponentAttribute == null || allowCreateComponentAttribute.Allow((SceneDataManager)InitializationDataForElements[0])) 
+            if (allowCreateComponentAttribute == null || allowCreateComponentAttribute.Allow((SceneDataManager)SetupData[0])) 
             {
                 return true;
             }

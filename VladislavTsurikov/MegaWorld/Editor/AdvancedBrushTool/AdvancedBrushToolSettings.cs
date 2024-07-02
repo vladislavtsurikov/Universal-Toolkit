@@ -7,7 +7,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Core;
 namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
     [Serializable]
-    [MenuItem("Advanced Brush Tool Settings")]
+    [Name("Advanced Brush Tool Settings")]
     public class AdvancedBrushToolSettings : Component
     {
         public float TextureTargetStrength = 1.0f;

@@ -1,10 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.ComponentStack.Editor.Core;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core;
@@ -44,7 +44,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 				        GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 				        if (CustomEditorGUILayout.ClickButton("Create Sectors"))
 				        {
-					        CoroutineRunner.StartCoroutine(Runtime.Sectorize.Sectorize.Instance.CreateScenesForTerrains());
+					        Runtime.Sectorize.Sectorize.Instance.CreateScenesForTerrains().Forget();
 				        }
 				        GUILayout.Space(3);
 			        }
@@ -136,14 +136,14 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 		            
 		            if (CustomEditorGUILayout.ClickButton("Load All Scenes"))
 		            {
-			            CoroutineRunner.StartCoroutine(StreamingUtility.LoadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()));
+			            StreamingUtility.LoadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
 		            }
 		            
 		            GUILayout.Space(3);
 		            
 		            if (CustomEditorGUILayout.ClickButton("Unload All Scenes"))
 		            {
-			            CoroutineRunner.StartCoroutine(StreamingUtility.UnloadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()));
+			            StreamingUtility.UnloadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
 		            }
 		            
 		            GUILayout.Space(3);

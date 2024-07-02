@@ -12,7 +12,7 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [MenuItem("Scale")]
+    [Name("Scale")]
 	public class Scale : Action
     {
         private ShortcutCombo _shortcutCombo;

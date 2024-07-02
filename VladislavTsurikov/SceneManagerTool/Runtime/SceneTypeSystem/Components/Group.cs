@@ -1,33 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 {
-    [MenuItem("Group")]
+    [Name("Group")]
     public class Group : SceneType
     {
         public List<SceneReference> SceneReferences = new List<SceneReference>();
         
-        protected override IEnumerator Load()
+        protected override async UniTask Load()
         {
             foreach (var sceneReference in SceneReferences)
             {
-                yield return sceneReference.LoadScene();
+                await sceneReference.LoadScene();
             }
         }
 
-        protected override IEnumerator Unload(SceneCollection nextLoadSceneCollection)
+        protected override async UniTask Unload(SceneCollection nextLoadSceneCollection)
         {
             foreach (var sceneReference in SceneReferences)
             {
-                yield return UnloadSceneReference(nextLoadSceneCollection, sceneReference);
+                await UnloadSceneReference(nextLoadSceneCollection, sceneReference);
             }
-            
-            yield return null;
         }
         
         public override bool HasScene(SceneReference sceneReference)

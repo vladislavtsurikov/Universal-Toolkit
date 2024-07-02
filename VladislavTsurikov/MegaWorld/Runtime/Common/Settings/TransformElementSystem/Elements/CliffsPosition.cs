@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Cliffs Position")]  
+    [Name("Cliffs Position")]  
     public class CliffsPosition : TransformComponent
     {
         public float OffsetPosition = 1;

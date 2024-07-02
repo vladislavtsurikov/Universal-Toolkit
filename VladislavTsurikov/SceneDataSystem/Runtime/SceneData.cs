@@ -17,11 +17,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
         public delegate void OnSetup ();
         public static OnSetup OnSetupEvent;
         
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            if (args != null)
+            if (setupData != null)
             {
-                SceneDataManager = (SceneDataManager)args[0]; 
+                SceneDataManager = (SceneDataManager)setupData[0]; 
             }
 
             SetupSceneData();

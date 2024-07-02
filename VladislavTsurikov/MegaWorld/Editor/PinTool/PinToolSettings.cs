@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
     }
 
     [Serializable]
-    [MenuItem("Pin Tool Settings")]
+    [Name("Pin Tool Settings")]
     public class PinToolSettings : Component
     {
         #region Position

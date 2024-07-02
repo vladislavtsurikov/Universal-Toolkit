@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 using Object = UnityEngine.Object;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     public class SimulatedBody 
     {
@@ -122,7 +121,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
             {
                 foreach (var onDisablePhysicsAction in _onDisablePhysicsEvents)
                 {
-                    onDisablePhysicsAction.OnDisablePhysicsInternal();
+                    onDisablePhysicsAction.OnDisablePhysics();
                 }
             }
             catch (Exception ex)

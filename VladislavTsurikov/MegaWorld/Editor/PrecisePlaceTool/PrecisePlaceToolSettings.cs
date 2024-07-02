@@ -8,7 +8,7 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     [Serializable]
-    [MenuItem("Precise Place Tool Settings")]
+    [Name("Precise Place Tool Settings")]
     public class PrecisePlaceToolSettings : Component
     {
         public MouseActionStack MouseActionStack = new MouseActionStack();
@@ -31,7 +31,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
         public bool AlongStroke;
         #endregion
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             MouseActionStack.Setup();
         }

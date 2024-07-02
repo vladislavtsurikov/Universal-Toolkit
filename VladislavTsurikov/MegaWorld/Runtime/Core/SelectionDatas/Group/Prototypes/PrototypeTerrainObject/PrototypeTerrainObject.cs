@@ -6,12 +6,11 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {
-    [MenuItem("Terrain Object")]
+    [Name("Terrain Object")]
     [DropObjects(new[]{typeof(GameObject)})]
     [MissingIconsWarning("Drag & Drop Prefabs Here")]
     [AddDefaultGroupComponents(new []{typeof(ContainerForGameObjects)})]

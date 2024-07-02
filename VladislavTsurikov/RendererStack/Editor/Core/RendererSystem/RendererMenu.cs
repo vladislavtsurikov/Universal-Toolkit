@@ -6,7 +6,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
 {
     public abstract class RendererMenu
     {
-        public abstract void ShowGenericMenu(GenericMenu menu, CustomRenderer customRenderer);
+        public abstract void ShowGenericMenu(GenericMenu menu, Renderer renderer);
     }
 }
 #endif

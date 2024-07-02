@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
@@ -11,21 +13,24 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
 {
     public static class SpawnGroup
     {
-        public static IEnumerator SpawnGameObject(Group group, BoxArea area)
+        public static async UniTask SpawnGameObject(Group group, BoxArea area)
         {
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
+            await scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
+                
                 if (rayHit != null)
                 {
                     PrototypeGameObject proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
@@ -43,15 +48,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
         }
         
 #if RENDERER_STACK
-        public static IEnumerator SpawnTerrainObject(Group group, BoxArea area)
+        public static async UniTask SpawnTerrainObject(Group group, BoxArea area)
         {
+            ScriptingSystem.SetColliders(new Sphere(area.Center, area.Size.x / 2 * 5), area);
+            
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
+            await scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, area.Center.y, sample.y)), 
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
+                
                 if (rayHit != null)
                 {
                     PrototypeTerrainObject proto = (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
@@ -66,6 +74,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             });
             
             RandomUtility.ChangeRandomSeed();
+            
+            await UniTask.WaitUntil(() => SimulatedBodyStack.Count == 0);
+                
+            ScriptingSystem.RemoveColliders(area);
         }
 #endif
     }

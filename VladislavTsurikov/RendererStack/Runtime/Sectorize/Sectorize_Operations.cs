@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
-using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,13 +15,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
     public partial class Sectorize
     {
-        public IEnumerator CreateScenesForTerrains()
+        public async UniTask CreateScenesForTerrains()
         {
             List<VirtualTerrain> terrains = AllVirtualTerrainTypes.FindAll();
 
             if (terrains.Count <= 0)
             {
-                yield break;
+                return;
             }
 
             Scene activeScene = SceneManager.GetActiveScene();
@@ -38,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                 
                 EditorUtility.DisplayProgressBar("Sector: " + progress + "%" + " (" + i + "/" + terrains.Count + ")", "Running " + terrains[i].Target.name, progress / 100);
                 
-                yield return StreamingUtilityEditor.CreateScene("Terrain", terrains[i].Target.name, terrains[i].GetTerrainBounds(), new List<GameObject>(){terrains[i].Target.gameObject});
+                await StreamingUtilityEditor.CreateScene("Terrain", terrains[i].Target.name, terrains[i].GetTerrainBounds(), new List<GameObject>(){terrains[i].Target.gameObject});
             }
 
             SceneDataManagerUtility.InstanceSceneDataManagerForAllScenes();

@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Slope Scale")]  
+    [Name("Slope Scale")]  
     public class SlopeScale : TransformComponent
     {
         public bool UniformScaleOffset = true;

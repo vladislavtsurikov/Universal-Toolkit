@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;

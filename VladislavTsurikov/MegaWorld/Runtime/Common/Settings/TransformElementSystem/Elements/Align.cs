@@ -8,7 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 {
     [Serializable]
     [Simple]  
-    [MenuItem("Align")]
+    [Name("Align")]
     public class Align : TransformComponent
     {
         public bool UseNormalWeight = true;

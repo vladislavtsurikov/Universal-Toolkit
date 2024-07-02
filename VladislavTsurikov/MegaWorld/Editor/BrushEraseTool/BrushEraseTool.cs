@@ -34,7 +34,7 @@ using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSetti
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
-    [MenuItem("Brush Erase")]
+    [Name("Brush Erase")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)})]
     [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]

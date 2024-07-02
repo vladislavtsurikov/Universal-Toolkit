@@ -1,18 +1,14 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     public static class PhysicsSimulator
     {
-        private static bool _useAccelerationPhysics = true;
+        public static bool UseAccelerationPhysics = true;
 
-        public static DisablePhysics.DisablePhysics ActiveDisablePhysics { get; private set; } = new ObjectTimeDisablePhysics();
+        public static DisablePhysicsMode ActiveDisablePhysicsMode { get; private set; } = new ObjectTimeDisablePhysicsMode();
 
         static PhysicsSimulator() 
         {
@@ -26,7 +22,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
                 return;
             }
 
-            ActiveDisablePhysics.DisablePhysicsSupport();
+            ActiveDisablePhysicsMode.DisablePhysicsSupport();
 
             if (PhysicsSimulatorSettings.Instance.SimulatePhysics)
             {
@@ -46,7 +42,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             Physics.autoSimulation = false;
 #endif
 
-            float accelerationPhysics = _useAccelerationPhysics ? PhysicsSimulatorSettings.Instance.SpeedUpPhysics : 1;
+            float accelerationPhysics = UseAccelerationPhysics ? PhysicsSimulatorSettings.Instance.SpeedUpPhysics : 1;
             
             for (int i = 0; i < accelerationPhysics; i++)
             {
@@ -66,18 +62,20 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             Physics.autoSimulation = prevAutoSimulation;
 #endif
         }
-
-        public static void Activate<T>(bool useAccelerationPhysics = true) where T : DisablePhysics.DisablePhysics
+        
+        public static void SetDisablePhysicsMode<T>() where T : DisablePhysicsMode
         {
-            if(ActiveDisablePhysics.GetType() != typeof(T))
+            if(ActiveDisablePhysicsMode.GetType() != typeof(T))
             {
-                ActiveDisablePhysics.OnDisable();
+                ActiveDisablePhysicsMode.OnDisable();
 
-                ActiveDisablePhysics = Activator.CreateInstance<T>();
+                ActiveDisablePhysicsMode = Activator.CreateInstance<T>();
             }
+        }
 
-            _useAccelerationPhysics = useAccelerationPhysics;
-            ActiveDisablePhysics.OnActivate();
+        public static void ResetDisablePhysicsMode()
+        {
+            ActiveDisablePhysicsMode?.Reset();
         }
     }
 }

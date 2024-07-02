@@ -7,7 +7,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Core;
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
     [Serializable]
-    [MenuItem("Brush Erase Tool Settings")]
+    [Name("Brush Erase Tool Settings")]
     public class BrushEraseToolSettings : Component
     {   
         public float EraseStrength = 1.0f;

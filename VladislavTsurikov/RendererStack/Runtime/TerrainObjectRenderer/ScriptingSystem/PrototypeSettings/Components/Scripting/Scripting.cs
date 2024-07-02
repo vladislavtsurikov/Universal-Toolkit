@@ -5,7 +5,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Proto
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting
 {
-    [MenuItem("Scripting")]
+    [Name("Scripting")]
     public class Scripting : PrototypeComponent
     {
         [SerializeField]

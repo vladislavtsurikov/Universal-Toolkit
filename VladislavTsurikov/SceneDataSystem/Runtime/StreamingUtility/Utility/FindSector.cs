@@ -17,7 +17,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             foreach (var sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
-                    ? sectorLayer.ObjectBoundsBvhTree.OverlapSphere(center, radius)
+                    ? sectorLayer.ObjectBoundsBVHTree.OverlapSphere(center, radius)
                     : sectorLayer.SectorBvhTree.OverlapSphere(center, radius));
             }
             
@@ -39,7 +39,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             foreach (var sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
-                    ? sectorLayer.ObjectBoundsBvhTree.OverlapBox(boxCenter,  boxSize, boxRotation)
+                    ? sectorLayer.ObjectBoundsBVHTree.OverlapBox(boxCenter,  boxSize, boxRotation)
                     : sectorLayer.SectorBvhTree.OverlapBox(boxCenter,  boxSize, boxRotation));
             }
             
@@ -61,7 +61,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             foreach (var sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
-                    ? sectorLayer.ObjectBoundsBvhTree.OverlapPosition(position)
+                    ? sectorLayer.ObjectBoundsBVHTree.OverlapPosition(position)
                     : sectorLayer.SectorBvhTree.OverlapPosition(position));
             }
 

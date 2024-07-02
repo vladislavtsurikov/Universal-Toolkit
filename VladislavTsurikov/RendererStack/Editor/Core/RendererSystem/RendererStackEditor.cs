@@ -14,10 +14,11 @@ using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.Utility.Runtime;
 using Object = System.Object;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
 {
-    public class RendererStackEditor : TabComponentStackEditor<CustomRenderer, RendererEditor>
+    public class RendererStackEditor : TabComponentStackEditor<Renderer, RendererEditor>
     {
         private readonly Runtime.Core.RendererSystem.RendererStack _rendererStack;
 
@@ -46,7 +47,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             {
                 CustomEditorGUILayout.Label("Initialization Failed:");
 
-                foreach (CustomRenderer renderer in Stack.ElementList)
+                foreach (Renderer renderer in Stack.ElementList)
                 {
                     if(!renderer.IsSetup)
                     {
@@ -71,7 +72,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             
             if (EditorGUI.EndChangeCheck())
             {
-                foreach (CustomRenderer renderer in Stack.ElementList)  
+                foreach (Renderer renderer in Stack.ElementList)  
                 {
                     renderer.ForceUpdateRendererData = true;
                 }
@@ -121,7 +122,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             if (editor.GetRendererMenu() != null)
             {
                 menu.AddSeparator ("");
-                editor.GetRendererMenu().ShowGenericMenu(menu, editor.CustomRendererTarget);
+                editor.GetRendererMenu().ShowGenericMenu(menu, editor.RendererTarget);
             }
             
             menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, ContextMenuUtility.ContextMenuCallback, new Action(() =>
@@ -144,10 +145,10 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
         
         private void SetTabColor(Object tab, out Color barColor, out Color labelColor)
         {
-            CustomRenderer customRenderer = (CustomRenderer)tab;
+            Renderer renderer = (Renderer)tab;
             barColor = EditorColors.Instance.LabelColor;
 
-            if(!customRenderer.Active)
+            if(!renderer.Active)
             {
                 if (EditorGUIUtility.isProSkin)
                 {
@@ -164,7 +165,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             {
                 labelColor = EditorColors.Instance.LabelColor;
 
-                if(customRenderer.Selected)
+                if(renderer.Selected)
                 {
                     barColor = EditorColors.Instance.ToggleButtonActiveColor;
                 }
@@ -179,9 +180,9 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
         {
             GenericMenu contextMenu = new GenericMenu();
 
-            foreach (Type type in AllTypesDerivedFrom<CustomRenderer>.TypeList)
+            foreach (Type type in AllTypesDerivedFrom<Renderer>.TypeList)
             {
-                string name = type.GetAttribute<MenuItemAttribute>().Name;
+                string name = type.GetAttribute<NameAttribute>().Name;
                     
                 if (_rendererStack.GetElement(type) == null)
                 {

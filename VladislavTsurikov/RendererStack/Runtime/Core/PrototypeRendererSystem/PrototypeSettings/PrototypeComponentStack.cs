@@ -6,13 +6,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
 {
     public class PrototypeComponentStack : ComponentStackOnlyDifferentTypes<PrototypeComponent>
     {
-        public PrototypeComponentStack(Type rendererType, Prototype prototype)
+        internal void CreateAllComponents()
         {
-            InitializationDataForElements = new object[]{prototype};
+            Type rendererType = (Type)SetupData[0];
             
             foreach (var type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
             {
                 CreateIfMissingType(type);
+            }
+        }
+        
+        protected override void OnCreateElements()
+        {
+            Type rendererType = (Type)SetupData[0];
+            
+            foreach (var type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
+            {
+                if (type.GetAttribute<PersistentComponentAttribute>() != null)
+                {
+                    CreateIfMissingType(type);
+                }
             }
         }
     }

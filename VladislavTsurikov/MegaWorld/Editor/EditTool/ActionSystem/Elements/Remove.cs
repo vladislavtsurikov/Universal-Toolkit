@@ -11,7 +11,7 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [MenuItem("Remove")]
+    [Name("Remove")]
 	public class Remove : Action
     {
         private ShortcutCombo _shortcutCombo;

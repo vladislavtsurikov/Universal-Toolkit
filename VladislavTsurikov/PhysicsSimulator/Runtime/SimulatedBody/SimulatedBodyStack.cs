@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.PhysicsSimulator.Runtime.Settings;
 using Object = UnityEngine.Object;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     public static class SimulatedBodyStack 
     {
@@ -68,7 +67,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
             simulatedBody.OnAddToSimulatedBodyStack?.Invoke();
             SimulatedBodyHashSet.Add(simulatedBody);
             
-            PhysicsSimulator.ActiveDisablePhysics.OnRegisterSimulatedBody(simulatedBody);
+            PhysicsSimulator.ActiveDisablePhysicsMode.OnRegisterSimulatedBody(simulatedBody);
         }
         
         public static void DisablePhysicsSupportIfObjectStopped() 
@@ -132,7 +131,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody
             }
 
             SimulatedBodyHashSet.Remove(simulatedBody);
-            PhysicsSimulator.ActiveDisablePhysics.OnUnregisterSimulatedBody(simulatedBody);
+            PhysicsSimulator.ActiveDisablePhysicsMode.OnUnregisterSimulatedBody(simulatedBody);
 
             simulatedBody.DisablePhysicsSupport();
 

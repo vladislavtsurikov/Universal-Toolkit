@@ -1,5 +1,5 @@
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
@@ -10,26 +10,26 @@ using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
-    [MenuItem("Sectorize - Terrain Streaming")]
+    [Name("Sectorize - Terrain Streaming")]
     [AddSceneData(new []{typeof(SectorLayerManager)})]
     [AddSceneComponents(new[]{typeof(CameraManager)})]
     [AddGlobalComponents(new[]{typeof(StreamingRules)})]
-    public partial class Sectorize : CustomRenderer
+    public partial class Sectorize : Renderer
     {
-        private static Sectorize _sInstance;
+        private static Sectorize s_instance;
 
         public static Sectorize Instance
         {
             get
             {
-                _sInstance = (Sectorize)RendererStackManager.Instance.RendererStack.GetElement(typeof(Sectorize));
+                s_instance = (Sectorize)RendererStackManager.Instance.RendererStack.GetElement(typeof(Sectorize));
 
-                if (_sInstance == null)
+                if (s_instance == null)
                 {
-                    _sInstance = (Sectorize)RendererStackManager.Instance.RendererStack.CreateIfMissingType(typeof(Sectorize));
+                    s_instance = (Sectorize)RendererStackManager.Instance.RendererStack.CreateIfMissingType(typeof(Sectorize));
                 }
 
-                return _sInstance;
+                return s_instance;
             }
         }
 
@@ -58,7 +58,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
         {
             if (editorPlayModeSimulation == false)
             {
-                CoroutineRunner.StartCoroutine(StreamingUtility.LoadAllScenes(GetSectorLayerTag()));
+                StreamingUtility.LoadAllScenes(GetSectorLayerTag()).Forget();
             }
         }
     }

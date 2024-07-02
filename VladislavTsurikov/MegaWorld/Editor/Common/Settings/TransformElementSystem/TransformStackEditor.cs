@@ -51,7 +51,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
                     continue;
                 }
 
-                string context = type.Key.GetAttribute<MenuItemAttribute>().Name;
+                string context = type.Key.GetAttribute<NameAttribute>().Name;
 
                 if (_useSimpleComponent)
                 {

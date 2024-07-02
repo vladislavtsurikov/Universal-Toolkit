@@ -1,34 +1,35 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    [MenuItem("Active Scene")]
+    [Name("Active Scene")]
     [SceneCollectionComponent]
     public class ActiveScene : SettingsComponent
     {
         public SceneReference SceneReference = new SceneReference();
         
-        internal static IEnumerator LoadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+        internal static async UniTask LoadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ActiveScene activeScene = (ActiveScene)settingsList.GetElement(typeof(ActiveScene));
 
             if (activeScene != null)
             {
-                yield return activeScene.LoadScene();
+                await activeScene.LoadScene();
             }
         }
         
-        internal static IEnumerator UnloadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+        internal static async UniTask UnloadActiveSceneIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
             ActiveScene activeScene = (ActiveScene)settingsList.GetElement(typeof(ActiveScene));
 
             if (activeScene != null)
             {
-                yield return activeScene.UnloadScene();
+                await activeScene.UnloadScene();
             }
         }
         
@@ -37,15 +38,15 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
             return new List<SceneReference>{SceneReference};
         }
 
-        private IEnumerator LoadScene()
+        private async UniTask LoadScene()
         {
-            yield return SceneReference.LoadScene();
+            await SceneReference.LoadScene();
             SceneManager.SetActiveScene(SceneReference.Scene);
         }
 
-        private IEnumerator UnloadScene()
+        private async UniTask UnloadScene()
         {
-            yield return SceneReference.UnloadScene();
+            await SceneReference.UnloadScene();
         }
     }
 }

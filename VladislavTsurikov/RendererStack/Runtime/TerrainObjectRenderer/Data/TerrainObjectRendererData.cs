@@ -44,6 +44,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 return;
             }
 
+            if (RendererStackManager.Instance == null)
+            {
+                return;
+            }
+
             TerrainObjectRenderer terrainObject = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
             terrainObject.ForceUpdateRendererData = true;
 

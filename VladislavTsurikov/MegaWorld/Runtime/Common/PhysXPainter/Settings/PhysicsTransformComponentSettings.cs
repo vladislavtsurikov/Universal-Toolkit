@@ -1,11 +1,10 @@
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings
 {
-    [MenuItem("Physics Transform Settings")]
+    [Name("Physics Transform Settings")]
     public class PhysicsTransformComponentSettings : Component
     {
         public TransformComponentStack TransformComponentStack = new TransformComponentStack();

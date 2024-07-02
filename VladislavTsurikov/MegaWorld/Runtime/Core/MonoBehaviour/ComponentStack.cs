@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 
         protected override void OnSetup()
         {
-            _tool = (UnityEngine.MonoBehaviour)InitializationDataForElements[0]; 
+            _tool = (UnityEngine.MonoBehaviour)SetupData[0]; 
         }
 
         protected override void OnCreateElements()

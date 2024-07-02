@@ -6,7 +6,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 {
     [Serializable]
-    [MenuItem("Additional Rotation")]
+    [Name("Additional Rotation")]
     public class AdditionalRotation : TransformComponent
     {
         public Vector3 Rotation;

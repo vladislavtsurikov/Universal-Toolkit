@@ -58,6 +58,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                 {
                     SectorLayerManager sectorLayerManager = SectorLayerManager.Instance;
 
+                    if (sectorLayerManager == null)
+                    {
+                        return null;
+                    }
+
                     if (!sectorLayerManager.IsSetup)
                     {
                         sectorLayerManager.SceneDataManager.SceneDataStack.SetupElement<SectorLayerManager>();

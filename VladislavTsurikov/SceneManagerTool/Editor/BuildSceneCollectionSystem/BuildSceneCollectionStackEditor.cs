@@ -90,7 +90,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
                         continue;
                     }
 
-                    string context = settingsType.GetAttribute<MenuItemAttribute>().Name;
+                    string context = settingsType.GetAttribute<NameAttribute>().Name;
 
                     menu.AddItem(new GUIContent(context), false, () => _buildSceneCollectionStack.CreateComponent(settingsType));
                 }

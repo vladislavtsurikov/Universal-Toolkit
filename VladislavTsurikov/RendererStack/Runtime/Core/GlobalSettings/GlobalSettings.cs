@@ -47,7 +47,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
         }
 
 #if UNITY_EDITOR
-        public void DrawGizmos(CustomRenderer renderer)
+        public void DrawGizmos(Renderer renderer)
         {
             if (renderer == null)
             {

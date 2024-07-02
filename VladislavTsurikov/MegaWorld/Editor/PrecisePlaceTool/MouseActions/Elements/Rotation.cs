@@ -26,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         Offset
     }
     
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Rotation")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Rotation")]
     public class Rotation : MouseAction
     {
         private RotationMode _rotationMode;

@@ -5,7 +5,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings
 {
-    [MenuItem("Quality")]
+    [Name("Quality")]
     public class Quality : GlobalComponent
     {
         [SerializeField]

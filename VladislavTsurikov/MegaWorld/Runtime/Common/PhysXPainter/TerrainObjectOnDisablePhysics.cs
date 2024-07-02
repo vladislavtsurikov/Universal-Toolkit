@@ -1,13 +1,12 @@
 ﻿#if RENDERER_STACK
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.UnityUtility.Runtime;
@@ -65,20 +64,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
             if (addedInstance)
             {
                 SimulatedBody.GameObject.DisableMeshRenderers();
-
-                CoroutineRunner.StartCoroutine(DestroyGameObject());
                 
-                IEnumerator DestroyGameObject()
-                {
-                    yield return new YieldCustom(() => SimulatedBodyStack.Count == 0);
-                    
-                    Object.DestroyImmediate(SimulatedBody.GameObject);
-                }
+                DestroyGameObject().Forget();
             }
             else
             {
                 Object.DestroyImmediate(SimulatedBody.GameObject);
             }
+        }
+        
+        private async UniTask DestroyGameObject()
+        {
+            await UniTask.WaitWhile(() => SimulatedBodyStack.Count > 0);
+
+            Object.DestroyImmediate(SimulatedBody.GameObject);
         }
 
         protected virtual float GetFitness(RayHit rayHit)

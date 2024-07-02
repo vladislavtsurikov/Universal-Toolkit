@@ -8,14 +8,15 @@ using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedInd
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.Utility.Runtime;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 
 namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
 {
     public class TerrainObjectRendererMenu : RendererMenu
     {
-        public override void ShowGenericMenu(GenericMenu menu, CustomRenderer customRenderer)
+        public override void ShowGenericMenu(GenericMenu menu, Renderer renderer)
         {
-            Runtime.TerrainObjectRenderer.TerrainObjectRenderer terrainObjectRenderer = (Runtime.TerrainObjectRenderer.TerrainObjectRenderer)customRenderer;
+            Runtime.TerrainObjectRenderer.TerrainObjectRenderer terrainObjectRenderer = (Runtime.TerrainObjectRenderer.TerrainObjectRenderer)renderer;
             
             menu.AddItem(new GUIContent("Regenerate Instanced Indirect Shaders"), false, ContextMenuUtility.ContextMenuCallback, 
                 new Action(() => { GPUInstancedIndirectShaderStack.Instance.RegenerateShaders(); })); 

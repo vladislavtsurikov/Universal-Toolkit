@@ -4,7 +4,7 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    [MenuItem("Scale")]
+    [Name("Scale")]
     public class Scale : ModifyTransformComponent
     {
         public float Strength = 0.3f;

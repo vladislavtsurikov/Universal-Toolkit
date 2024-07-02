@@ -3,7 +3,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
-    public abstract class PrototypeRenderer : CustomRenderer
+    public abstract class PrototypeRenderer : Renderer
     {
         [OdinSerialize]
         public SelectionData SelectionData = new SelectionData();

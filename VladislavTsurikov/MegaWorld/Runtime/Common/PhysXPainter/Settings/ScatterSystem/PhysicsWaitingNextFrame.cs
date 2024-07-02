@@ -1,11 +1,11 @@
 ﻿using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings.ScatterSystem
 {
     public class PhysicsWaitingNextFrame : WaitingNextFrame
     {
-        private int _maxSimulatedBodyCount;
+        private readonly int _maxSimulatedBodyCount;
 
         public PhysicsWaitingNextFrame(int maxSimulatedBodyCount)
         {

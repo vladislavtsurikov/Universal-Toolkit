@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter;
 using VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings;
@@ -9,10 +8,8 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
 {
@@ -36,7 +33,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
 
                 GravitySpawnerGameObject gravitySpawnerGameObject = new GravitySpawnerGameObject(group, terrainsMaskManager, boxArea);
                 
-                PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+                PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+                PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
                 SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
                     instance.Position, instance.Scale, instance.Rotation, new List<OnDisableSimulatedBodyEvent>{gravitySpawnerGameObject});
@@ -68,7 +66,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
 
                 GravitySpawnerTerrainObject gravitySpawnerTerrainObject = new GravitySpawnerTerrainObject(group, proto.RendererPrototype, terrainsMaskManager, boxArea);
                 
-                PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+                PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+                PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
                 TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
                         instance.Position, instance.Scale, instance.Rotation, new List<OnDisableSimulatedBodyEvent>{gravitySpawnerTerrainObject});

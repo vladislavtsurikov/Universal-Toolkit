@@ -2,13 +2,14 @@
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
 {
     public class RendererEditor : IMGUIElementEditor
     {
 	    private Vector2 _windowScrollPos;
-	    public CustomRenderer CustomRendererTarget => (CustomRenderer)Target;
+	    public Renderer RendererTarget => (Renderer)Target;
 
 	    public virtual RendererMenu GetRendererMenu()
 		{

@@ -10,8 +10,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
-using VladislavTsurikov.PhysicsSimulator.Runtime.DisablePhysics;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.UnityUtility.Runtime;
 
@@ -42,8 +41,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
                 
             TerrainObjectOnDisablePhysics onDisableSimulatedBodyAction = new TerrainObjectOnDisablePhysics(group, proto.RendererPrototype);
-
-            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+            
+            PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+            PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
             TerrainObjectSimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody<TerrainObjectSimulatedBody>(proto.Prefab,
                 instance.Position, instance.Scale, instance.Rotation, new List<OnDisableSimulatedBodyEvent>{onDisableSimulatedBodyAction});
@@ -77,7 +77,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             PhysicsTransformComponentSettings transformComponentSettings = (PhysicsTransformComponentSettings)proto.GetElement(typeof(PhysicsTransformComponentSettings));
             transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
                 
-            PhysicsSimulator.Runtime.PhysicsSimulator.Activate<ObjectTimeDisablePhysics>();
+            PhysicsSimulator.Runtime.PhysicsSimulator.UseAccelerationPhysics = true;
+            PhysicsSimulator.Runtime.PhysicsSimulator.SetDisablePhysicsMode<ObjectTimeDisablePhysicsMode>();
 
             SimulatedBody simulatedBody = SimulatedBodyStack.InstantiateSimulatedBody(proto.Prefab,
                 instance.Position, instance.Scale, instance.Rotation);

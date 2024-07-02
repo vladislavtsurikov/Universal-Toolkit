@@ -15,7 +15,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     }
 
     [Serializable]
-    [MenuItem("Mask Operations")]  
+    [Name("Mask Operations")]  
     public class MaskOperationsFilter : MaskFilter
     {
         public MaskOperations MaskOperations = MaskOperations.Remap;

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace VladislavTsurikov.PhysicsSimulator.Runtime.Utility
+namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
     public static class PhysicsUtility
     {

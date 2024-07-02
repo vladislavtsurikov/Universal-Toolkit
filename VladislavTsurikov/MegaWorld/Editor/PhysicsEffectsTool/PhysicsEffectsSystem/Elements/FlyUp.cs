@@ -6,7 +6,7 @@ using VladislavTsurikov.ColorUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("Fly Up")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("Fly Up")]
 	public class FlyUp : PhysicsEffect
     {
         public float MaxForce => 200;

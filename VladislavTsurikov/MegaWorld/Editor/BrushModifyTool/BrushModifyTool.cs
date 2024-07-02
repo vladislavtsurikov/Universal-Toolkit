@@ -31,7 +31,7 @@ using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSetti
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
 {
-    [MenuItem("Happy Artist/Brush Modify")]
+    [Name("Happy Artist/Brush Modify")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
     [AddToolComponents(new[] { typeof(BrushSettings), typeof(ModifyTransformSettings)})]
@@ -114,15 +114,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
             {
                 ModifyGameObject(group, area);
             }
+#if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 ModifyTerrainObject(group, area);
             }
+#endif
         }
 
+#if RENDERER_STACK
         private void ModifyTerrainObject(Group group, BoxArea boxArea)
         {
-#if RENDERER_STACK
             FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(BrushModifyTool), typeof(FilterSettings));
             
             if(filterSettings.FilterType == FilterType.MaskFilter)
@@ -139,7 +141,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                 {
                     return true;
                 }
-
+                
                 if (!_modifiedTerrainObjects.TryGetValue(terrainObjectInstance, out var modifyInfo))
                 {
                     Vector3 randomVector = Random.insideUnitSphere;
@@ -189,17 +191,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
                     
                     modifyTransformSettings.ModifyTransform(ref instance, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
 
-                    instance.Position = instance.Position;
-                    instance.Rotation = instance.Rotation.normalized;
-                    instance.Scale = instance.Scale;
+                    terrainObjectInstance.Position = instance.Position;
+                    terrainObjectInstance.Rotation = instance.Rotation.normalized;
+                    terrainObjectInstance.Scale = instance.Scale;
                 }
 
                 _modifiedTerrainObjects[terrainObjectInstance] = modifyInfo;
 
                 return true;
             });
-#endif
         }
+#endif
 
         private void ModifyGameObject(Group group, BoxArea boxArea)
         {

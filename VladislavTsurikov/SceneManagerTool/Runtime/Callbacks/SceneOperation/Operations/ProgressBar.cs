@@ -1,4 +1,5 @@
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
@@ -13,25 +14,28 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation
         public CanvasGroup Group;
         public Image Image;
         public Slider Slider;
-        public float Duration = 0.5f;
-        public Color Color;
+        public Color BackgroundColor;
+        public float DurationFade = 0.5f;
 
-        public override IEnumerator OnLoad()
+        public override async UniTask OnLoad()
         {
+            Image.color = BackgroundColor;
+            
+            await UniTask.Yield();
+            
             if(_progressBar.DisableFade)
             {
-                yield break;
+                return;
             }
 
-            Image.color = Color;
-            yield return Group.Fade(1, Duration); 
+            await Group.Fade(1, DurationFade); 
         }
 
-        public override IEnumerator OnUnload()
+        public override async UniTask OnUnload()
         {
             if(_progressBar.DisableFade)
             {
-                yield break;
+                return;
             }
 
             if (Slider)
@@ -39,13 +43,13 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation
                 Slider.gameObject.SetActive(false);
             }
 
-            yield return Group.Fade(0, Duration);
+            await Group.Fade(0, DurationFade);
         }
 
         private void Start()
         {
             _progressBar = (SettingsSystem.ProgressBar)SceneCollection.Current.SettingsStack.GetElement(typeof(SettingsSystem.ProgressBar));
-
+            
             if (!_progressBar.DisableFade)
             {
                 Group.alpha = 0;

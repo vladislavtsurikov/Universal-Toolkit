@@ -8,7 +8,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFil
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     [Serializable]
-    [MenuItem("Noise")]
+    [Name("Noise")]
     public class NoiseFilter : MaskFilter
     {
         public BlendMode BlendMode = BlendMode.Multiply;

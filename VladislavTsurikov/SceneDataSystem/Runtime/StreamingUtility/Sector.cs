@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEditor;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
@@ -88,12 +90,12 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public void LoadScene(float waitForSeconds = 0)
         {
-            CoroutineRunner.StartCoroutine(SceneReference.LoadScene(waitForSeconds));
+            SceneReference.LoadScene(waitForSeconds).Forget();
         }
         
         public void UnloadScene(float waitForSeconds = 0)
         {
-            CoroutineRunner.StartCoroutine(SceneReference.UnloadScene(waitForSeconds));
+            SceneReference.UnloadScene(waitForSeconds).Forget();
         }
 
         public void CacheScene(float waitForSeconds = 0, float keepScene = 0)
@@ -147,8 +149,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
 #endif
         }
-
-
+        
         public bool IsValid()
         {
 #if UNITY_EDITOR

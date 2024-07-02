@@ -11,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
     {
         protected override void OnCreateElements()
         {
-            foreach (var rendererType in AllTypesDerivedFrom<CustomRenderer>.TypeList)
+            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
             {
                 AddSceneComponentsAttribute addComponentsAttribute = rendererType.GetAttribute<AddSceneComponentsAttribute>();
 
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
             {
                 bool find = false;
                 
-                foreach (var rendererType in AllTypesDerivedFrom<CustomRenderer>.TypeList)
+                foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
                 {
                     AddSceneComponentsAttribute addComponentsAttribute = 
                         (AddSceneComponentsAttribute)rendererType.GetAttribute(typeof(AddSceneComponentsAttribute));
@@ -55,7 +55,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
         }
 
 #if UNITY_EDITOR
-        public void DrawDebug(CustomRenderer renderer)
+        public void DrawDebug(Renderer renderer)
         {
             if (renderer == null)
             {

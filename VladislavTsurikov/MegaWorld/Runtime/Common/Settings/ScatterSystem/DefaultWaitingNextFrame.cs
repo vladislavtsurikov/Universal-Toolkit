@@ -5,13 +5,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
     public class DefaultWaitingNextFrame : WaitingNextFrame
     {
         private Stopwatch _stopwatch;
-        
-        public float SecondsUntilNextFrame = 5;
-        public float MillisecondsUntilNextFrame => SecondsUntilNextFrame * 1000;
+
+        private float _secondsUntilNextFrame;
+        private float MillisecondsUntilNextFrame => _secondsUntilNextFrame * 1000;
 
         public DefaultWaitingNextFrame(float secondsUntilNextFrame)
         {
-            SecondsUntilNextFrame = secondsUntilNextFrame;
+            _secondsUntilNextFrame = secondsUntilNextFrame;
         }
 
         public override bool IsWaitForNextFrame()
@@ -22,7 +22,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
                 _stopwatch.Start();
                 return false;
             }
-		    
+            
             if (_stopwatch.ElapsedMilliseconds >= MillisecondsUntilNextFrame)
             {
                 _stopwatch.Restart();

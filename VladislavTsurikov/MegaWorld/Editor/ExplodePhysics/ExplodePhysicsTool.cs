@@ -1,10 +1,9 @@
 #if UNITY_EDITOR
-using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Coroutines.Runtime;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
@@ -16,14 +15,13 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.PhysicsSimulator.Runtime.SimulatedBody;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.UnityUtility.Editor;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.MenuItem("PhysX Painter/Explode Physics")]
+    [ComponentStack.Runtime.AdvancedComponentStack.Name("PhysX Painter/Explode Physics")]
     [SupportMultipleSelectedGroups]
     [SupportedPrototypeTypes(new []{typeof(PrototypeGameObject), typeof(PrototypeTerrainObject)})]
     [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]
@@ -56,7 +54,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
         {
             Group group = WindowData.Instance.SelectionData.SelectedData.SelectedGroup;
             
-            CoroutineRunner.StartCoroutine(PaintGroup(group, _mouseMove.Raycast));
+            PaintGroup(group, _mouseMove.Raycast).Forget();
         }
 
         private void OnMouseDrag(Vector3 dragPoint)
@@ -68,14 +66,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 
             if(rayHit != null)
             {
-                CoroutineRunner.StartCoroutine(PaintGroup(group, rayHit));
+                PaintGroup(group, rayHit).Forget();
             }
         }
         
-        private IEnumerator PaintGroup(Group group, RayHit rayHit)
+        private async UniTask PaintGroup(Group group, RayHit rayHit)
         {
-            ScriptingSystem.SetColliders(new Sphere(rayHit.Point, 500), rayHit);
-            
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {
                 SpawnGroup.SpawnGameObject(group, rayHit);
@@ -83,18 +79,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
 #if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                SpawnGroup.SpawnTerrainObject(group, rayHit);
+                await SpawnGroup.SpawnTerrainObject(group, rayHit);
             }
 #endif
-            
-            yield return new YieldCustom(IsDone);
-            
-            bool IsDone()
-            {
-                return SimulatedBodyStack.Count == 0;
-            }
-            
-            ScriptingSystem.RemoveColliders(rayHit);
         }
 
         private void OnRepaint()

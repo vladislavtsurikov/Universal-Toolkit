@@ -1,11 +1,15 @@
 ﻿#if UNITY_EDITOR
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.PhysicsSimulator.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
@@ -37,8 +41,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
         }
         
 #if RENDERER_STACK
-        public static void SpawnTerrainObject(Group group, RayHit rayHit)
+        public static async UniTask SpawnTerrainObject(Group group, RayHit rayHit)
         {
+            ScriptingSystem.SetColliders(new Sphere(rayHit.Point, 500), rayHit);
+            
             ExplodePhysicsToolSettings settings = (ExplodePhysicsToolSettings)ToolsComponentStack.GetElement(typeof(ExplodePhysicsTool), typeof(ExplodePhysicsToolSettings));
 
             int spawnCount = Random.Range(settings.InstancesMin, settings.InstancesMax);
@@ -59,6 +65,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
             }
             
             RandomUtility.ChangeRandomSeed();
+            
+            await UniTask.WaitUntil(() => SimulatedBodyStack.Count == 0);
+
+            ScriptingSystem.RemoveColliders(rayHit);
         }
 #endif
     }

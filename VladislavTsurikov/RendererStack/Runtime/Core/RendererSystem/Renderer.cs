@@ -7,11 +7,11 @@ using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
 {
-    public abstract class CustomRenderer : Component
+    public abstract class Renderer : Component
     {
         public bool ForceUpdateRendererData = false;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             SetupSceneData(); 
             SetupRenderer();

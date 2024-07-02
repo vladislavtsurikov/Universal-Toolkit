@@ -4,7 +4,7 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Proto
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings
 {
-    [MenuItem("Distance Culling")]
+    [Name("Distance Culling")]
     public class DistanceCulling : PrototypeComponent
     {
         [OdinSerialize]

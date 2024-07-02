@@ -1,5 +1,6 @@
 ﻿using System;
-using System.Collections;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
@@ -26,7 +27,7 @@ using VladislavTsurikov.MegaWorld.Editor.GravitySpawner;
 namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 {
     [ExecuteInEditMode]
-    [MenuItem("Gravity Spawner")]
+    [Name("Gravity Spawner")]
     [SupportMultipleSelectedGroups]
     [AddMonoBehaviourComponents(new[]{typeof(Area), typeof(StamperControllerSettings), typeof(PhysicsEffects)})]
     [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
@@ -111,24 +112,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
             Area.SetAreaBoundsIfNecessary(this);
         }
 
-        protected override IEnumerator Spawn(bool displayProgressBar)
+        protected override async UniTask Spawn(CancellationToken token, bool displayProgressBar)
         {
             int maxTypes = Data.GroupList.Count;
             int completedTypes = 0;
             
-            for (int i = 0; i < Data.GroupList.Count; i++)
+            foreach (var group in Data.GroupList)
             {
-                if (IsCancelSpawn)
-                {
-                    break;
-                }
+                token.ThrowIfCancellationRequested();
                 
 #if UNITY_EDITOR
-                UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[i].name,
-                    completedTypes / (float)maxTypes);
+                UpdateDisplayProgressBar("Running", "Running " + group.name);
 #endif
 
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[i].PrototypeType));
+                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
         
                 if(rayHit == null)
                 {
@@ -137,13 +134,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 
                 BoxArea boxArea = Area.GetAreaVariables(rayHit);
 
-                yield return SpawnGroup(Data.GroupList[i], boxArea);
+                await SpawnGroup(token, group, boxArea);
                 
                 completedTypes++;
                 SpawnProgress = completedTypes / (float)maxTypes;
             }
-
-            SpawnProgress = completedTypes / (float)maxTypes;
         }
 
         public override void OnCancelSpawn()
@@ -156,7 +151,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
             ContainerForGameObjectsUtility.DestroyGameObjects<PrototypeTerrainObject>(Data);
         }
 
-        private IEnumerator SpawnGroup(Group group, BoxArea boxArea)
+        private async UniTask SpawnGroup(CancellationToken token, Group group, BoxArea boxArea)
         {
             if(group.HasAllActivePrototypes())
             {
@@ -165,7 +160,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
                     
-                    yield return Utility.SpawnGroup.SpawnGameObject(this, group, _terrainsMaskManager, boxArea);
+                    await Utility.SpawnGroup.SpawnGameObject(token, this, group, _terrainsMaskManager, boxArea);
                 }
 #if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
@@ -173,14 +168,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
                     RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
 
-                    yield return Utility.SpawnGroup.SpawnTerrainObject(this, group, _terrainsMaskManager, boxArea);
+                    await Utility.SpawnGroup.SpawnTerrainObject(token, this, group, _terrainsMaskManager, boxArea);
                 }
 #endif
             }
             
             _terrainsMaskManager.Dispose();
 
-            yield return null;
+            UniTask.Yield();
         }
     }
 }

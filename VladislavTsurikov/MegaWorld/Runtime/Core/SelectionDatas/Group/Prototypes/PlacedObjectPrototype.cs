@@ -2,7 +2,6 @@
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes

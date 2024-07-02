@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
-using VladislavTsurikov.Coroutines.Runtime;
+﻿using Cysharp.Threading.Tasks;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.Utility
 {
@@ -8,13 +6,13 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Utility
     {
         internal static void Start()
         {
-            CoroutineRunner.StartCoroutine(Load(), SceneManagerData.Instance);
+            Load().Forget();
             
-            static IEnumerator Load()
+            static async UniTask Load()
             {
                 foreach (var sceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ActiveBuildSceneCollection.GetStartupSceneCollections())
                 {
-                    yield return sceneCollection.Load();
+                    await sceneCollection.Load();
                 }
             }
         }

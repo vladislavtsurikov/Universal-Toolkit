@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
@@ -29,7 +30,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
         }
 
-        public static IEnumerator UnloadAllScenes(string tag)
+        public static async UniTask UnloadAllScenes(string tag)
         {
             foreach (var sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
             {
@@ -37,13 +38,13 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 {
                     foreach (var sector in sceneDataManager.SectorList)
                     {
-                        yield return sector.SceneReference.UnloadScene();
+                        await sector.SceneReference.UnloadScene();
                     }
                 }
             }
         }
 
-        public static IEnumerator LoadAllScenes(string tag)
+        public static async UniTask LoadAllScenes(string tag)
         {
             foreach (var sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
             {
@@ -51,7 +52,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 {
                     foreach (var sector in sceneDataManager.SectorList)
                     {
-                        yield return sector.SceneReference.LoadScene();
+                        await sector.SceneReference.LoadScene();
                     }
                 }
             }

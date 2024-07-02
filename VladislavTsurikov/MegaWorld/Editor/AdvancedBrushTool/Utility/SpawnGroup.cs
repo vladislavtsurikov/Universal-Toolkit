@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System.Collections;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
@@ -20,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
     public static class SpawnGroup
     {
-        public static IEnumerator SpawnGroupGameObject(Group group, BoxArea area, bool dragMouse)
+        public static async UniTask SpawnGroupGameObject(Group group, BoxArea area, bool dragMouse)
         {
             AdvancedBrushToolSettings advancedBrushToolSettings = (AdvancedBrushToolSettings)ToolsComponentStack.GetElement(typeof(AdvancedBrushTool), typeof(AdvancedBrushToolSettings));
 
@@ -34,7 +35,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
+            await scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 if(dragMouse)
                 {
@@ -74,9 +75,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             });
         }
 
-        public static IEnumerator SpawnGroupTerrainObject(Group group, BoxArea area, bool dragMouse = false)
-        {
 #if RENDERER_STACK
+        public static async UniTask SpawnGroupTerrainObject(Group group, BoxArea area, bool dragMouse = false)
+        {
             AdvancedBrushToolSettings advancedBrushToolSettings = (AdvancedBrushToolSettings)ToolsComponentStack.GetElement(typeof(AdvancedBrushTool), typeof(AdvancedBrushToolSettings));
 
             FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
@@ -89,7 +90,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(null);
 
-            yield return scatterComponentSettings.ScatterStack.Samples(area, sample =>
+            await scatterComponentSettings.ScatterStack.Samples(area, sample =>
             {
                 if(dragMouse)
                 {
@@ -127,10 +128,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
                     }
                 }
             });
-#else
-            yield return null;
-#endif
         }
+#endif
     }
 }
 #endif

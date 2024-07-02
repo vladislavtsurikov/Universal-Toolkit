@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API

@@ -1,4 +1,4 @@
-using VladislavTsurikov.ComponentStack.Runtime.Core;
+using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
@@ -6,9 +6,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
     {
         public Prototype Prototype { get; private set; }
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            Prototype = (Prototype)args[0];
+            Prototype = (Prototype)setupData[1];
             SetupPrototypeComponent();
         }
 

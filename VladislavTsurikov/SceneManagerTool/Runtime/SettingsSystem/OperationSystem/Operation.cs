@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
@@ -9,10 +10,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSys
 {
     public class Operation : Component
     {
-        public virtual IEnumerator DoOperation()
-        {
-            yield break;
-        }
+        public virtual async UniTask DoOperation() { }
 
         public virtual List<SceneReference> GetSceneReferences()
         {

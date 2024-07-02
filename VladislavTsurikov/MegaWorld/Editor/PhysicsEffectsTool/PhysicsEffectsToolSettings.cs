@@ -8,14 +8,14 @@ using VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool
 {
     [Serializable]
-    [MenuItem("Physics Effects Tool Settings")]
+    [Name("Physics Effects Tool Settings")]
     public class PhysicsEffectsToolSettings : Component
     {
         public ComponentStackOnlyDifferentTypes<PhysicsEffect> List = new ComponentStackOnlyDifferentTypes<PhysicsEffect>();
         
         public float Spacing = 5;
 
-        protected override void SetupElement(object[] args = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             List.CreateAllElementTypes();
         }

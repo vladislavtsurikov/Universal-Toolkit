@@ -27,7 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
             {
                 Type modifyTransformComponentType = type.Key;
                 
-                string context = modifyTransformComponentType.GetAttribute<MenuItemAttribute>().Name;
+                string context = modifyTransformComponentType.GetAttribute<NameAttribute>().Name;
 
                 bool exists = ComponentStackOnlyDifferentTypes.HasType(modifyTransformComponentType);
 
