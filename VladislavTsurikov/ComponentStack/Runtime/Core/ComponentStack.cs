@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.OdinSerializer.Utilities;
 
@@ -13,7 +14,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         [OdinSerialize]
         protected AdvancedElementList<T> _elementList = new AdvancedElementList<T>();
 
-        public object[] InitializationDataForElements { get; protected set; }
+        public object[] SetupData { get; private set; }
         
         public IReadOnlyList<T> ElementList => _elementList;
 
@@ -26,35 +27,14 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             get { return _elementList.FirstOrDefault(t => t.Selected); }
         }
 
-        protected virtual void OnSetup()
-        {
-        }
-
-        protected virtual bool AllowCreate(Type type)
-        {
-            return true;
-        }
-
-        protected virtual void CreateElements()
-        {
-        }
-
-        protected virtual void OnDisableStack()
-        {
-        }
-
-        public virtual void OnRemoveInvalidElements()
-        {
-        }
-
-        public void Setup(bool force = true, params object[] args)
+        public void Setup(bool force = true, params object[] setupData)
         {
             _elementList ??= new AdvancedElementList<T>();
             
             IsSetup = true;
 
             IsDirty = true;
-            InitializationDataForElements = args;
+            SetupData = setupData;
 
             OnSetup();
             RemoveInvalidElements();
@@ -63,7 +43,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             for (int i = 0; i < _elementList.Count; i++)
             {
                 _elementList[i].Stack = this;
-                _elementList[i].Setup(args, force);
+                _elementList[i].Setup(setupData, force);
             }
         }
 
@@ -73,7 +53,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
 
             for (int i = 0; i < _elementList.Count; i++)
             {
-                ((IDisable)_elementList[i]).OnDisable();
+                ((IDisableable)_elementList[i]).OnDisable();
             }
 
             OnDisableStack();
@@ -105,7 +85,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             var element = Instantiate(type, false);
             Add(element, index);
             element.Stack = this;
-            element.Setup(InitializationDataForElements);
+            element.Setup(SetupData);
             element.OnCreateInternal();
 
             return element;
@@ -124,7 +104,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
 
                 if (setup)
                 {
-                    element.Setup(InitializationDataForElements);
+                    element.Setup(SetupData);
                     element.OnCreateInternal();
                 }
 
@@ -193,32 +173,29 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
                 Remove(i);
             }
         }
-
+        
         public bool Remove(int index)
         {
             var element = _elementList[index];
-
-            if (element == null)
+            
+            if (element == null || element.IsDeletable())
             {
                 _elementList.RemoveAt(index);
+                IsDirty = true;
                 return true;
             }
             
-            if (!element.IsDeletable())
-            {
-                return false;
-            }
-            
-            _elementList.RemoveAt(index);
-            
-            IsDirty = true;
-
-            return true;
+            return false;
         }
 
         public void ReplaceElement(T element, int index)
         {
-            _elementList[index] = element;
+            if (!Remove(index))
+            {
+                return;
+            }
+
+            _elementList.Insert(index, element);
             IsDirty = true;
         }
 
@@ -259,6 +236,27 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             }
             
             return all;
+        }
+
+        protected virtual void OnSetup()
+        {
+        }
+
+        protected virtual bool AllowCreate(Type type)
+        {
+            return true;
+        }
+
+        private protected virtual void CreateElements()
+        {
+        }
+
+        protected virtual void OnDisableStack()
+        {
+        }
+
+        public virtual void OnRemoveInvalidElements()
+        {
         }
     }
 }

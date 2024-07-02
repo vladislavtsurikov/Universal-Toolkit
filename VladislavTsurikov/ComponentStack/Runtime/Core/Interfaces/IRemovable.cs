@@ -1,6 +1,6 @@
 ﻿namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
-    public interface IRemoved
+    public interface IRemovable
     {
         protected internal void OnRemove();
     }

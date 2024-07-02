@@ -1,8 +1,10 @@
+using VladislavTsurikov.AttributeUtility.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
-    public abstract class Component : Element, ISelected, IRemoved
+    public abstract class Component : Element, ISelectable, IRemovable
     {
         [OdinSerialize]
         protected bool _selected;
@@ -47,17 +49,27 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
                 }
             }
         }
+        
+        public bool IsDeletable()
+        {
+            if (GetType().GetAttribute<PersistentComponentAttribute>() != null)
+            {
+                return false;
+            }
+            
+            return IsDeletableComponent();
+        }
 
-        public virtual bool IsDeletable()
+        protected virtual bool IsDeletableComponent()
         {
             return true;
         }
 
-        void IRemoved.OnRemove()
+        void IRemovable.OnRemove()
         {
             IsSetup = false;
             OnDeleteElement();
-            ((IDisable)this).OnDisable();
+            ((IDisableable)this).OnDisable();
         }
 
         internal void OnCreateInternal()

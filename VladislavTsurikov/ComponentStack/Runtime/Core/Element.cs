@@ -6,7 +6,7 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
     [Serializable]
-    public class Element : IHasName, ISetup, IDisable
+    public class Element : IHasName, ISetupable, IDisableable
     {
         [NonSerialized] 
         public string RenamingName;
@@ -19,11 +19,11 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         {
             get
             {
-                MenuItemAttribute menuItemAttribute = GetType().GetAttribute<MenuItemAttribute>();
+                NameAttribute nameAttribute = GetType().GetAttribute<NameAttribute>();
                 
-                if (menuItemAttribute != null)
+                if (nameAttribute != null)
                 {
-                    return menuItemAttribute.Name.Split('/').Last(); 
+                    return nameAttribute.Name.Split('/').Last(); 
                 }
                 else
                 {
@@ -38,7 +38,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         [field: NonSerialized] 
         public bool IsHappenedReset { get; internal set; }
 
-        protected virtual void SetupElement(object[] args = null){}
+        protected virtual void SetupComponent(object[] setupData = null){}
 
         protected virtual void OnDisableElement(){}
 
@@ -49,7 +49,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             return true;
         }
         
-        public void Setup(object[] args = null, bool force = false)
+        public void Setup(object[] setupData = null, bool force = false)
         {
             if (!force)
             {
@@ -61,11 +61,11 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             
             IsSetup = false;
             OnDisableElement();
-            SetupElement(args);
+            SetupComponent(setupData);
             IsSetup = true;
         }
 
-        void IDisable.OnDisable()
+        void IDisableable.OnDisable()
         {
             IsSetup = false;
             OnDisableElement();

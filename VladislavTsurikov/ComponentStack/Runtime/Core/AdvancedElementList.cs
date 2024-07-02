@@ -3,7 +3,7 @@
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
     public class AdvancedElementList<T> : CallbackList<T> 
-        where T: IRemoved
+        where T: IRemovable
     {
         public AdvancedElementList()
         {

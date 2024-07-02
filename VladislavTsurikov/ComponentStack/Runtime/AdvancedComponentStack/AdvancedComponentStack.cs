@@ -15,7 +15,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         /// </summary>
         public AdvancedElementList<T> ReorderableElementList => _elementList;
         
-        protected override void CreateElements()
+        private protected override void CreateElements()
         {
             OnCreateElements();
             

@@ -19,10 +19,6 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         {
             for (int i = _elementList.Count - 1; i >= 0; i--)
             {
-                if (_elementList[i] == null)
-                {
-                    Debug.Log(_elementList[i] == null);
-                }
                 if (HasMultipleType(_elementList[i].GetType()))
                 {
                     Remove(i);
@@ -44,7 +40,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
             Component componentElement = GetElement(type);
 
-            componentElement?.Setup(InitializationDataForElements, force);
+            componentElement?.Setup(SetupData, force);
         }
         
         public void CreateIfMissingType(Type[] types)

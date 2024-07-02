@@ -1,6 +1,6 @@
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
-    public interface ISelected
+    public interface ISelectable
     {
         bool Selected
         {

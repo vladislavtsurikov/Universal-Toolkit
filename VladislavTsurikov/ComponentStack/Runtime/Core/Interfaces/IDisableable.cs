@@ -1,6 +1,6 @@
 ﻿namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
-    public interface IDisable
+    public interface IDisableable
     {
         internal void OnDisable();
     }
