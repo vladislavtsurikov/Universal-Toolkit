@@ -16,8 +16,12 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
         {
             get
             {
-                if (instance != null) return instance;
-                instance = AssetDatabase.LoadAssetAtPath<EditorColors>(CommonPath.CombinePath(IMGUIPath.PathToGUISkin, "EditorColors.asset"));
+                if (instance != null)
+                {
+                    return instance;
+                }
+                
+                instance = AssetDatabase.LoadAssetAtPath<EditorColors>(CommonPath.CombinePath(IMGUIContentPath.Path, "EditorColors.asset"));
                 return instance;
             }
         }

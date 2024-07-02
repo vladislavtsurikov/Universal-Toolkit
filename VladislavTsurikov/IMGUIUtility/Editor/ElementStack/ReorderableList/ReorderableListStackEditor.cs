@@ -66,7 +66,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                     continue;
                 }
                 
-                string context = settingsType.GetAttribute<MenuItemAttribute>().Name;
+                string context = settingsType.GetAttribute<NameAttribute>().Name;
 
                 if (Stack is ComponentStackSupportSameType<T> componentStackWithSameTypes)
                 {

@@ -9,7 +9,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 {
     public static class CustomEditorGUI
     {
-	    private static GUISkin Skin => AssetDatabase.LoadAssetAtPath<GUISkin>(IMGUIPath.SkinPath);
+	    private static GUISkin Skin => AssetDatabase.LoadAssetAtPath<GUISkin>(IMGUIContentPath.SkinPath);
         		
 		private static Vector2 _sliderClickPos;
 		private static int _sliderDraggingId = -20000000;
@@ -525,11 +525,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
 			if(foldout)
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutDownPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutDownPath);
 			}
 			else
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutRightPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutRightPath);
 			}
 
 			Rect foldoutRect = rect;
@@ -573,11 +573,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
 			if(foldout)
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutDownPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutDownPath);
 			}
 			else
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutRightPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutRightPath);
 			}
 
 			Rect foldoutRect = rect;
@@ -628,11 +628,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
 			if(foldout)
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutDownPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutDownPath);
 			}
 			else
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutRightPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutRightPath);
 			}
 			
 			if (GUI.Button(rect, "", GUIStyle.none))
@@ -780,11 +780,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
 			if(foldout)
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutDownPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutDownPath);
 			}
 			else
 			{
-				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIPath.FoldoutRightPath);
+				texture = AssetDatabase.LoadAssetAtPath<Texture>(IMGUIContentPath.FoldoutRightPath);
 			}
 
 			GUI.color = EditorColors.Instance.LabelColor;

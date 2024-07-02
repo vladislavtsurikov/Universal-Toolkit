@@ -3,7 +3,7 @@ using VladislavTsurikov.ComponentStack.Runtime.Core;
 
 namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack
 {
-    public interface IShowIcon : ISelected
+    public interface IShowIcon : ISelectable
     {
 #if UNITY_EDITOR
         string Name { get; }

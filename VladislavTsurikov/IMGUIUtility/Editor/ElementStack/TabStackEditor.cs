@@ -85,7 +85,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
             object draggingTab = null;
             if (_dragAndDrop.IsDragging() || _dragAndDrop.IsDragPerform())
             {
-                if(_dragAndDrop.GetData() is ISelected and IHasName)
+                if(_dragAndDrop.GetData() is ISelectable and IHasName)
 				{
 					draggingTab = _dragAndDrop.GetData();
 				}      
@@ -167,7 +167,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                 }
                 else
                 {
-                    CustomEditorGUILayout.RectTab(tabRect, (tab as IHasName).Name, (tab as ISelected).Selected, TabHeight);
+                    CustomEditorGUILayout.RectTab(tabRect, (tab as IHasName).Name, (tab as ISelectable).Selected, TabHeight);
                 }
 
                 if (EnableRename)
@@ -293,7 +293,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                         
                         object tab = _elements[tabUnderCursor];
 
-            	    	if((tab as ISelected).Selected == false)
+            	    	if((tab as ISelectable).Selected == false)
             	    	{
             	    	    Select(tabUnderCursor);
             	    	} 
@@ -336,12 +336,12 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 
             foreach (var localTab in _elements)
             {
-                ((ISelected)localTab).Selected = false;
+                ((ISelectable)localTab).Selected = false;
             }
 
             object tab = _elements[index];
 
-            ((ISelected)tab).Selected = true;
+            ((ISelectable)tab).Selected = true;
         }
 
         private int GetSelectedIndex()
@@ -349,7 +349,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
             for (int i = 0; i < _elements.Count; i++)
             {
                 object tab = _elements[i];
-                if(((ISelected)tab).Selected)
+                if(((ISelectable)tab).Selected)
                 {
                     return i;
                 }
@@ -398,7 +398,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
             {
                 object obj = _elements[^1];
 
-                if(obj is not IHasName and ISelected)
+                if(obj is not IHasName and ISelectable)
                 {
                     return false;
                 }
