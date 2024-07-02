@@ -14,7 +14,10 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         public long GetCacheMemoryThresholdInBytes()
         {
             if (CacheMemoryThreshold == CacheMemoryThreshold.Custom)
+            {
                 return (long)((int)CustomCacheMemoryThreshold * Math.Pow(1024, 2));
+            }
+
             return (long)((int)CacheMemoryThreshold * Math.Pow(1024, 3));
         }
     }

@@ -1,16 +1,18 @@
 ﻿#if SCENE_MANAGER_ADDRESSABLES
-using System.Collections;
+using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneUtility.Runtime;
+using VladislavTsurikov.Utility.Runtime.Extensions;
+using UniTask = Cysharp.Threading.Tasks.UniTask;
 
 namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
 {
     public class AddressablesSceneOperations : SceneOperations
     {
-        private AsyncOperationHandle<SceneInstance> _loadSceneAsyncOperation;
-        private AsyncOperationHandle<SceneInstance> _unloadSceneAsyncOperation;
+        public AsyncOperationHandle<SceneInstance> _loadSceneAsyncOperation;
+        public AsyncOperationHandle<SceneInstance> _unloadSceneAsyncOperation;
 
         public AddressablesSceneOperations(SceneReference sceneReference) : base(sceneReference)
         {
@@ -19,21 +21,23 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
         public override float LoadingProgress()
         {
             if (_loadSceneAsyncOperation.IsValid())
+            {
                 return _loadSceneAsyncOperation.PercentComplete;
+            }
 
             return SceneReference.Scene.isLoaded ? 1 : 0;
         }
         
-        protected override IEnumerator LoadSceneOverride()
+        protected override async UniTask LoadScene()
         {
             _loadSceneAsyncOperation = UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(SceneReference.ScenePath, LoadSceneMode.Additive);
-            yield return _loadSceneAsyncOperation;
+            await _loadSceneAsyncOperation;
         }
         
-        protected override IEnumerator UnloadSceneOverride()
+        protected override async UniTask UnloadScene()
         {
             _unloadSceneAsyncOperation = UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
-            yield return _unloadSceneAsyncOperation;
+            await _unloadSceneAsyncOperation;
         }
 
         public override bool IsLoading()
@@ -49,7 +53,9 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
         public override bool IsUnloading()
         {
             if (!_unloadSceneAsyncOperation.IsValid())
+            {
                 return false;
+            }
 
             return _unloadSceneAsyncOperation.PercentComplete != 1;
         }

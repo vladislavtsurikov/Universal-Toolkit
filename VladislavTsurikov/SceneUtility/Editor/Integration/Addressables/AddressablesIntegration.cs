@@ -20,7 +20,9 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
             Settings = AddressableAssetSettingsDefaultObject.GetSettings(true);
             
             if(!Application.isPlaying)
+            {
                 ScenesInBuildUtility.SetupScenesInBuildOverride = SetupScenesInBuild;
+            }
         }
 
         private static void SetupScenesInBuild(List<string> scenePaths)
@@ -37,10 +39,14 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
         internal static bool IsAdded(params string[] paths)
         {
             if (paths == null || paths.Length == 0)
+            {
                 return false;
+            }
 
             if (!Settings)
+            {
                 return false;
+            }
 
             var entries = Settings.groups.SelectMany(g => g.entries?.Where(e => paths.Contains(e.AssetPath)));
             return paths.All(path => entries.Any(e => e.AssetPath == path));
@@ -71,7 +77,9 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
         private static void AddScene(string scenePath)
         {
             if (!Settings)
+            {
                 return;
+            }
 
             Settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(scenePath), Settings.DefaultGroup, postEvent: false).
                 SetLabel("Scene Manager", true, true);
@@ -80,7 +88,9 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
         private static void RemoveScene(string scenePath)
         {
             if (!Settings)
+            {
                 return;
+            }
 
             Settings.RemoveAssetEntry(AssetDatabase.AssetPathToGUID(scenePath), postEvent: false);
         }

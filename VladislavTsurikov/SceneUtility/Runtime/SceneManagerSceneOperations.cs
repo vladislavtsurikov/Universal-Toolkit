@@ -29,7 +29,6 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             _loadSceneAsyncOperation = SceneManager.LoadSceneAsync(SceneReference.SceneName, LoadSceneMode.Additive);
 
             await _loadSceneAsyncOperation;
-            
         }
 
         protected override async UniTask UnloadScene()
@@ -54,7 +53,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         public override bool IsUnloading()
         {
             if (_unloadSceneAsyncOperation == null)
+            {
                 return false;
+            }
 
             return _unloadSceneAsyncOperation.progress != 1;
         }

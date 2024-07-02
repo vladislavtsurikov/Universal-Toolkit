@@ -20,9 +20,13 @@ namespace VladislavTsurikov.SceneUtility.Editor
             }
             
             if(SetupScenesInBuildOverride != null)
-                SetupScenesInBuildOverride.Invoke(scenePaths); 
+            {
+                SetupScenesInBuildOverride.Invoke(scenePaths);
+            }
             else
+            {
                 SetupScenesInBuildSettings(scenePaths);
+            }
         }
         
         private static void SetupScenesInBuildSettings(List<string> scenePaths)
@@ -48,8 +52,10 @@ namespace VladislavTsurikov.SceneUtility.Editor
         public static void AddBuildScene(string pathToScene)
         {
             if(HasSceneInBuild(pathToScene))
+            {
                 return;
-            
+            }
+
             var newScene = new EditorBuildSettingsScene(pathToScene, true);
             var tempScenes = EditorBuildSettings.scenes.ToList();
             tempScenes.Add(newScene);
@@ -59,8 +65,10 @@ namespace VladislavTsurikov.SceneUtility.Editor
         public static void RemoveBuildScene(string pathToScene)
         {
             if(HasSceneInBuild(pathToScene))
+            {
                 return;
-            
+            }
+
             var tempScenes = EditorBuildSettings.scenes.ToList();
             tempScenes.RemoveAll(scene => scene.path == pathToScene);
             EditorBuildSettings.scenes = tempScenes.ToArray();
