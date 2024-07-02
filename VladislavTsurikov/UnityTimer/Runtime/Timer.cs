@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.Timer.Runtime 
+namespace VladislavTsurikov.UnityTimer.Runtime 
 {
     public class Timer
     {

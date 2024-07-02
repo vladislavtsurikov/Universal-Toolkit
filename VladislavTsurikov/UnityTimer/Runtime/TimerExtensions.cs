@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace VladislavTsurikov.Timer.Runtime 
+namespace VladislavTsurikov.UnityTimer.Runtime 
 {
     public static class TimerExtensions
     {
