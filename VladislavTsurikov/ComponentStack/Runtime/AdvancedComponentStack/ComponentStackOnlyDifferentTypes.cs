@@ -14,21 +14,22 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         {
             RemoveElementsWithSameType();
         }
-        
-        public void RemoveElementsWithSameType()
-        {
-            for (int i = _elementList.Count - 1; i >= 0; i--)
-            {
-                if (HasMultipleType(_elementList[i].GetType()))
-                {
-                    Remove(i);
-                }
-            }
-        }
-        
+
         public void SetupElement<T2>(bool force = false) where T2: Component
         {
             SetupElement(typeof(T2), force);
+        }
+        
+        public T2 GetElement<T2>() where T2 : Component
+        {
+            object component = GetElement(typeof(T2), out _);
+
+            if (component == null)
+            {
+                return null;
+            }
+
+            return (T2)component;
         }
 
         public void SetupElement(Type type, bool force = false) 
@@ -38,9 +39,9 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
                 throw new ArgumentOutOfRangeException(nameof(type));
             }
 
-            Component componentElement = GetElement(type);
+            Component component = GetElement(type);
 
-            componentElement?.Setup(SetupData, force);
+            component?.Setup(force);
         }
         
         public void CreateIfMissingType(Type[] types)
@@ -96,6 +97,34 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
                 }
             }
         }
+
+        public T2 GetAndAutoUpdateComponent<T2>(Action<T2> updateComponent) where T2 : Component
+        {
+            T2 component = GetElement<T2>();
+
+            if (component != null)
+            {
+                OnCollectionChanged += CollectionChanged;
+                
+                void CollectionChanged()
+                {
+                    T2 newComponent = GetElement<T2>();
+                    updateComponent(newComponent);
+
+                    if (newComponent == null)
+                    {
+                        OnCollectionChanged -= CollectionChanged;
+                    }
+                }
+            }
+
+            return component;
+        }
+
+        public bool HasType(Type type)
+        {
+            return GetElement(type) != null;
+        }
         
         protected bool HasMultipleType(Type type)
         {
@@ -119,10 +148,16 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
             return false;
         }
-
-        public bool HasType(Type type)
+        
+        protected void RemoveElementsWithSameType()
         {
-            return GetElement(type) != null;
+            for (int i = _elementList.Count - 1; i >= 0; i--)
+            {
+                if (HasMultipleType(_elementList[i].GetType()))
+                {
+                    Remove(i);
+                }
+            }
         }
     }
 }

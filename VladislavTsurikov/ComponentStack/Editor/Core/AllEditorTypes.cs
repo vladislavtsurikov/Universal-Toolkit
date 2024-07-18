@@ -14,9 +14,9 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
 
         static AllEditorTypes()
         {
-            var elementTypes = AllTypesDerivedFrom<T>.TypeList;
+            var elementTypes = AllTypesDerivedFrom<T>.Types;
 
-            var editorTypes = AllTypesDerivedFrom<ElementEditor>.TypeList
+            var editorTypes = AllTypesDerivedFrom<ElementEditor>.Types
                 .Where(
                     t => t.IsDefined(typeof(ElementEditorAttribute), false)
                          && !t.IsAbstract

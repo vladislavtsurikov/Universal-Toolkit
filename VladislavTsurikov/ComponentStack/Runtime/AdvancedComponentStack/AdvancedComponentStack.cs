@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.ReflectionUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {
@@ -33,7 +31,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
         public void CreateAllElementTypes()
         {
-            CreateElementIfMissingType(AllTypesDerivedFrom<T>.TypeList.ToArray());
+            CreateElementIfMissingType(AllTypesDerivedFrom<T>.Types);
         }
         
         protected void CreateElementIfMissingType(Type[] types)
@@ -63,29 +61,6 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             {
                 Add(element);
             }
-        }
-        
-        public T GetElement(Type type)
-        {
-            return GetElement(type, out _);
-        }
-        
-        public T GetElement(Type type, out int index)
-        {
-            index = -1;
-            for (int i = 0; i < _elementList.Count; i++)
-            {
-                if (_elementList[i] != null)
-                {
-                    if (_elementList[i].GetType() == type)
-                    {
-                        index = i;
-                        return _elementList[i];
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }

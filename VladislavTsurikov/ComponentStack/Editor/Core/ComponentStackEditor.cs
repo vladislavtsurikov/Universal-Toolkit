@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
@@ -42,7 +43,15 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
                 }
                 
                 var editor = (N)Activator.CreateInstance(editorType);
-                editor.Init(settings);
+                
+                try
+                {
+                    editor.Init(settings);
+                }
+                catch
+                {
+                    Debug.LogError("Component Editor initialization: " + settings.Name);
+                }
 
                 if (index < 0)
                 {

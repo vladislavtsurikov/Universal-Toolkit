@@ -82,6 +82,6 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         protected virtual void OnDeselect(){}
         protected virtual void OnSelect(){}
         protected virtual void OnChangeActive(){}
-        public virtual bool IsValid() { return true; }
+        public virtual bool DeleteElement() { return true; }
     }
 }

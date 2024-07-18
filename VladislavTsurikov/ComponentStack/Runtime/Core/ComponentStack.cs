@@ -11,6 +11,9 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
     [Serializable]
     public abstract class ComponentStack<T> where T : Component
     {
+        [NonSerialized] 
+        private bool _isDirty = true;
+        
         [OdinSerialize]
         protected AdvancedElementList<T> _elementList = new AdvancedElementList<T>();
 
@@ -18,9 +21,28 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         
         public IReadOnlyList<T> ElementList => _elementList;
 
-        [NonSerialized] 
-        public bool IsDirty = true;
+        public bool IsDirty
+        {
+            get => _isDirty;
+            set
+            {
+                if (_isDirty == value)
+                {
+                    return;
+                }
+                
+                _isDirty = value;
+                    
+                if (_isDirty)
+                {
+                    OnCollectionChanged?.Invoke();
+                }
+            }
+        }
+        
         public bool IsSetup { get; private set; }
+
+        public event Action OnCollectionChanged;
 
         public T SelectedElement
         {
@@ -43,7 +65,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             for (int i = 0; i < _elementList.Count; i++)
             {
                 _elementList[i].Stack = this;
-                _elementList[i].Setup(setupData, force);
+                _elementList[i].SetupWithSetupData(force, setupData);
             }
         }
 
@@ -85,7 +107,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             var element = Instantiate(type, false);
             Add(element, index);
             element.Stack = this;
-            element.Setup(SetupData);
+            element.SetupWithSetupData(true, SetupData);
             element.OnCreateInternal();
 
             return element;
@@ -104,7 +126,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
 
                 if (setup)
                 {
-                    element.Setup(SetupData);
+                    element.SetupWithSetupData(true, SetupData);
                     element.OnCreateInternal();
                 }
 
@@ -199,17 +221,17 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             IsDirty = true;
         }
 
-        public void Select(T stackElement)
+        public void Select(T element)
         {
             _elementList.ForEach(setting => setting.Selected = false);
-            stackElement.Selected = true;
+            element.Selected = true;
         }
 
         public void RemoveInvalidElements()
         {
             for (int i = _elementList.Count - 1; i >= 0; i--)
             {
-                if (_elementList[i] == null || _elementList[i].GetType().IsAbstract || !_elementList[i].IsValid())
+                if (_elementList[i] == null || _elementList[i].GetType().IsAbstract || !_elementList[i].DeleteElement())
                 {
                     Remove(i);
                 }
@@ -236,6 +258,29 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             }
             
             return all;
+        }
+        
+        public T GetElement(Type type)
+        {
+            return GetElement(type, out _);
+        }
+
+        public T GetElement(Type type, out int index)
+        {
+            index = -1;
+            for (int i = 0; i < _elementList.Count; i++)
+            {
+                if (_elementList[i] != null)
+                {
+                    if (_elementList[i].GetType() == type)
+                    {
+                        index = i;
+                        return _elementList[i];
+                    }
+                }
+            }
+
+            return null;
         }
 
         protected virtual void OnSetup()

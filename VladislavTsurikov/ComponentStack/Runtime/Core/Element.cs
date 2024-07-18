@@ -6,8 +6,10 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
     [Serializable]
-    public class Element : IHasName, ISetupable, IDisableable
+    public class Element : IHasName, IDisableable
     {
+        private object[] _setupData;
+        
         [NonSerialized] 
         public string RenamingName;
         [NonSerialized] 
@@ -49,7 +51,12 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             return true;
         }
         
-        public void Setup(object[] setupData = null, bool force = false)
+        public void Setup(bool force = false)
+        {
+            SetupWithSetupData(force, _setupData);
+        }
+
+        internal void SetupWithSetupData(bool force = false, object[] setupData = null)
         {
             if (!force)
             {
@@ -58,6 +65,8 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
                     return;
                 }
             }
+
+            _setupData = setupData;
             
             IsSetup = false;
             OnDisableElement();
