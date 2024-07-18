@@ -10,35 +10,74 @@ using VladislavTsurikov.SceneDataSystem.Editor.StreamingUtility;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
+using VladislavTsurikov.SceneUtility.Editor;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
     public partial class Sectorize
     {
-        public async UniTask CreateScenesForTerrains()
+        public async UniTask CreateSectors()
         {
-            List<VirtualTerrain> terrains = AllVirtualTerrainTypes.FindAll();
+            Scene activeScene = SceneManager.GetActiveScene();
+            
+            SceneDataManager sceneDataManager = SceneDataManagerFinder.Find(activeScene);
 
-            if (terrains.Count <= 0)
+            sceneDataManager.SceneType = SceneType.ParentScene;
+            
+            CreateSectorsForAdditiveScenes(activeScene);
+
+            await CreateScenesForActiveSceneTerrains();
+        }
+
+        private static void CreateSectorsForAdditiveScenes(Scene activeScene)
+        {
+            for (int i = 0; i < SceneManager.sceneCount; i++)
+            {
+                Scene scene = SceneManager.GetSceneAt(i);
+
+                if (activeScene == scene)
+                {
+                    continue;
+                }
+
+                List<VirtualTerrain> terrains = AllVirtualTerrainTypes.FindAll(scene);
+
+                if (terrains.Count == 0)
+                {
+                    continue;
+                }
+
+                for (int terrainIndex = 0; terrainIndex < terrains.Count; terrainIndex++)
+                {
+                    SectorLayerManager.Instance.AddSector(GetSectorLayerTag(), SceneAssetFinder.FindSceneAsset(scene),
+                        SceneObjectsBounds.GetSceneObjectsBounds(scene, true).ToBounds());
+                }
+            }
+        }
+
+        private static async UniTask CreateScenesForActiveSceneTerrains()
+        {
+            Scene activeScene = SceneManager.GetActiveScene();
+            
+            List<VirtualTerrain> activeSceneTerrains = AllVirtualTerrainTypes.FindAll(activeScene);
+
+            if (activeSceneTerrains.Count == 0)
             {
                 return;
             }
 
-            Scene activeScene = SceneManager.GetActiveScene();
-            
-            SceneDataManager sceneDataManager = SceneDataManagerUtility.FindSceneDataManager(activeScene);
-
-            sceneDataManager.SceneType = SceneType.ParentScene;
-
             EditorSceneManager.MarkSceneDirty(activeScene);
-            
-            for (int i = 0; i < terrains.Count; i++)
+
+            for (int i = 0; i < activeSceneTerrains.Count; i++)
             {
-                float progress = i / (float)terrains.Count * 100;
-                
-                EditorUtility.DisplayProgressBar("Sector: " + progress + "%" + " (" + i + "/" + terrains.Count + ")", "Running " + terrains[i].Target.name, progress / 100);
-                
-                await StreamingUtilityEditor.CreateScene("Terrain", terrains[i].Target.name, terrains[i].GetTerrainBounds(), new List<GameObject>(){terrains[i].Target.gameObject});
+                float progress = i / (float)activeSceneTerrains.Count * 100;
+
+                EditorUtility.DisplayProgressBar("Sector: " + progress + "%" + " (" + i + "/" + activeSceneTerrains.Count + ")",
+                    "Running " + activeSceneTerrains[i].Target.name, progress / 100);
+
+                await StreamingUtilityEditor.CreateScene(GetSectorLayerTag(), activeSceneTerrains[i].Target.name,
+                    activeSceneTerrains[i].GetTerrainBounds(),
+                    new List<GameObject>() { activeSceneTerrains[i].Target.gameObject });
             }
 
             SceneDataManagerUtility.InstanceSceneDataManagerForAllScenes();
@@ -49,11 +88,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             }
 
             Editor.Sectorize.Integration.SceneManagerIntegration.PrepareSceneManager();
-            
-            EditorUtility.ClearProgressBar();
-            
+
             CreateScenesAfterEvent?.Invoke();
-            
+
             EditorUtility.ClearProgressBar();
         }
     }

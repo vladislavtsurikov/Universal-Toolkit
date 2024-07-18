@@ -1,12 +1,15 @@
+using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
-using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
+using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.StreamingRules;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
@@ -32,12 +35,31 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                 return s_instance;
             }
         }
+        
+#if UNITY_EDITOR
+        [NonSerialized]
+        private bool _enableManualSceneControl;
+
+        public bool EnableManualSceneControl
+        {
+            get
+            {
+                if (Application.isPlaying)
+                {
+                    return false;
+                }
+                
+                return _enableManualSceneControl;
+            }
+            set => _enableManualSceneControl = value;
+        }
+
 
         public bool DebugAllCells = false;
         public bool DebugVisibleCells = false;
         
-        public delegate void CreateScenesAfter ();
-        public static CreateScenesAfter CreateScenesAfterEvent;
+        public static Action CreateScenesAfterEvent;
+#endif
         
         public static string GetSectorLayerTag()
         {

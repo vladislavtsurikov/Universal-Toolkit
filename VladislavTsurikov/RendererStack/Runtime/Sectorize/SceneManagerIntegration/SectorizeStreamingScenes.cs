@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
@@ -21,7 +20,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
 
         protected override async UniTask Load()
         {
-            _loadSectors = Sectorize.Instance.GetLoadSectorsForSceneManager();
+            _loadSectors = GetLoadSectorsForSceneManager();
             
             foreach (var sector in _loadSectors)
             {
@@ -66,7 +65,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
             return !_loadSectors.Any() ? 1 : _loadSectors.Sum(a => a.SceneReference.LoadingProgress) / _loadSectors.Count;
         }
 
-        public override bool IsValid()
+        public override bool DeleteElement()
         {
             for (int i = SubScenes.Count - 1; i >= 0; i--)
             {
@@ -85,6 +84,25 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.SceneManagerIntegrat
             {
                 SubScenes.Add(sceneReference);
             }
+        }
+        
+        private static List<Sector> GetLoadSectorsForSceneManager()
+        {
+            Sectorize sectorize = Sectorize.Instance;
+            
+            List<Sector> startupSectors = new List<Sector>();
+            
+            foreach (var cam in sectorize.CameraManager.VirtualCameraList)
+            {
+                if (cam.Ignored) 
+                {
+                    continue;
+                }
+
+                startupSectors.AddRange(FindSector.OverlapSphere(cam.Camera.transform.position, sectorize.GetMaxLoadingDistance(), Sectorize.GetSectorLayerTag(), false));
+            }
+
+            return startupSectors;
         }
     }
 }
