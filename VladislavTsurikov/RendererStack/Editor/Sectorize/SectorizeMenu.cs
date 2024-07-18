@@ -15,6 +15,9 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
         public override void ShowGenericMenu(GenericMenu menu, Renderer renderer)
         {
             Runtime.Sectorize.Sectorize sectorize = (Runtime.Sectorize.Sectorize)renderer;
+            
+            menu.AddItem(new GUIContent("Enable Manual Scene Control"), sectorize.EnableManualSceneControl, ContextMenuUtility.ContextMenuCallback, new Action(() => 
+                sectorize.EnableManualSceneControl = !sectorize.EnableManualSceneControl));
 
             menu.AddItem(new GUIContent("Debug/All Cells"), sectorize.DebugAllCells, ContextMenuUtility.ContextMenuCallback, new Action(() => 
                 sectorize.DebugAllCells = !sectorize.DebugAllCells));

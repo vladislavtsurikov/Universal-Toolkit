@@ -12,22 +12,22 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 {
     public static class AllVirtualTerrainTypes 
     {
-        private static readonly List<Type> _typeList;
+        private static readonly Type[] _types;
 
         static AllVirtualTerrainTypes()
         {
-            _typeList = AllTypesDerivedFrom<VirtualTerrain>.TypeList;
+            _types = AllTypesDerivedFrom<VirtualTerrain>.Types;
         }
-
-        public static List<VirtualTerrain> FindAll()
+        
+        public static List<VirtualTerrain> FindAll(Scene scene)
         {
             List<VirtualTerrain> virtualTerrains = new List<VirtualTerrain>();
             
-            foreach (Type type in AllTerrainHelperTypes.TypeList)
+            foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
 
-                foreach (GameObject go in terrainHelperAttribute.GetTerrains(SceneManager.GetActiveScene()))
+                foreach (GameObject go in terrainHelperAttribute.GetTerrains(scene))
                 {
                     VirtualTerrain virtualTerrain = CreateTerrainHelper(go);
 
@@ -45,7 +45,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
         {
             List<VirtualTerrain> virtualTerrains = new List<VirtualTerrain>();
             
-            foreach (Type type in AllTerrainHelperTypes.TypeList)
+            foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
 
@@ -78,7 +78,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
                     continue;
                 }
 
-                foreach (var type in _typeList)
+                foreach (var type in _types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 

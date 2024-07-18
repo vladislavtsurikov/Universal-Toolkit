@@ -6,7 +6,6 @@ using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 {
-    [Serializable]
     [TerrainHelper(typeof(Terrain), "Unity terrain")]
     public class UnityTerrain : VirtualTerrain
     {

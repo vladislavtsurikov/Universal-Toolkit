@@ -18,10 +18,11 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 	[ElementEditor(typeof(Runtime.Sectorize.Sectorize))]
     public class SectorizeEditor : RendererEditor
     {
-        private Vector2 _windowScrollPos;
+	    private Vector2 _windowScrollPos;
         public static SettingsType SettingsType = SettingsType.Sectors;
 		
 		private readonly SectorizeMenu _menu = new SectorizeMenu();
+		private Runtime.Sectorize.Sectorize _sectorize => (Runtime.Sectorize.Sectorize)Target;
 
 		public override void OnGUI()
         {
@@ -30,10 +31,8 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 	        if(sectors.Count == 0)
 	        {
 		        CustomEditorGUILayout.Label("No Sectors found");
-
-		        Scene activeScene = SceneManager.GetActiveScene();
-	            
-		        List<Object> terrains = GameObjectUtility.FindObjectsOfType(typeof(Terrain), activeScene, true);
+		        
+		        List<Object> terrains = GameObjectUtility.FindObjectsOfType(typeof(Terrain), true);
 	            
 		        if (terrains.Count > 0)
 		        {
@@ -44,7 +43,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 				        GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
 				        if (CustomEditorGUILayout.ClickButton("Create Sectors"))
 				        {
-					        Runtime.Sectorize.Sectorize.Instance.CreateScenesForTerrains().Forget();
+					        Runtime.Sectorize.Sectorize.Instance.CreateSectors().Forget();
 				        }
 				        GUILayout.Space(3);
 			        }
@@ -127,30 +126,33 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize
 		            GUILayout.Space(3);
 	            }
 	            GUILayout.EndHorizontal();
-	            
-	            GUILayout.Space(3);
-	            
-	            GUILayout.BeginHorizontal();
-	            {
-		            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-		            
-		            if (CustomEditorGUILayout.ClickButton("Load All Scenes"))
-		            {
-			            StreamingUtility.LoadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
-		            }
-		            
-		            GUILayout.Space(3);
-		            
-		            if (CustomEditorGUILayout.ClickButton("Unload All Scenes"))
-		            {
-			            StreamingUtility.UnloadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
-		            }
-		            
-		            GUILayout.Space(3);
-	            }
-	            GUILayout.EndHorizontal();
 
-	            GUILayout.Space(6);
+	            if (_sectorize.EnableManualSceneControl)
+	            {
+		            GUILayout.Space(3);
+		            
+		            GUILayout.BeginHorizontal();
+		            {
+			            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
+		            
+			            if (CustomEditorGUILayout.ClickButton("Load All Scenes"))
+			            {
+				            StreamingUtility.LoadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
+			            }
+		            
+			            GUILayout.Space(3);
+		            
+			            if (CustomEditorGUILayout.ClickButton("Unload All Scenes"))
+			            {
+				            StreamingUtility.UnloadAllScenes(Runtime.Sectorize.Sectorize.GetSectorLayerTag()).Forget();
+			            }
+		            
+			            GUILayout.Space(3);
+		            }
+		            GUILayout.EndHorizontal();
+		            
+		            GUILayout.Space(6);
+	            }
 
 	            CustomEditorGUILayout.Label("Sectors:");
                 EditorGUILayout.BeginHorizontal();

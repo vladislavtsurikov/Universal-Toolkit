@@ -27,7 +27,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
             ChangeGameObjectSceneIfNecessary(gameObject);
 
             List<SceneDataManager> sceneDataManagers =
-                FindSceneDataManager.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
+                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
             
             if (sceneDataManagers.Count == 0)
             {
@@ -52,7 +52,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
         private static void ChangeGameObjectSceneIfNecessary(GameObject gameObject)
         {
             List<SceneDataManager> sceneDataManagers =
-                FindSceneDataManager.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(),
+                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(),
                     false);
 
             if (sceneDataManagers.Count <= 1) return;
