@@ -8,11 +8,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
     public static class AllTerrainHelperTypes 
     {
-        public static readonly List<Type> TypeList;
+        public static readonly Type[] Types;
 
         static AllTerrainHelperTypes()
         {
-            TypeList = AllTypesDerivedFrom<TerrainHelper>.TypeList;
+            Types = AllTypesDerivedFrom<TerrainHelper>.Types;
         }
 
         public static bool HasTerrainMonoBehaviourType(GameObject go)
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
                     continue;
                 }
 
-                foreach (var type in TypeList)
+                foreach (var type in Types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 
@@ -59,7 +59,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
                     continue;
                 }
 
-                foreach (var type in TypeList)
+                foreach (var type in Types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 

@@ -19,11 +19,8 @@ using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
 using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
-
-#if RENDERER_STACK
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 using PrototypeTerrainObject = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.PrototypeTerrainObject;
-#endif
 #if UNITY_EDITOR
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;

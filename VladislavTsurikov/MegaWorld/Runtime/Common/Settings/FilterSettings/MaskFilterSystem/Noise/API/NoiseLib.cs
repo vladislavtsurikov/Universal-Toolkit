@@ -661,7 +661,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         private static void GatherGenerators()
         {
-            var generatorTypes = AllTypesDerivedFrom<INoiseShaderGenerator>.TypeList
+            var generatorTypes = AllTypesDerivedFrom<INoiseShaderGenerator>.Types
             .Where(t => !t.IsAbstract); 
 
             _sGenerators = new Dictionary<Type, INoiseShaderGenerator>();

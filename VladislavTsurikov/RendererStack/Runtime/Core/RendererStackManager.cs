@@ -107,7 +107,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
             {
                 SceneComponentStack.DrawDebug(customRenderer);
                 GlobalSettings.GlobalSettings.Instance.DrawGizmos(customRenderer);
-
+                
                 customRenderer.DrawDebug();
             }
         }

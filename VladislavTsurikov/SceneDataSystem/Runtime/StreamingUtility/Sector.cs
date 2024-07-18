@@ -17,7 +17,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
     [Serializable]
     public sealed class Sector
     {
-        [NonSerialized] private ObjectBoundsBVHTree _objectBoundsBvhTree = new ObjectBoundsBVHTree();
+        [NonSerialized] 
+        private ObjectBoundsBVHTree _objectBoundsBvhTree = new ObjectBoundsBVHTree();
         
         //References to GameObject in another SceneReference.Scene
         private List<GameObject> _references = new List<GameObject>();
@@ -138,12 +139,12 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
         }
 
-        public void ChangeObjectBoundsNodeSize()
+        public void ChangeObjectBoundsNodeSize(bool markSceneDirty = true)
         {
-            _objectBoundsBvhTree.ChangeNodeSize(this, SceneObjectsBoundsUtility.GetSceneObjectsBounds(this));
+            _objectBoundsBvhTree.ChangeNodeSize(this, SceneObjectsBounds.GetSceneObjectsBounds(this));
             
 #if UNITY_EDITOR
-            if(!Application.isPlaying)
+            if(!Application.isPlaying && markSceneDirty)
             {
                 SceneReference.MarkSceneDirty();
             }

@@ -9,7 +9,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 {
     public static class CustomEditorGUILayout
     {
-	    public static float LabelWidth = 270;
+	    public static float LabelWidth = 230;
 	    private static GUISkin Skin => AssetDatabase.LoadAssetAtPath<GUISkin>(IMGUIContentPath.SkinPath);
         		
 		private static Vector2 _sliderClickPos;
@@ -650,8 +650,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 		{
 			GUILayout.BeginHorizontal();
 			{
-				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(LabelWidth));
-				labelRect.width += 25;
+				Rect labelRect = EditorGUILayout.GetControlRect(GUILayout.Height(15), GUILayout.Width(ScreenRect.width));
 				labelRect.x += 1;
 	
 				style.normal.textColor = EditorColors.Instance.LabelColor;

@@ -15,8 +15,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             _tree.Clear();
             _leafNodes.Clear();
         }
-        
-        public void RegisterSector(Sector sector, AABB aabb)
+
+        private void RegisterSector(Sector sector, AABB aabb)
         {
             if(_leafNodes.ContainsKey(sector))
             {

@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 
         static AllPrototypeTypes()
         {
-            var types = AllTypesDerivedFrom<Prototype>.TypeList
+            var types = AllTypesDerivedFrom<Prototype>.Types
                 .Where(
                     t => t.IsDefined(typeof(NameAttribute), false) && !t.IsAbstract
                 );

@@ -44,14 +44,14 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
         {
             _sceneObjectTree = new BVHObjectTree<BVHGameObject>();
             _leafNodes = new Dictionary<BVHGameObject, BVHNodeAABB<BVHGameObject>>();
-            RegisterGameObjects(GameObjectUtility.GetSceneObjects(SceneDataManager.Scene));
+            RegisterGameObjects(GameObjectUtility.GetSceneObjects(SceneDataManager.Scene), false);
         }
 
-        public void RegisterGameObjects(IEnumerable<GameObject> gameObjects)
+        public void RegisterGameObjects(IEnumerable<GameObject> gameObjects, bool markSceneDirty = true)
         {
             foreach (GameObject go in gameObjects)
             {
-                RegisterGameObject(go);
+                RegisterGameObject(go, markSceneDirty);
             }
         }
 
@@ -65,7 +65,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
             }
         }
 
-        public void RegisterGameObject(GameObject gameObject)
+        public void RegisterGameObject(GameObject gameObject, bool markSceneDirty = true)
         {
             if (!CanRegisterGameObject(gameObject))
             {
@@ -95,7 +95,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 
             _leafNodes.Add(bvhGameObject, treeNode); 
             
-            SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(SceneDataManager.Sector);
+            SceneObjectsBounds.ChangeSceneObjectsBounds(SceneDataManager.Sector, markSceneDirty); 
         }
 
         public void HandleTransformChanges(bool forceCheck = false)
@@ -128,7 +128,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
                     RegisterGameObjectToCurrentScene?.Invoke(pair.Key.GameObject);
                 }
 
-                SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(SceneDataManager.Sector);
+                SceneObjectsBounds.ChangeSceneObjectsBounds(SceneDataManager.Sector);
             }
         }
         
@@ -142,7 +142,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
                 {
                     _sceneObjectTree.Tree.RemoveLeafNode(item.Value);
                     _leafNodes.Remove(item.Key);
-                    SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(SceneDataManager.Sector);
+                    SceneObjectsBounds.ChangeSceneObjectsBounds(SceneDataManager.Sector);
                     return;
                 }
             }
@@ -171,7 +171,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
                 _leafNodes.Clear();
                 _leafNodes = newDictionary;
 
-                SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(SceneDataManager.Sector);
+                SceneObjectsBounds.ChangeSceneObjectsBounds(SceneDataManager.Sector);
             }
         }
 

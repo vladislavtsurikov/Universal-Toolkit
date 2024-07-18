@@ -37,7 +37,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     return _sceneOperations;
                 }
 
-                var types = AllTypesDerivedFrom<SceneOperations>.TypeList
+                var types = AllTypesDerivedFrom<SceneOperations>.Types
                     .Where(
                         t => !t.IsAbstract
                     );

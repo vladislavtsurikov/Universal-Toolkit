@@ -24,7 +24,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
         public static SceneDataManager InstanceSceneDataManager(Scene scene)
         {
-            SceneDataManager sceneDataManager = FindSceneDataManager(scene, false);
+            SceneDataManager sceneDataManager = SceneDataManagerFinder.Find(scene, false);
 
             if(sceneDataManager == null)
             {
@@ -53,7 +53,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             for (int i = 0; i < SceneManager.sceneCount; i++)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
-                SceneDataManager sceneDataManager = FindSceneDataManager(scene, getActive);
+                SceneDataManager sceneDataManager = SceneDataManagerFinder.Find(scene, getActive);
 
                 if (sceneDataManager != null)
                 {
@@ -72,49 +72,6 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             {
                 sceneDataManagers[i].Setup(forceSetupSceneDatas); 
             }
-        }
-
-        //The Object.FindObjectOfType method does not allow me to find a component with a hidden GameObject, but this method allows me to
-        public static SceneDataManager FindSceneDataManager(Scene scene, bool getActive = true)
-        {
-            Profiler.BeginSample("FindSceneDataManager");
-            
-            if (!scene.isLoaded)
-            {
-                Profiler.EndSample();
-                return null;
-            }
-            
-            GameObject[] gameObjects = scene.GetRootGameObjects();
-
-            foreach (GameObject go in gameObjects)
-            {
-                if (getActive)
-                {
-                    if (!go.activeInHierarchy)
-                    {
-                        continue;
-                    }
-                }
-                
-                Object obj = go.GetComponentInChildren(typeof(SceneDataManager));
-                if(obj != null)
-                {
-                    SceneDataManager sceneDataManager = (SceneDataManager)obj;
-                    if (!sceneDataManager.IsSetup)
-                    {
-                        sceneDataManager.Setup(); 
-                    }
-                    
-                    Profiler.EndSample();
-
-                    return sceneDataManager;
-                }
-            }
-            
-            Profiler.EndSample();
-
-            return null;
         }
     }
 }

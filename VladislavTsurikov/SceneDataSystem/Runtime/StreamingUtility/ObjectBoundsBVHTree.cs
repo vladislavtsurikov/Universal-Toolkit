@@ -112,7 +112,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 Sector sector = node.Data;
                 
                 if(sector.SceneDataManager != null && sector.SceneDataManager.IsSetup)
+                {
                     overlappedObjects.Add(node.Data);
+                }
             }
 
             return overlappedObjects;

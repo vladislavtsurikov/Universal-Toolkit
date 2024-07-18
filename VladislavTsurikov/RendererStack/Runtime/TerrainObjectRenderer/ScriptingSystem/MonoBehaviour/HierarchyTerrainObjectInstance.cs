@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting;
@@ -18,7 +19,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             TerrainObjectInstance = instance;
             instance.HierarchyTerrainObjectInstance = this;
 			
-            if (PrototypeComponent.IsValid(scriptingComponent))
+            if (scriptingComponent.IsValid())
             {
                 if (!Application.isPlaying)
                 {

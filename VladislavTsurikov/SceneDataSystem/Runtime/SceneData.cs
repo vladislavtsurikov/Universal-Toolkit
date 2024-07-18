@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-#endif
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {
@@ -58,12 +57,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
 #endif
         }
 
-        public override bool IsValid()
+        public override bool DeleteElement()
         {
             AllowCreateComponentAttribute allowCreateComponentAttribute = GetType().GetAttribute<AllowCreateComponentAttribute>();
-                
-            if(allowCreateComponentAttribute == null)
+
+            if (allowCreateComponentAttribute == null)
+            {
                 return true;
+            }
 
             return allowCreateComponentAttribute.Allow(SceneDataManager);
         }

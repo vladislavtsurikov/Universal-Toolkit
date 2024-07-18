@@ -11,7 +11,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
     {
         public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = FindSceneDataManager.OverlapBox(boxCenter, boxSize, boxRotation);
+            var sceneDataManagers = SceneDataManagerFinder.OverlapBox(boxCenter, boxSize, boxRotation);
 
             List<ColliderObject> overlappedObjects = new List<ColliderObject>();
 
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 
         public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = FindSceneDataManager.OverlapSphere(sphereCenter, sphereRadius);
+            var sceneDataManagers = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius);
 
             List<ColliderObject> overlappedObjects = new List<ColliderObject>();
             foreach(var sceneDataManager in sceneDataManagers)

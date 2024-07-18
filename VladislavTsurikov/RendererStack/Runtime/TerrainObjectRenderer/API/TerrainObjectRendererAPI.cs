@@ -103,7 +103,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
         
         public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = FindSceneDataManager.OverlapBox(boxCenter, boxSize, boxRotation, Sectorize.Sectorize.GetSectorLayerTag());
+            var sceneDataManagers = SceneDataManagerFinder.OverlapBox(boxCenter, boxSize, boxRotation, Sectorize.Sectorize.GetSectorLayerTag());
 
             List<ColliderObject> overlappedObjects = new List<ColliderObject>();
 
@@ -127,7 +127,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 
         public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
         {
-            var sectorList = FindSceneDataManager.OverlapSphere(sphereCenter, sphereRadius, Sectorize.Sectorize.GetSectorLayerTag());
+            var sectorList = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius, Sectorize.Sectorize.GetSectorLayerTag());
             
             List<ColliderObject> overlappedObjects = new List<ColliderObject>();
             foreach(var sceneDataManager in sectorList)

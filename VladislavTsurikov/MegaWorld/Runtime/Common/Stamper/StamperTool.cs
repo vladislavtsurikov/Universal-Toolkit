@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
@@ -7,6 +6,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using UnityEditor;
 #endif
+
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
     public abstract class StamperTool : MonoBehaviourTool
@@ -23,14 +23,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 #if UNITY_EDITOR
         public AutoRespawnController AutoRespawnController = new AutoRespawnController();
 #endif
-
-        [OnDeserializing]
-        private void Initialize()
-        {
-#if UNITY_EDITOR
-            AutoRespawnController = new AutoRespawnController();
-#endif
-        }
         
         private protected override void OnToolEnable()
         {

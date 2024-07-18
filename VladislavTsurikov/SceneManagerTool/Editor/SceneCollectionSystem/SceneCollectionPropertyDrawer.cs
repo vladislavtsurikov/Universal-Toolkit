@@ -13,7 +13,6 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
     {
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // Move this up
             EditorGUI.BeginProperty(position, GUIContent.none, property);
             {
                 SceneCollectionReferenceField(position, new GUIContent("SceneCollection"), property.GetTarget<SceneCollectionReference>());

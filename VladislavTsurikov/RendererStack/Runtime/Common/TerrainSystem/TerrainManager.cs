@@ -45,7 +45,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
         public void FindAll()
         {
-            foreach (Type type in AllTerrainHelperTypes.TypeList)
+            foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
                 

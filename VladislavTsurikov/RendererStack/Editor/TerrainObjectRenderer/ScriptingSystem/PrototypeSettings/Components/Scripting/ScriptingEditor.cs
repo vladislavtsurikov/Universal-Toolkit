@@ -2,6 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
@@ -25,7 +26,7 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.Scripting
         {
             Colliders colliders = (Colliders)Prototype.GetSettings(typeof(Colliders));
 
-            if(!PrototypeComponent.IsValid(colliders))
+            if(!colliders.IsValid())
             {
                 _scripting.MaxDistance = CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),  new GUIContent("Max Distance"), _scripting.MaxDistance);
                 rect.y += CustomEditorGUI.SingleLineHeight;
@@ -42,7 +43,7 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.Scripting
             
             Colliders colliders = (Colliders)Prototype.GetSettings(typeof(Colliders));
 
-            if(!PrototypeComponent.IsValid(colliders))
+            if(!colliders.IsValid())
             {
                 height += CustomEditorGUI.SingleLineHeight;
             }

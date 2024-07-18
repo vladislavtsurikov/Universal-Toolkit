@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
@@ -53,7 +54,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.Utility
 
         public static float GetMaxDistance(Type rendererType, VirtualCamera virtualCamera, DistanceCulling distanceCulling)
         {
-            if (!PrototypeComponent.IsValid(distanceCulling))
+            if (!distanceCulling.IsValid())
             {
                 return 0;
             }

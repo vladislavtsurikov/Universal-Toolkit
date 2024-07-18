@@ -12,7 +12,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
             if (sectorLayers == null)
+            {
                 return new List<Sector>();
+            }
 
             foreach (var sectorLayer in sectorLayers)
             {
@@ -22,7 +24,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
             
             if(sort)
+            {
                 SortCloserToCenter(findSectors, center);
+            }
 
             return findSectors;
         }
@@ -34,7 +38,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
             if (sectorLayers == null)
+            {
                 return new List<Sector>();
+            }
 
             foreach (var sectorLayer in sectorLayers)
             {
@@ -44,7 +50,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
             
             if(sort)
+            {
                 SortCloserToCenter(findSectors, boxCenter);
+            }
 
             return findSectors;
         }
@@ -56,7 +64,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
             if (sectorLayers == null)
+            {
                 return new List<Sector>();
+            }
 
             foreach (var sectorLayer in sectorLayers)
             {
@@ -71,8 +81,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         private static void SortCloserToCenter(List<Sector> sectors, Vector3 center)
         {
             if (sectors == null)
+            {
                 return;
-            
+            }
+
             sectors.Sort(delegate(Sector h0, Sector h1)
             {
                 float distance0 = Vector3.Distance(center, h0.Bounds.center);

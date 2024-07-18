@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
@@ -74,7 +75,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
                 Colliders collidersSettings = (Colliders)prototypeScriptingManager.Proto.GetSettings(typeof(Colliders));
                 Scripting scriptingSettings = (Scripting)prototypeScriptingManager.Proto.GetSettings(typeof(Scripting));
                 
-                if (PrototypeComponent.IsValid(collidersSettings) || PrototypeComponent.IsValid(scriptingSettings))
+                if (collidersSettings.IsValid() || scriptingSettings.IsValid())
                 {
                     CameraManager cameraManager = (CameraManager)RendererStackManager.Instance.SceneComponentStack
                         .GetElement(typeof(CameraManager));
@@ -135,7 +136,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
                 Colliders collidersSettings = (Colliders)prototypeScriptingManager.Proto.GetSettings(typeof(Colliders));
                 Scripting scriptingSettings = (Scripting)prototypeScriptingManager.Proto.GetSettings(typeof(Scripting));
 
-                if (PrototypeComponent.IsValid(collidersSettings) || PrototypeComponent.IsValid(scriptingSettings))
+                if (collidersSettings.IsValid() || scriptingSettings.IsValid())
                 {
                     prototypeScriptingManager.SetColliders(sphere, obj);
                 }

@@ -19,6 +19,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
     {
         private static List<Cell> cellsCached = new List<Cell>();
         
+        private static List<Cell> visibleCellListCached = new List<Cell>();
+        
         public static List<Cell> GetAllVisibleCellList(VirtualCamera virtualCamera)
         {
             if (cellsCached == null)
@@ -76,8 +78,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 AddInstance(instance.Instance,  Sectorize.Sectorize.GetSectorLayerTag());
             }
         }
-        
-        private static List<Cell> visibleCellListCached = new List<Cell>();
 
         public List<Cell> GetVisibleCellList(VirtualCamera virtualCamera)
         {
@@ -149,7 +149,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             ModifiedPrototypeRenderDataStack.Clear();
             
             TerrainManager terrainManager = SceneDataStackUtility.InstanceSceneData<TerrainManager>(SceneDataManager.Scene);
-            SceneDataManager.SceneDataStack.SetupElement<TerrainManager>(true);
+            terrainManager.Setup(true);
 
             CellList.Clear();
             BVHCellTree.Clear();

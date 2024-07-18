@@ -200,5 +200,10 @@ namespace VladislavTsurikov.Math.Runtime
 
             return false;
         }
+
+        public Bounds ToBounds()
+        {
+            return new Bounds(_center, _size);
+        }
     }
 }

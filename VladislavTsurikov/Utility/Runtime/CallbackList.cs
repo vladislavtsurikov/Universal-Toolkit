@@ -28,8 +28,9 @@ namespace VladislavTsurikov.Utility.Runtime
 
         public object SyncRoot => null;
 
-        public Action<int> OnAdded;
-        public Action<int> OnRemoved;
+        public event Action<int> OnAdded;
+        public event Action<int> OnRemoved;
+        public event Action OnListChanged;
 
         int IList.Add(object value)
         {
@@ -46,6 +47,7 @@ namespace VladislavTsurikov.Utility.Runtime
             
             _list.Add(item);
             OnAdded?.Invoke(_list.Count - 1);
+            OnListChanged?.Invoke();
         }
 
         public void Clear()
@@ -91,6 +93,7 @@ namespace VladislavTsurikov.Utility.Runtime
             if (_list[index] != null)
             {
                 OnRemoved?.Invoke(index);
+                OnListChanged?.Invoke();
             }
             
             _list.RemoveAt(index);

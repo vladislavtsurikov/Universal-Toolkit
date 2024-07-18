@@ -16,7 +16,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
         static RequiredSceneData()
         {
-            var types = AllTypesDerivedFrom<SceneData>.TypeList
+            var types = AllTypesDerivedFrom<SceneData>.Types
                                 .Where(t => t.IsDefined(typeof(RequiredSceneDataAttribute), false)); 
 
             foreach (Type type in types)

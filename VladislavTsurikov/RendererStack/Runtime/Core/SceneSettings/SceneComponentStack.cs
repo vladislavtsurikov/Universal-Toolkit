@@ -11,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
     {
         protected override void OnCreateElements()
         {
-            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
+            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
             {
                 AddSceneComponentsAttribute addComponentsAttribute = rendererType.GetAttribute<AddSceneComponentsAttribute>();
 
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
             {
                 bool find = false;
                 
-                foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
+                foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
                 {
                     AddSceneComponentsAttribute addComponentsAttribute = 
                         (AddSceneComponentsAttribute)rendererType.GetAttribute(typeof(AddSceneComponentsAttribute));

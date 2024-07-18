@@ -62,11 +62,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                     {
                         return null;
                     }
-
-                    if (!sectorLayerManager.IsSetup)
-                    {
-                        sectorLayerManager.SceneDataManager.SceneDataStack.SetupElement<SectorLayerManager>();
-                    }
+                    
+                    sectorLayerManager.Setup();
 
                     foreach (var sectorLayer in sectorLayerManager.SectorLayerList)
                     {

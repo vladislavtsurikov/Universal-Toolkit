@@ -93,7 +93,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                     continue;
                 }
                 
-                if (settingsType.GetAttribute<DontShowInAddMenuAttribute>() != null) 
+                if (settingsType.GetAttribute<PersistentComponentAttribute>() != null || settingsType.GetAttribute<DontShowInAddMenuAttribute>() != null) 
                 {
                     continue;
                 }

@@ -14,10 +14,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core
         static AllToolTypes()
         {
 #if UNITY_EDITOR
-            var toolWindowTypes = AllTypesDerivedFrom<ToolWindow>.TypeList;
+            var toolWindowTypes = AllTypesDerivedFrom<ToolWindow>.Types;
             TypeList.AddRange(toolWindowTypes);
 #endif
-            var toolMonoBehaviourTypes = AllTypesDerivedFrom<MonoBehaviourTool>.TypeList;
+            var toolMonoBehaviourTypes = AllTypesDerivedFrom<MonoBehaviourTool>.Types;
             TypeList.AddRange(toolMonoBehaviourTypes);
         }
     }

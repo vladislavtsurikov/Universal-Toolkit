@@ -25,7 +25,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
-
 namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
     [Name("Advanced Brush")]

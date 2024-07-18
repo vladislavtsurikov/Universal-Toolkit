@@ -19,7 +19,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.Utility
             var go = Object.Instantiate(prefab);
 #endif
 
-            SceneDataManager sceneDataManager = FindSceneDataManager.OverlapPosition(position, Sectorize.GetSectorLayerTag(), false)[0];
+            SceneDataManager sceneDataManager = SceneDataManagerFinder.OverlapPosition(position, Sectorize.GetSectorLayerTag(), false)[0];
             SceneManager.MoveGameObjectToScene(go, sceneDataManager.Scene);
 
             go.transform.position = position;

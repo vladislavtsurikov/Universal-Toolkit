@@ -1,3 +1,4 @@
+using UnityEngine;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
@@ -13,15 +14,5 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
         }
 
         protected virtual void SetupPrototypeComponent(){}
-
-        public static bool IsValid(PrototypeComponent component)
-        {
-            if (component == null || !component.Active)
-            {
-                return false;
-            }
-
-            return true;
-        }
     }
 }

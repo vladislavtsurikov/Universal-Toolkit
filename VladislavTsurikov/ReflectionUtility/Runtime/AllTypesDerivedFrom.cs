@@ -7,40 +7,20 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime
 {
     public static class AllTypesDerivedFrom<T>
     {
-        public static readonly List<Type> TypeList;
+        public static readonly Type[] Types;
 
         static AllTypesDerivedFrom()
         {
 #if UNITY_EDITOR && UNITY_2019_2_OR_NEWER
-            var types = TypeCache.GetTypesDerivedFrom<T>().Where(
-                t => !t.IsAbstract
-            ); ;
+            Types = TypeCache.GetTypesDerivedFrom<T>().Where(t => !t.IsAbstract).ToArray();
 #else
-            var types = GetAllAssemblyTypes().Where(t => t.IsSubclassOf(typeof(T)));
+            Types = GetAllAssemblyTypes().Where(t => t.IsSubclassOf(typeof(T))).ToArray();
 #endif
-
-            TypeList = types.ToList();
         }
         
-        private static IEnumerable<Type> GetAllAssemblyTypes()
+        private static Type[] GetAllAssemblyTypes()
         {
-            IEnumerable<Type> assemblyTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(t =>
-                {
-                    var innerTypes = Type.EmptyTypes;
-                    try
-                    {
-                        innerTypes = t.GetTypes();
-                    }
-                    catch
-                    {
-                        // ignored
-                    }
-
-                    return innerTypes;
-                });
-
-            return assemblyTypes;
+            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes()).ToArray();
         }
     }
 }

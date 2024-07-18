@@ -216,7 +216,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             {                
                 ChangeNodeSizeIfNecessary(terrainObjectCollider, colliderCell);
                 
-                SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(sceneDataManager.Sector);
+                SceneObjectsBounds.ChangeSceneObjectsBounds(sceneDataManager.Sector);
             }
 
             return terrainObjectCollider;

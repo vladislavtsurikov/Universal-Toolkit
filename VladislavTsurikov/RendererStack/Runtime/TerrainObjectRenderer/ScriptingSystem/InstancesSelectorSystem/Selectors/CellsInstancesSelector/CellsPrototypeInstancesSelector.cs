@@ -115,7 +115,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
 		private List<ColliderCell> OverlapColliderCell(Vector3 sphereCenter, float sphereRadius)
 		{
-			var sectorList = FindSceneDataManager.OverlapSphere(sphereCenter, sphereRadius, Sectorize.Sectorize.GetSectorLayerTag());
+			var sectorList = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius, Sectorize.Sectorize.GetSectorLayerTag());
 
 			List<ColliderCell> colliderCells = new List<ColliderCell>();
 			

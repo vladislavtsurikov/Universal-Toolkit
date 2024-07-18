@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.OdinSerializer.Core.Misc;
@@ -89,6 +90,18 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                     return;
                 }
             }
+        }
+        
+        public void AddSector(string tag, SceneAsset sceneAsset, Bounds bounds)
+        {
+            SectorLayer sectorLayer = GetSectorLayer(tag);
+            if (sectorLayer == null)
+            {
+                sectorLayer = new SectorLayer(tag);
+                SectorLayerList.Add(sectorLayer);
+            }
+
+            sectorLayer.AddSector(sceneAsset, bounds);
         }
         
         public SceneReference CreateScene(string tag, string sceneName, Bounds bounds)

@@ -75,9 +75,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             });
         }
 
-#if RENDERER_STACK
+
         public static async UniTask SpawnGroupTerrainObject(Group group, BoxArea area, bool dragMouse = false)
         {
+#if RENDERER_STACK
             AdvancedBrushToolSettings advancedBrushToolSettings = (AdvancedBrushToolSettings)ToolsComponentStack.GetElement(typeof(AdvancedBrushTool), typeof(AdvancedBrushToolSettings));
 
             FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
@@ -128,8 +129,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
                     }
                 }
             });
-        }
 #endif
+        }
     }
 }
 #endif

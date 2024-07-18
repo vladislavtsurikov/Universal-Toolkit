@@ -102,7 +102,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             pathToTerrainObjectCollider.ColliderCell.ChangeNodeSizeIfNecessary(TerrainObjectCollider);
             pathToTerrainObjectCollider.RenderCell.ChangeNodeSizeIfNecessary(TerrainObjectCollider);
             
-            SceneObjectsBoundsUtility.ChangeSceneObjectsBounds(pathToTerrainObjectCollider.SceneDataManager.Sector);
+            SceneObjectsBounds.ChangeSceneObjectsBounds(pathToTerrainObjectCollider.SceneDataManager.Sector);
 
             if (HierarchyTerrainObjectInstance != null)
             {

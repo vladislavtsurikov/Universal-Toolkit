@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Templates
 
         static AllTemplateTypes()
         {
-            var types = AllTypesDerivedFrom<Template>.TypeList
+            var types = AllTypesDerivedFrom<Template>.Types
                                 .Where(
                                     t => t.IsDefined(typeof(TemplateAttribute), false)
                                       && !t.IsAbstract

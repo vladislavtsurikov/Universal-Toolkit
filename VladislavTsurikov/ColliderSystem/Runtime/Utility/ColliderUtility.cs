@@ -52,7 +52,7 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
         public static List<RayHit> RaycastAll<T>(Ray ray, ObjectFilter raycastFilter)
             where T: RendererSceneData, IRaycast
         {
-            List<SceneDataManager> sceneDataManagers = FindSceneDataManager.RaycastAll(ray);
+            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.RaycastAll(ray);
 
             List<RayHit> allObjectHits = new List<RayHit>();
 
@@ -71,7 +71,7 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
         public static List<RayHit> RaycastAll(Ray ray, ObjectFilter raycastFilter)
         {
-            List<SceneDataManager> sceneDataManagers = FindSceneDataManager.RaycastAll(ray);
+            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.RaycastAll(ray);
 
             List<RayHit> allObjectHits = new List<RayHit>();
 

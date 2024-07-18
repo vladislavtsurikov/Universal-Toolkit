@@ -41,6 +41,14 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
 
         public bool DisplayHeaderText = true;
         public bool DisplayPlusButton = true;
+        
+        public ReorderableListStackEditor(AdvancedComponentStack<T> stack) : base(stack)
+        {
+            _reorderableListName = new GUIContent("");
+            _reorderableList = new UnityEditorInternal.ReorderableList(stack.ReorderableElementList, typeof(T), true, true, false, false);
+
+            SetupCallbacks();
+        }
 
         public ReorderableListStackEditor(GUIContent reorderableListName, AdvancedComponentStack<T> stack, bool displayHeader) : base(stack)
         {
@@ -61,7 +69,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                     continue;
                 }
                 
-                if (settingsType.GetAttribute<DontShowInAddMenuAttribute>() != null) 
+                if (settingsType.GetAttribute<PersistentComponentAttribute>() != null || settingsType.GetAttribute<DontShowInAddMenuAttribute>() != null) 
                 {
                     continue;
                 }
@@ -460,12 +468,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                     }
                     catch
                     {
-                        // EditorApplication.delayCall += () =>
-                        // {
-                        //     Stack.Remove(index);
-                        // };
-                        //
-                        // Debug.LogError("ComponentEditor has an error! It was deleted automatically");
+                        Debug.LogError("ComponentEditor has an error!");
                     }
                 }
             }

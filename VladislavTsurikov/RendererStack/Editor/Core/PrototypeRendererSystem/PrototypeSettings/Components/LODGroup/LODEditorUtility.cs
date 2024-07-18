@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
@@ -79,7 +80,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
 
             #endregion
 
-            if (!PrototypeComponent.IsValid(distanceCulling))
+            if (!distanceCulling.IsValid())
             {
                 DrawLODLevelsSlider(GetDistanceMeasures(renderModel.LODs, lodBias), infos, sliderRect, 
                     quality.MaxRenderDistance);

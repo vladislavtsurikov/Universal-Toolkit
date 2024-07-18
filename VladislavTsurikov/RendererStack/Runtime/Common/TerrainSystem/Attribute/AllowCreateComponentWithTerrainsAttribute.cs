@@ -11,11 +11,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
             if(terrainManager != null)
             {
-                if (!terrainManager.IsSetup)
-                {
-                    sceneDataManager.SceneDataStack.SetupElement<TerrainManager>();
-                }
-                
+                terrainManager.Setup();
+
                 if(terrainManager.TerrainHelperList.Count == 0) 
                 {
                     return false;

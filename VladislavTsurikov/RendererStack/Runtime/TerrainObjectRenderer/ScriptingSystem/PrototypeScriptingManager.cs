@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
@@ -116,7 +117,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             sourceColliderObject.tag = Proto.Prefab.tag;
             sourceColliderObject.SetActive(false);
 
-            if (PrototypeComponent.IsValid(CollidersComponent))
+            if (CollidersComponent.IsValid())
             {
                 GameObject tmpColliderObject = Object.Instantiate(Proto.Prefab, _scriptingSystemGameObjectParent, true);
                 tmpColliderObject.hideFlags = HideFlags.DontSave;
@@ -196,11 +197,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         public float GetMaxDistance()
         {
-            if (PrototypeComponent.IsValid(CollidersComponent))
+            if (CollidersComponent.IsValid())
             {
                 return CollidersComponent.MaxDistance;
             }
-            if (PrototypeComponent.IsValid(ScriptingComponent))
+            if (ScriptingComponent.IsValid())
             {
                 return ScriptingComponent.MaxDistance;
             }

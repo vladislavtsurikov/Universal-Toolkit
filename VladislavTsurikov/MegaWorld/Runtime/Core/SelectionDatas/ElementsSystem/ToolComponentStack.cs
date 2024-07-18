@@ -16,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
             ComponentStack.Setup();
         }
 
-        public override bool IsValid()
+        public override bool DeleteElement()
         {
             return ToolType != null;
         }

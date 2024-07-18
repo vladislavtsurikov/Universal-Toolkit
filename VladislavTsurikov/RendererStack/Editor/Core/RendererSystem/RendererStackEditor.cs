@@ -110,7 +110,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
             
             menu.AddSeparator ("");
             
-            menu.AddItem(new GUIContent("Refresh"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => {RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);}));
+            menu.AddItem(new GUIContent("Refresh"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => {RendererStackManager.Instance.Setup(true);}));
             
             menu.AddItem(new GUIContent("Active"), Stack.ElementList[currentTabIndex].Active, ContextMenuUtility.ContextMenuCallback, new Action(() =>
             {
@@ -180,7 +180,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.RendererSystem
         {
             GenericMenu contextMenu = new GenericMenu();
 
-            foreach (Type type in AllTypesDerivedFrom<Renderer>.TypeList)
+            foreach (Type type in AllTypesDerivedFrom<Renderer>.Types)
             {
                 string name = type.GetAttribute<NameAttribute>().Name;
                     

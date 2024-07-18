@@ -18,7 +18,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
             ComponentStack.Setup();
         }
 
-        public override bool IsValid()
+        public override bool DeleteElement()
         {
             return RendererType != null;
         }

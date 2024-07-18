@@ -11,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
     {
         protected override void OnCreateElements()
         {
-            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
+            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
             {
                 AddGlobalComponentsAttribute addComponentsAttribute = rendererType.GetAttribute<AddGlobalComponentsAttribute>();
 
@@ -39,13 +39,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
         {
             for (int i = ElementList.Count - 1; i >= 0; i--)
             {
-                if (!ElementList[i].IsValid())
+                if (!ElementList[i].DeleteElement())
                 {
                     Remove(i);
                 }
             }
             
-            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.TypeList)
+            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
             {
                 RendererGlobalComponentStack rendererGlobalComponentStack = GetRendererGlobalComponentStack(rendererType);
 

@@ -1,12 +1,56 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 {
-    public static class FindSceneDataManager
+    public static class SceneDataManagerFinder
     {
+        //The Object.FindObjectOfType method does not allow me to find a component with a hidden GameObject, but this method allows me to
+        public static SceneDataManager Find(Scene scene, bool getActive = true)
+        {
+            Profiler.BeginSample("FindSceneDataManager");
+            
+            if (!scene.isLoaded)
+            {
+                Profiler.EndSample();
+                return null;
+            }
+            
+            GameObject[] gameObjects = scene.GetRootGameObjects();
+
+            foreach (GameObject go in gameObjects)
+            {
+                if (getActive)
+                {
+                    if (!go.activeInHierarchy)
+                    {
+                        continue;
+                    }
+                }
+                
+                Object obj = go.GetComponentInChildren(typeof(SceneDataManager));
+                if(obj != null)
+                {
+                    SceneDataManager sceneDataManager = (SceneDataManager)obj;
+                    if (!sceneDataManager.IsSetup)
+                    {
+                        sceneDataManager.Setup(); 
+                    }
+                    
+                    Profiler.EndSample();
+
+                    return sceneDataManager;
+                }
+            }
+            
+            Profiler.EndSample();
+
+            return null;
+        }
+        
         public static List<SceneDataManager> OverlapSphere(Vector3 center, float radius, string sectorLayerTag = null)
         {
             if (SceneManager.sceneCount == 1)
@@ -21,8 +65,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 if (sector.IsLoaded)
                 {
                     SceneDataManager sceneDataManager = sector.SceneDataManager;
-                    
-                    if(sceneDataManager != null)
+
+                    if (sceneDataManager != null)
                     {
                         sceneDataManagers.Add(sector.SceneDataManager);
                     }
@@ -46,8 +90,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 if (sector.IsLoaded)
                 {
                     SceneDataManager sceneDataManager = sector.SceneDataManager;
-                    
-                    if(sceneDataManager != null)
+
+                    if (sceneDataManager != null)
                     {
                         sceneDataManagers.Add(sector.SceneDataManager);
                     }
@@ -71,8 +115,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 if (sector.IsLoaded)
                 {
                     SceneDataManager sceneDataManager = sector.SceneDataManager;
-                    
-                    if(sceneDataManager != null)
+
+                    if (sceneDataManager != null)
                     {
                         sceneDataManagers.Add(sector.SceneDataManager);
                     }
@@ -92,12 +136,12 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
             
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
-            
+
             if (sectorLayers == null)
             {
                 return sceneDataManagers;
             }
-
+            
             foreach (var sectorLayer in sectorLayers)
             {
                 foreach (var sector in sectorLayer.ObjectBoundsBVHTree.RaycastAll(ray))
@@ -105,8 +149,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                     if (sector.IsLoaded)
                     {
                         SceneDataManager sceneDataManager = sector.SceneDataManager;
-                    
-                        if(sceneDataManager != null)
+
+                        if (sceneDataManager != null)
                         {
                             sceneDataManagers.Add(sector.SceneDataManager);
                         }

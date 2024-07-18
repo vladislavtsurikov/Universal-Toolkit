@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
@@ -201,7 +202,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
             _frustumCulling.SetInt(_instanceCountID, totalInstanceCount);
             
-            if (PrototypeComponent.IsValid(frustumCulling))
+            if (frustumCulling.IsValid())
             {
                 _frustumCulling.SetBool(_isFrustumCullingID, terrainObjectRendererCameraSettings.CameraCullingMode == CameraCullingMode.FrustumCulling);
                 _frustumCulling.SetFloat(_boundingSphereRadiusID, renderModel.BoundingSphereRadius + frustumCulling.IncreaseBoundingSphere);
@@ -216,11 +217,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
             _frustumCulling.SetFloat(_maxDistanceID, maxDistance);
 
-            _frustumCulling.SetBool(_isDistanceCullingID, PrototypeComponent.IsValid(distanceCulling));
+            _frustumCulling.SetBool(_isDistanceCullingID, distanceCulling.IsValid());
 
             _frustumCulling.SetBool(_useLODFadeID, lodGroup.EnabledLODFade);
 
-            _frustumCulling.SetFloat(_shadowDistanceID, PrototypeComponent.IsValid(shadow) ? shadow.ShadowDistance : 0);
+            _frustumCulling.SetFloat(_shadowDistanceID, shadow.IsValid() ? shadow.ShadowDistance : 0);
             
             _frustumCulling.SetFloat(_lodFadeDistanceID, lodGroup.LodFadeTransitionDistance);
             _frustumCulling.SetBool(_lodFadeForLastLodID, lodGroup.LodFadeForLastLOD);

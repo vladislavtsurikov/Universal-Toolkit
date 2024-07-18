@@ -3,6 +3,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
@@ -33,7 +34,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings
 			_render.IncreaseBoundingSphere = Mathf.Max(0, CustomEditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), IncreaseBoundingSphere, _render.IncreaseBoundingSphere));
 			rect.y += CustomEditorGUI.SingleLineHeight;
 			
-			if (PrototypeComponent.IsValid(shadow) && quality.IsShadowCasting)
+			if (shadow.IsValid() && quality.IsShadowCasting)
 			{
 				_render.GetAdditionalShadow = (GetAdditionalShadow)CustomEditorGUI.EnumPopup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), GetAdditionalShadow, _render.GetAdditionalShadow);
 				rect.y += CustomEditorGUI.SingleLineHeight;
@@ -90,7 +91,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Common.PrototypeSettings
 			
 			float height = EditorGUIUtility.singleLineHeight;
 
-			if (PrototypeComponent.IsValid(shadow) && quality.IsShadowCasting)
+			if (shadow.IsValid() && quality.IsShadowCasting)
 			{
 				height += CustomEditorGUI.SingleLineHeight;
             

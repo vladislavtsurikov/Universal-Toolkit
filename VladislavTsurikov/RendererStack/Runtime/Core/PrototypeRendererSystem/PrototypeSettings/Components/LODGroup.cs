@@ -5,7 +5,6 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Rende
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
 {
     [Name("LOD Group")]
-    [DontShowInAddMenu]
     [PersistentComponent]
     public class LODGroup : PrototypeComponent
     { 
@@ -29,11 +28,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
     		}
         }
 
-        protected override bool IsDeletableComponent()
-        {
-            return false;
-        }
-        
         public override bool ShowActiveToggle()
         {
             return false;

@@ -11,7 +11,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
     {
         public static TerrainObjectInstance AddInstance(TerrainObjectInstance instance, string sectorLayerTag)
         {
-            List<SceneDataManager> sceneDataManagers = FindSceneDataManager.OverlapPosition(instance.Position, sectorLayerTag, false);
+            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.OverlapPosition(instance.Position, sectorLayerTag, false);
                 
             if (sceneDataManagers.Count != 0)
             {

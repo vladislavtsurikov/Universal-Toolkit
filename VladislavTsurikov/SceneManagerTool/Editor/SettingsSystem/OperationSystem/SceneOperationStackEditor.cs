@@ -14,7 +14,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
         private readonly SettingsTypes _settingsTypes;
         private readonly ComponentStackSupportSameType<Operation> _componentStackSupportSameType;
         
-        public SceneOperationStackEditor(SettingsTypes settingsTypes, ComponentStackSupportSameType<Operation> list) : base(new GUIContent("Settings"), list, true)
+        public SceneOperationStackEditor(SettingsTypes settingsTypes, ComponentStackSupportSameType<Operation> list) : base(new GUIContent("Actions"), list, true)
         {
             _componentStackSupportSameType = list;
             _settingsTypes = settingsTypes;

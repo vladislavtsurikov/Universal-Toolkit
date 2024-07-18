@@ -104,8 +104,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
             }
             
             SelectedData.GetLastGroup().PrototypeList.Add(proto);
-
-            RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true); 
+            
+            RendererStackManager.Instance.Setup(true);
 
             return proto;
         }
@@ -124,8 +124,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             if (removePrototypeFromAllScenes)
                 PrototypesStorage.Instance.Remove(protoList, RendererType);
-
-            RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);
+            
+            RendererStackManager.Instance.Setup(true);
         }
         
         public void DeleteInvalidPrototypes()
@@ -142,7 +142,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             if (happenedDelete)
             {
-                RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);
+                RendererStackManager.Instance.Setup(true);
             }
         }
 

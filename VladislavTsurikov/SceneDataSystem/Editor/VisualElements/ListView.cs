@@ -131,7 +131,11 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
             bool hasListName = !text.IsNullOrEmpty();
             VisualElementExtensions.SetStyleDisplay(ListTitle, hasListName ? DisplayStyle.Flex : DisplayStyle.None);
-            if (hasListName) VisualElementExtensions.SetStyleDisplay(HeaderContainer, DisplayStyle.Flex);
+            if (hasListName)
+            {
+                VisualElementExtensions.SetStyleDisplay(HeaderContainer, DisplayStyle.Flex);
+            }
+
             return this;
         }
         

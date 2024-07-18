@@ -41,8 +41,16 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         private List<VisualElement> IconDependentComponents { get; }
         internal void UpdateIconType(IconType value)
         {
-            if (IconType != IconType.None) UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(IconType.ToString(), IconDependentComponents);
-            if (value != IconType.None) UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), IconDependentComponents);
+            if (IconType != IconType.None)
+            {
+                UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(IconType.ToString(), IconDependentComponents);
+            }
+
+            if (value != IconType.None)
+            {
+                UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), IconDependentComponents);
+            }
+
             IconType = value;
         }
 
@@ -190,7 +198,11 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public void ExecuteOnClick(EventBase clickEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             OnClick?.Invoke();
             //if (animationTrigger == ButtonAnimationTrigger.OnClick)
                 //iconReaction?.Play();
@@ -198,7 +210,10 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public void ExecuteOnPointerEnter(PointerEnterEvent enterEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
             //if (animationTrigger == ButtonAnimationTrigger.OnPointerEnter)
                 //iconReaction?.Play();
         }
@@ -256,7 +271,11 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         /// <param name="callback"> OnClick callback </param>
         public static T SetOnClick<T>(this T target, UnityAction callback) where T : Button
         {
-            if (callback == null) return target;
+            if (callback == null)
+            {
+                return target;
+            }
+
             target.OnClick = callback;
             return target;
         }
@@ -266,7 +285,11 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         /// <param name="callback"> OnClick callback </param>
         public static T AddOnClick<T>(this T target, UnityAction callback) where T : Button
         {
-            if (callback == null) return target;
+            if (callback == null)
+            {
+                return target;
+            }
+
             target.OnClick += callback;
             return target;
         }

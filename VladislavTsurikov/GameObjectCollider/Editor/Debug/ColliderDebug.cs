@@ -394,7 +394,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
                                     {
                                         // Perform the overlap test
                                         _overlapBoxCenter = objectHit.Point;
-                                        _overlappedScenes = FindSceneDataManager.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler));
+                                        _overlappedScenes = SceneDataManagerFinder.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler));
                                     }
                                 }
                                 else if (_demoMode == OverlapMode.SphereOverlap)
@@ -403,7 +403,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
                                     if (objectHit != null)
                                     {
                                         _overlapSphereCenter = objectHit.Point;
-                                        _overlappedScenes = FindSceneDataManager.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius);
+                                        _overlappedScenes = SceneDataManagerFinder.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius);
                                     }
                                 }
                                 break;

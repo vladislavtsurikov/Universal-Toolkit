@@ -153,7 +153,6 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 
 			    if (sceneDataManager.SceneDataStack == null)
 			    {
-				    Debug.Log("Delete");
 				    DeleteSceneDataManager(sceneDataManager);
 				    continue;
 			    }
@@ -169,8 +168,10 @@ namespace VladislavTsurikov.SceneDataSystem.Editor
 		    SceneDataManager component = _sceneDataManagerList.Find(component => component == sceneDataManager);
 		    
 		    if(component == null)
+		    {
 			    return;
-		    
+		    }
+
 		    GameObject go = component.gameObject;
 		    
 		    DestroyImmediate(go);

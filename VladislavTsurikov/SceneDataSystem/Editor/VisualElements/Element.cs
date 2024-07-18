@@ -189,32 +189,52 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public void ExecuteFocusIn(FocusInEvent evt = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             SelectionState = SelectionState.Selected;
         }
 
         public void ExecuteFocusOut(FocusOutEvent evt = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             SelectionState = SelectionState.Normal;
         }
 
         public void ExecuteOnClick(EventBase clickEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             OnClick?.Invoke(clickEvent);
         }
 
         public void ExecuteOnPointerEnter(PointerEnterEvent enterEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             SelectionState = SelectionState.Highlighted;
             OnPointerEnter?.Invoke(enterEvent);
         }
 
         public void ExecuteOnPointerLeave(PointerLeaveEvent leaveEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             SelectionState =
                 HasTarget && Target.focusController.focusedElement == Target
                     ? SelectionState.Selected
@@ -224,19 +244,31 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public void ExecuteOnPointerDown(PointerDownEvent downEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             SelectionState = SelectionState.Pressed;
             OnPointerDown?.Invoke(downEvent);
         }
 
         public void ExecuteOnPointerUp(PointerUpEvent upEvent = null)
         {
-            if (SelectionState == SelectionState.Disabled) return;
+            if (SelectionState == SelectionState.Disabled)
+            {
+                return;
+            }
+
             if (upEvent != null && HasTarget && Target.ContainsPoint(upEvent.localPosition))
+            {
                 SelectionState = SelectionState.Highlighted;
+            }
 
             if (upEvent != null && HasTarget && !Target.ContainsPoint(upEvent.localPosition) && SelectionState == SelectionState.Pressed)
+            {
                 SelectionState = SelectionState.Normal;
+            }
 
             OnPointerUp?.Invoke(upEvent);
         }

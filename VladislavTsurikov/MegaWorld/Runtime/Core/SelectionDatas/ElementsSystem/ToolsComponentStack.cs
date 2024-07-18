@@ -52,7 +52,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
         {
             for (int i = ElementList.Count - 1; i >= 0; i--)
             {
-                if (!ElementList[i].IsValid())
+                if (!ElementList[i].DeleteElement())
                 {
                     Remove(i);
                 }

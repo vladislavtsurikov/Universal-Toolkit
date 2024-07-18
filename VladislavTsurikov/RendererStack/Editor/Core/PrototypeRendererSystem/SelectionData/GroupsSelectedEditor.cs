@@ -91,7 +91,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
 
         private void HappenedMoveCallback()
         {
-            RendererStackManager.Instance.SceneDataManager.SceneDataStack.SetupElement<RendererStackManager>(true);
+            RendererStackManager.Instance.Setup(true);
         }
 
         private GenericMenu TabMenu(int currentTabIndex)

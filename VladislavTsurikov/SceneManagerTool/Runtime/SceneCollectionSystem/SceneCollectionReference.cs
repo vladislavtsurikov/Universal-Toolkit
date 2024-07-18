@@ -10,7 +10,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
         private SceneCollection _sceneCollection;
         
         [OdinSerialize]
-        public int SceneCollectionID;
+        private int _sceneCollectionID;
 
         public SceneCollection SceneCollection
         {
@@ -18,7 +18,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             {
                 if (_sceneCollection == null)
                 {
-                    _sceneCollection = SceneCollectionUtility.GetSceneCollection(SceneCollectionID);
+                    _sceneCollection = SceneCollectionUtility.GetSceneCollection(_sceneCollectionID);
                 }
 
                 return _sceneCollection;
@@ -28,7 +28,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
                 if (value != null)
                 {
                     _sceneCollection = value;
-                    SceneCollectionID = value.ID;
+                    _sceneCollectionID = value.ID;
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 
         public SceneCollectionReference(SceneCollection sceneCollection)
         {
-            SceneCollectionID = sceneCollection.ID;
+            _sceneCollectionID = sceneCollection.ID;
             _sceneCollection = sceneCollection;
         }
     }

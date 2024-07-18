@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
+using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
@@ -62,7 +63,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager
 
                     ShadowCastingMode shadowCastingMode = quality.GetShadowCastingMode();
                     
-                    if (!PrototypeComponent.IsValid(shadowSettings))
+                    if (!shadowSettings.IsValid())
                     {
                         shadowCastingMode = ShadowCastingMode.Off;
                     }

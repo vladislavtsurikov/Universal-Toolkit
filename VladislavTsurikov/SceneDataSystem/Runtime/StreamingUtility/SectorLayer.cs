@@ -40,9 +40,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         
         public void Setup()
         {
-#if UNITY_EDITOR
             SectorList.RemoveAll(sector => sector == null || !sector.IsValid());
-#endif
             
             SectorBvhTree.Clear();
             ObjectBoundsBVHTree.Clear();
@@ -52,7 +50,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 sector.Setup(ObjectBoundsBVHTree);
                 
                 SectorBvhTree.RegisterSector(sector); 
-                ObjectBoundsBVHTree.RegisterSector(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
+                ObjectBoundsBVHTree.RegisterSector(sector, SceneObjectsBounds.GetSceneObjectsBounds(sector));
             }
         }
 
@@ -75,7 +73,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 {
                     if (sector.SceneReference.SceneName == scene.name)
                     {
-                        sectorLayer.ObjectBoundsBVHTree.ChangeNodeSize(sector, SceneObjectsBoundsUtility.GetSceneObjectsBounds(sector));
+                        sectorLayer.ObjectBoundsBVHTree.ChangeNodeSize(sector, SceneObjectsBounds.GetSceneObjectsBounds(sector));
                     }
                 }
             }
@@ -122,10 +120,28 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 SectorBvhTree.RemoveNodes(sector);
             }
         }
-
+        
 #if UNITY_EDITOR
-        private Sector AddSector(SceneAsset sceneAsset, Bounds bounds)
+        private bool HasSceneAsset(SceneAsset sceneAsset)
         {
+            foreach (var sector in SectorList)
+            {
+                if (sector.SceneReference.SceneAsset == sceneAsset)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public Sector AddSector(SceneAsset sceneAsset, Bounds bounds)
+        {
+            if (HasSceneAsset(sceneAsset))
+            {
+                return null;
+            }
+            
             Sector sector = new Sector(sceneAsset, bounds, ObjectBoundsBVHTree); 
             SectorList.Add(sector);
             SectorBvhTree.RegisterSector(sector);
