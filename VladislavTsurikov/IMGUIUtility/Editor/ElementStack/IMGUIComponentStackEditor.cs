@@ -1,19 +1,17 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Editor;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
+using UnityEditor;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 {
     public class IMGUIComponentStackEditor<T, N> : ComponentStackEditor<T, N>
-        where T: Component
+        where T: VladislavTsurikov.ComponentStack.Runtime.Core.Component
         where N: IMGUIElementEditor
     {
         public IMGUIComponentStackEditor(AdvancedComponentStack<T> stack) : base(stack)

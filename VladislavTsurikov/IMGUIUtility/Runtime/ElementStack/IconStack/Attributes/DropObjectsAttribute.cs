@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes
+namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class DropObjectsAttribute : Attribute

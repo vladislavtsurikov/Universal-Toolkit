@@ -1,22 +1,26 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor;
-using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime;
+using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.DeepCopy.Runtime;
-using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
+using VladislavTsurikov.ReflectionUtility;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
 {
     public class ReorderableListStackEditor<T, N> : ComponentStackEditor<T, N>
-        where T: Component
+        where T: Runtime_Core_Component
         where N: ReorderableListComponentEditor
     {
         private static class Styles
@@ -32,12 +36,13 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
         private UnityEditorInternal.ReorderableList _reorderableList;
         private GUIContent _reorderableListName;
         private bool _dragging;
-        private Component _copyComponentElement;
+        private Runtime_Core_Component _copyComponentElement;
         private bool _displayAddButton;
         
         protected bool ShowActiveToggle = true;
         protected bool RenameSupport = false;
-        protected bool CopySettings = false;
+        protected bool CopySettings = true;
+        protected bool DuplicateSupport = true;
 
         public bool DisplayHeaderText = true;
         public bool DisplayPlusButton = true;
@@ -62,7 +67,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
         {
             GenericMenu menu = new GenericMenu();
 
-            foreach (var settingsType in GetSettingsTypeForAddManu())
+            foreach (var settingsType in GetComponentTypes())
             {
                 if (settingsType.GetAttribute(typeof(DontCreateAttribute)) != null)
                 {
@@ -107,13 +112,13 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
         {
             if (ShowActiveToggle && componentEditor.Target.ShowActiveToggle())
             {
-                bool temporaryActive = ((Component)componentEditor.Target).Active;
+                bool temporaryActive = ((Runtime_Core_Component)componentEditor.Target).Active;
                 
                 componentEditor.Target.SelectSettingsFoldout = CustomEditorGUI.HeaderWithMenu(headerRect,
                     componentEditor.Target.Name,
                     componentEditor.Target.SelectSettingsFoldout, ref temporaryActive, () => Menu(Stack.ElementList[index], index));
 
-                ((Component)componentEditor.Target).Active = temporaryActive;
+                ((Runtime_Core_Component)componentEditor.Target).Active = temporaryActive;
             }
             else
             {
@@ -131,6 +136,16 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             if (component.IsDeletable())
             {
                 menu.AddItem(new GUIContent("Remove"), false, () => Stack.Remove(index));
+            }
+            
+            if (DuplicateSupport)
+            {
+                menu.AddItem(new GUIContent("Duplicate"), false, () => DuplicateComponent(component, index+1));
+            }
+
+            if (DuplicateSupport)
+            {
+                menu.AddItem(new GUIContent("Duplicate"), false, () => DuplicateComponent(component, index+1));
             }
 
             if (RenameSupport)
@@ -155,6 +170,15 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             }
 
             menu.ShowAsContext();
+        }
+
+        private void DuplicateComponent(T component, int index)
+        {
+            if (Stack is ComponentStackSupportSameType<T> componentStackWithSameTypes)
+            {
+                componentStackWithSameTypes.CreateComponent(component.GetType(), index);
+                Stack.ReplaceElement(DeepCopier.Copy(component), index);
+            }
         }
 
         private void SetupCallbacks()
@@ -466,9 +490,10 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                     {
                         componentEditor.OnGUI(totalRect, index);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        Debug.LogError("ComponentEditor has an error!");
+                        Debug.LogError("ComponentEditor has an error: " + ex.Message);
+                        Debug.LogError("Stack trace: " + ex.StackTrace);
                     }
                 }
             }
@@ -476,7 +501,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             GUI.color = prevColor;
         }
 
-        private void RenameComponent(Component componentElement)
+        private void RenameComponent(Runtime_Core_Component componentElement)
         {
             componentElement.Renaming = !componentElement.Renaming;
             componentElement.RenamingName = componentElement.Name;
@@ -524,24 +549,9 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             GUILayout.Space(15);
         }
 
-        protected List<Type> GetSettingsTypeForAddManu()
+        private List<Type> GetComponentTypes()
         {
-            List<Type> settingsTypes = new List<Type>();
-
-            foreach (var type in AllEditorTypes<T>.Types)
-            {
-                Type settingsType = type.Key;
-                
-                if (type.Value.GetAttribute<DontDrawForAddButton>() != null)
-                {
-                    continue;
-                }
-
-                settingsTypes.Add(settingsType);
-                
-            }
-
-            return settingsTypes;
+            return AllTypesDerivedFrom<T>.Types.OrderBy(x => x.FullName).ThenBy(x => x.Namespace?.Split('.')[^1]).ToList();;
         }
     }
 }

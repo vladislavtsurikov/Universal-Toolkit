@@ -4,17 +4,20 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor;
+using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Editor;
-using VladislavTsurikov.Utility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
 {
     public class TabComponentStackEditor<T, N> : ComponentStackEditor<T, N>
-        where T: Component
+        where T: Runtime_Core_Component
         where N: IMGUIElementEditor
     {
         protected AdvancedComponentStack<T> AdvancedComponentStack => (AdvancedComponentStack<T>)Stack;
