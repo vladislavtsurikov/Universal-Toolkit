@@ -1,7 +1,10 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
@@ -9,14 +12,14 @@ using UnityEditor.SceneManagement;
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {
     [Serializable]
-    public abstract class SceneData : Component
+    public abstract class SceneData : Runtime_Core_Component
     {
         public SceneDataManager SceneDataManager;
         
         public delegate void OnSetup ();
         public static OnSetup OnSetupEvent;
         
-        protected override void SetupComponent(object[] setupData = null)
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
             if (setupData != null)
             {
@@ -25,6 +28,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
 
             SetupSceneData();
             OnSetupEvent?.Invoke();
+            return UniTask.CompletedTask;
         }
 
         protected override void OnCreate()

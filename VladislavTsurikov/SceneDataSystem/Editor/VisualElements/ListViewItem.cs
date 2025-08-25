@@ -3,8 +3,8 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using VladislavTsurikov.UIElementsUtility;
-using VladislavTsurikov.UIElementsUtility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
+using VladislavTsurikov.UIElementsUtility.Runtime;
 using VisualElementExtensions = VladislavTsurikov.UIElementsUtility.Runtime.Utility.VisualElementExtensions;
 
 namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
@@ -84,13 +84,13 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public static T EnableItemRemoveButton<T>(this T target) where T : ListViewItem
         {
-            VisualElementExtensions.EnableElement(target.ItemRemoveButton);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.EnableElement(target.ItemRemoveButton);
             return target;
         }
 
         public static T DisableItemRemoveButton<T>(this T target) where T : ListViewItem
         {
-            VisualElementExtensions.DisableElement(target.ItemRemoveButton);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.DisableElement(target.ItemRemoveButton);
             return target;
         }
 

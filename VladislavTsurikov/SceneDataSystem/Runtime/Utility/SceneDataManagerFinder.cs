@@ -160,5 +160,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
             return sceneDataManagers;
         }
+        
+        public static SceneDataManager GetSceneDataManagerFromActiveScene()
+        {
+            return SectorLayerManager.ActiveSceneSector.SceneDataManager;
+        }
     }
 }
