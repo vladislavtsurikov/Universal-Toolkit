@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System.IO;
+using OdinSerializer.Editor;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.OdinSerializer.Unity_Integration;
 
 namespace VladislavTsurikov.UnityUtility.Editor
 {

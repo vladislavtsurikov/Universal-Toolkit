@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
+using Random = UnityEngine.Random;
 
 namespace VladislavTsurikov.Utility.Runtime
 {
@@ -44,6 +45,17 @@ namespace VladislavTsurikov.Utility.Runtime
 #else
             return ArrayAccessor<T>.Getter(list);
 #endif
+        }
+        
+        public static T GetRandomItem<T>(this List<T> items)
+        {
+            if (items == null || items.Count == 0)
+            {
+                return default;
+            }
+            
+            int randomIndex = Random.Range(0, items.Count);
+            return items[randomIndex];
         }
     }
 }

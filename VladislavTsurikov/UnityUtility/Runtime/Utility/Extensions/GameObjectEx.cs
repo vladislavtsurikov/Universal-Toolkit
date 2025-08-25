@@ -79,6 +79,12 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             {
                 return skinnedRenderer.enabled;
             }
+            
+            SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+            if (spriteRenderer != null)
+            {
+                return spriteRenderer.enabled;
+            }
 
             return false;
         }
@@ -210,6 +216,36 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 {
                     renderer.enabled = false;
                 }
+            }
+        }
+        
+        public static T InstantiateWithComponent<T>(this GameObject prefab, Transform parent = null) where T : Component
+        {
+            if (prefab == null)
+            {
+                Debug.LogError("GameObjectExtensions: Prefab is null.");
+                return null;
+            }
+
+            var instance = Object.Instantiate(prefab, parent);
+            var component = instance.GetComponent<T>();
+
+            if (component == null)
+            {
+                Debug.LogError($"GameObjectExtensions: Component of type {typeof(T).Name} not found in the instantiated prefab.");
+                Object.Destroy(instance);
+                return null;
+            }
+
+            return component;
+        }
+        
+        public static void ClearChildren(this GameObject parent)
+        {
+            int children = parent.transform.childCount;
+            for (var i = children - 1; i >= 0; i--)
+            {
+                Object.Destroy(parent.transform.GetChild(i).gameObject);
             }
         }
     }

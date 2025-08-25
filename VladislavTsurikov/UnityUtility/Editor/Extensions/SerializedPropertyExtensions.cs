@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace VladislavTsurikov.UnityUtility.Editor
 {
-    public static class SerializedPropertyExtentions
+    public static class SerializedPropertyExtensions
     {
         private static Regex ArrayIndexCapturePattern = new Regex(@"\[(\d*)\]");
  
