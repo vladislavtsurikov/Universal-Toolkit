@@ -6,6 +6,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;

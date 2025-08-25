@@ -46,7 +46,7 @@ namespace OdinSerializer.Utilities
     [Serializable]
     public sealed class ImmutableList : IImmutableList<object>
     {
-        private IList innerList;
+        private readonly IList innerList;
 
         /// <summary>
         ///     Creates an immutable list around another list.
@@ -198,7 +198,7 @@ namespace OdinSerializer.Utilities
     [Serializable]
     public sealed class ImmutableList<T> : IImmutableList<T>
     {
-        private IList<T> innerList;
+        private readonly IList<T> innerList;
 
         /// <summary>
         ///     Not yet documented.

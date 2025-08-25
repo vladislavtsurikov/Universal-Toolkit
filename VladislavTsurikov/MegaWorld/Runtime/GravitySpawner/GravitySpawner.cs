@@ -167,8 +167,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 #if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    RandomSeedSettings randomSeedSettings =
- (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
+                    var randomSeedSettings =
+                        (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
 
                     await Utility.SpawnGroup.SpawnTerrainObject(token, this, group, _terrainsMaskManager, boxArea);

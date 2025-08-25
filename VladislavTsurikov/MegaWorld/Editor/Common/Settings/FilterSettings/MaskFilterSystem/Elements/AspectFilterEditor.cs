@@ -12,10 +12,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
     [ElementEditor(typeof(AspectFilter))]
     public class AspectFilterEditor : MaskFilterEditor
     {
-        private static GUIContent _strengthLabel =
+        private static readonly GUIContent _strengthLabel =
             EditorGUIUtility.TrTextContent("Strength", "Controls the strength of the masking effect.");
 
-        private static GUIContent _curveLabel = EditorGUIUtility.TrTextContent("Remap Curve",
+        private static readonly GUIContent _curveLabel = EditorGUIUtility.TrTextContent("Remap Curve",
             "Remaps the concavity input before computing the final mask.");
 
         private AspectFilter _aspectFilter;

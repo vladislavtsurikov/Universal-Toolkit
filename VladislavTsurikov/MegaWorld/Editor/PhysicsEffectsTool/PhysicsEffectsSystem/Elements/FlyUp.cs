@@ -3,10 +3,11 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.ColorUtility.Runtime;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Fly Up")]
+    [Name("Fly Up")]
     public class FlyUp : PhysicsEffect
     {
         public float Force = 30f;

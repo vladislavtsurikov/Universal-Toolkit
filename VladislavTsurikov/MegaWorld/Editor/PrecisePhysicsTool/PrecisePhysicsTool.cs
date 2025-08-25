@@ -87,8 +87,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePhysicsTool
 #if RENDERER_STACK
             else if (group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                PrototypeTerrainObject proto =
- (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
+                var proto =
+                    (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.GetAllSelectedPrototypes());
                 await SpawnPrototype.SpawnTerrainObject(group, proto, rayHit);
             }
 #endif

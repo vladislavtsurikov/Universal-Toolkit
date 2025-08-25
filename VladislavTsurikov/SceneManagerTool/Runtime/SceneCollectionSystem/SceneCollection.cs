@@ -64,8 +64,8 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 
         protected override UniTask SetupComponent(object[] setupData = null)
         {
-            SceneTypeComponentStack.Setup(true, this);
-            SettingsStack.Setup();
+            _ = SceneTypeComponentStack.Setup(true, new object[] { this });
+            _ = SettingsStack.Setup();
 
             return UniTask.CompletedTask;
         }

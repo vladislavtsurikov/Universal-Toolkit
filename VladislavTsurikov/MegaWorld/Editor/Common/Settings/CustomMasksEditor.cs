@@ -16,10 +16,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
     {
         public Vector2 AlphaBrushesWindowsScroll = Vector2.zero;
         public float AlphaBrushesWindowHeight = 100.0f;
-        private int _alphaBrushesIconHeight = 60;
+        private readonly int _alphaBrushesIconHeight = 60;
 
-        private int _alphaBrushesIconWidth = 60;
-        private CustomMasks _target;
+        private readonly int _alphaBrushesIconWidth = 60;
+        private readonly CustomMasks _target;
 
         public CustomMasksEditor(CustomMasks target) => _target = target;
 

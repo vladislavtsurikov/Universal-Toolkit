@@ -18,43 +18,38 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     [AddDefaultGroupComponents(new[] { typeof(ContainerForGameObjects) })]
     public class PrototypeTerrainObject : PlacedObjectPrototype
     {
-#if RENDERER_STACK
-        public RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject RendererPrototype => 
-            (RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject)TerrainObjectRendererAPI.AddMissingPrototype(Prefab);
-
-        public int RendererPrototypeID
-        {
-            get
-            {
-                RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject rendererPrototype = 
-                    (RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject)PrototypesStorage.Instance.GetPrototype(Prefab, typeof(TerrainObjectRenderer));
-
-                if (rendererPrototype == null)
-                {
-                    return -1;
-                }
-                
-                return rendererPrototype.ID; 
-            }
-        }
-
-
-        public override void SetupPrototype()
-        {
-            AllAvailableTerrainObjectPrototypes.AddPrototype(this);
-        }
-
-        public override void OnDisablePrototype()
-        {
-            AllAvailableTerrainObjectPrototypes.RemovePrototype(this);
-        }
-#endif
-
         public override bool IsSamePrototypeObject(Object obj)
         {
             var go = (GameObject)obj;
 
             return GameObjectUtility.IsSameGameObject(go, Prefab);
         }
+#if RENDERER_STACK
+        public RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject RendererPrototype =>
+            (RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject)TerrainObjectRendererAPI
+                .AddMissingPrototype(Prefab);
+
+        public int RendererPrototypeID
+        {
+            get
+            {
+                var rendererPrototype =
+                    (RendererStack.Runtime.TerrainObjectRenderer.PrototypeTerrainObject)PrototypesStorage.Instance
+                        .GetPrototype(Prefab, typeof(TerrainObjectRenderer));
+
+                if (rendererPrototype == null)
+                {
+                    return -1;
+                }
+
+                return rendererPrototype.ID;
+            }
+        }
+
+
+        public override void SetupPrototype() => AllAvailableTerrainObjectPrototypes.AddPrototype(this);
+
+        public override void OnDisablePrototype() => AllAvailableTerrainObjectPrototypes.RemovePrototype(this);
+#endif
     }
 }

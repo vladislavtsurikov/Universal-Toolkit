@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions;
 using VladislavTsurikov.ReflectionUtility;
@@ -25,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
         public bool EnableSnapMove;
         public Vector3 SnapMove = new(2.5f, 2.5f, 2.5f);
 
-        protected override void SetupComponent(object[] setupData = null) => MouseActionStack.Setup();
+        protected override UniTask SetupComponent(object[] setupData = null) => MouseActionStack.Setup();
 
         #region Move Action
 

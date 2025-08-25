@@ -60,7 +60,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
         {
             if (SimulatedBodyStack.GetSimulatedBody(prefabRoot) == null)
             {
-                SimulatedBody simulatedBody = new SimulatedBody(prefabRoot);
+                var simulatedBody = new SimulatedBody(prefabRoot);
                 SimulatedBodyStack.RegisterSimulatedBody(simulatedBody);
 
                 return simulatedBody;

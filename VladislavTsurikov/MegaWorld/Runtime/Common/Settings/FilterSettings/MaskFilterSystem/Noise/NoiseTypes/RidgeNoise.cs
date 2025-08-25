@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     {
         private static RidgeNoise _sInstance;
 
-        private static NoiseTypeDescriptor _desc = new()
+        private static readonly NoiseTypeDescriptor _desc = new()
         {
             Name = "Ridge",
             OutputDir = MaskFilterShadersPath.Path + "/NoiseLib/",

@@ -12,9 +12,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
     {
         public bool FilterSettingsFoldout = true;
 
-        private GUIContent _checkHeight = new("Check Height");
-        private GUIContent _checkSlope = new("Check Slope");
-        private GUIContent _slope = new("Slope");
+        private readonly GUIContent _checkHeight = new("Check Height");
+        private readonly GUIContent _checkSlope = new("Check Slope");
+        private readonly GUIContent _slope = new("Slope");
 
         public void OnGUI(SimpleFilter element, string text)
         {

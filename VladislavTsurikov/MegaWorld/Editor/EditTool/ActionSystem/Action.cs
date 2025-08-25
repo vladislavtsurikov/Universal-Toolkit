@@ -5,6 +5,7 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.UnityUtility.Editor;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
@@ -77,34 +78,36 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
                 }
 
 #if RENDERER_STACK
-                if(WindowData.Instance.SelectedData.GetSelectedPrototypes(typeof(PrototypeTerrainObject)).Count != 0)
+                if (WindowData.Instance.SelectedData.GetSelectedPrototypes(typeof(PrototypeTerrainObject)).Count != 0)
                 {
-                    PrototypeTerrainObjectOverlap.OverlapSphere(rayHit.Point, editToolSettings.SphereSize / 2, null, false, true, (proto, obj) =>
-                    {
-                        if(proto.Active == false || proto.Selected == false)
+                    PrototypeTerrainObjectOverlap.OverlapSphere(rayHit.Point, editToolSettings.SphereSize / 2, null,
+                        false, true, (proto, obj) =>
                         {
+                            if (proto.Active == false || proto.Selected == false)
+                            {
+                                return true;
+                            }
+
+                            Vector3 sceneCameraPosition = SceneView.currentDrawingSceneView.camera.transform.position;
+                            var distanceFromSceneCamera = Vector3.Distance(sceneCameraPosition, obj.Position);
+
+                            if (distanceFromSceneCamera > editToolSettings.MaxDistance)
+                            {
+                                return true;
+                            }
+
+                            if (DrawHandles.HandleButton(ToolWindow.EditorHash + obj.GetHashCode(), obj.Position,
+                                    GetColorHandleButton(), new Color(1f, 1f, 0f, 0.7f)))
+                            {
+                                EditTool.FindObject = new CommonInstance(proto, obj);
+
+                                RegisterUndo();
+                                OnObjectFound();
+                                return false;
+                            }
+
                             return true;
-                        }
-
-                        Vector3 sceneCameraPosition = SceneView.currentDrawingSceneView.camera.transform.position;
-                        float distanceFromSceneCamera = Vector3.Distance(sceneCameraPosition, obj.Position);
-
-                        if(distanceFromSceneCamera > editToolSettings.MaxDistance)
-                        {
-                            return true;
-                        }
-
-                        if(DrawHandles.HandleButton(ToolWindow.EditorHash + obj.GetHashCode(), obj.Position, GetColorHandleButton(), new Color(1f, 1f, 0f, 0.7f)))
-                        {
-                            EditTool.FindObject = new CommonInstance(proto, obj);
-                            
-                            RegisterUndo();
-                            OnObjectFound();
-                            return false;
-                        }
-
-                        return true;
-                    });
+                        });
                 }
 #endif
             }

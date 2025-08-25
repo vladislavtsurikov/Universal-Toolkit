@@ -54,7 +54,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
             }
             else if (EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
+                var instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
             }
         }

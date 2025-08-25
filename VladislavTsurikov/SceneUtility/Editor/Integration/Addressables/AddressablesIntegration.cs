@@ -13,17 +13,17 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
     [InitializeOnLoad]
     internal static class AddressablesIntegration
     {
-        private static AddressableAssetSettings Settings { get; }
-
         static AddressablesIntegration()
         {
             Settings = AddressableAssetSettingsDefaultObject.GetSettings(true);
-            
-            if(!Application.isPlaying)
+
+            if (!Application.isPlaying)
             {
                 ScenesInBuildUtility.SetupScenesInBuildOverride = SetupScenesInBuild;
             }
         }
+
+        private static AddressableAssetSettings Settings { get; }
 
         private static void SetupScenesInBuild(List<string> scenePaths)
         {
@@ -35,7 +35,7 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
                 AddScene(path);
             }
         }
-        
+
         internal static bool IsAdded(params string[] paths)
         {
             if (paths == null || paths.Length == 0)
@@ -48,18 +48,18 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
                 return false;
             }
 
-            var entries = Settings.groups.SelectMany(g => g.entries?.Where(e => paths.Contains(e.AssetPath)));
+            IEnumerable<AddressableAssetEntry> entries =
+                Settings.groups.SelectMany(g => g.entries?.Where(e => paths.Contains(e.AssetPath)));
             return paths.All(path => entries.Any(e => e.AssetPath == path));
-
         }
 
         private static void ClearAllScene()
         {
-            List<string> removeScenePaths = new List<string>();
-            
-            foreach (var assetGroup in Settings.groups)
+            var removeScenePaths = new List<string>();
+
+            foreach (AddressableAssetGroup assetGroup in Settings.groups)
             {
-                foreach (var assetEntry in assetGroup.entries)
+                foreach (AddressableAssetEntry assetEntry in assetGroup.entries)
                 {
                     if (assetEntry.IsScene)
                     {
@@ -81,8 +81,8 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
                 return;
             }
 
-            Settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(scenePath), Settings.DefaultGroup, postEvent: false).
-                SetLabel("Scene Manager", true, true);
+            Settings.CreateOrMoveEntry(AssetDatabase.AssetPathToGUID(scenePath), Settings.DefaultGroup,
+                postEvent: false).SetLabel("Scene Manager", true, true);
         }
 
         private static void RemoveScene(string scenePath)
@@ -92,7 +92,7 @@ namespace VladislavTsurikov.SceneUtility.ScriptsEditor.Integration.Addressables
                 return;
             }
 
-            Settings.RemoveAssetEntry(AssetDatabase.AssetPathToGUID(scenePath), postEvent: false);
+            Settings.RemoveAssetEntry(AssetDatabase.AssetPathToGUID(scenePath), false);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
@@ -9,7 +10,7 @@ using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtili
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.
     GameObjectConverter
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("GameObject Converter")]
+    [Name("GameObject Converter")]
     public class GameObjectConverter : Extension
     {
 #if UNITY_EDITOR

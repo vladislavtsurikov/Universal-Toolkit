@@ -11,10 +11,14 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.ReflectionUtility;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Editor;
 using VladislavTsurikov.UnityUtility.Runtime;
 using DrawHandles = VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint.DrawHandles;
+using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
 using PrototypeTerrainObject =
     VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject.
     PrototypeTerrainObject;
@@ -196,30 +200,31 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool
                                 }
                             }
 #if RENDERER_STACK
-                        else if (group.PrototypeType == typeof(PrototypeTerrainObject))
-                        {
-                            if (settings.ScaleTransformMode != TransformMode.Fixed)
+                            else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                             {
-                                Vector2 placeScreenPoint =
- HandleUtility.WorldToGUIPoint(_placedObjectData.GameObject.transform.position);
-
-                                if ((e.mousePosition - placeScreenPoint).magnitude < 5f)
+                                if (settings.ScaleTransformMode != TransformMode.Fixed)
                                 {
-                                    Object.DestroyImmediate(_placedObjectData.GameObject);
-                                }
-                                else
-                                {
-                                    PrototypeTerrainObject proto = (PrototypeTerrainObject)_placedObjectData.Proto;
-                                    Instance instance = new Instance(_placedObjectData.GameObject);
+                                    Vector2 placeScreenPoint =
+                                        HandleUtility.WorldToGUIPoint(_placedObjectData.GameObject.transform.position);
 
-                                    TerrainObjectInstance terrainObjectInstance =
- TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale, instance.Rotation);
-                                    Undo.Editor.Undo.RecordUndo(new CreatedTerrainObject(terrainObjectInstance));
+                                    if ((e.mousePosition - placeScreenPoint).magnitude < 5f)
+                                    {
+                                        Object.DestroyImmediate(_placedObjectData.GameObject);
+                                    }
+                                    else
+                                    {
+                                        var proto = (PrototypeTerrainObject)_placedObjectData.Proto;
+                                        var instance = new Instance(_placedObjectData.GameObject);
 
-                                    Object.DestroyImmediate(_placedObjectData.GameObject);
+                                        TerrainObjectInstance terrainObjectInstance =
+                                            TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype,
+                                                instance.Position, instance.Scale, instance.Rotation);
+                                        Undo.Editor.Undo.RecordUndo(new CreatedTerrainObject(terrainObjectInstance));
+
+                                        Object.DestroyImmediate(_placedObjectData.GameObject);
+                                    }
                                 }
                             }
-                        }
 #endif
 
                             _placedObjectData = null;

@@ -2,10 +2,11 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Explosion")]
+    [Name("Explosion")]
     public class Explosion : PhysicsEffect
     {
         public float Force = 50f;

@@ -165,11 +165,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
 #if RENDERER_STACK
                 else if (group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    RandomSeedSettings randomSeedSettings =
- (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
+                    var randomSeedSettings =
+                        (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
-                    
-                    await Utility.SpawnGroup.SpawnTerrainObject(token, group, _terrainsMaskManager, boxArea, displayProgressBar);
+
+                    await Utility.SpawnGroup.SpawnTerrainObject(token, group, _terrainsMaskManager, boxArea,
+                        displayProgressBar);
                 }
 #endif
                 else if (group.PrototypeType == typeof(PrototypeTerrainDetail))

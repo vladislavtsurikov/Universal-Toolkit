@@ -2025,7 +2025,6 @@ namespace OdinSerializer
                             ReadTypeEntry(); // Never actually skip type entries; they might contain type ids that we'll need later
                             if (!SkipBuffer(4))
                             {
-                                return; // Skip reference id int
                             }
 
                             break;

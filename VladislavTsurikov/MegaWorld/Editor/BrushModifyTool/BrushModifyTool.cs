@@ -20,7 +20,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.ReflectionUtility;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
@@ -36,14 +38,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
         new[] { typeof(FilterSettings) })]
     public class BrushModifyTool : ToolWindow
     {
+        private BrushSettings _brushSettings;
         private Dictionary<GameObject, ModifyInfo> _modifiedGameObjects = new();
 #if RENDERER_STACK
-        private Dictionary<TerrainObjectInstance, ModifyInfo> _modifiedTerrainObjects =
- new Dictionary<TerrainObjectInstance, ModifyInfo>();
+        private Dictionary<TerrainObjectInstance, ModifyInfo> _modifiedTerrainObjects = new();
 #endif
 
         private MouseMove _mouseMove = new();
-        private BrushSettings _brushSettings;
         private int _updateTicks;
 
         protected override void OnEnable()
@@ -123,85 +124,93 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
 #if RENDERER_STACK
         private void ModifyTerrainObject(Group group, BoxArea boxArea)
         {
-            FilterSettings filterSettings =
- (FilterSettings)group.GetElement(typeof(BrushModifyTool), typeof(FilterSettings));
-            
-            if(filterSettings.FilterType == FilterType.MaskFilter)
+            var filterSettings =
+                (FilterSettings)group.GetElement(typeof(BrushModifyTool), typeof(FilterSettings));
+
+            if (filterSettings.FilterType == FilterType.MaskFilter)
             {
                 FilterMaskOperation.UpdateMaskTexture(filterSettings.MaskFilterComponentSettings, boxArea);
             }
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
-            ModifyTransformSettings modifyTransformSettings =
- (ModifyTransformSettings)ToolsComponentStack.GetElement(typeof(BrushModifyTool), typeof(ModifyTransformSettings));
-            
-            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true, (proto, terrainObjectInstance) =>
-            {
-                if(proto.Active == false || proto.Selected == false)
+            var modifyTransformSettings =
+                (ModifyTransformSettings)ToolsComponentStack.GetElement(typeof(BrushModifyTool),
+                    typeof(ModifyTransformSettings));
+
+            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true,
+                (proto, terrainObjectInstance) =>
                 {
+                    if (proto.Active == false || proto.Selected == false)
+                    {
+                        return true;
+                    }
+
+                    if (!_modifiedTerrainObjects.TryGetValue(terrainObjectInstance, out ModifyInfo modifyInfo))
+                    {
+                        Vector3 randomVector = Random.insideUnitSphere;
+
+                        modifyInfo.RandomScale = 1f - Random.value;
+                        modifyInfo.RandomPositionY = 1f - Random.value;
+                        modifyInfo.RandomRotation = new Vector3(randomVector.x, randomVector.y, randomVector.z);
+
+                        Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(terrainObjectInstance));
+                    }
+
+                    float fitness = 1;
+                    Vector3 checkPoint = terrainObjectInstance.Position;
+
+                    switch (filterSettings.FilterType)
+                    {
+                        case FilterType.SimpleFilter:
+                        {
+                            if (Physics.Raycast(RayUtility.GetRayDown(checkPoint), out RaycastHit hit,
+                                    PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance,
+                                    layerSettings.GetCurrentPaintLayers(group.PrototypeType)))
+                            {
+                                fitness = filterSettings.SimpleFilter.GetFitness(hit.point, hit.normal);
+                            }
+
+                            break;
+                        }
+                        case FilterType.MaskFilter:
+                        {
+                            if (filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
+                            {
+                                fitness =
+                                    TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint,
+                                        filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            }
+
+                            break;
+                        }
+                    }
+
+                    var maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
+
+                    fitness *= maskFitness;
+
+                    if (modifyInfo.LastUpdate != _updateTicks)
+                    {
+                        modifyInfo.LastUpdate = _updateTicks;
+
+                        var instance =
+                            new Instance(terrainObjectInstance.Position, terrainObjectInstance.Scale,
+                                terrainObjectInstance.Rotation);
+
+                        var moveLenght = Event.current.delta.magnitude;
+
+                        modifyTransformSettings.ModifyTransform(ref instance, ref modifyInfo, moveLenght,
+                            _mouseMove.StrokeDirection, fitness, Vector3.up);
+
+                        terrainObjectInstance.Position = instance.Position;
+                        terrainObjectInstance.Rotation = instance.Rotation.normalized;
+                        terrainObjectInstance.Scale = instance.Scale;
+                    }
+
+                    _modifiedTerrainObjects[terrainObjectInstance] = modifyInfo;
+
                     return true;
-                }
-                
-                if (!_modifiedTerrainObjects.TryGetValue(terrainObjectInstance, out var modifyInfo))
-                {
-                    Vector3 randomVector = Random.insideUnitSphere;
-
-                    modifyInfo.RandomScale = 1f - Random.value;
-                    modifyInfo.RandomPositionY = 1f - Random.value;
-                    modifyInfo.RandomRotation = new Vector3(randomVector.x, randomVector.y, randomVector.z);
-                    
-                    Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(terrainObjectInstance));
-                }
-
-                float fitness = 1;
-                Vector3 checkPoint = terrainObjectInstance.Position;
-
-                switch (filterSettings.FilterType)
-                {
-                    case FilterType.SimpleFilter:
-                    {
-                        if (Physics.Raycast(RayUtility.GetRayDown(checkPoint), out var hit, PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance, 
-                                layerSettings.GetCurrentPaintLayers(group.PrototypeType)))
-                        {
-                            fitness = filterSettings.SimpleFilter.GetFitness(hit.point, hit.normal);
-                        }
-                        break;
-                    }
-                    case FilterType.MaskFilter:
-                    {
-                        if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
-                        {
-                            fitness =
- TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
-                        }
-                        break;
-                    }
-                }
-
-                float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, checkPoint, boxArea.Mask);
-                    
-                fitness *= maskFitness;
-
-                if (modifyInfo.LastUpdate != _updateTicks)
-                {
-                    modifyInfo.LastUpdate = _updateTicks;
-
-                    Instance instance =
- new Instance(terrainObjectInstance.Position, terrainObjectInstance.Scale, terrainObjectInstance.Rotation);
-        
-                    float moveLenght = Event.current.delta.magnitude;
-                    
-                    modifyTransformSettings.ModifyTransform(ref instance, ref modifyInfo, moveLenght, _mouseMove.StrokeDirection, fitness, Vector3.up);
-
-                    terrainObjectInstance.Position = instance.Position;
-                    terrainObjectInstance.Rotation = instance.Rotation.normalized;
-                    terrainObjectInstance.Scale = instance.Scale;
-                }
-
-                _modifiedTerrainObjects[terrainObjectInstance] = modifyInfo;
-
-                return true;
-            });
+                });
         }
 #endif
 

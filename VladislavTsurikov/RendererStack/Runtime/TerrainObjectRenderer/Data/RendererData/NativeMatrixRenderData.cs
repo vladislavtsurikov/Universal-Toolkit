@@ -2,8 +2,10 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.RendererData
 {

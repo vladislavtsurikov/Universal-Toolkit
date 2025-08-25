@@ -18,8 +18,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                     {
                         continue;
                     }
-                    
-                    foreach (var prototype in group.PrototypeList)
+
+                    foreach (Prototype prototype in group.PrototypeList)
                     {
                         AddPrototype((PrototypeTerrainObject)prototype);
                     }
@@ -31,7 +31,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             if (!_prototypes.TryAdd(prototype.RendererPrototypeID, new List<PrototypeTerrainObject> { prototype }))
             {
-                if(_prototypes.TryGetValue(prototype.RendererPrototypeID, out var prototypes))
+                if (_prototypes.TryGetValue(prototype.RendererPrototypeID, out List<PrototypeTerrainObject> prototypes))
                 {
                     if (!prototypes.Contains(prototype))
                     {
@@ -40,10 +40,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 }
             }
         }
-        
+
         public static void RemovePrototype(PrototypeTerrainObject prototype)
         {
-            if(_prototypes.TryGetValue(prototype.RendererPrototypeID, out var prototypes))
+            if (_prototypes.TryGetValue(prototype.RendererPrototypeID, out List<PrototypeTerrainObject> prototypes))
             {
                 prototypes.Remove(prototype);
 
@@ -53,11 +53,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 }
             }
         }
-        
-        public static List<PrototypeTerrainObject> GetPrototypes(int rendererPrototypeID)
-        {
-            return _prototypes.TryGetValue(rendererPrototypeID, out var prototypes) ? prototypes : null;
-        }
+
+        public static List<PrototypeTerrainObject> GetPrototypes(int rendererPrototypeID) =>
+            _prototypes.TryGetValue(rendererPrototypeID, out List<PrototypeTerrainObject> prototypes)
+                ? prototypes
+                : null;
     }
 }
 #endif

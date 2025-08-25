@@ -33,12 +33,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSetting
                         return true;
                     }
                 }
-                
-                Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings overlapCheckSettings =
- (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
 
-                overlapCheckSettings.CurrentOverlapShape?.DrawOverlapVisualisation(terrainObjectInstance.Position, terrainObjectInstance.Scale, terrainObjectInstance.Rotation, proto.Extents);
-                
+                var overlapCheckSettings =
+                    (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(
+                        typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
+
+                overlapCheckSettings.CurrentOverlapShape?.DrawOverlapVisualisation(terrainObjectInstance.Position,
+                    terrainObjectInstance.Scale, terrainObjectInstance.Rotation, proto.Extents);
+
                 return true;
             });
 #endif

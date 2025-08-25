@@ -24,6 +24,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.U
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.Undo.Editor.GameObject;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
@@ -135,60 +136,64 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
         private void EraseTerrainObject(Group group, BoxArea boxArea)
         {
 #if RENDERER_STACK
-            BrushEraseToolSettings brushEraseToolSettings =
- (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushEraseToolSettings));
-            
-            FilterSettings filterSettings =
- (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
-            
-            if(filterSettings.FilterType == FilterType.MaskFilter)
+            var brushEraseToolSettings =
+                (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool),
+                    typeof(BrushEraseToolSettings));
+
+            var filterSettings =
+                (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
+
+            if (filterSettings.FilterType == FilterType.MaskFilter)
             {
                 FilterMaskOperation.UpdateMaskTexture(filterSettings.MaskFilterComponentSettings, boxArea);
             }
-            
-            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true,(proto, instance) =>
+
+            PrototypeTerrainObjectOverlap.OverlapBox(boxArea.Bounds, null, false, true, (proto, instance) =>
             {
-                if(proto.Active == false || proto.Selected == false)
+                if (proto.Active == false || proto.Selected == false)
                 {
                     return true;
                 }
 
-                AdditionalEraseSetting additionalEraseSetting =
- (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
+                var additionalEraseSetting =
+                    (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
 
                 float fitness = 1;
 
-                if(filterSettings.FilterType == FilterType.SimpleFilter)
+                if (filterSettings.FilterType == FilterType.SimpleFilter)
                 {
-                    if (Physics.Raycast(RayUtility.GetRayFromCameraPosition(instance.Position), out var hit, PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance, 
-                            GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType)))
-    		        {
+                    if (Physics.Raycast(RayUtility.GetRayFromCameraPosition(instance.Position), out RaycastHit hit,
+                            PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance,
+                            GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(
+                                group.PrototypeType)))
+                    {
                         fitness = filterSettings.SimpleFilter.GetFitness(hit.point, hit.normal);
                     }
                 }
                 else
                 {
-                    if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
+                    if (filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                     {
                         fitness =
- TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position,
+                                filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                     }
                 }
 
-                float maskFitness =
- TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
+                var maskFitness =
+                    TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
 
                 fitness *= maskFitness;
 
                 fitness *= brushEraseToolSettings.EraseStrength;
 
-                float successOfErase = Random.Range(0.0f, 1.0f);
+                var successOfErase = Random.Range(0.0f, 1.0f);
 
-                if(successOfErase < fitness)
+                if (successOfErase < fitness)
                 {
-                    float randomSuccessForErase = Random.Range(0.0f, 1.0f);
+                    var randomSuccessForErase = Random.Range(0.0f, 1.0f);
 
-                    if(randomSuccessForErase < additionalEraseSetting.Success / 100)
+                    if (randomSuccessForErase < additionalEraseSetting.Success / 100)
                     {
                         Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedTerrainObject(instance));
                         instance.Destroy();

@@ -4,6 +4,8 @@ using UnityEngine;
 using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
@@ -30,9 +32,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     return gameObject.transform.position;
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+
+                if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     return instantObject.Position;
                 }
@@ -49,9 +52,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     GameObjectColliderUtility.HandleTransformChangesForAllScenes();
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+                else if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     instantObject.Position = value;
                 }
@@ -69,9 +72,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     return gameObject.transform.rotation;
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+
+                if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     return instantObject.Rotation;
                 }
@@ -88,9 +92,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     GameObjectColliderUtility.HandleTransformChangesForAllScenes();
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+                else if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     instantObject.Rotation = value;
                 }
@@ -108,9 +112,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     return gameObject.transform.localScale;
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+
+                if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     return instantObject.Scale;
                 }
@@ -127,9 +132,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                     GameObjectColliderUtility.HandleTransformChangesForAllScenes();
                 }
 #if RENDERER_STACK
-                else if(PrototypeType == typeof(PrototypeTerrainObject))
+                else if (PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                    var instantObject = (TerrainObjectInstance)Obj;
 
                     instantObject.Scale = value;
                 }
@@ -146,9 +151,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                 GameObjectColliderUtility.RemoveNullObjectNodesForAllScenes();
             }
 #if RENDERER_STACK
-            else if(PrototypeType == typeof(PrototypeTerrainObject))
+            else if (PrototypeType == typeof(PrototypeTerrainObject))
             {
-                TerrainObjectInstance instantObject = (TerrainObjectInstance)Obj;
+                var instantObject = (TerrainObjectInstance)Obj;
 
                 instantObject.Destroy();
             }

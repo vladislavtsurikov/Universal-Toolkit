@@ -113,7 +113,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 
                 if (terrainData == null)
                 {
-                    Debug.LogWarning("Terrain (" + terrain.gameObject.name + ") not including Terrain Data");
+                    UnityEngine.Debug.LogWarning("Terrain (" + terrain.gameObject.name +
+                                                 ") not including Terrain Data");
                     return new AABB(Vector3.zero, Vector3.one);
                 }
 

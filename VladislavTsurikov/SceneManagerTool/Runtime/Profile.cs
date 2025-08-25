@@ -45,7 +45,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             path = CommonPath.CombinePath(SceneManagerPath.PathToResourcesSceneManager, path);
             path = AssetDatabase.GenerateUniqueAssetPath(path);
 
-            var asset = CreateInstance<Profile>();
+            Profile asset = CreateInstance<Profile>();
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

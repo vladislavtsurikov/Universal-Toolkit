@@ -1,6 +1,8 @@
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
+using Unity.Mathematics;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.RendererData
 {

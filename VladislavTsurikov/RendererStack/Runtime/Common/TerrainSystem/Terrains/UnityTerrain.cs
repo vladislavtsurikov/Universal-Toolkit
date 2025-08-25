@@ -4,6 +4,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
+using VladislavTsurikov.UnityUtility.Runtime;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
@@ -12,7 +13,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
     [TerrainHelper(typeof(Terrain), "Unity terrain")]
     public class UnityTerrain : TerrainHelper
     {
-        private NativeArrayProperty<float> _heights = new();
+        private readonly NativeArrayProperty<float> _heights = new();
 
         [OdinSerialize]
         private Terrain _terrain;

@@ -2,10 +2,11 @@
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Simple Force")]
+    [Name("Simple Force")]
     public class SimpleForce : PhysicsEffect
     {
         public float Angle = 0;

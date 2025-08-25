@@ -30,7 +30,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         {
             _proto = proto;
             PrototypeID = proto.ID;
-            _ = _scriptList.Setup(true, new object[]{this});
+            _ = _scriptList.Setup(true, new object[] { this });
         }
 
         public TerrainObjectInstance(int id, Vector3 position, Vector3 scale, Quaternion rotation,
@@ -38,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         {
             _proto = proto;
             PrototypeID = proto.ID;
-            _ = _scriptList.Setup(true, new object[]{this});
+            _ = _scriptList.Setup(true, new object[] { this });
         }
 
         public PrototypeTerrainObject Proto

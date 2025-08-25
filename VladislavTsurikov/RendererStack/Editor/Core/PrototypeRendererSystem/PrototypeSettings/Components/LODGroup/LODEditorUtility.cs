@@ -150,7 +150,6 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
 
             if (lodInfos[lodInfos.Count - 1] == null)
             {
-                return;
             }
         }
 

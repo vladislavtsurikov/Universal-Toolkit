@@ -6,13 +6,14 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Raycast")]
+    [Name("Raycast")]
     public class Raycast : Action
     {
         private ShortcutCombo _shortcutCombo;
@@ -51,7 +52,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
             }
             else if (EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
+                var instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
             }
         }

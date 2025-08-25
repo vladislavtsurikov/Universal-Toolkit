@@ -19,37 +19,43 @@
 #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib/NoiseCommon.hlsl"
 
 
+
+
+
 #ifndef FBMFRACTALINPUT_DEF // [ FBMFRACTALINPUT_DEF
 #define FBMFRACTALINPUT_DEF
 
 struct FbmFractalInput
 {
-    float octaves;
-    float amplitude;
-    float persistence;
-    float frequency;
-    float lacunarity;
-    float warpIterations;
-    float warpStrength;
-    float4 warpOffsets;
+	float octaves;
+	float amplitude;
+	float persistence;
+	float frequency;
+	float lacunarity;
+	float warpIterations;
+	float warpStrength;
+	float4 warpOffsets;
 };
+
 
 
 FbmFractalInput GetDefaultFbmFractalInput()
 {
-    FbmFractalInput ret;
+	FbmFractalInput ret;
 
-    ret.octaves = 3;
-    ret.amplitude = 0.5;
-    ret.persistence = 0.5;
-    ret.frequency = 1;
-    ret.lacunarity = 2;
-    ret.warpIterations = 0;
-    ret.warpStrength = 0.5;
-    ret.warpOffsets = float4(2.5, 1.4, 3.2, 2.7);
+	ret.octaves = 3;
+	ret.amplitude = 0.5;
+	ret.persistence = 0.5;
+	ret.frequency = 1;
+	ret.lacunarity = 2;
+	ret.warpIterations = 0;
+	ret.warpStrength = 0.5;
+	ret.warpOffsets = float4(2.5, 1.4, 3.2, 2.7);
 
-    return ret;
+	return ret;
 }
+
+
 
 
 float _FbmOctaves;
@@ -63,22 +69,24 @@ float4 _FbmWarpOffsets;
 
 FbmFractalInput GetFbmFractalInput()
 {
-    FbmFractalInput ret;
+	FbmFractalInput ret;
 
-    ret.octaves = _FbmOctaves;
-    ret.amplitude = _FbmAmplitude;
-    ret.persistence = _FbmPersistence;
-    ret.frequency = _FbmFrequency;
-    ret.lacunarity = _FbmLacunarity;
-    ret.warpIterations = _FbmWarpIterations;
-    ret.warpStrength = _FbmWarpStrength;
-    ret.warpOffsets = _FbmWarpOffsets;
+	ret.octaves = _FbmOctaves;
+	ret.amplitude = _FbmAmplitude;
+	ret.persistence = _FbmPersistence;
+	ret.frequency = _FbmFrequency;
+	ret.lacunarity = _FbmLacunarity;
+	ret.warpIterations = _FbmWarpIterations;
+	ret.warpStrength = _FbmWarpStrength;
+	ret.warpOffsets = _FbmWarpOffsets;
 
-    return ret;
+	return ret;
 }
 
 
+
 #endif // ] FBMFRACTALINPUT_DEF
+
 
 
 /*=========================================================================
@@ -87,17 +95,17 @@ FbmFractalInput GetFbmFractalInput()
 
 =========================================================================*/
 
-float noise_FbmValue_Raw(float pos, FbmFractalInput fractalInput)
+float noise_FbmValue_Raw( float pos, FbmFractalInput fractalInput )
 {
     float prev = 0;
     float n = 0;
 
     float octaves = ceil(fractalInput.octaves) + (1 - sign(frac(fractalInput.octaves)));
 
-    for (float i = 0; i < octaves; ++i)
+    for( float i = 0; i < octaves; ++i )
     {
         prev = n;
-        n += fractalInput.amplitude * get_noise_Value(pos * fractalInput.frequency);
+        n += fractalInput.amplitude * get_noise_Value( pos * fractalInput.frequency );
         fractalInput.frequency *= fractalInput.lacunarity;
         fractalInput.amplitude *= fractalInput.persistence;
     }
@@ -107,17 +115,17 @@ float noise_FbmValue_Raw(float pos, FbmFractalInput fractalInput)
     return n;
 }
 
-float noise_FbmValue_Raw(float2 pos, FbmFractalInput fractalInput)
+float noise_FbmValue_Raw( float2 pos, FbmFractalInput fractalInput )
 {
     float prev = 0;
     float n = 0;
 
     float octaves = ceil(fractalInput.octaves) + (1 - sign(frac(fractalInput.octaves)));
 
-    for (float i = 0; i < octaves; ++i)
+    for( float i = 0; i < octaves; ++i )
     {
         prev = n;
-        n += fractalInput.amplitude * get_noise_Value(pos * fractalInput.frequency);
+        n += fractalInput.amplitude * get_noise_Value( pos * fractalInput.frequency );
         fractalInput.frequency *= fractalInput.lacunarity;
         fractalInput.amplitude *= fractalInput.persistence;
     }
@@ -127,17 +135,17 @@ float noise_FbmValue_Raw(float2 pos, FbmFractalInput fractalInput)
     return n;
 }
 
-float noise_FbmValue_Raw(float3 pos, FbmFractalInput fractalInput)
+float noise_FbmValue_Raw( float3 pos, FbmFractalInput fractalInput )
 {
     float prev = 0;
     float n = 0;
 
     float octaves = ceil(fractalInput.octaves) + (1 - sign(frac(fractalInput.octaves)));
 
-    for (float i = 0; i < octaves; ++i)
+    for( float i = 0; i < octaves; ++i )
     {
         prev = n;
-        n += fractalInput.amplitude * get_noise_Value(pos * fractalInput.frequency);
+        n += fractalInput.amplitude * get_noise_Value( pos * fractalInput.frequency );
         fractalInput.frequency *= fractalInput.lacunarity;
         fractalInput.amplitude *= fractalInput.persistence;
     }
@@ -147,17 +155,17 @@ float noise_FbmValue_Raw(float3 pos, FbmFractalInput fractalInput)
     return n;
 }
 
-float noise_FbmValue_Raw(float4 pos, FbmFractalInput fractalInput)
+float noise_FbmValue_Raw( float4 pos, FbmFractalInput fractalInput )
 {
     float prev = 0;
     float n = 0;
 
     float octaves = ceil(fractalInput.octaves) + (1 - sign(frac(fractalInput.octaves)));
 
-    for (float i = 0; i < octaves; ++i)
+    for( float i = 0; i < octaves; ++i )
     {
         prev = n;
-        n += fractalInput.amplitude * get_noise_Value(pos * fractalInput.frequency);
+        n += fractalInput.amplitude * get_noise_Value( pos * fractalInput.frequency );
         fractalInput.frequency *= fractalInput.lacunarity;
         fractalInput.amplitude *= fractalInput.persistence;
     }
@@ -173,78 +181,76 @@ float noise_FbmValue_Raw(float4 pos, FbmFractalInput fractalInput)
 
 =========================================================================*/
 
-float noise_FbmValue(float pos, FbmFractalInput fractalInput)
+float noise_FbmValue( float pos, FbmFractalInput fractalInput )
 {
     float prev = 0;
 
     float warpIterations = ceil(fractalInput.warpIterations) + (1 - sign(frac(fractalInput.warpIterations)));
 
     // do warping
-    for (float i = 0; i < warpIterations; ++i)
+    for ( float i = 0; i < warpIterations; ++i )
     {
-        float q = noise_FbmValue_Raw(pos + fractalInput.warpOffsets.x, fractalInput);
+        float q = noise_FbmValue_Raw( pos + fractalInput.warpOffsets.x, fractalInput );
         prev = pos;
         pos = pos + fractalInput.warpStrength * q;
     }
 
     pos = lerp(prev, pos, frac(fractalInput.warpIterations));
 
-    float f = noise_FbmValue_Raw(pos, fractalInput);
+    float f = noise_FbmValue_Raw( pos, fractalInput );
 
     return f;
 }
 
-float noise_FbmValue(float2 pos, FbmFractalInput fractalInput)
+float noise_FbmValue( float2 pos, FbmFractalInput fractalInput )
 {
     float2 prev = 0;
 
     float warpIterations = ceil(fractalInput.warpIterations) + (1 - sign(frac(fractalInput.warpIterations)));
 
     // do warping
-    for (float i = 0; i < warpIterations; ++i)
+    for ( float i = 0; i < warpIterations; ++i )
     {
-        float2 q = float2(noise_FbmValue_Raw(pos, fractalInput),
-                          noise_FbmValue_Raw(pos + fractalInput.warpOffsets.xy, fractalInput));
+        float2 q = float2( noise_FbmValue_Raw( pos, fractalInput ),
+                           noise_FbmValue_Raw( pos + fractalInput.warpOffsets.xy, fractalInput ) );
         prev = pos;
 
         pos = pos + fractalInput.warpStrength * q;
     }
-
+    
     pos = lerp(prev, pos, frac(fractalInput.warpIterations));
 
-    float f = noise_FbmValue_Raw(pos, fractalInput);
+    float f = noise_FbmValue_Raw( pos, fractalInput );
 
     return f;
 }
 
-float noise_FbmValue(float3 pos, FbmFractalInput fractalInput)
+float noise_FbmValue( float3 pos, FbmFractalInput fractalInput )
 {
     float3 prev = 0;
 
     float warpIterations = ceil(fractalInput.warpIterations) + (1 - sign(frac(fractalInput.warpIterations)));
 
     // do warping
-    for (float i = 0; i < warpIterations; ++i)
+    for ( float i = 0; i < warpIterations; ++i )
     {
-        float3 q = float3(noise_FbmValue_Raw(pos.xyz, fractalInput),
-                          noise_FbmValue_Raw(pos.xyz + fractalInput.warpOffsets.xyz, fractalInput),
-                          noise_FbmValue_Raw(
-                              pos.xyz + float3(fractalInput.warpOffsets.x, fractalInput.warpOffsets.y, 0),
-                              fractalInput));
+        float3 q = float3( noise_FbmValue_Raw( pos.xyz, fractalInput ),
+                    noise_FbmValue_Raw( pos.xyz + fractalInput.warpOffsets.xyz, fractalInput ),
+                    noise_FbmValue_Raw( pos.xyz + float3( fractalInput.warpOffsets.x, fractalInput.warpOffsets.y, 0 ), fractalInput ) );
         prev = pos;
         pos = pos + fractalInput.warpStrength * q;
     }
-
+    
     pos = lerp(prev, pos, frac(fractalInput.warpIterations));
-
-    float f = noise_FbmValue_Raw(pos, fractalInput);
+    
+    float f = noise_FbmValue_Raw( pos, fractalInput );
 
     return f;
 }
 
-float noise_FbmValue(float4 pos, FbmFractalInput fractalInput)
+float noise_FbmValue( float4 pos, FbmFractalInput fractalInput )
 {
-    float f = noise_FbmValue_Raw(pos, fractalInput);
+    float f = noise_FbmValue_Raw( pos, fractalInput );
 
     return f;
 }

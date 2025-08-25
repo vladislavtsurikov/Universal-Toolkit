@@ -12,13 +12,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
     [ElementEditor(typeof(SpawnDetailSettings))]
     public class SpawnDetailSettingsEditor : IMGUIElementEditor
     {
-        private GUIContent _density = new("Density");
+        private readonly GUIContent _density = new("Density");
 
-        private GUIContent _failureRate = new("Failure Rate (%)",
+        private readonly GUIContent _failureRate = new("Failure Rate (%)",
             "The larger this value, the less likely it is to spawn an object.");
 
         private SpawnDetailSettings _spawnDetailSettings;
-        private GUIContent _useRandomOpacity = new("Use Random Opacity");
+        private readonly GUIContent _useRandomOpacity = new("Use Random Opacity");
 
         public override void OnEnable() => _spawnDetailSettings = (SpawnDetailSettings)Target;
 

@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     {
         private static VoronoiNoise _sInstance;
 
-        private static NoiseTypeDescriptor _desc = new()
+        private static readonly NoiseTypeDescriptor _desc = new()
         {
             Name = "Voronoi",
             OutputDir = MaskFilterShadersPath.Path + "/NoiseLib/",

@@ -1,5 +1,7 @@
-﻿using Unity.Collections;
+﻿using Unity.Burst;
+using Unity.Collections;
 using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using VladislavTsurikov.Utility.Runtime;
 
@@ -28,11 +30,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
                 return;
             }
 
-            float2 worldspaceCellCorner = new float2(cellBounds.center.x - cellBounds.extents.x,
+            var worldspaceCellCorner = new float2(cellBounds.center.x - cellBounds.extents.x,
                 cellBounds.center.z - cellBounds.extents.z);
-            float2 terrainspaceCellCorner = new float2(worldspaceCellCorner.x - TerrainPosition.x,
+            var terrainspaceCellCorner = new float2(worldspaceCellCorner.x - TerrainPosition.x,
                 worldspaceCellCorner.y - TerrainPosition.z);
-            float2 heightmapPosition = new float2(terrainspaceCellCorner.x / HeightMapScale.x,
+            var heightmapPosition = new float2(terrainspaceCellCorner.x / HeightMapScale.x,
                 terrainspaceCellCorner.y / HeightMapScale.z);
 
             var xCount = Mathf.CeilToInt(cellRect.width / HeightMapScale.x);

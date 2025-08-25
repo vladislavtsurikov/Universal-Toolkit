@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     {
         private static PerlinNoise _sInstance;
 
-        private static NoiseTypeDescriptor _desc = new()
+        private static readonly NoiseTypeDescriptor _desc = new()
         {
             Name = "Perlin",
             OutputDir = MaskFilterShadersPath.Path + "/NoiseLib/",

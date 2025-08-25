@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.UnityUtility.Runtime;
 using Object = UnityEngine.Object;
 
@@ -9,6 +10,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     {
         [NonSerialized]
         public Vector3 Extents = Vector3.one;
+
+        [NonSerialized]
+        public PastTransform PastTransform;
 
         public GameObject Prefab;
 
@@ -45,6 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public override void OnCreatePrototype(Object obj)
         {
             Prefab = (GameObject)obj;
+            PastTransform = new PastTransform(Prefab.transform);
             Extents = GameObjectUtility.CalculateBoundsInstantiate(Prefab).extents;
         }
     }

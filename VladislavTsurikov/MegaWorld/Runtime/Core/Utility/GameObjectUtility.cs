@@ -1,5 +1,4 @@
 #if RENDERER_STACK
-using VladislavTsurikov.RendererStack.Runtime.Sectorize;
 #endif
 using UnityEngine;
 #if UNITY_EDITOR

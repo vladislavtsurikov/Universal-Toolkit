@@ -51,10 +51,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
                     {
                         SingleKeyWord = KeyWord.Static,
                         Parameters =
-                            new List<Parameter>
-                            {
-                                new("ColorName", "colorName"), new("SelectionState", "state")
-                            },
+                            new List<Parameter> { new("ColorName", "colorName"), new("SelectionState", "state") },
                         BodyLines =
                             new List<string> { $"return {groupName}.GetColor(colorName.ToString(), state);" }
                     },
@@ -62,15 +59,9 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
                     {
                         SingleKeyWord = KeyWord.Static,
                         Parameters =
-                            new List<Parameter>
-                            {
-                                new("ColorName", "colorName"), new("SelectionState", "state")
-                            },
+                            new List<Parameter> { new("ColorName", "colorName"), new("SelectionState", "state") },
                         BodyLines =
-                            new List<string>
-                            {
-                                $"return {groupName}.GetThemeColor(colorName.ToString(), state);"
-                            }
+                            new List<string> { $"return {groupName}.GetThemeColor(colorName.ToString(), state);" }
                     },
                     new Method(typeof(EditorSelectableColorInfo), "GetSelectableColorInfo")
                     {

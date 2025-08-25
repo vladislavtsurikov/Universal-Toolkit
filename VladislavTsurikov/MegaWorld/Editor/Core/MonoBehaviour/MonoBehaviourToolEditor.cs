@@ -19,7 +19,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.ReflectionUtility;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 

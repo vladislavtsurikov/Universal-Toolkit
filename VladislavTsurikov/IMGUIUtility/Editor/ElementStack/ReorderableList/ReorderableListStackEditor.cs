@@ -134,11 +134,6 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                 menu.AddItem(new GUIContent("Duplicate"), false, () => DuplicateComponent(component, index + 1));
             }
 
-            if (DuplicateSupport)
-            {
-                menu.AddItem(new GUIContent("Duplicate"), false, () => DuplicateComponent(component, index + 1));
-            }
-
             if (RenameSupport)
             {
                 menu.AddSeparator("");
@@ -550,7 +545,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             GUILayout.Space(15);
         }
 
-        private List<Type> GetComponentTypes() =>
+        protected List<Type> GetComponentTypes() =>
             AllTypesDerivedFrom<T>.Types.OrderBy(x => x.FullName).ThenBy(x => x.Namespace?.Split('.')[^1])
                 .ToList();
 

@@ -4,7 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.CPUNoise.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
 {
@@ -16,21 +16,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
         public bool ProceduralBrushPreviewTextureFoldout = true;
 
         [NonSerialized]
-        private GUIContent _brushFalloff = new("Brush Falloff (%)",
+        private readonly GUIContent _brushFalloff = new("Brush Falloff (%)",
             "Allows you to control the brush fall by creating a gradient.");
 
         [NonSerialized]
-        private GUIContent _brushStrength = new("Brush Strength (%)",
+        private readonly GUIContent _brushStrength = new("Brush Strength (%)",
             "Allows you to change the maximum strength of the brush the lower this parameter, the closer the value.");
 
         [NonSerialized]
-        private GUIContent _fractalNoise = new("Fractal Noise",
+        private readonly GUIContent _fractalNoise = new("Fractal Noise",
             "Mathematical algorithm for generating a procedural texture by a pseudo-random method.");
 
         [NonSerialized]
-        private GUIContent _shape = new("Shape", "Allows you to select the geometric shape of the mask.");
+        private readonly GUIContent _shape = new("Shape", "Allows you to select the geometric shape of the mask.");
 
-        private ProceduralMask _target;
+        private readonly ProceduralMask _target;
 
         public ProceduralMaskEditor(ProceduralMask target) => _target = target;
 
@@ -87,7 +87,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
                 EditorGUI.indentLevel++;
 
                 _target.NoiseType =
-                    (NoiseType<>)CustomEditorGUILayout.EnumPopup(new GUIContent("Check Fractal Noise"),
+                    (NoiseType)CustomEditorGUILayout.EnumPopup(new GUIContent("Check Fractal Noise"),
                         _target.NoiseType);
 
                 _target.Seed = CustomEditorGUILayout.IntSlider(new GUIContent("Seed"), _target.Seed, 0, 65000);

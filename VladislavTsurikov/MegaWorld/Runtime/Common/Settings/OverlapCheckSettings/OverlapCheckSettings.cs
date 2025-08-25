@@ -3,6 +3,7 @@ using UnityEngine;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
@@ -19,10 +20,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
     [Name("Overlap Check Settings")]
     public class OverlapCheckSettings : Runtime_Core_Component
     {
-        public OverlapShapeEnum OverlapShapeEnum = OverlapShapeEnum.Sphere;
-        public OBBCheck ObbCheck = new();
-        public SphereCheck SphereCheck = new();
         public CollisionCheck CollisionCheck = new();
+        public OBBCheck ObbCheck = new();
+        public OverlapShapeEnum OverlapShapeEnum = OverlapShapeEnum.Sphere;
+        public SphereCheck SphereCheck = new();
 
         public OverlapShape CurrentOverlapShape =>
             OverlapShapeEnum switch
@@ -55,9 +56,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
 #endif
             }
 #if RENDERER_STACK
-            else 
+            else
             {
-                if(!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, instance)))
+                if (!RunOverlapCheckForTerrainObject(new OverlapInstance(overlapCheckSettings, extents, instance)))
                 {
                     return true;
                 }
@@ -69,13 +70,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
 #if RENDERER_STACK
         private static bool RunOverlapCheckForTerrainObject(OverlapInstance spawnOverlapInstance)
         {
-            bool overlaps = false;
+            var overlaps = false;
 
-            PrototypeTerrainObjectOverlap.OverlapBox(spawnOverlapInstance.Obb.Center, spawnOverlapInstance.Obb.Size * PreferenceElementSingleton<OverlapCheckSettingsPreference>.Instance.MultiplyFindSize, 
+            PrototypeTerrainObjectOverlap.OverlapBox(spawnOverlapInstance.Obb.Center,
+                spawnOverlapInstance.Obb.Size * PreferenceElementSingleton<OverlapCheckSettingsPreference>.Instance
+                    .MultiplyFindSize,
                 spawnOverlapInstance.Obb.Rotation, null, true,
                 false, (proto, persistentInstance) =>
                 {
-                    OverlapCheckSettings localOverlapCheckSettings =
+                    var localOverlapCheckSettings =
                         (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
                     if (localOverlapCheckSettings.OverlapShapeEnum == OverlapShapeEnum.None)
@@ -83,7 +86,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
                         return true;
                     }
 
-                    OverlapInstance overlapInstance = new OverlapInstance(localOverlapCheckSettings,
+                    var overlapInstance = new OverlapInstance(localOverlapCheckSettings,
                         persistentInstance.Position, persistentInstance.Scale, persistentInstance.Rotation,
                         proto.Extents);
 

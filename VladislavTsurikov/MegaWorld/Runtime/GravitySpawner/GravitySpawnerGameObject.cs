@@ -26,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 
         protected override void OnDisablePhysics()
         {
-            var position = SimulatedBody.GameObject.transform.position;
+            Vector3 position = SimulatedBody.GameObject.transform.position;
 
             if (!_area.Contains(position))
             {

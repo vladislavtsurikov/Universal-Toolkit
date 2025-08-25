@@ -222,7 +222,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings
         #region Fractal Noise Settings
 
         public Texture2D NoiseTexture;
-        public FractalNoiseCPU Fractal = new FractalNoiseCPU(new PerlinNoiseCPU(0, 20), 3, 0.03f, 2, 0.5f);
+        public FractalNoiseCPU Fractal = new(new PerlinNoiseCPU(0, 20), 3, 0.03f, 2, 0.5f);
 
         public float RangeMin = -0.5f;
         public float RangeMax = 0.5f;

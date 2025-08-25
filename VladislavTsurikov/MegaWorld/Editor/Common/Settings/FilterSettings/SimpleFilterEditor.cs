@@ -6,7 +6,6 @@ using VladislavTsurikov.CPUNoise.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 {
@@ -181,8 +180,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
                 }
                 GUILayout.EndHorizontal();
 
-                filter.Fractal.NoiseType = CustomEditorGUILayout.EnumPopup(new GUIContent("Noise Type"),
-                        filter.Fractal.NoiseType);
+                filter.Fractal.NoiseType = (NoiseType)CustomEditorGUILayout.EnumPopup(new GUIContent("Noise Type"),
+                    filter.Fractal.NoiseType);
 
                 filter.Fractal.Seed = CustomEditorGUILayout.IntSlider(_seed, filter.Fractal.Seed, 0, 65000);
                 filter.Fractal.Octaves = CustomEditorGUILayout.IntSlider(_octaves, filter.Fractal.Octaves, 1, 12);
@@ -216,7 +215,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
             {
                 if (filter.NoisePreviewTexture)
                 {
-                    FractalNoiseCPU fractal = new FractalNoiseCPU(filter.Fractal.GetNoise(), filter.Fractal.Octaves,
+                    var fractal = new FractalNoiseCPU(filter.Fractal.GetNoise(), filter.Fractal.Octaves,
                         filter.Fractal.Frequency / 7, filter.Fractal.Lacunarity, filter.Fractal.Persistence);
                     filter.NoiseTexture = new Texture2D(width, height);
 

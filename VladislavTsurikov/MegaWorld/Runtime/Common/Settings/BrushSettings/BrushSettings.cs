@@ -37,7 +37,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
         public CustomMasks CustomMasks = new();
         public MaskType MaskType = MaskType.Procedural;
 
-        public ProceduralMask ProceduralMask = new ProceduralMask();
+        public ProceduralMask ProceduralMask = new();
         public SpacingEqualsType SpacingEqualsType = SpacingEqualsType.HalfBrushSize;
 
         public float CustomSpacing

@@ -17,7 +17,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
     {
         protected readonly Group _group;
         protected readonly PrototypeTerrainObject _proto;
-        
+
         public TerrainObjectOnDisablePhysics(Group group, PrototypeTerrainObject proto)
         {
             _group = group;
@@ -30,19 +30,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
             {
                 return;
             }
-            
-            var position = SimulatedBody.GameObject.transform.position;
-            
-            bool addedInstance = false;
+
+            Vector3 position = SimulatedBody.GameObject.transform.position;
+
+            var addedInstance = false;
 
             RayHit rayHit =
- RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, position.y + 1, position.z)), 
-                GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(_group.PrototypeType));
-            
+                RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, position.y + 1, position.z)),
+                    GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(_group.PrototypeType));
+
             if (rayHit != null)
             {
-                float fitness = GetFitness(rayHit);
-                
+                var fitness = GetFitness(rayHit);
+
                 if (fitness != 0)
                 {
                     if (Random.Range(0f, 1f) < 1 - fitness)
@@ -50,12 +50,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
                         Object.DestroyImmediate(SimulatedBody.GameObject);
                         return;
                     }
-                    
+
                     TerrainObjectInstance terrainObjectInstance = TerrainObjectRendererAPI.AddInstance(_proto,
                         SimulatedBody.GameObject.transform.position, SimulatedBody.GameObject.transform.lossyScale,
                         SimulatedBody.GameObject.transform.rotation);
 
-                    TerrainObjectSimulatedBody terrainObjectSimulatedBody = (TerrainObjectSimulatedBody)SimulatedBody;
+                    var terrainObjectSimulatedBody = (TerrainObjectSimulatedBody)SimulatedBody;
                     terrainObjectSimulatedBody.TerrainObjectInstance = terrainObjectInstance;
 
                     addedInstance = true;
@@ -65,7 +65,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
             if (addedInstance)
             {
                 SimulatedBody.GameObject.DisableMeshRenderers();
-                
+
                 DestroyGameObject().Forget();
             }
             else
@@ -73,7 +73,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
                 Object.DestroyImmediate(SimulatedBody.GameObject);
             }
         }
-        
+
         private async UniTask DestroyGameObject()
         {
             await UniTask.WaitWhile(() => SimulatedBodyStack.Count > 0);
@@ -81,15 +81,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
             Object.DestroyImmediate(SimulatedBody.GameObject);
         }
 
-        protected virtual float GetFitness(RayHit rayHit)
-        {
-            return 1;
-        }
-        
-        protected virtual bool IsValid()
-        {
-            return true;
-        }
+        protected virtual float GetFitness(RayHit rayHit) => 1;
+
+        protected virtual bool IsValid() => true;
     }
 }
 #endif

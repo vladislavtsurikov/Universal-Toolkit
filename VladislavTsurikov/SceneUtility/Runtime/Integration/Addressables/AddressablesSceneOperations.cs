@@ -16,7 +16,7 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
         public AddressablesSceneOperations(SceneReference sceneReference) : base(sceneReference)
         {
         }
-        
+
         public override float LoadingProgress()
         {
             if (_loadSceneAsyncOperation.IsValid())
@@ -26,23 +26,24 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
 
             return SceneReference.Scene.isLoaded ? 1 : 0;
         }
-        
+
         protected override async UniTask LoadScene()
         {
             _loadSceneAsyncOperation =
- UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(SceneReference.ScenePath, LoadSceneMode.Additive);
+                UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(SceneReference.ScenePath,
+                    LoadSceneMode.Additive);
             await _loadSceneAsyncOperation;
         }
-        
+
         protected override async UniTask UnloadScene()
         {
             if (!_loadSceneAsyncOperation.IsValid())
             {
                 return;
             }
-            
+
             _unloadSceneAsyncOperation =
- UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
+                UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
             await _unloadSceneAsyncOperation;
         }
 

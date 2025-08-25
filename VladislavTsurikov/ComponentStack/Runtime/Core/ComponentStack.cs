@@ -30,7 +30,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         public event Action<int> ElementRemoved;
         public event Action ListChanged;
 
-        public async UniTask Setup(bool force = true, SceneCollection sceneCollection, object[] setupData = null,
+        public async UniTask Setup(bool force = true, object[] setupData = null,
             CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();

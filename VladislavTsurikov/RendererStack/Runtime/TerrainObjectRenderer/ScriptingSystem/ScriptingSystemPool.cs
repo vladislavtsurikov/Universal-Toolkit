@@ -8,7 +8,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
     {
         private readonly PrototypeScriptingManager _prototypeScriptingManager;
 
-        public ScriptingSystemPool(PrototypeScriptingManager prototypeScriptingManager) : base(false) =>
+        public ScriptingSystemPool(PrototypeScriptingManager prototypeScriptingManager) : base(
+            new StackPoolCollection<GameObject>()) =>
             _prototypeScriptingManager = prototypeScriptingManager;
 
         public GameObject Get(TerrainObjectInstance instance)
@@ -20,11 +21,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             return go;
         }
 
+        protected override GameObject CreateInstance() =>
+            _prototypeScriptingManager.CreateGameObject(CountAll.ToString());
+
         protected override void OnGet(GameObject go) => go.SetActive(true);
 
         protected override void OnRelease(GameObject go) => go.SetActive(false);
-
-        protected override GameObject OnCreateObject() =>
-            _prototypeScriptingManager.CreateGameObject(CountAll.ToString());
     }
 }

@@ -20,7 +20,6 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {

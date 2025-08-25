@@ -15,6 +15,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
+using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
 using Instance = VladislavTsurikov.UnityUtility.Runtime.Instance;
@@ -33,23 +36,25 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
             bool supportUndo = false)
         {
 #if RENDERER_STACK
-            OverlapCheckSettings overlapCheckSettings =
- (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
+            var overlapCheckSettings =
+                (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-            Instance instance =
- new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
+            var instance =
+                new Instance(rayHit.Point, proto.Prefab.transform.lossyScale, proto.Prefab.transform.rotation);
 
-            TransformComponentSettings transformComponentSettings =
- (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness, rayHit.Normal);
+            var transformComponentSettings =
+                (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
+            transformComponentSettings.TransformComponentStack.ManipulateTransform(ref instance, fitness,
+                rayHit.Normal);
 
-            if(OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
+            if (OverlapCheckSettings.RunOverlapCheck(proto.GetType(), overlapCheckSettings, proto.Extents, instance))
             {
                 TerrainObjectInstance terrainObjectInstance =
- TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale, instance.Rotation);
-                
+                    TerrainObjectRendererAPI.AddInstance(proto.RendererPrototype, instance.Position, instance.Scale,
+                        instance.Rotation);
+
 #if UNITY_EDITOR
-                if(supportUndo)
+                if (supportUndo)
                 {
                     Undo.Editor.Undo.RegisterUndoAfterMouseUp(new CreatedTerrainObject(terrainObjectInstance));
                 }

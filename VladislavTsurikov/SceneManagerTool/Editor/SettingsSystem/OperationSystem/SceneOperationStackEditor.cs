@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
@@ -28,7 +29,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
         {
             var menu = new GenericMenu();
 
-            foreach (var settingsType in GetSettingsTypeForAddManu())
+            foreach (Type settingsType in GetComponentTypes())
             {
                 switch (_settingsTypes)
                 {
@@ -62,7 +63,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
                         break;
                 }
 
-                string context = settingsType.GetAttribute<NameAttribute>().Name;
+                var context = settingsType.GetAttribute<NameAttribute>().Name;
 
                 menu.AddItem(new GUIContent(context), false,
                     () => _componentStackSupportSameType.CreateComponent(settingsType));

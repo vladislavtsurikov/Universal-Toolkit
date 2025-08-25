@@ -14,16 +14,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.BrushSettings
     public class BrushJitterSettingsEditor
     {
         [NonSerialized]
-        private GUIContent _brushJitter = new("Jitter", "Control brush stroke randomness.");
+        private readonly GUIContent _brushJitter = new("Jitter", "Control brush stroke randomness.");
 
         [NonSerialized]
-        private GUIContent _brushRotation = new("Brush Rotation", "Rotation of the brush.");
+        private readonly GUIContent _brushRotation = new("Brush Rotation", "Rotation of the brush.");
 
         [NonSerialized]
-        private GUIContent _brushScatter = new("Brush Scatter", "Randomize brush position by an offset.");
+        private readonly GUIContent _brushScatter = new("Brush Scatter", "Randomize brush position by an offset.");
 
         [NonSerialized]
-        private GUIContent _brushSize = new("Brush Size",
+        private readonly GUIContent _brushSize = new("Brush Size",
             "Selected prototypes will only spawn in this range around the center of Brush.");
 
         public void OnGUI(Runtime.Common.Settings.BrushSettings.BrushSettings brush, BrushJitterSettings jitter)
