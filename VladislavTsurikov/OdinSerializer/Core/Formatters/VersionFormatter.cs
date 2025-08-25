@@ -16,15 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(VersionFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Custom formatter for the <see cref="Version"/> type.
     /// </summary>

@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// A helper class for quickly and easily defining custom loggers.
     /// </summary>

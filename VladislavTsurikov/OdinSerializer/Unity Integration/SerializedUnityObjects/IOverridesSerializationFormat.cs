@@ -16,9 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects
+namespace OdinSerializer
 {
     /// <summary>
     /// Indicates that an Odin-serialized Unity object controls its own serialization format. Every time it is serialized, it will be asked which format to use.

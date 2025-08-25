@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Compares types by reference before comparing them using the default type equality operator.
     /// This can constitute a *significant* speedup when used as the comparer for dictionaries.

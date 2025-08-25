@@ -16,16 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using Utilities;
+
     /// <summary>
     /// Serializer for all complex types; IE, types which are not primitives as determined by the <see cref="FormatterUtilities.IsPrimitiveType(Type)" /> method.
     /// </summary>

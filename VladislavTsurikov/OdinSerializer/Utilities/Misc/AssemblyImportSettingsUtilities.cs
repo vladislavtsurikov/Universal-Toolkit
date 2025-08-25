@@ -16,16 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using UnityEditor;
-
 #if UNITY_EDITOR
 
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities.Editor
 {
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using UnityEditor;
+
     /// <summary>
     /// Defines how an assembly's import settings should be configured.
     /// </summary>

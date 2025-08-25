@@ -15,10 +15,7 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
     /// <summary>
     /// Specifies that a type is capable of serializing itself using an <see cref="IDataWriter"/> and an

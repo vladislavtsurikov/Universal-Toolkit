@@ -16,17 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
-    // System.ExecutionEngineException is marked obsolete in .NET 4.6
+    using OdinSerializer.Utilities;
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Reflection;
+
+
+// System.ExecutionEngineException is marked obsolete in .NET 4.6
 // That's all very good for .NET, but Unity still uses it!
 #pragma warning disable 618
 

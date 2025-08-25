@@ -16,12 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.IO;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
+namespace OdinSerializer
 {
+    using System;
+    using System.IO;
+
     /// <summary>
     /// Provides a set of methods for reading data stored in a format written by a corresponding <see cref="IDataWriter"/> class.
     /// <para />

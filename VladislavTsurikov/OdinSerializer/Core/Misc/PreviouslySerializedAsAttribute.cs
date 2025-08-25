@@ -15,11 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Indicates that an instance field or auto-property was previously serialized with a different name, so that values serialized with the old name will be properly deserialized into this member.
     ///

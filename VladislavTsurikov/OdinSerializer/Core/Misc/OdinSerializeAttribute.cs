@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Indicates that an instance field or auto-property should be serialized by Odin.
     /// </summary>

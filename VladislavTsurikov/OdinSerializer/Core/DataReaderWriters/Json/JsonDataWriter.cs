@@ -16,15 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Json
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Text;
+
     /// <summary>
     /// Writes json data to a stream that can be read by a <see cref="JsonDataReader"/>.
     /// </summary>

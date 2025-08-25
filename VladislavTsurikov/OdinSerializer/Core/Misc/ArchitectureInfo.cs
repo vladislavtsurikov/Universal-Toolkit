@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using UnityEngine;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using UnityEngine;
+
     /// <summary>
     /// This class gathers info about the current architecture for the purpose of determinining
     /// the unaligned read/write capabilities that we have to work with.

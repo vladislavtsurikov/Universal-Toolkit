@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+﻿namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Implements methods for logging warnings, errors and exceptions during serialization and deserialization.
     /// </summary>

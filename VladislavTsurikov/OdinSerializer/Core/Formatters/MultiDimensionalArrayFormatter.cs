@@ -16,15 +16,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
 using System.Globalization;
-using System.Text;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Text;
+
     /// <summary>
     /// Formatter for all arrays with more than one dimension.
     /// </summary>

@@ -16,16 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
+    using Utilities;
+    using System;
+    using System.Collections.Generic;
+
     public sealed class AnySerializer : Serializer
     {
         private static readonly ISerializationPolicy UnityPolicy = SerializationPolicies.Unity;

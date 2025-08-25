@@ -16,19 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Binary;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Json;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using UnityEngine;
+    using Utilities;
+
     /// <summary>
     /// Provides an array of utility wrapper methods for easy serialization and deserialization of objects of any type.
     /// </summary>

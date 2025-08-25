@@ -16,12 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Serializes and deserializes a given type.
     /// <para />

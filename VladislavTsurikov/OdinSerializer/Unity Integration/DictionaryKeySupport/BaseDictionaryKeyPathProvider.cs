@@ -15,11 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System.Collections.Generic;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Not yet documented.
     /// </summary>

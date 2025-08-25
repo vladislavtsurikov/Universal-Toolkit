@@ -16,12 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Serializer for all enums.
     /// </summary>

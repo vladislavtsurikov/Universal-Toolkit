@@ -19,12 +19,13 @@
 // Tested and verified to work
 #pragma warning disable 0675
 
-using System;
 using System.Globalization;
-using System.Runtime.InteropServices;
 
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// Corresponds to the .NET <see cref="BitConverter"/> class, but works only with buffers and so never allocates garbage.
     /// <para />

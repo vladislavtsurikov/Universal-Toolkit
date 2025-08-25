@@ -16,16 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
+    using System.Globalization;
+    using System;
+    using System.Collections.Generic;
+    using Utilities;
+    using System.Linq;
+    using UnityEngine;
+    using System.Reflection;
+
     /// <summary>
     /// Provides utility methods for handling dictionary keys in the prefab modification system.
     /// </summary>

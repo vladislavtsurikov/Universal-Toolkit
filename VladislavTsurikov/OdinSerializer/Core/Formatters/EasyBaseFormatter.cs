@@ -16,10 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
     /// <summary>
     /// Provides an easy way of implementing custom formatters.

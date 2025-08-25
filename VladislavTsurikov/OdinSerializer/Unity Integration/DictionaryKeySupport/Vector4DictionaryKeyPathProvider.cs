@@ -16,14 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport;
+using OdinSerializer;
 
 [assembly: RegisterDictionaryKeyPathProvider(typeof(Vector4DictionaryKeyPathProvider))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
+    using System.Globalization;
+    using UnityEngine;
+
     public sealed class Vector4DictionaryKeyPathProvider : BaseDictionaryKeyPathProvider<Vector4>
     {
         public override string ProviderID { get { return "v4"; } }

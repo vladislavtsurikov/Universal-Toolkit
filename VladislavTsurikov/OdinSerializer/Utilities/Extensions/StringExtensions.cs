@@ -16,11 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
-using System.Text;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Globalization;
+    using System.Text;
+
     /// <summary>
     /// String method extensions.
     /// </summary>

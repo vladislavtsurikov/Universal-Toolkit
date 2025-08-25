@@ -16,7 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Json
+namespace OdinSerializer
 {
     /// <summary>
     /// Contains various string constants used by the <see cref="JsonDataWriter"/>, <see cref="JsonDataReader"/> and <see cref="JsonTextReader"/> classes.

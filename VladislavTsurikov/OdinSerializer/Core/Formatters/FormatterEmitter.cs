@@ -15,22 +15,20 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
 #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
 #define CAN_EMIT
 #endif
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using OdinSerializer.Utilities;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using UnityEngine;
+
 #if CAN_EMIT
 
     using System.Reflection.Emit;

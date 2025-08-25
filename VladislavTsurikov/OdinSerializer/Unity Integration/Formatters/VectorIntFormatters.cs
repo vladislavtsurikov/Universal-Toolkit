@@ -16,25 +16,22 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(Vector2IntFormatter))]
 [assembly: RegisterFormatter(typeof(Vector3IntFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="Vector2Int"/> type.
     /// </summary>
-    /// <seealso cref="Vector2Int" />
+    /// <seealso cref="Sirenix.Serialization.MinimalBaseFormatter{UnityEngine.Vector2Int}" />
     public class Vector2IntFormatter : MinimalBaseFormatter<Vector2Int>
     {
-        private static readonly Serializer<int> Serializer = Core.Serializers.Serializer.Get<int>();
+        private static readonly Serializer<int> Serializer = OdinSerializer.Serializer.Get<int>();
 
         /// <summary>
         /// Reads into the specified value using the specified reader.
@@ -62,10 +59,10 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
     /// <summary>
     /// Custom formatter for the <see cref="Vector3Int"/> type.
     /// </summary>
-    /// <seealso cref="Vector3Int" />
+    /// <seealso cref="Sirenix.Serialization.MinimalBaseFormatter{UnityEngine.Vector3Int}" />
     public class Vector3IntFormatter : MinimalBaseFormatter<Vector3Int>
     {
-        private static readonly Serializer<int> Serializer = Core.Serializers.Serializer.Get<int>();
+        private static readonly Serializer<int> Serializer = OdinSerializer.Serializer.Get<int>();
 
         /// <summary>
         /// Reads into the specified value using the specified reader.

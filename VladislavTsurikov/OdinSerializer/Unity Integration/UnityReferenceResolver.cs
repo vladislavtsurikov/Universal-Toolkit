@@ -16,12 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration
+namespace OdinSerializer
 {
+    using System.Collections.Generic;
+    using Utilities;
+
     /// <summary>
     /// Resolves external index references to Unity objects.
     /// </summary>

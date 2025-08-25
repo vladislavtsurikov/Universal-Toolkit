@@ -15,10 +15,7 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Config
+namespace OdinSerializer
 {
     /// <summary>
     /// Contains global configuration options for the serialization system.

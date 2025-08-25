@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// <para>
     /// Applying this attribute to a type indicates that in the case where, when expecting to deserialize an instance of the type

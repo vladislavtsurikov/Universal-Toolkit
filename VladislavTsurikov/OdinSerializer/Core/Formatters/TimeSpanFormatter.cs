@@ -16,19 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(TimeSpanFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Custom formatter for the <see cref="TimeSpan"/> type.
     /// </summary>
-    /// <seealso cref="TimeSpan" />
+    /// <seealso cref="MinimalBaseFormatter{System.TimeSpan}" />
     public sealed class TimeSpanFormatter : MinimalBaseFormatter<TimeSpan>
     {
         /// <summary>

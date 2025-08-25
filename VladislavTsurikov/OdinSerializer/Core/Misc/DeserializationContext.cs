@@ -16,13 +16,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization;
+    using Utilities;
+
     /// <summary>
     /// The context of a given deserialization session. This class maintains all internal and external references during deserialization.
     /// </summary>
@@ -31,6 +31,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
     {
         private SerializationConfig config;
         private Dictionary<int, object> internalIdReferenceMap = new Dictionary<int, object>(128);
+        private StreamingContext streamingContext;
+        private IFormatterConverter formatterConverter;
         private TwoWaySerializationBinder binder;
 
         /// <summary>
@@ -72,8 +74,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
                 throw new ArgumentNullException("formatterConverter");
             }
 
-            this.StreamingContext = context;
-            this.FormatterConverter = formatterConverter;
+            this.streamingContext = context;
+            this.formatterConverter = formatterConverter;
 
             this.Reset();
         }
@@ -132,7 +134,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The streaming context.
         /// </value>
-        public StreamingContext StreamingContext { get; }
+        public StreamingContext StreamingContext { get { return this.streamingContext; } }
 
         /// <summary>
         /// Gets the formatter converter.
@@ -140,7 +142,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The formatter converter.
         /// </value>
-        public IFormatterConverter FormatterConverter { get; }
+        public IFormatterConverter FormatterConverter { get { return this.formatterConverter; } }
 
         /// <summary>
         /// Gets or sets the serialization configuration.

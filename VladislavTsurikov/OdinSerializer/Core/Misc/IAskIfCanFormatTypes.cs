@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     public interface IAskIfCanFormatTypes
     {
         bool CanFormatType(Type type);

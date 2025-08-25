@@ -1,4 +1,4 @@
-﻿namespace VladislavTsurikov.OdinSerializer.Core.Misc
+﻿namespace OdinSerializer
 {
     /// <summary>
     /// The policy for which level of logging to do during serialization and deserialization.

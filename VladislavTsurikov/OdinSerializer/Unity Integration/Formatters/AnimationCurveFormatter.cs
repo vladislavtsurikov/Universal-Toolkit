@@ -16,21 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(AnimationCurveFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="AnimationCurve"/> type.
     /// </summary>
-    /// <seealso cref="AnimationCurve" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.AnimationCurve}" />
     public class AnimationCurveFormatter : MinimalBaseFormatter<AnimationCurve>
     {
         private static readonly Serializer<Keyframe[]> KeyframeSerializer = Serializer.Get<Keyframe[]>();

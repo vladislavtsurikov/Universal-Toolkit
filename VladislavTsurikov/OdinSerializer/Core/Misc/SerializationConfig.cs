@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Defines the configuration during serialization and deserialization. This class is thread-safe.
     /// </summary>

@@ -16,18 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     // Registered by TypeFormatterLocator
 
     /// <summary>
     /// Formatter for the <see cref="Type"/> type which uses the reader/writer's <see cref="TwoWaySerializationBinder"/> to bind types.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{T}" />
+    /// <seealso cref="Serialization.MinimalBaseFormatter{T}" />
     public sealed class TypeFormatter : MinimalBaseFormatter<Type>
     {
         /// <summary>

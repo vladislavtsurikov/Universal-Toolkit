@@ -15,7 +15,7 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.SerializationNodes
+namespace OdinSerializer
 {
     /// <summary>
     /// Shared config class for <see cref="SerializationNodeDataReader"/> and <see cref="SerializationNodeDataWriter"/>.

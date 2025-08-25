@@ -16,7 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
     /// <summary>
     /// Not yet documented.

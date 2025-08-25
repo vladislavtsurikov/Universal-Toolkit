@@ -16,19 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(DateTimeFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Custom formatter for the <see cref="DateTime"/> type.
     /// </summary>
-    /// <seealso cref="DateTime" />
+    /// <seealso cref="MinimalBaseFormatter{System.DateTime}" />
     public sealed class DateTimeFormatter : MinimalBaseFormatter<DateTime>
     {
         /// <summary>

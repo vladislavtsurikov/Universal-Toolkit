@@ -16,10 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects
+namespace OdinSerializer
 {
+    using Utilities;
+    using UnityEngine;
+
     /// <summary>
     /// A Unity ScriptableObject which is serialized by the Sirenix serialization system.
     /// </summary>
@@ -34,12 +35,14 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObje
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
+            if (this.SafeIsUnityNull()) return;
             UnitySerializationUtility.DeserializeUnityObject(this, ref this.serializationData);
             this.OnAfterDeserialize();
         }
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
+            if (this.SafeIsUnityNull()) return;
             this.OnBeforeSerialize();
             UnitySerializationUtility.SerializeUnityObject(this, ref this.serializationData);
         }

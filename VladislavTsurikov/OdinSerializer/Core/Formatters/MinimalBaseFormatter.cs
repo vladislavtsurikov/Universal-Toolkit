@@ -16,13 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Minimal baseline formatter. Doesn't come with all the bells and whistles of any of the other BaseFormatter classes.
     /// Common serialization conventions aren't automatically supported, and common deserialization callbacks are not automatically invoked.

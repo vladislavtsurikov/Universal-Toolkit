@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.IO;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using OdinSerializer.Utilities;
+    using System.IO;
+
     internal sealed class CachedMemoryStream : ICacheNotificationReceiver
     {
         public static int InitialCapacity = 1024 * 1; // Initial capacity of 1 kb

@@ -16,18 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(DerivedDictionaryFormatter<,,>), weakFallback: typeof(WeakDictionaryFormatter), priority: -1)]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+
     /// <summary>
     /// Emergency hack class to support serialization of types derived from dictionary
     /// </summary>

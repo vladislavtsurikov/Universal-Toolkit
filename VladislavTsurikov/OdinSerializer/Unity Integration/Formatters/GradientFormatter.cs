@@ -16,23 +16,20 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Reflection;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(GradientFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Reflection;
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="Gradient"/> type.
     /// </summary>
-    /// <seealso cref="Gradient" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Gradient}" />
     public class GradientFormatter : MinimalBaseFormatter<Gradient>
     {
         private static readonly Serializer<GradientAlphaKey[]> AlphaKeysSerializer = Serializer.Get<GradientAlphaKey[]>();

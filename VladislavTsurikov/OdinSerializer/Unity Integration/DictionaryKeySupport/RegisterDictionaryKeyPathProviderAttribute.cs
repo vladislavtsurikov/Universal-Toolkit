@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
+    using System;
+
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class RegisterDictionaryKeyPathProviderAttribute : Attribute
     {

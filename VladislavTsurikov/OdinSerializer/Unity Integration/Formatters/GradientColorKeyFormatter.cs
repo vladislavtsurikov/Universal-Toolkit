@@ -16,21 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(GradientColorKeyFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="GradientColorKey"/> type.
     /// </summary>
-    /// <seealso cref="GradientColorKey" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.GradientColorKey}" />
     public class GradientColorKeyFormatter : MinimalBaseFormatter<GradientColorKey>
     {
         private static readonly Serializer<Color> ColorSerializer = Serializer.Get<Color>();

@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="char"/> type.
     /// </summary>
-    /// <seealso cref="char" />
+    /// <seealso cref="Serializer{System.Char}" />
     public sealed class CharSerializer : Serializer<char>
     {
         /// <summary>

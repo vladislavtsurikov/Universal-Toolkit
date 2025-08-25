@@ -15,11 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Use this attribute to specify that a type that implements the <see cref="ISelfFormatter"/>
     /// interface should *always* format itself regardless of other formatters being specified.

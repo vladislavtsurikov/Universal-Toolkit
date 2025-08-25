@@ -16,21 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Reflection;
-using UnityEngine;
-using UnityEngine.UI;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(ColorBlockFormatterLocator))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Reflection;
+    using UnityEngine;
+
     public class ColorBlockFormatterLocator : IFormatterLocator
     {
         public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
@@ -63,7 +58,7 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
     /// <summary>
     /// Custom formatter for the <see cref="ColorBlock"/> type.
     /// </summary>
-    /// <seealso cref="ColorBlock" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.UI.ColorBlock}" />
     public class ColorBlockFormatter<T> : MinimalBaseFormatter<T>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

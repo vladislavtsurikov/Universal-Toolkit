@@ -15,11 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// <para>
     /// Causes Odin's inspector to completely ignore a given member, preventing it from even being included in an Odin PropertyTree,

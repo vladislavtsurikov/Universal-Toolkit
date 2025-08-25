@@ -16,21 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(RectFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="Rect"/> type.
     /// </summary>
-    /// <seealso cref="Rect" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Rect}" />
     public class RectFormatter : MinimalBaseFormatter<Rect>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();

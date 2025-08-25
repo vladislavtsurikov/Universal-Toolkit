@@ -24,13 +24,15 @@
 #define CAN_EMIT
 #endif
 
-using System;
-using System.Reflection;
-using System.Reflection.Emit;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Reflection;
+
 #if CAN_EMIT
+
+    using System.Reflection.Emit;
+
 #endif
 
     /// <summary>

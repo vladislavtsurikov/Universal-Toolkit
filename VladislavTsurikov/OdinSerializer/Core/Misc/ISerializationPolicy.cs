@@ -15,12 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System.Reflection;
+
     /// <summary>
     /// Defines which members to serialize and deserialize when there aren't any custom formatters for a type.
     /// Usually, it governs the behaviour of the <see cref="FormatterEmitter"/> and <see cref="ReflectionFormatter{T}"/> classes.

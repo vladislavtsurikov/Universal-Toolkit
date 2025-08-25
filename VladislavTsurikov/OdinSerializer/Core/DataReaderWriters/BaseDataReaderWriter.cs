@@ -16,11 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Implements functionality that is shared by both data readers and data writers.
     /// </summary>
@@ -28,6 +27,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
     {
         // Once, there was a stack here. But stacks are slow, so now there's no longer
         //  a stack here and we just do it ourselves.
+        private NodeInfo[] nodes = new NodeInfo[32];
+        private int nodesLength = 0;
 
         /// <summary>
         /// Gets or sets the context's or writer's serialization binder.
@@ -72,7 +73,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <value>
         /// <c>true</c> if the reader or writer is in an array node; otherwise, <c>false</c>.
         /// </value>
-        public bool IsInArrayNode { get { return this.NodeDepth == 0 ? false : this.NodesArray[this.NodeDepth - 1].IsArray; } }
+        public bool IsInArrayNode { get { return this.nodesLength == 0 ? false : this.nodes[this.nodesLength - 1].IsArray; } }
 
         /// <summary>
         /// Gets the current node depth. In other words, the current count of the node stack.
@@ -80,7 +81,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <value>
         /// The current node depth.
         /// </value>
-        protected int NodeDepth { get; private set; } = 0;
+        protected int NodeDepth { get { return this.nodesLength; } }
 
         /// <summary>
         /// Gets the current nodes array. The amount of nodes contained in it is stored in the <see cref="NodeDepth"/> property. The remainder of the array's length is buffer space.
@@ -88,7 +89,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <value>
         /// The current node array.
         /// </value>
-        protected NodeInfo[] NodesArray { get; private set; } = new NodeInfo[32];
+        protected NodeInfo[] NodesArray { get { return this.nodes; } }
 
         /// <summary>
         /// Gets the current node, or <see cref="NodeInfo.Empty"/> if there is no current node.
@@ -96,7 +97,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <value>
         /// The current node.
         /// </value>
-        protected NodeInfo CurrentNode { get { return this.NodeDepth == 0 ? NodeInfo.Empty : this.NodesArray[this.NodeDepth - 1]; } }
+        protected NodeInfo CurrentNode { get { return this.nodesLength == 0 ? NodeInfo.Empty : this.nodes[this.nodesLength - 1]; } }
 
         /// <summary>
         /// Pushes a node onto the node stack.
@@ -104,13 +105,13 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <param name="node">The node to push.</param>
         protected void PushNode(NodeInfo node)
         {
-            if (this.NodeDepth == this.NodesArray.Length)
+            if (this.nodesLength == this.nodes.Length)
             {
                 this.ExpandNodes();
             }
 
-            this.NodesArray[this.NodeDepth] = node;
-            this.NodeDepth++;
+            this.nodes[this.nodesLength] = node;
+            this.nodesLength++;
         }
 
         /// <summary>
@@ -121,13 +122,13 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// <param name="type">The type of the node.</param>
         protected void PushNode(string name, int id, Type type)
         {
-            if (this.NodeDepth == this.NodesArray.Length)
+            if (this.nodesLength == this.nodes.Length)
             {
                 this.ExpandNodes();
             }
 
-            this.NodesArray[this.NodeDepth] = new NodeInfo(name, id, type, false);
-            this.NodeDepth++;
+            this.nodes[this.nodesLength] = new NodeInfo(name, id, type, false);
+            this.nodesLength++;
         }
 
         /// <summary>
@@ -135,36 +136,36 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// </summary>
         protected void PushArray()
         {
-            if (this.NodeDepth == this.NodesArray.Length)
+            if (this.nodesLength == this.nodes.Length)
             {
                 this.ExpandNodes();
             }
 
-            if (this.NodeDepth == 0 || this.NodesArray[this.NodeDepth - 1].IsArray)
+            if (this.nodesLength == 0 || this.nodes[this.nodesLength - 1].IsArray)
             {
-                this.NodesArray[this.NodeDepth] = new NodeInfo(null, -1, null, true);
+                this.nodes[this.nodesLength] = new NodeInfo(null, -1, null, true);
             }
             else
             {
-                var current = this.NodesArray[this.NodeDepth - 1];
-                this.NodesArray[this.NodeDepth] = new NodeInfo(current.Name, current.Id, current.Type, true);
+                var current = this.nodes[this.nodesLength - 1];
+                this.nodes[this.nodesLength] = new NodeInfo(current.Name, current.Id, current.Type, true);
             }
             
-            this.NodeDepth++;
+            this.nodesLength++;
         }
 
         private void ExpandNodes()
         {
-            var newArr = new NodeInfo[this.NodesArray.Length * 2];
+            var newArr = new NodeInfo[this.nodes.Length * 2];
 
-            var oldNodes = this.NodesArray;
+            var oldNodes = this.nodes;
 
             for (int i = 0; i < oldNodes.Length; i++)
             {
                 newArr[i] = oldNodes[i];
             }
 
-            this.NodesArray = newArr;
+            this.nodes = newArr;
         }
 
         /// <summary>
@@ -178,7 +179,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// </exception>
         protected void PopNode(string name)
         {
-            if (this.NodeDepth == 0)
+            if (this.nodesLength == 0)
             {
                 throw new InvalidOperationException("There are no nodes to pop.");
             }
@@ -191,7 +192,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
             //    throw new InvalidOperationException("Tried to pop node with name " + name + " but current node's name is " + current.Name);
             //}
 
-            this.NodeDepth--;
+            this.nodesLength--;
         }
 
         /// <summary>
@@ -199,22 +200,22 @@ namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
         /// </summary>
         protected void PopArray()
         {
-            if (this.NodeDepth == 0)
+            if (this.nodesLength == 0)
             {
                 throw new InvalidOperationException("There are no nodes to pop.");
             }
 
-            if (this.NodesArray[this.NodeDepth - 1].IsArray == false)
+            if (this.nodes[this.nodesLength - 1].IsArray == false)
             {
                 throw new InvalidOperationException("Was not in array when exiting array.");
             }
 
-            this.NodeDepth--;
+            this.nodesLength--;
         }
 
         protected void ClearNodes()
         {
-            this.NodeDepth = 0;
+            this.nodesLength = 0;
         }
     }
 }

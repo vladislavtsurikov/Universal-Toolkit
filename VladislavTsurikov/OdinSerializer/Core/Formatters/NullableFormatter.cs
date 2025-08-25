@@ -16,16 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(NullableFormatter<>), weakFallback: typeof(WeakNullableFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Formatter for all <see cref="System.Nullable{T}"/> types.
     /// </summary>

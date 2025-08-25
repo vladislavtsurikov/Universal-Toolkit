@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Reflection;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Reflection;
+
     /// <summary>
     /// Extends various Unity classes.
     /// </summary>

@@ -16,15 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using OdinSerializer.Utilities;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
+
     /// <summary>
     /// An attribute that lets you help the DefaultSerializationBinder bind type names to types. This is useful if you're renaming a type,
     /// that would result in data loss, and what to specify the new type name to avoid loss of data.

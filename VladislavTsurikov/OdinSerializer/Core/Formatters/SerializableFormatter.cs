@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Reflection;
-using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using System.Reflection;
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Formatter for all types that implement the ISerializable interface.
     /// </summary>

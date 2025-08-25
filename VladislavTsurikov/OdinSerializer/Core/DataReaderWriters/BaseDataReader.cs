@@ -16,14 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.IO;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters
+namespace OdinSerializer
 {
+    using System;
+    using System.IO;
+
     /// <summary>
     /// Provides basic functionality and overridable abstract methods for implementing a data reader.
     /// <para />
