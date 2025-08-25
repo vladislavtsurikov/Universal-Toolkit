@@ -1,9 +1,9 @@
 using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
+using OdinSerializer;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
 
 namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
 {
