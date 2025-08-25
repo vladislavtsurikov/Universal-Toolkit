@@ -7,9 +7,6 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
     {
         public readonly Type Type;
 
-        public EventCallbacksTypeAttribute(Type type)
-        {
-            Type = type;
-        }
+        public EventCallbacksTypeAttribute(Type type) => Type = type;
     }
 }

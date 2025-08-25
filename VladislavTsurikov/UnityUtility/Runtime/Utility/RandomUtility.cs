@@ -4,10 +4,10 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 {
     public static class RandomUtility
     {
-        public static void ChangeRandomSeed() 
+        public static void ChangeRandomSeed()
         {
-            int randomSeed = Random.Range(0, int.MaxValue);
-            
+            var randomSeed = Random.Range(0, int.MaxValue);
+
             Random.InitState(randomSeed);
         }
     }

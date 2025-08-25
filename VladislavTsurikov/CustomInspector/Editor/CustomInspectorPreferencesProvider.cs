@@ -16,7 +16,7 @@ namespace VladislavTsurikov.CustomInspector.Editor
                 label = "Custom Inspector",
                 guiHandler = searchContext =>
                 {
-                    var settings = CustomInspectorPreferences.Instance;
+                    CustomInspectorPreferences settings = CustomInspectorPreferences.Instance;
 
                     if (settings == null)
                     {
@@ -24,7 +24,8 @@ namespace VladislavTsurikov.CustomInspector.Editor
                         return;
                     }
 
-                    settings.ShowFieldWithHideInInspectorAttribute = EditorGUILayout.Toggle("Show Field With Hide In Inspector Attribute", settings.ShowFieldWithHideInInspectorAttribute);
+                    settings.ShowFieldWithHideInInspectorAttribute = EditorGUILayout.Toggle(
+                        "Show Field With Hide In Inspector Attribute", settings.ShowFieldWithHideInInspectorAttribute);
 
                     if (GUI.changed)
                     {

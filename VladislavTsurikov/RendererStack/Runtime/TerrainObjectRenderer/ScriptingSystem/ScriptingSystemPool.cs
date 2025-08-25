@@ -4,37 +4,27 @@ using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem
 {
-	public class ScriptingSystemPool : ObjectPool<GameObject>
-	{
-		private readonly PrototypeScriptingManager _prototypeScriptingManager;
+    public class ScriptingSystemPool : ObjectPool<GameObject>
+    {
+        private readonly PrototypeScriptingManager _prototypeScriptingManager;
 
-		public ScriptingSystemPool(PrototypeScriptingManager prototypeScriptingManager) : base(false)
-		{
-			_prototypeScriptingManager = prototypeScriptingManager;
-		}
+        public ScriptingSystemPool(PrototypeScriptingManager prototypeScriptingManager) : base(false) =>
+            _prototypeScriptingManager = prototypeScriptingManager;
 
-		public GameObject Get(TerrainObjectInstance instance)
-		{
-			GameObject go = Get();
+        public GameObject Get(TerrainObjectInstance instance)
+        {
+            GameObject go = Get();
 
-			_prototypeScriptingManager.MoveGameObject(instance, go);
+            _prototypeScriptingManager.MoveGameObject(instance, go);
 
-			return go;
-		}
-		
-		protected override void OnGet(GameObject go)
-		{
-			go.SetActive(true);
-		}
+            return go;
+        }
 
-		protected override void OnRelease(GameObject go)
-		{
-			go.SetActive(false);
-		}
+        protected override void OnGet(GameObject go) => go.SetActive(true);
 
-		protected override GameObject OnCreateObject()
-		{
-			return _prototypeScriptingManager.CreateGameObject(CountAll.ToString());
-		}
-	}
+        protected override void OnRelease(GameObject go) => go.SetActive(false);
+
+        protected override GameObject OnCreateObject() =>
+            _prototypeScriptingManager.CreateGameObject(CountAll.ToString());
+    }
 }

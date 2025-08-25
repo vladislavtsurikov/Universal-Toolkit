@@ -16,13 +16,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using OdinSerializer.Utilities;
+using UnityEngine;
+
 namespace OdinSerializer
 {
-    using Utilities;
-    using UnityEngine;
-
     /// <summary>
-    /// A Unity ScriptableObject which is serialized by the Sirenix serialization system.
+    ///     A Unity ScriptableObject which is serialized by the Sirenix serialization system.
     /// </summary>
 #if ODIN_INSPECTOR
     [Sirenix.OdinInspector.ShowOdinSerializedPropertiesInInspector]
@@ -30,32 +30,41 @@ namespace OdinSerializer
 
     public abstract class SerializedScriptableObject : ScriptableObject, ISerializationCallbackReceiver
     {
-        [SerializeField, HideInInspector]
+        [SerializeField]
+        [HideInInspector]
         private SerializationData serializationData;
 
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            if (this.SafeIsUnityNull()) return;
-            UnitySerializationUtility.DeserializeUnityObject(this, ref this.serializationData);
-            this.OnAfterDeserialize();
+            if (this.SafeIsUnityNull())
+            {
+                return;
+            }
+
+            UnitySerializationUtility.DeserializeUnityObject(this, ref serializationData);
+            OnAfterDeserialize();
         }
 
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
-            if (this.SafeIsUnityNull()) return;
-            this.OnBeforeSerialize();
-            UnitySerializationUtility.SerializeUnityObject(this, ref this.serializationData);
+            if (this.SafeIsUnityNull())
+            {
+                return;
+            }
+
+            OnBeforeSerialize();
+            UnitySerializationUtility.SerializeUnityObject(this, ref serializationData);
         }
 
         /// <summary>
-        /// Invoked after deserialization has taken place.
+        ///     Invoked after deserialization has taken place.
         /// </summary>
         protected virtual void OnAfterDeserialize()
         {
         }
 
         /// <summary>
-        /// Invoked before serialization has taken place.
+        ///     Invoked before serialization has taken place.
         /// </summary>
         protected virtual void OnBeforeSerialize()
         {

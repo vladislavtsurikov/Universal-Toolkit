@@ -8,13 +8,6 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
 {
     public class AttributeCache
     {
-        // Using lists instead of hashsets because:
-        //  - Insertion will be faster
-        //  - Iteration will be just as fast
-        //  - We don't need contains lookups
-        public List<Attribute> inheritedAttributes { get; } = new List<Attribute>();
-        public List<Attribute> definedAttributes { get; } = new List<Attribute>();
-
         // Important to use Attribute.GetCustomAttributes, because MemberInfo.GetCustomAttributes
         // ignores the inherited parameter on properties and events
 
@@ -134,9 +127,16 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
             }
         }
 
+        // Using lists instead of hashsets because:
+        //  - Insertion will be faster
+        //  - Iteration will be just as fast
+        //  - We don't need contains lookups
+        public List<Attribute> inheritedAttributes { get; } = new();
+        public List<Attribute> definedAttributes { get; } = new();
+
         private void Cache(Attribute[] attributeObjects, List<Attribute> cache)
         {
-            foreach (var attributeObject in attributeObjects)
+            foreach (Attribute attributeObject in attributeObjects)
             {
                 cache.Add(attributeObject);
             }
@@ -144,9 +144,9 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
 
         private bool HasAttribute(Type attributeType, List<Attribute> cache)
         {
-            for (int i = 0; i < cache.Count; i++)
+            for (var i = 0; i < cache.Count; i++)
             {
-                var attribute = cache[i];
+                Attribute attribute = cache[i];
 
                 if (attributeType.IsInstanceOfType(attribute))
                 {
@@ -159,9 +159,9 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
 
         private Attribute GetAttribute(Type attributeType, List<Attribute> cache)
         {
-            for (int i = 0; i < cache.Count; i++)
+            for (var i = 0; i < cache.Count; i++)
             {
-                var attribute = cache[i];
+                Attribute attribute = cache[i];
 
                 if (attributeType.IsInstanceOfType(attribute))
                 {
@@ -174,9 +174,9 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
 
         private IEnumerable<Attribute> GetAttributes(Type attributeType, List<Attribute> cache)
         {
-            for (int i = 0; i < cache.Count; i++)
+            for (var i = 0; i < cache.Count; i++)
             {
-                var attribute = cache[i];
+                Attribute attribute = cache[i];
 
                 if (attributeType.IsInstanceOfType(attribute))
                 {
@@ -191,10 +191,8 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
             {
                 return HasAttribute(attributeType, inheritedAttributes);
             }
-            else
-            {
-                return HasAttribute(attributeType, definedAttributes);
-            }
+
+            return HasAttribute(attributeType, definedAttributes);
         }
 
         public Attribute GetAttribute(Type attributeType, bool inherit = true)
@@ -203,10 +201,8 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
             {
                 return GetAttribute(attributeType, inheritedAttributes);
             }
-            else
-            {
-                return GetAttribute(attributeType, definedAttributes);
-            }
+
+            return GetAttribute(attributeType, definedAttributes);
         }
 
         public IEnumerable<Attribute> GetAttributes(Type attributeType, bool inherit = true)
@@ -215,28 +211,20 @@ namespace VladislavTsurikov.AttributeUtility.Runtime
             {
                 return GetAttributes(attributeType, inheritedAttributes);
             }
-            else
-            {
-                return GetAttributes(attributeType, definedAttributes);
-            }
+
+            return GetAttributes(attributeType, definedAttributes);
         }
 
         public bool HasAttribute<TAttribute>(bool inherit = true)
-            where TAttribute : Attribute
-        {
-            return HasAttribute(typeof(TAttribute), inherit);
-        }
+            where TAttribute : Attribute =>
+            HasAttribute(typeof(TAttribute), inherit);
 
         public TAttribute GetAttribute<TAttribute>(bool inherit = true)
-            where TAttribute : Attribute
-        {
-            return (TAttribute)GetAttribute(typeof(TAttribute), inherit);
-        }
+            where TAttribute : Attribute =>
+            (TAttribute)GetAttribute(typeof(TAttribute), inherit);
 
         public IEnumerable<TAttribute> GetAttributes<TAttribute>(bool inherit = true)
-            where TAttribute : Attribute
-        {
-            return GetAttributes(typeof(TAttribute), inherit).Cast<TAttribute>();
-        }
+            where TAttribute : Attribute =>
+            GetAttributes(typeof(TAttribute), inherit).Cast<TAttribute>();
     }
 }

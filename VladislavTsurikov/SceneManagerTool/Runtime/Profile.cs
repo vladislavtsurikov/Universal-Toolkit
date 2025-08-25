@@ -1,24 +1,21 @@
-﻿using UnityEngine;
+﻿using OdinSerializer;
+using UnityEngine;
 using UnityEngine.Windows;
 using VladislavTsurikov.Core.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-
+using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
 #if UNITY_EDITOR
 using VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem;
 using UnityEditor;
 #endif
 
-using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
-
-namespace VladislavTsurikov.SceneManagerTool.Runtime 
+namespace VladislavTsurikov.SceneManagerTool.Runtime
 {
-    [CreateAssetMenu(fileName = "Profile", menuName = "SceneManager/Profile")] 
+    [CreateAssetMenu(fileName = "Profile", menuName = "SceneManager/Profile")]
     public class Profile : SerializedScriptableObject
-    { 
-        [OdinSerialize] 
-        public BuildSceneCollectionStack BuildSceneCollectionStack = new BuildSceneCollectionStack(); 
-        
+    {
+        [OdinSerialize]
+        public BuildSceneCollectionStack BuildSceneCollectionStack = new();
+
 #if UNITY_EDITOR
         public BuildSceneCollectionStackEditor BuildSceneCollectionStackEditor;
 #endif
@@ -26,24 +23,21 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
         public static Profile Current => SceneManagerData.Instance.Profile;
 
         public void Setup()
-        { 
-                BuildSceneCollectionStack.Setup();
+        {
+            BuildSceneCollectionStack.Setup();
 #if UNITY_EDITOR
-                BuildSceneCollectionStackEditor = new BuildSceneCollectionStackEditor(BuildSceneCollectionStack);
+            BuildSceneCollectionStackEditor = new BuildSceneCollectionStackEditor(BuildSceneCollectionStack);
 #endif
         }
 
 #if UNITY_EDITOR
-        public void MaskAsDirty()
-        { 
-                EditorUtility.SetDirty(this);
-        }
+        public void MaskAsDirty() => EditorUtility.SetDirty(this);
 #endif
         public static Profile CreateProfile()
         {
 #if UNITY_EDITOR
-            Directory.CreateDirectory(SceneManagerPath.PathToResourcesSceneManager); 
-            
+            Directory.CreateDirectory(SceneManagerPath.PathToResourcesSceneManager);
+
             var path = string.Empty;
 
             path += "Profile.asset";
@@ -51,13 +45,13 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             path = CommonPath.CombinePath(SceneManagerPath.PathToResourcesSceneManager, path);
             path = AssetDatabase.GenerateUniqueAssetPath(path);
 
-            var asset = CreateInstance<Profile>(); 
+            var asset = CreateInstance<Profile>();
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
             return asset;
 
-#else 
+#else
             return null;
 #endif
         }

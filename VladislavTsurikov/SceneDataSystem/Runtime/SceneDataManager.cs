@@ -3,29 +3,29 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using OdinSerializer;
-#if UNITY_EDITOR
-using UnityEditor.SceneManagement;
-#endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
+#if UNITY_EDITOR
+using UnityEditor.SceneManagement;
+#endif
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {
     [ExecuteInEditMode]
     public class SceneDataManager : SerializedMonoBehaviour
     {
-        [NonSerialized]
-        private Sector _sector;
         [OdinSerialize]
         private SceneType _sceneType;
 
+        [NonSerialized]
+        private Sector _sector;
+
+        public SceneDataStack SceneDataStack = new();
+
         public SceneType SceneType
         {
-            get
-            {
-                return _sceneType;
-            }
+            get { return _sceneType; }
             set
             {
                 if (_sceneType != value)
@@ -40,10 +40,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                 }
             }
         }
-            
-        public SceneDataStack SceneDataStack = new SceneDataStack();
+
         public Scene Scene => gameObject.scene;
-        
+
         public bool IsSetup { get; private set; }
 
         public Sector Sector
@@ -63,51 +62,26 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                     {
                         return null;
                     }
-                    
+
                     sectorLayerManager.Setup();
 
-                    foreach (var sectorLayer in sectorLayerManager.SectorLayerList)
+                    foreach (SectorLayer sectorLayer in sectorLayerManager.SectorLayerList)
+                    foreach (Sector sector in sectorLayer.SectorList)
                     {
-                        foreach (var sector in sectorLayer.SectorList)
+                        if (sector.SceneReference.SceneName == Scene.name)
                         {
-                            if (sector.SceneReference.SceneName == Scene.name)
-                            {
-                                _sector = sector;
-                                break;
-                            }
+                            _sector = sector;
+                            break;
                         }
                     }
                 }
-                
+
                 return _sector;
             }
         }
 
-        protected override void OnAfterDeserialize()
-        {
-            if (SceneDataStack == null)
-            {
-                SceneDataStack = new SceneDataStack();
-            }
-        }
-        
-        private void Awake()
-        {
-            transform.SetSiblingIndex(0);
-        }
+        private void Awake() => transform.SetSiblingIndex(0);
 
-        private void OnEnable()
-        {
-            Setup(true); 
-        }
-
-        private void OnDisable() 
-        {
-            IsSetup = false;
-            
-            SceneDataStack.OnDisable();
-        }
-        
         private void LateUpdate()
         {
             if (!gameObject.scene.isLoaded)
@@ -120,12 +94,29 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                 Setup();
             }
 
-            for (int i = 0; i < SceneDataStack.ElementList.Count; i++)
+            for (var i = 0; i < SceneDataStack.ElementList.Count; i++)
             {
                 SceneDataStack.ElementList[i]?.LateUpdate();
             }
         }
-        
+
+        private void OnEnable() => Setup(true);
+
+        private void OnDisable()
+        {
+            IsSetup = false;
+
+            SceneDataStack.OnDisable();
+        }
+
+        protected override void OnAfterDeserialize()
+        {
+            if (SceneDataStack == null)
+            {
+                SceneDataStack = new SceneDataStack();
+            }
+        }
+
         public async UniTask Setup(bool forceSetup = false, CancellationToken cancellationToken = default)
         {
             if (!gameObject.scene.isLoaded || !gameObject.activeInHierarchy)
@@ -144,32 +135,32 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
 
             IsSetup = true;
 
-            await SceneDataStack.Setup(forceSetup,new object[]{this}, cancellationToken);
+            await SceneDataStack.Setup(forceSetup, new object[] { this }, cancellationToken);
         }
 
         public bool RemoveMultipleSceneDataManagers()
         {
             GameObject[] sceneRoots = Scene.GetRootGameObjects();
-            List<GameObject> sceneDataManagers = new List<GameObject>();
-            foreach(GameObject root in sceneRoots)
+            var sceneDataManagers = new List<GameObject>();
+            foreach (GameObject root in sceneRoots)
             {
-                if(root.name == "Scene Data Manager") 
+                if (root.name == "Scene Data Manager")
                 {
                     sceneDataManagers.Add(root);
                 }
             }
 
-            bool happenedDestroy = false;
+            var happenedDestroy = false;
 
             if (sceneDataManagers.Count > 1)
             {
-                for (int i = sceneDataManagers.Count - 1; i >= 0; i--)
+                for (var i = sceneDataManagers.Count - 1; i >= 0; i--)
                 {
                     if (i == 0)
                     {
                         break;
                     }
-                    
+
                     DestroyImmediate(sceneDataManagers[i].gameObject);
                     happenedDestroy = true;
                 }

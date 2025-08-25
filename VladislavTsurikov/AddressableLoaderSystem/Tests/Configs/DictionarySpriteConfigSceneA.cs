@@ -8,6 +8,6 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
     public class DictionarySpriteConfigSceneA : BaseConfig
     {
         [SerializeField]
-        public SerializedDictionary<string, AssetReferenceSprite> Sprites = new ();
+        public SerializedDictionary<string, AssetReferenceSprite> Sprites = new();
     }
 }

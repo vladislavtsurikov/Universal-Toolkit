@@ -8,9 +8,6 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Layouts
     {
         public VisualTreeAsset UxmlReference;
 
-        public LayoutInfo()
-        {
-            UxmlReference = null;
-        }
+        public LayoutInfo() => UxmlReference = null;
     }
 }

@@ -12,20 +12,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
     {
         private PoissonDisc _poissonDisc;
 
-        public override void OnEnable()
-        {
-            _poissonDisc = (PoissonDisc)Target;
-        }
+        public override void OnEnable() => _poissonDisc = (PoissonDisc)Target;
 
-        public override void OnGUI(Rect rect, int index) 
+        public override void OnGUI(Rect rect, int index)
         {
-            _poissonDisc.PoissonDiscSize = EditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Poisson Disc Size"), _poissonDisc.PoissonDiscSize);
+            _poissonDisc.PoissonDiscSize = EditorGUI.FloatField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Poisson Disc Size"), _poissonDisc.PoissonDiscSize);
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
 

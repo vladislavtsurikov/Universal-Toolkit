@@ -14,17 +14,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn
     public class RespawnUnityTerrainDetail : Respawn
     {
         private readonly PrototypeTerrainDetail _modifiedTerrainDetailProto;
-        
-        public RespawnUnityTerrainDetail(PrototypeTerrainDetail proto, StamperTool stamperToolTool) : base(stamperToolTool)
-        {
+
+        public RespawnUnityTerrainDetail(PrototypeTerrainDetail proto, StamperTool stamperToolTool) : base(
+            stamperToolTool) =>
             _modifiedTerrainDetailProto = proto;
-        }
 
         public override void OnRespawn()
         {
-            Area area = (Area)StamperTool.GetElement(typeof(Area));
-            
-            CallbackList<Prototype> protoTerrainDetailList = new CallbackList<Prototype>();
+            var area = (Area)StamperTool.GetElement(typeof(Area));
+
+            var protoTerrainDetailList = new CallbackList<Prototype>();
             protoTerrainDetailList.Add(_modifiedTerrainDetailProto);
             UnspawnTerrainDetail.Unspawn(protoTerrainDetailList, false);
 
@@ -32,10 +31,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(StamperTool.transform.position), 
+            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(StamperTool.transform.position),
                 layerSettings.GetCurrentPaintLayers(group.PrototypeType));
-                    	
-            if(rayHit != null)
+
+            if (rayHit != null)
             {
                 BoxArea boxArea = area.GetAreaVariables(rayHit);
 

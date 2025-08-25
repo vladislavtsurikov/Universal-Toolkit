@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.SceneDataSystem.Runtime;
@@ -11,40 +13,48 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
     {
         public bool ForceUpdateRendererData = false;
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
-            SetupSceneData(); 
+            SetupSceneData();
             SetupRenderer();
+
+            return UniTask.CompletedTask;
         }
-        
+
         private void SetupSceneData()
         {
             AddSceneDataAttribute[] addSceneDataAttributes = GetType().GetAttributes<AddSceneDataAttribute>().ToArray();
 
             List<SceneDataManager> sceneDataManagers = SceneDataManagerUtility.GetAllSceneDataManager();
-            
-            foreach (var addSceneDataAttribute in addSceneDataAttributes)
+
+            foreach (AddSceneDataAttribute addSceneDataAttribute in addSceneDataAttributes)
+            foreach (Type type in addSceneDataAttribute.Types)
             {
-                foreach (var type in addSceneDataAttribute.Types)
+                RequiredSceneData.AddRequiredType(type);
+
+                foreach (SceneDataManager sceneDataManager in sceneDataManagers)
                 {
-                    RequiredSceneData.AddRequiredType(type);
-                    
-                    foreach (var sceneDataManager in sceneDataManagers)
-                    {
-                        sceneDataManager.SceneDataStack.SetupElement(type, true);
-                    }
+                    sceneDataManager.SceneDataStack.SetupElement(type, true);
                 }
             }
         }
 
-        protected override void OnCreate()
+        protected override void OnCreate() => GlobalSettings.GlobalSettings.Instance.Setup();
+
+        protected virtual void SetupRenderer()
         {
-            GlobalSettings.GlobalSettings.Instance.Setup();
         }
 
-        protected virtual void SetupRenderer(){}
-        public virtual void Render(){}
-        public virtual void DrawDebug(){}
-        public virtual void CheckChanges(){}
+        public virtual void Render()
+        {
+        }
+
+        public virtual void DrawDebug()
+        {
+        }
+
+        public virtual void CheckChanges()
+        {
+        }
     }
 }

@@ -7,8 +7,6 @@ using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Utility;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -19,36 +17,122 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
     [Serializable]
     public class ComponentStackManager
     {
-        [OdinSerialize] 
+        private Type _addElementsAttribute;
+        private Type _addGeneralElementsAttribute;
+
+        [OdinSerialize]
         private GeneralComponentStack _generalGeneralComponentStack;
-        [OdinSerialize] 
-        private ToolsComponentStack _toolsComponentStack;
 
         private Type _prototypeType;
-        private Type _addGeneralElementsAttribute;
-        private Type _addElementsAttribute;
+
+        [OdinSerialize]
+        private ToolsComponentStack _toolsComponentStack;
 
         public GeneralComponentStack GeneralComponentStack => _generalGeneralComponentStack;
         public ToolsComponentStack ToolsComponentStack => _toolsComponentStack;
-        
+
+        internal void SetupElementStack(Type addGeneralElementsAttribute, Type addElementsAttribute, Type prototypeType)
+        {
+            _prototypeType = prototypeType;
+            _addGeneralElementsAttribute = addGeneralElementsAttribute;
+            _addElementsAttribute = addElementsAttribute;
+
+            _generalGeneralComponentStack ??= new GeneralComponentStack();
+            _toolsComponentStack ??= new ToolsComponentStack();
+
+            _generalGeneralComponentStack.Setup(true, new object[] { addGeneralElementsAttribute, prototypeType })
+                .Forget();
+            _toolsComponentStack.Setup(true, new object[] { addElementsAttribute, prototypeType }).Forget();
+        }
+
+        public List<Type> GetAllElementTypes(Type toolType, Type prototypeType = null)
+        {
+            List<Type> types = GetGeneralElementTypes(toolType, prototypeType);
+            types.AddRange(GetElementTypes(toolType, prototypeType));
+
+            return types;
+        }
+
+        public List<Type> GetGeneralElementTypes(Type toolType, Type prototypeType = null)
+        {
+            var drawTypes = new List<Type>();
+
+            foreach (var attribute in MegaWorldComponentsUtility.GetAttributes(_addGeneralElementsAttribute,
+                         _prototypeType, toolType))
+            {
+                var addComponentsAttribute = (AddComponentsAttribute)attribute;
+
+                if (prototypeType != null)
+                {
+                    if (!addComponentsAttribute.PrototypeTypes.Contains(prototypeType))
+                    {
+                        continue;
+                    }
+                }
+
+                drawTypes.AddRange(addComponentsAttribute.Types);
+            }
+
+            return drawTypes;
+        }
+
+        public List<Type> GetElementTypes(Type toolType, Type prototypeType = null)
+        {
+            var drawTypes = new List<Type>();
+
+            foreach (var attribute in MegaWorldComponentsUtility.GetAttributes(_addElementsAttribute, _prototypeType,
+                         toolType))
+            {
+                var addComponentsAttribute = (AddComponentsAttribute)attribute;
+
+                if (prototypeType != null)
+                {
+                    if (!addComponentsAttribute.PrototypeTypes.Contains(prototypeType))
+                    {
+                        continue;
+                    }
+                }
+
+                drawTypes.AddRange(addComponentsAttribute.Types);
+            }
+
+            return drawTypes;
+        }
+
+        internal void ResetElementsStacks(Type toolType)
+        {
+            foreach (Type type in GetGeneralElementTypes(toolType))
+            {
+                _generalGeneralComponentStack.Reset(type);
+            }
+
+            ToolComponentStack toolComponentStack = ToolsComponentStack.GetToolStackElement(toolType);
+
+            toolComponentStack.ComponentStack.Reset();
+        }
+
 #if UNITY_EDITOR
-        [NonSerialized] 
+        [NonSerialized]
         private IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor> _generalComponentStackEditor;
+
         public IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor> GeneralComponentStackEditor
         {
             get
             {
                 if (_generalComponentStackEditor == null)
                 {
-                    _generalComponentStackEditor = new IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor>(_generalGeneralComponentStack);
+                    _generalComponentStackEditor =
+                        new IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor>(
+                            _generalGeneralComponentStack);
                 }
 
                 return _generalComponentStackEditor;
             }
         }
-        
-        [NonSerialized] 
+
+        [NonSerialized]
         private ToolsComponentStackEditor _toolsComponentStackEditor;
+
         public ToolsComponentStackEditor ToolsComponentStackEditor
         {
             get
@@ -63,83 +147,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
         }
 #endif
 
-        internal void SetupElementStack(Type addGeneralElementsAttribute, Type addElementsAttribute, Type prototypeType)
-        {
-            _prototypeType = prototypeType;
-            _addGeneralElementsAttribute = addGeneralElementsAttribute;
-            _addElementsAttribute = addElementsAttribute;
-            
-            _generalGeneralComponentStack ??= new GeneralComponentStack();
-            _toolsComponentStack ??= new ToolsComponentStack();
-
-            _generalGeneralComponentStack.Setup(true, new object[]{addGeneralElementsAttribute, prototypeType}).Forget();
-            _toolsComponentStack.Setup(true, new object[]{addElementsAttribute, prototypeType}).Forget();
-        }
-
-        public List<Type> GetAllElementTypes(Type toolType, Type prototypeType = null)
-        {
-            List<Type> types = GetGeneralElementTypes(toolType, prototypeType);
-            types.AddRange(GetElementTypes(toolType, prototypeType));
-
-            return types;
-        }
-
-        public List<Type> GetGeneralElementTypes(Type toolType, Type prototypeType = null)
-        {
-            List<Type> drawTypes = new List<Type>();
-
-            foreach (var attribute in MegaWorldComponentsUtility.GetAttributes(_addGeneralElementsAttribute, _prototypeType, toolType))
-            {
-                AddComponentsAttribute addComponentsAttribute = (AddComponentsAttribute)attribute;
-                
-                if (prototypeType != null)
-                {
-                    if (!addComponentsAttribute.PrototypeTypes.Contains(prototypeType))
-                    {
-                        continue;
-                    }
-                }
-                
-                drawTypes.AddRange(addComponentsAttribute.Types);
-            }
-
-            return drawTypes;
-        }
-	    
-        public List<Type> GetElementTypes(Type toolType, Type prototypeType = null)
-        {
-            List<Type> drawTypes = new List<Type>();
-
-            foreach (var attribute in MegaWorldComponentsUtility.GetAttributes(_addElementsAttribute, _prototypeType, toolType))
-            {
-                AddComponentsAttribute addComponentsAttribute = (AddComponentsAttribute)attribute;
-
-                if (prototypeType != null)
-                {
-                    if (!addComponentsAttribute.PrototypeTypes.Contains(prototypeType))
-                    {
-                        continue;
-                    }
-                }
-                
-                drawTypes.AddRange(addComponentsAttribute.Types);
-            }
-
-            return drawTypes;
-        }
-        
-        internal void ResetElementsStacks(Type toolType)
-        {
-            foreach (var type in GetGeneralElementTypes(toolType))
-            {
-                _generalGeneralComponentStack.Reset(type);
-            }
-
-            ToolComponentStack toolComponentStack = ToolsComponentStack.GetToolStackElement(toolType);
-            
-            toolComponentStack.ComponentStack.Reset();
-        }
-
 #if UNITY_EDITOR
         public void DrawToolElements(Type toolType)
         {
@@ -149,17 +156,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
             GeneralComponentStackEditor.DrawElements(drawGeneralTypes);
             ToolsComponentStackEditor.DrawElements(toolType, drawTypes);
         }
-        
-        public void DrawElement(Type type)
-        {
-            GeneralComponentStackEditor.DrawElement(type);
-        }
-        
-        public void DrawElement(Type type, Type toolType)
-        {
+
+        public void DrawElement(Type type) => GeneralComponentStackEditor.DrawElement(type);
+
+        public void DrawElement(Type type, Type toolType) =>
             ToolsComponentStackEditor.DrawElements(toolType, new List<Type> { type });
-        }
-        
+
         public void ResetElementsMenu(Type toolType)
         {
             var menu = new GenericMenu();

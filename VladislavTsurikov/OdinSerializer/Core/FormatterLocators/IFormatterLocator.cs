@@ -16,12 +16,13 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     public interface IFormatterLocator
     {
-        bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter);
+        bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter);
     }
 }

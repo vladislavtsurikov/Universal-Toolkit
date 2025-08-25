@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem;
 using VladislavTsurikov.ReflectionUtility;
@@ -11,14 +10,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     [Serializable]
     [Name("Unity/GameObject")]
-    [DropObjects(new[]{typeof(GameObject)})]
+    [DropObjects(new[] { typeof(GameObject) })]
     [MissingIconsWarning("Drag & Drop Prefabs Here")]
-    [AddDefaultGroupComponents(new []{typeof(ContainerForGameObjects)})]
+    [AddDefaultGroupComponents(new[] { typeof(ContainerForGameObjects) })]
     public class PrototypeGameObject : PlacedObjectPrototype
     {
         public override bool IsSamePrototypeObject(Object obj)
         {
-            GameObject go = (GameObject)obj;
+            var go = (GameObject)obj;
 
             return GameObjectUtility.IsSameGameObject(go, Prefab);
         }

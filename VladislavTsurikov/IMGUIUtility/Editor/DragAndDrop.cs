@@ -4,18 +4,12 @@ using UnityEngine;
 namespace VladislavTsurikov.IMGUIUtility.Editor
 {
     public class DragAndDrop
-	{
-        private enum State
-		{
-			None,
-			Dragging,
-			DragPerform
-		}
-        
+    {
+        private const float DragStartDistance = 14.0f;
+
         private object _dragData;
-		private Vector2 _mouseDownPosition;
-		private State _state = State.None;
-		private const float DragStartDistance = 14.0f;
+        private Vector2 _mouseDownPosition;
+        private State _state = State.None;
 
         public void OnBeginGUI()
         {
@@ -26,12 +20,12 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 _mouseDownPosition = e.mousePosition;
             }
 
-            if(_state == State.Dragging)
+            if (_state == State.Dragging)
             {
                 if (e.type == EventType.MouseUp && e.button == 0)
-                {                        
+                {
                     _state = State.DragPerform;
-                }  
+                }
             }
         }
 
@@ -39,15 +33,15 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
         {
             Event e = Event.current;
 
-            if(_state == State.DragPerform)
+            if (_state == State.DragPerform)
             {
                 _dragData = null;
                 _state = State.None;
             }
 
-            if(_dragData != null)
+            if (_dragData != null)
             {
-                if(_state == State.None)
+                if (_state == State.None)
                 {
                     if (e.type == EventType.MouseDrag &&
                         (_mouseDownPosition - e.mousePosition).magnitude > DragStartDistance)
@@ -61,9 +55,9 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
         public void AddDragObject(object data)
         {
             if (data == null && _dragData != null)
-			{
-				return;
-			}
+            {
+                return;
+            }
 
             if (Event.current.type == EventType.MouseDown && Event.current.button == 0)
             {
@@ -71,19 +65,17 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
             }
         }
 
-        public bool IsDragging()
-        {
-            return _state == State.Dragging;
-        }
+        public bool IsDragging() => _state == State.Dragging;
 
-        public bool IsDragPerform()
-        {
-            return _state == State.DragPerform;
-        }
+        public bool IsDragPerform() => _state == State.DragPerform;
 
-        public object GetData()
+        public object GetData() => _dragData;
+
+        private enum State
         {
-            return _dragData;
+            None,
+            Dragging,
+            DragPerform
         }
     }
 }

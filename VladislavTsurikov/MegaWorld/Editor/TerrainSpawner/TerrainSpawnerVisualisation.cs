@@ -18,39 +18,42 @@ namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
         [DrawGizmo(GizmoType.InSelectionHierarchy | GizmoType.Selected)]
         private static void DrawGizmoForArea(Runtime.TerrainSpawner.TerrainSpawner stamper, GizmoType gizmoType)
         {
-            bool isFaded = (int)gizmoType == (int)GizmoType.NonSelected || (int)gizmoType == (int)GizmoType.NotInSelectionHierarchy || (int)gizmoType == (int)GizmoType.NonSelected + (int)GizmoType.NotInSelectionHierarchy;
-            
-            if(stamper.Area.DrawHandleIfNotSelected == false)
+            var isFaded = (int)gizmoType == (int)GizmoType.NonSelected ||
+                          (int)gizmoType == (int)GizmoType.NotInSelectionHierarchy || (int)gizmoType ==
+                          (int)GizmoType.NonSelected + (int)GizmoType.NotInSelectionHierarchy;
+
+            if (stamper.Area.DrawHandleIfNotSelected == false)
             {
-                if(isFaded)
+                if (isFaded)
                 {
                     return;
                 }
             }
-            
-            Bounds bounds = new Bounds(Camera.current.transform.position, new Vector3(50f, 50f, 50f));
-            
+
+            var bounds = new Bounds(Camera.current.transform.position, new Vector3(50f, 50f, 50f));
+
             OverlapVisualisation.Draw(bounds, stamper.Data);
-            
-            float opacity = isFaded ? 0.5f : 1.0f;
+
+            var opacity = isFaded ? 0.5f : 1.0f;
 
             DrawStamperVisualisationIfNecessary(stamper, opacity);
 
             AreaVisualisation.DrawBox(stamper.Area, opacity);
         }
 
-        private static void DrawStamperVisualisationIfNecessary(Runtime.TerrainSpawner.TerrainSpawner stamper, float multiplyAlpha)
+        private static void DrawStamperVisualisationIfNecessary(Runtime.TerrainSpawner.TerrainSpawner stamper,
+            float multiplyAlpha)
         {
-            if(stamper.StamperControllerSettings.Visualisation == false)
+            if (stamper.StamperControllerSettings.Visualisation == false)
             {
                 return;
             }
 
-            if(stamper.Data.SelectedData.HasOneSelectedGroup() == false)
+            if (stamper.Data.SelectedData.HasOneSelectedGroup() == false)
             {
                 return;
             }
-            
+
             if (!ToolUtility.IsToolSupportSelectedResourcesType(stamper.GetType(), stamper.Data))
             {
                 return;
@@ -60,13 +63,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.TerrainSpawner
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(stamper.Area.Bounds.center), 
+            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(stamper.Area.Bounds.center),
                 layerSettings.GetCurrentPaintLayers(group.PrototypeType));
-            
-            if(rayHit != null)
+
+            if (rayHit != null)
             {
                 BoxArea area = stamper.Area.GetAreaVariables(rayHit);
-                stamper.StamperVisualisation.Draw(area, stamper.Data, GlobalCommonComponentSingleton<LayerSettings>.Instance, multiplyAlpha);
+                stamper.StamperVisualisation.Draw(area, stamper.Data,
+                    GlobalCommonComponentSingleton<LayerSettings>.Instance, multiplyAlpha);
             }
         }
     }

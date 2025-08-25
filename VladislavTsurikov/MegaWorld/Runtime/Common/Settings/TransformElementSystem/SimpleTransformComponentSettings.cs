@@ -1,5 +1,4 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.ComponentStack.Runtime.Core;
+﻿using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
@@ -7,7 +6,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
     [Name("Simple Transform Settings")]
     public class SimpleTransformComponentSettings : Component
     {
-        public TransformComponentStack TransformComponentStack = new TransformComponentStack();
+        public TransformComponentStack TransformComponentStack = new();
 
         protected override void OnCreate()
         {

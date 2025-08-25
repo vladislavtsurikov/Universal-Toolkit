@@ -5,7 +5,7 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility
 {
-    public static class UnspawnUtility 
+    public static class UnspawnUtility
     {
         public static void UnspawnGroups(IReadOnlyList<Group> groupList, bool unspawnSelected)
         {

@@ -9,37 +9,44 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 {
     public static class GameObjectColliderUtility
     {
-        public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool checkObbIntersection = false)
+        public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            ObjectFilter objectFilter, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = SceneDataManagerFinder.OverlapBox(boxCenter, boxSize, boxRotation);
+            List<SceneDataManager> sceneDataManagers =
+                SceneDataManagerFinder.OverlapBox(boxCenter, boxSize, boxRotation);
 
-            List<ColliderObject> overlappedObjects = new List<ColliderObject>();
+            var overlappedObjects = new List<ColliderObject>();
 
-            foreach(var sceneDataManager in sceneDataManagers)
+            foreach (SceneDataManager sceneDataManager in sceneDataManagers)
             {
-                GameObjectCollider gameObjectCollider = SceneDataStackUtility.InstanceSceneData<GameObjectCollider>(sceneDataManager.Scene);
+                GameObjectCollider gameObjectCollider =
+                    SceneDataStackUtility.InstanceSceneData<GameObjectCollider>(sceneDataManager.Scene);
 
                 if (gameObjectCollider != null)
                 {
-                    overlappedObjects.AddRange(gameObjectCollider.OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, checkObbIntersection));
+                    overlappedObjects.AddRange(gameObjectCollider.OverlapBox(boxCenter, boxSize, boxRotation,
+                        objectFilter, checkObbIntersection));
                 }
             }
 
             return overlappedObjects;
         }
 
-        public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool checkObbIntersection = false)
+        public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius,
+            ObjectFilter objectFilter, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius);
+            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius);
 
-            List<ColliderObject> overlappedObjects = new List<ColliderObject>();
-            foreach(var sceneDataManager in sceneDataManagers)
+            var overlappedObjects = new List<ColliderObject>();
+            foreach (SceneDataManager sceneDataManager in sceneDataManagers)
             {
-                GameObjectCollider gameObjectCollider = SceneDataStackUtility.InstanceSceneData<GameObjectCollider>(sceneDataManager.Scene);
+                GameObjectCollider gameObjectCollider =
+                    SceneDataStackUtility.InstanceSceneData<GameObjectCollider>(sceneDataManager.Scene);
 
                 if (gameObjectCollider != null)
                 {
-                    overlappedObjects.AddRange(gameObjectCollider.OverlapSphere(sphereCenter, sphereRadius, objectFilter, checkObbIntersection));
+                    overlappedObjects.AddRange(gameObjectCollider.OverlapSphere(sphereCenter, sphereRadius,
+                        objectFilter, checkObbIntersection));
                 }
             }
 
@@ -48,9 +55,9 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 
         public static void RemoveNullObjectNodesForAllScenes()
         {
-            foreach (var item in SceneDataManagerUtility.GetAllSceneDataManager())
+            foreach (SceneDataManager item in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                GameObjectCollider gameObjectCollider = (GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider));
+                var gameObjectCollider = (GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider));
 
                 gameObjectCollider?.RemoveNullObjectNodes();
             }
@@ -58,25 +65,26 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
 
         public static void HandleTransformChangesForAllScenes()
         {
-            foreach (var item in SceneDataManagerUtility.GetAllSceneDataManager())
+            foreach (SceneDataManager item in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                GameObjectCollider gameObjectCollider = (GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider));
+                var gameObjectCollider = (GameObjectCollider)item.SceneDataStack.GetElement(typeof(GameObjectCollider));
 
                 gameObjectCollider?.HandleTransformChanges(true);
             }
         }
-        
+
         public static void RemoveNode(GameObject gameObject)
         {
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                GameObjectCollider gameObjectCollider = (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
+                var gameObjectCollider =
+                    (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
 
                 if (gameObjectCollider == null)
                 {
                     continue;
                 }
-                
+
                 gameObjectCollider.RemoveNode(gameObject);
             }
         }

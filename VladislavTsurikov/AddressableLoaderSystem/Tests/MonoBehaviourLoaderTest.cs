@@ -55,12 +55,12 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         {
             if (generalConfigReference != null && generalConfigReference.IsValid())
             {
-                Debug.Log($"GeneralConfig is valid and loaded.");
+                Debug.Log("GeneralConfig is valid and loaded.");
                 Debug.Log($"GeneralConfig loaded with name: {generalConfigReference.AssetGUID}");
             }
             else
             {
-                Debug.LogError($"GeneralConfig is not valid.");
+                Debug.LogError("GeneralConfig is not valid.");
             }
         }
     }

@@ -7,9 +7,10 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Variables
     [Serializable]
     public abstract class Variable<T> : SerializedScriptableObject
     {
-        [SerializeField] 
+        [SerializeField]
         private string _uniqueID;
-        [SerializeField] 
+
+        [SerializeField]
         protected T _value;
 
         public string UniqueID => _uniqueID;
@@ -20,12 +21,17 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Variables
             set => Set(value);
         }
 
+        private void OnEnable()
+        {
+            if (string.IsNullOrEmpty(_uniqueID))
+            {
+                _uniqueID = Guid.NewGuid().ToString();
+            }
+        }
+
         public event Action<T> OnValueChanged;
 
-        protected virtual T Get()
-        {
-            return _value;
-        }
+        protected virtual T Get() => _value;
 
         protected virtual void Set(T value)
         {
@@ -33,14 +39,6 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Variables
             {
                 _value = value;
                 OnValueChanged?.Invoke(_value);
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (string.IsNullOrEmpty(_uniqueID))
-            {
-                _uniqueID = Guid.NewGuid().ToString();
             }
         }
 

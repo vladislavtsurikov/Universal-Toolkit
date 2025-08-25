@@ -14,9 +14,17 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
             OnEnable();
         }
 
-        protected virtual void InitElement(){}
-        public virtual void OnEnable(){}
-        public virtual void OnDisable(){}
+        protected virtual void InitElement()
+        {
+        }
+
+        public virtual void OnEnable()
+        {
+        }
+
+        public virtual void OnDisable()
+        {
+        }
     }
 }
 #endif

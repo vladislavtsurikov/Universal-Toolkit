@@ -6,16 +6,10 @@ namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class DropObjectsAttribute : Attribute
     {
-        public readonly List<Type> ObjectsTypes = new List<Type>();
+        public readonly List<Type> ObjectsTypes = new();
 
-        public DropObjectsAttribute(Type type)
-        {
-            ObjectsTypes.Add(type);
-        }
+        public DropObjectsAttribute(Type type) => ObjectsTypes.Add(type);
 
-        public DropObjectsAttribute(Type[] types)
-        {
-            ObjectsTypes.AddRange(types);
-        }
+        public DropObjectsAttribute(Type[] types) => ObjectsTypes.AddRange(types);
     }
 }

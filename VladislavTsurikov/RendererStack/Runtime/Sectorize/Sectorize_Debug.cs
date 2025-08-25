@@ -2,19 +2,15 @@
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
-using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings;
-using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.StreamingRules;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 using VladislavTsurikov.UnityUtility.Editor;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 {
-    public partial class Sectorize 
+    public partial class Sectorize
     {
         public override void DrawDebug()
         {
@@ -26,18 +22,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
 
                 if (sectors != null)
                 {
-                    foreach (var sector in sectors)
+                    foreach (Sector sector in sectors)
                     {
                         Handles.DrawWireCube(sector.Bounds.center, sector.Bounds.size);
                     }
                 }
             }
-            
+
             if (DebugVisibleCells)
             {
                 foreach (VirtualCamera cam in CameraManager.VirtualCameraList)
                 {
-                    if(cam.Ignored)
+                    if (cam.Ignored)
                     {
                         continue;
                     }
@@ -49,7 +45,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                             if (PreventingUnloading.MaxDistance != 0)
                             {
                                 Handles.color = Color.yellow;
-                                DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), PreventingUnloading.MaxDistance);
+                                DrawHandles.CircleCap(1, cam.Camera.transform.position,
+                                    Quaternion.LookRotation(Vector3.up), PreventingUnloading.MaxDistance);
                             }
                         }
 
@@ -58,18 +55,21 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                             if (AsynchronousLoading.MaxDistance != 0)
                             {
                                 Handles.color = Color.blue;
-                                DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), AsynchronousLoading.MaxDistance);
+                                DrawHandles.CircleCap(1, cam.Camera.transform.position,
+                                    Quaternion.LookRotation(Vector3.up), AsynchronousLoading.MaxDistance);
                             }
                         }
 
                         if (ImmediatelyLoading.MaxDistance != 0)
                         {
                             Handles.color = Color.red;
-                            DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up), ImmediatelyLoading.MaxDistance);
+                            DrawHandles.CircleCap(1, cam.Camera.transform.position, Quaternion.LookRotation(Vector3.up),
+                                ImmediatelyLoading.MaxDistance);
                         }
                     }
 
-                    foreach (var sector in FindSector.OverlapSphere(cam.Camera.transform.position, GetMaxLoadingDistance(), GetSectorLayerTag(), false))
+                    foreach (Sector sector in FindSector.OverlapSphere(cam.Camera.transform.position,
+                                 GetMaxLoadingDistance(), GetSectorLayerTag(), false))
                     {
                         Handles.color = Color.green;
                         Handles.DrawWireCube(sector.Bounds.center, sector.Bounds.size);

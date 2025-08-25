@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using OdinSerializer;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneUtility.Runtime;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 #if UNITY_EDITOR
@@ -14,10 +14,15 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
     [LocationAsset("SceneManager/SceneManagerData")]
     public class SceneManagerData : SerializedScriptableObjectSingleton<SceneManagerData>
     {
-        [OdinSerialize] 
-        private Profile _profile;
-        
         public bool EnableSceneManager;
+
+        [OdinSerialize]
+        private Profile _profile;
+
+#if UNITY_EDITOR
+        [OdinSerialize]
+        internal SceneManagerEditorData SceneManagerEditorData = new();
+#endif
 
         public Profile Profile
         {
@@ -34,15 +39,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             get => _profile;
         }
 
-#if UNITY_EDITOR
-        [OdinSerialize] 
-        internal SceneManagerEditorData SceneManagerEditorData = new SceneManagerEditorData();
-#endif
-
-        private void OnEnable()
-        {
-            Setup();
-        }
+        private void OnEnable() => Setup();
 
         private void OnDisable()
         {
@@ -50,7 +47,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             {
                 return;
             }
-            
+
             Profile.BuildSceneCollectionStack.OnDisable();
         }
 
@@ -60,9 +57,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
             {
                 return;
             }
-            
+
             Profile.Setup();
-            
+
 #if UNITY_EDITOR
             if (Application.isPlaying)
             {
@@ -71,7 +68,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
 
             SceneReference.OnDeleteScene -= Setup;
             SceneReference.OnDeleteScene += Setup;
-            
+
             SceneManagerEditorData.Setup();
             ScenesInBuildUtility.Setup(GetAllScenePaths());
 #endif
@@ -88,29 +85,25 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime
         }
 #endif
 
-        public static bool IsValidSceneManager()
-        {
-            return Instance.EnableSceneManager && Instance._profile != null;
-        }
+        public static bool IsValidSceneManager() => Instance.EnableSceneManager && Instance._profile != null;
 
         public List<string> GetAllScenePaths()
         {
-            List<string> scenePaths = new List<string>();
+            var scenePaths = new List<string>();
 
-            foreach (var sceneReference in Profile.BuildSceneCollectionStack.GetSceneReferences())
+            foreach (SceneReference sceneReference in Profile.BuildSceneCollectionStack.GetSceneReferences())
             {
                 if (sceneReference.IsValid())
                 {
                     scenePaths.Add(sceneReference.ScenePath);
                 }
             }
-            
+
 #if UNITY_EDITOR
             scenePaths.Add(StartupScene.GetStartupScenePath());
 #endif
-            
-            return scenePaths;
 
+            return scenePaths;
         }
     }
 }

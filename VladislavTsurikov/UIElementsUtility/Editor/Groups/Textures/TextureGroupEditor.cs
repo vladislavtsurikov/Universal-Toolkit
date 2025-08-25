@@ -9,21 +9,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Textures
     public class TextureGroupEditor : UnityEditor.Editor
     {
         private TextureGroup _textureGroup => (TextureGroup)target;
-        
+
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("Setup"))
             {
                 Setup();
             }
-            
+
             base.OnInspectorGUI();
         }
 
-        private void Setup()
-        {
-            _textureGroup.Setup();
-        }
+        private void Setup() => _textureGroup.Setup();
     }
 }
 #endif

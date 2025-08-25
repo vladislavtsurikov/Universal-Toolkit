@@ -8,12 +8,12 @@ namespace VladislavTsurikov.SceneUtility.Editor.Utility
     {
         public static bool IsSceneInBuildSettings(string sceneName)
         {
-            int sceneCount = SceneManager.sceneCountInBuildSettings;
+            var sceneCount = SceneManager.sceneCountInBuildSettings;
 
-            for (int i = 0; i < sceneCount; i++)
+            for (var i = 0; i < sceneCount; i++)
             {
-                string path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
-                string name = Path.GetFileNameWithoutExtension(path);
+                var path = UnityEngine.SceneManagement.SceneUtility.GetScenePathByBuildIndex(i);
+                var name = Path.GetFileNameWithoutExtension(path);
 
                 if (string.Equals(name, sceneName, StringComparison.OrdinalIgnoreCase))
                 {

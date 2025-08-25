@@ -4,6 +4,7 @@ using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem;
 
@@ -11,10 +12,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
 {
     public class SceneOperationStackEditor : ReorderableListStackEditor<Operation, ReorderableListComponentEditor>
     {
-        private readonly SettingsTypes _settingsTypes;
         private readonly ComponentStackSupportSameType<Operation> _componentStackSupportSameType;
-        
-        public SceneOperationStackEditor(SettingsTypes settingsTypes, ComponentStackSupportSameType<Operation> list) : base(new GUIContent("Actions"), list, true)
+        private readonly SettingsTypes _settingsTypes;
+
+        public SceneOperationStackEditor(SettingsTypes settingsTypes, ComponentStackSupportSameType<Operation> list) :
+            base(new GUIContent("Actions"), list, true)
         {
             _componentStackSupportSameType = list;
             _settingsTypes = settingsTypes;
@@ -24,35 +26,35 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
 
         protected override void ShowAddMenu()
         {
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
             foreach (var settingsType in GetSettingsTypeForAddManu())
             {
                 switch (_settingsTypes)
                 {
                     case SettingsTypes.AfterLoadScene:
-                        if(settingsType.GetAttribute<AfterLoadSceneComponentAttribute>() == null)
+                        if (settingsType.GetAttribute<AfterLoadSceneComponentAttribute>() == null)
                         {
                             continue;
                         }
 
                         break;
                     case SettingsTypes.BeforeLoadScene:
-                        if(settingsType.GetAttribute<BeforeLoadSceneComponentAttribute>() == null)
+                        if (settingsType.GetAttribute<BeforeLoadSceneComponentAttribute>() == null)
                         {
                             continue;
                         }
 
                         break;
                     case SettingsTypes.AfterUnloadScene:
-                        if(settingsType.GetAttribute<AfterUnloadSceneComponentAttribute>() == null)
+                        if (settingsType.GetAttribute<AfterUnloadSceneComponentAttribute>() == null)
                         {
                             continue;
                         }
 
                         break;
                     case SettingsTypes.BeforeUnloadScene:
-                        if(settingsType.GetAttribute<BeforeUnloadSceneComponentAttribute>() == null)
+                        if (settingsType.GetAttribute<BeforeUnloadSceneComponentAttribute>() == null)
                         {
                             continue;
                         }
@@ -62,7 +64,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem.OperationSyst
 
                 string context = settingsType.GetAttribute<NameAttribute>().Name;
 
-                menu.AddItem(new GUIContent(context), false, () => _componentStackSupportSameType.CreateComponent(settingsType));
+                menu.AddItem(new GUIContent(context), false,
+                    () => _componentStackSupportSameType.CreateComponent(settingsType));
             }
 
             menu.ShowAsContext();

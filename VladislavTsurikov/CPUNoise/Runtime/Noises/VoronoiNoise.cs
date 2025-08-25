@@ -3,22 +3,24 @@ using UnityEngine;
 
 namespace VladislavTsurikov.CPUNoise.Runtime
 {
-    public enum VoronoiDistance { Euclidian, Manhattan, Chebyshev };
+    public enum VoronoiDistance
+    {
+        Euclidian,
+        Manhattan,
+        Chebyshev
+    }
 
-    public enum VoronoiCombination { D0, D1D0, D2D0 };
+    public enum VoronoiCombination
+    {
+        D0,
+        D1D0,
+        D2D0
+    }
 
     public class VoronoiNoiseCPU : NoiseCPU
     {
-
-        public VoronoiDistance Distance { get; set; }
-
-        public VoronoiCombination Combination { get; set; }
-
-        private PermutationTable Perm { get; set; }
-
         public VoronoiNoiseCPU(int seed, float frequency, float amplitude = 1.0f)
         {
-
             Frequency = frequency;
             Amplitude = amplitude;
             Offset = Vector3.zero;
@@ -27,19 +29,21 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             Combination = VoronoiCombination.D1D0;
 
             Perm = new PermutationTable(1024, int.MaxValue, seed);
-
         }
 
+        public VoronoiDistance Distance { get; set; }
+
+        public VoronoiCombination Combination { get; set; }
+
+        private PermutationTable Perm { get; }
+
         /// <summary>
-        /// Update the seed.
+        ///     Update the seed.
         /// </summary>
-        public override void UpdateSeed(int seed)
-        {
-            Perm.Build(seed);
-        }
+        public override void UpdateSeed(int seed) => Perm.Build(seed);
 
         /// <summary>
-        /// Sample the noise in 1 dimension.
+        ///     Sample the noise in 1 dimension.
         /// </summary>
         public override float Sample1D(float x)
         {
@@ -51,12 +55,12 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             float featurePointX;
             int cubeX;
 
-            Vector3 distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+            var distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
 
             //1. Determine which cube the evaluation point is in
-            int evalCubeX = (int)Mathf.Floor(x);
+            var evalCubeX = (int)Mathf.Floor(x);
 
-            for (int i = -1; i < 2; ++i)
+            for (var i = -1; i < 2; ++i)
             {
                 cubeX = evalCubeX + i;
 
@@ -67,7 +71,7 @@ namespace VladislavTsurikov.CPUNoise.Runtime
                 numberFeaturePoints = ProbLookup(lastRandom * Perm.Inverse);
 
                 //4. Randomly place the feature points in the cube
-                for (int l = 0; l < numberFeaturePoints; ++l)
+                for (var l = 0; l < numberFeaturePoints; ++l)
                 {
                     lastRandom = Perm[lastRandom];
                     randomDiffX = lastRandom * Perm.Inverse;
@@ -89,7 +93,7 @@ namespace VladislavTsurikov.CPUNoise.Runtime
         }
 
         /// <summary>
-        /// Sample the noise in 2 dimensions.
+        ///     Sample the noise in 2 dimensions.
         /// </summary>
         public override float Sample2D(float x, float y)
         {
@@ -102,52 +106,49 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             float featurePointX, featurePointY;
             int cubeX, cubeY;
 
-            Vector3 distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+            var distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
 
             //1. Determine which cube the evaluation point is in
-            int evalCubeX = (int)Mathf.Floor(x);
-            int evalCubeY = (int)Mathf.Floor(y);
+            var evalCubeX = (int)Mathf.Floor(x);
+            var evalCubeY = (int)Mathf.Floor(y);
 
-            for (int i = -1; i < 2; ++i)
+            for (var i = -1; i < 2; ++i)
+            for (var j = -1; j < 2; ++j)
             {
-                for (int j = -1; j < 2; ++j)
+                cubeX = evalCubeX + i;
+                cubeY = evalCubeY + j;
+
+                //2. Generate a reproducible random number generator for the cube
+                lastRandom = Perm[cubeX, cubeY];
+
+                //3. Determine how many feature points are in the cube
+                numberFeaturePoints = ProbLookup(lastRandom * Perm.Inverse);
+
+                //4. Randomly place the feature points in the cube
+                for (var l = 0; l < numberFeaturePoints; ++l)
                 {
-                    cubeX = evalCubeX + i;
-                    cubeY = evalCubeY + j;
+                    lastRandom = Perm[lastRandom];
+                    randomDiffX = lastRandom * Perm.Inverse;
 
-                    //2. Generate a reproducible random number generator for the cube
-                    lastRandom = Perm[cubeX, cubeY];
+                    lastRandom = Perm[lastRandom];
+                    randomDiffY = lastRandom * Perm.Inverse;
 
-                    //3. Determine how many feature points are in the cube
-                    numberFeaturePoints = ProbLookup(lastRandom * Perm.Inverse);
+                    featurePointX = randomDiffX + cubeX;
+                    featurePointY = randomDiffY + cubeY;
 
-                    //4. Randomly place the feature points in the cube
-                    for (int l = 0; l < numberFeaturePoints; ++l)
-                    {
-                        lastRandom = Perm[lastRandom];
-                        randomDiffX = lastRandom * Perm.Inverse;
-
-                        lastRandom = Perm[lastRandom];
-                        randomDiffY = lastRandom * Perm.Inverse;
-
-                        featurePointX = randomDiffX + cubeX;
-                        featurePointY = randomDiffY + cubeY;
-
-                        //5. Find the feature point closest to the evaluation point. 
-                        //This is done by inserting the distances to the feature points into a sorted list
-                        distanceArray = Insert(distanceArray, Distance2(x, y, featurePointX, featurePointY));
-                    }
-
-                    //6. Check the neighboring cubes to ensure their are no closer evaluation points.
-                    // This is done by repeating steps 1 through 5 above for each neighboring cube
+                    //5. Find the feature point closest to the evaluation point. 
+                    //This is done by inserting the distances to the feature points into a sorted list
+                    distanceArray = Insert(distanceArray, Distance2(x, y, featurePointX, featurePointY));
                 }
+                //6. Check the neighboring cubes to ensure their are no closer evaluation points.
+                // This is done by repeating steps 1 through 5 above for each neighboring cube
             }
 
             return Combine(distanceArray) * Amplitude;
         }
 
         /// <summary>
-        /// Sample the noise in 3 dimensions.
+        ///     Sample the noise in 3 dimensions.
         /// </summary>
         public override float Sample3D(float x, float y, float z)
         {
@@ -161,54 +162,50 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             float featurePointX, featurePointY, featurePointZ;
             int cubeX, cubeY, cubeZ;
 
-            Vector3 distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
+            var distanceArray = new Vector3(float.PositiveInfinity, float.PositiveInfinity, float.PositiveInfinity);
 
             //1. Determine which cube the evaluation point is in
-            int evalCubeX = (int)Mathf.Floor(x);
-            int evalCubeY = (int)Mathf.Floor(y);
-            int evalCubeZ = (int)Mathf.Floor(z);
+            var evalCubeX = (int)Mathf.Floor(x);
+            var evalCubeY = (int)Mathf.Floor(y);
+            var evalCubeZ = (int)Mathf.Floor(z);
 
-            for (int i = -1; i < 2; ++i)
+            for (var i = -1; i < 2; ++i)
+            for (var j = -1; j < 2; ++j)
+            for (var k = -1; k < 2; ++k)
             {
-                for (int j = -1; j < 2; ++j)
+                cubeX = evalCubeX + i;
+                cubeY = evalCubeY + j;
+                cubeZ = evalCubeZ + k;
+
+                //2. Generate a reproducible random number generator for the cube
+                lastRandom = Perm[cubeX, cubeY, cubeZ];
+
+                //3. Determine how many feature points are in the cube
+                numberFeaturePoints = ProbLookup(lastRandom * Perm.Inverse);
+
+                //4. Randomly place the feature points in the cube
+                for (var l = 0; l < numberFeaturePoints; ++l)
                 {
-                    for (int k = -1; k < 2; ++k)
-                    {
-                        cubeX = evalCubeX + i;
-                        cubeY = evalCubeY + j;
-                        cubeZ = evalCubeZ + k;
+                    lastRandom = Perm[lastRandom];
+                    randomDiffX = lastRandom * Perm.Inverse;
 
-                        //2. Generate a reproducible random number generator for the cube
-                        lastRandom = Perm[cubeX, cubeY, cubeZ];
+                    lastRandom = Perm[lastRandom];
+                    randomDiffY = lastRandom * Perm.Inverse;
 
-                        //3. Determine how many feature points are in the cube
-                        numberFeaturePoints = ProbLookup(lastRandom * Perm.Inverse);
+                    lastRandom = Perm[lastRandom];
+                    randomDiffZ = lastRandom * Perm.Inverse;
 
-                        //4. Randomly place the feature points in the cube
-                        for (int l = 0; l < numberFeaturePoints; ++l)
-                        {
-                            lastRandom = Perm[lastRandom];
-                            randomDiffX = lastRandom * Perm.Inverse;
+                    featurePointX = randomDiffX + cubeX;
+                    featurePointY = randomDiffY + cubeY;
+                    featurePointZ = randomDiffZ + cubeZ;
 
-                            lastRandom = Perm[lastRandom];
-                            randomDiffY = lastRandom * Perm.Inverse;
-
-                            lastRandom = Perm[lastRandom];
-                            randomDiffZ = lastRandom * Perm.Inverse;
-
-                            featurePointX = randomDiffX + cubeX;
-                            featurePointY = randomDiffY + cubeY;
-                            featurePointZ = randomDiffZ + cubeZ;
-
-                            //5. Find the feature point closest to the evaluation point. 
-                            //This is done by inserting the distances to the feature points into a sorted list
-                            distanceArray = Insert(distanceArray, Distance3(x, y, z, featurePointX, featurePointY, featurePointZ));
-                        }
-
-                        //6. Check the neighboring cubes to ensure their are no closer evaluation points.
-                        // This is done by repeating steps 1 through 5 above for each neighboring cube
-                    }
+                    //5. Find the feature point closest to the evaluation point. 
+                    //This is done by inserting the distances to the feature points into a sorted list
+                    distanceArray = Insert(distanceArray,
+                        Distance3(x, y, z, featurePointX, featurePointY, featurePointZ));
                 }
+                //6. Check the neighboring cubes to ensure their are no closer evaluation points.
+                // This is done by repeating steps 1 through 5 above for each neighboring cube
             }
 
             return Combine(distanceArray) * Amplitude;
@@ -233,7 +230,7 @@ namespace VladislavTsurikov.CPUNoise.Runtime
 
         private float Distance2(float p1X, float p1Y, float p2X, float p2Y)
         {
-            switch(Distance)
+            switch (Distance)
             {
                 case VoronoiDistance.Euclidian:
                     return (p1X - p2X) * (p1X - p2X) + (p1Y - p2Y) * (p1Y - p2Y);
@@ -267,7 +264,7 @@ namespace VladislavTsurikov.CPUNoise.Runtime
 
         private float Combine(Vector3 arr)
         {
-            switch(Combination)
+            switch (Combination)
             {
                 case VoronoiCombination.D0:
                     return arr[0];
@@ -283,44 +280,81 @@ namespace VladislavTsurikov.CPUNoise.Runtime
         }
 
         /// <summary>
-        /// Given a uniformly distributed random number this function returns the number of feature points in a given cube.
+        ///     Given a uniformly distributed random number this function returns the number of feature points in a given cube.
         /// </summary>
         /// <param name="value">a uniformly distributed random number</param>
         /// <returns>The number of feature points in a cube.</returns>
         private int ProbLookup(float value)
         {
             //Poisson Distribution
-            if (value < 0.0915781944272058) return 1;
-            if (value < 0.238103305510735) return 2;
-            if (value < 0.433470120288774) return 3;
-            if (value < 0.628836935299644) return 4;
-            if (value < 0.785130387122075) return 5;
-            if (value < 0.889326021747972) return 6;
-            if (value < 0.948866384324819) return 7;
-            if (value < 0.978636565613243) return 8;
+            if (value < 0.0915781944272058)
+            {
+                return 1;
+            }
+
+            if (value < 0.238103305510735)
+            {
+                return 2;
+            }
+
+            if (value < 0.433470120288774)
+            {
+                return 3;
+            }
+
+            if (value < 0.628836935299644)
+            {
+                return 4;
+            }
+
+            if (value < 0.785130387122075)
+            {
+                return 5;
+            }
+
+            if (value < 0.889326021747972)
+            {
+                return 6;
+            }
+
+            if (value < 0.948866384324819)
+            {
+                return 7;
+            }
+
+            if (value < 0.978636565613243)
+            {
+                return 8;
+            }
 
             return 9;
         }
 
         /// <summary>
-        /// Inserts value into array using insertion sort. If the value is greater than the largest value in the array
-        /// it will not be added to the array.
+        ///     Inserts value into array using insertion sort. If the value is greater than the largest value in the array
+        ///     it will not be added to the array.
         /// </summary>
         /// <param name="arr">The array to insert the value into.</param>
         /// <param name="value">The value to insert into the array.</param>
         private Vector3 Insert(Vector3 arr, float value)
         {
             float temp;
-            for (int i = 3 - 1; i >= 0; i--)
+            for (var i = 3 - 1; i >= 0; i--)
             {
-                if (value > arr[i]) break;
+                if (value > arr[i])
+                {
+                    break;
+                }
+
                 temp = arr[i];
                 arr[i] = value;
-                if (i + 1 < 3) arr[i + 1] = temp;
+                if (i + 1 < 3)
+                {
+                    arr[i + 1] = temp;
+                }
             }
 
             return arr;
         }
-
     }
 }

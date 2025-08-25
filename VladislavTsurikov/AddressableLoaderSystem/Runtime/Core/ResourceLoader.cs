@@ -8,10 +8,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
         public abstract UniTask LoadResourceLoader(CancellationToken token);
 
-        protected virtual UniTask UnloadResourceLoader(CancellationToken cancellationToken)
-        {
-            return UniTask.CompletedTask;
-        }
+        protected virtual UniTask UnloadResourceLoader(CancellationToken cancellationToken) => UniTask.CompletedTask;
 
         public async UniTask Unload(CancellationToken cancellationToken)
         {
@@ -50,7 +47,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                 });
         }
 
-        protected UniTask LoadAssetReferencesRecursive<T>(T result, string key, CancellationToken cancellationToken) where T : Object
+        protected UniTask LoadAssetReferencesRecursive<T>(T result, string key, CancellationToken cancellationToken)
+            where T : Object
         {
 #if ADDRESSABLE_LOADER_LOGS_VERBOSE
             var swRecursive = System.Diagnostics.Stopwatch.StartNew();

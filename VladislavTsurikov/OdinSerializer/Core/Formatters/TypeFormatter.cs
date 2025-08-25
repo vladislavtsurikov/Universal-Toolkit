@@ -16,20 +16,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     // Registered by TypeFormatterLocator
 
     /// <summary>
-    /// Formatter for the <see cref="Type"/> type which uses the reader/writer's <see cref="TwoWaySerializationBinder"/> to bind types.
+    ///     Formatter for the <see cref="Type" /> type which uses the reader/writer's <see cref="TwoWaySerializationBinder" />
+    ///     to bind types.
     /// </summary>
-    /// <seealso cref="Serialization.MinimalBaseFormatter{T}" />
+    /// <seealso cref="MinimalBaseFormatter{T}" />
     public sealed class TypeFormatter : MinimalBaseFormatter<Type>
     {
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -44,28 +45,23 @@ namespace OdinSerializer
 
                 if (value != null)
                 {
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
                 }
             }
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
-        protected override void Write(ref Type value, IDataWriter writer)
-        {
-            writer.WriteString(null, writer.Context.Binder.BindToName(value, writer.Context.Config.DebugContext));
-        }
+        protected override void Write(ref Type value, IDataWriter writer) => writer.WriteString(null,
+            writer.Context.Binder.BindToName(value, writer.Context.Config.DebugContext));
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>null.</returns>
-        protected override Type GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override Type GetUninitializedObject() => null;
     }
 }

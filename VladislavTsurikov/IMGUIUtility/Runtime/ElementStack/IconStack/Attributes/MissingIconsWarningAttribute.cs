@@ -7,9 +7,6 @@ namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack
     {
         public readonly string Text;
 
-        public MissingIconsWarningAttribute(string text)
-        {
-            Text = text;
-        }
+        public MissingIconsWarningAttribute(string text) => Text = text;
     }
 }

@@ -5,30 +5,29 @@ using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
-using ElementsSystem_ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
-using GlobalSettings_ElementsSystem_ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
-using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
+using GlobalSettings_ElementsSystem_ToolsComponentStack =
+    VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
 {
     public class ToolsComponentStackEditor : IMGUIComponentStackEditor<ToolComponentStack, ToolStackElementEditor>
     {
-        private GlobalSettings_ElementsSystem_ToolsComponentStack _toolsComponentStack;
-        
-        public ToolsComponentStackEditor(GlobalSettings_ElementsSystem_ToolsComponentStack stack) : base(stack)
-        {
+        private readonly GlobalSettings_ElementsSystem_ToolsComponentStack _toolsComponentStack;
+
+        public ToolsComponentStackEditor(GlobalSettings_ElementsSystem_ToolsComponentStack stack) : base(stack) =>
             _toolsComponentStack = stack;
-        }
 
         public static void OnGUI(Type toolType, Type type)
         {
-            foreach (var item in GlobalSettings.Instance.ToolsComponentStackEditor.Editors)
+            foreach (ToolStackElementEditor item in GlobalSettings.Instance.ToolsComponentStackEditor.Editors)
             {
-                ToolComponentStack toolComponentStack = (ToolComponentStack)item.Target;
-                
-                if(toolComponentStack == null)
+                var toolComponentStack = (ToolComponentStack)item.Target;
+
+                if (toolComponentStack == null)
+                {
                     continue;
-                
+                }
+
                 if (toolComponentStack.ToolType == toolType)
                 {
                     item.GeneralComponentStackEditor.DrawElement(type);
@@ -38,10 +37,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
 
         public static IMGUIElementEditor GetEditor(Type toolType, Type type)
         {
-            foreach (var item in GlobalSettings.Instance.ToolsComponentStackEditor.Editors)
+            foreach (ToolStackElementEditor item in GlobalSettings.Instance.ToolsComponentStackEditor.Editors)
             {
-                ToolComponentStack toolComponentStack = (ToolComponentStack)item.Target;
-                
+                var toolComponentStack = (ToolComponentStack)item.Target;
+
                 if (toolComponentStack.ToolType == toolType)
                 {
                     return item.GeneralComponentStackEditor.GetEditor(type);
@@ -50,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
 
             return null;
         }
-        
+
         public void ResetStackMenu(Type toolType)
         {
             var menu = new GenericMenu();

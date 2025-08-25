@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.RendererStack.Runtime.Core.Utility;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
@@ -8,8 +9,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
     [LocationAsset("RendererStack/GPUInstancedIndirectShaderStack")]
     public class GPUInstancedIndirectShaderStack : SerializedScriptableObjectSingleton<GPUInstancedIndirectShaderStack>
     {
-        public List<GPUInstancedIndirectShader> GPUInstancedIndirectShaderList = new List<GPUInstancedIndirectShader>();
-        
+        public List<GPUInstancedIndirectShader> GPUInstancedIndirectShaderList = new();
+
         public Shader GetShader(string shaderName)
         {
             foreach (GPUInstancedIndirectShader item in GPUInstancedIndirectShaderList)
@@ -22,15 +23,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 
             if (UnityBuiltInSupportShaders.StandardUnityShaders.Contains(shaderName))
             {
-                return Shader.Find(UnityBuiltInSupportShaders.StandardUnityShadersGPUI[UnityBuiltInSupportShaders.StandardUnityShaders.IndexOf(shaderName)]);
+                return Shader.Find(
+                    UnityBuiltInSupportShaders.StandardUnityShadersGPUI[
+                        UnityBuiltInSupportShaders.StandardUnityShaders.IndexOf(shaderName)]);
             }
 
             if (!shaderName.Equals(UnityBuiltInSupportShaders.ShaderUnityStandard))
             {
                 if (Application.isPlaying)
                 {
-                    Debug.LogWarning("Can not find instanced shader for : " + shaderName + ". Using Standard shader instead.");
+                    Debug.LogWarning("Can not find instanced shader for : " + shaderName +
+                                     ". Using Standard shader instead.");
                 }
+
                 return GetShader(UnityBuiltInSupportShaders.ShaderUnityStandard);
             }
 
@@ -42,26 +47,29 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
         {
             GPUInstancedIndirectShaderList.Clear();
 
-#if UNITY_EDITOR 
-            UnityEditor.EditorUtility.SetDirty(this);
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
 #endif
         }
 
         public void ClearEmptyShaders()
         {
-#if UNITY_EDITOR 
-            if (GPUInstancedIndirectShaderList.RemoveAll(si => si == null || si.Shader == null || string.IsNullOrEmpty(si.OriginalName)) > 0)
+#if UNITY_EDITOR
+            if (GPUInstancedIndirectShaderList.RemoveAll(si =>
+                    si == null || si.Shader == null || string.IsNullOrEmpty(si.OriginalName)) >
+                0)
             {
-                UnityEditor.EditorUtility.SetDirty(this);
+                EditorUtility.SetDirty(this);
             }
 #endif
         }
 
         public void AddShaderInstance(string name, Shader instancedShader, bool isOriginalInstanced = false)
         {
-            GPUInstancedIndirectShaderList.Add(new GPUInstancedIndirectShader(name, instancedShader, isOriginalInstanced));
-#if UNITY_EDITOR 
-            UnityEditor.EditorUtility.SetDirty(this);
+            GPUInstancedIndirectShaderList.Add(new GPUInstancedIndirectShader(name, instancedShader,
+                isOriginalInstanced));
+#if UNITY_EDITOR
+            EditorUtility.SetDirty(this);
 #endif
         }
 
@@ -79,6 +87,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -88,16 +97,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
             {
                 if (item.OriginalName.Equals(shaderName))
                 {
-                    if(item.IsOriginal)
+                    if (item.IsOriginal)
                     {
                         return true;
                     }
-                    else
-                    {
-                        return false;
-                    }
+
+                    return false;
                 }
             }
+
             return false;
         }
 
@@ -105,17 +113,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
         {
             if (originalMaterial == null || originalMaterial.shader == null)
             {
-                Debug.LogError("One of the prototypes is missing material reference! Check the Material references in MeshRenderer.");
+                Debug.LogError(
+                    "One of the prototypes is missing material reference! Check the Material references in MeshRenderer.");
 
                 return new Material(GetShader(RendererStackConstants.ShaderUnityInternalError));
             }
 
-            if(IsShaderOriginalInstanced(originalMaterial.shader.name))
+            if (IsShaderOriginalInstanced(originalMaterial.shader.name))
             {
                 return originalMaterial;
             }
 
-            Material instancedMaterial = new Material(GetShader(originalMaterial.shader.name));
+            var instancedMaterial = new Material(GetShader(originalMaterial.shader.name));
             instancedMaterial.CopyPropertiesFromMaterial(originalMaterial);
             instancedMaterial.name = originalMaterial.name + "_GPUInstancedIndirect";
             instancedMaterial.enableInstancing = true;
@@ -136,11 +145,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 #if UNITY_EDITOR
             if (instancedIndirectShader.IsOriginal)
             {
-                instancedIndirectShader.Shader = GenerateGPUInstancedIndirectShader.Create(instancedIndirectShader.Shader, true);
+                instancedIndirectShader.Shader =
+                    GenerateGPUInstancedIndirectShader.Create(instancedIndirectShader.Shader, true);
                 return;
             }
 
-            Shader originalShader = Shader.Find(instancedIndirectShader.OriginalName);
+            var originalShader = Shader.Find(instancedIndirectShader.OriginalName);
             if (originalShader != null)
             {
                 instancedIndirectShader.Shader = GenerateGPUInstancedIndirectShader.Create(originalShader);

@@ -10,14 +10,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
     {
         private TerrainObjectRendererCollider _terrainObjectRendererCollider;
 
-        public PrototypeBVHObjectTreeStack PrototypeBVHObjectTreeStack = new PrototypeBVHObjectTreeStack();
-
         public Bounds Bounds;
 
-        public ColliderCell(Bounds bounds)
-        {
-            Bounds = bounds;
-        }
+        public PrototypeBVHObjectTreeStack PrototypeBVHObjectTreeStack = new();
+
+        public ColliderCell(Bounds bounds) => Bounds = bounds;
 
         public Rect Rectangle
         {
@@ -27,27 +24,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 
         public void Prepare(TerrainObjectRendererCollider terrainObjectRendererCollider, SelectionData selectionData)
         {
-            _terrainObjectRendererCollider = terrainObjectRendererCollider; 
+            _terrainObjectRendererCollider = terrainObjectRendererCollider;
 
-            PrototypeBVHObjectTreeStack.PreparePrototypeRenderCount(selectionData); 
+            PrototypeBVHObjectTreeStack.PreparePrototypeRenderCount(selectionData);
         }
 
-        public void ChangeNodeSizeIfNecessary(TerrainObjectCollider terrainObjectCollider)
-        {
+        public void ChangeNodeSizeIfNecessary(TerrainObjectCollider terrainObjectCollider) =>
             _terrainObjectRendererCollider.ChangeNodeSizeIfNecessary(terrainObjectCollider, this);
-        }
 
         public AABB GetObjectsAABB()
         {
-            AABB currentAABB = new AABB(Bounds);
+            var currentAABB = new AABB(Bounds);
 
-            foreach (PrototypeBVHObjectTree prototypeBVHObjectTree in PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
+            foreach (PrototypeBVHObjectTree prototypeBVHObjectTree in PrototypeBVHObjectTreeStack
+                         .PrototypeBVHObjectTreeList)
             {
                 AABB prototypeObjectsAABB = prototypeBVHObjectTree.BVHObjectTree.Tree.GetAABB();
 
-                if(prototypeObjectsAABB.IsValid)
-                {   
-                    currentAABB.Encapsulate(prototypeObjectsAABB); 
+                if (prototypeObjectsAABB.IsValid)
+                {
+                    currentAABB.Encapsulate(prototypeObjectsAABB);
                 }
             }
 

@@ -2,18 +2,15 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 {
     public abstract class AutoDisposeProperty
     {
-        public bool isDispose = false;
-        
-        public AutoDisposeProperty()
-        {
-            isDispose = false;
-            //AutoDisposeManager.Instance.AddUnmanagedProperties(this);
-        }
+        public bool isDispose;
 
+        public AutoDisposeProperty() => isDispose = false;
+
+        //AutoDisposeManager.Instance.AddUnmanagedProperties(this);
         public void DisposeUnmanagedMemory()
         {
             isDispose = true;
-            
+
             InternalDisposeUnmanagedMemory();
             //AutoDisposeManager.Instance.RemoveAutoDisposeProperty(this);
         }
@@ -25,7 +22,7 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
         // }
         //
         // protected virtual void ChangeNativeArray(T property) { }
-        
+
         protected abstract void InternalDisposeUnmanagedMemory();
     }
 }

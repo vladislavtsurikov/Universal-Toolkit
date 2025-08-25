@@ -1,19 +1,15 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
-    public static class AllTerrainHelperTypes 
+    public static class AllTerrainHelperTypes
     {
         public static readonly Type[] Types;
 
-        static AllTerrainHelperTypes()
-        {
-            Types = AllTypesDerivedFrom<TerrainHelper>.Types;
-        }
+        static AllTerrainHelperTypes() => Types = AllTypesDerivedFrom<TerrainHelper>.Types;
 
         public static bool HasTerrainMonoBehaviourType(GameObject go)
         {
@@ -25,12 +21,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
             Behaviour[] list = go.GetComponents<Behaviour>();
             foreach (Behaviour component in list)
             {
-                if(component == null)
+                if (component == null)
                 {
                     continue;
                 }
 
-                foreach (var type in Types)
+                foreach (Type type in Types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 
@@ -54,12 +50,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
             Behaviour[] list = go.GetComponents<Behaviour>();
             foreach (Behaviour component in list)
             {
-                if(component == null)
+                if (component == null)
                 {
                     continue;
                 }
 
-                foreach (var type in Types)
+                foreach (Type type in Types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 

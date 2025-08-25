@@ -16,69 +16,75 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using OdinSerializer.Utilities;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Scripting;
+using Object = UnityEngine.Object;
+
 #if UNITY_EDITOR
 
 namespace OdinSerializer.Editor
 {
-    using OdinSerializer.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using UnityEditor;
-    using UnityEditor.SceneManagement;
-    using UnityEngine;
-    using UnityEngine.Scripting;
-
     public static class AOTSupportUtilities
     {
         /// <summary>
-        /// Scans the project's build scenes and resources, plus their dependencies, for serialized types to support. Progress bars are shown during the scan.
+        ///     Scans the project's build scenes and resources, plus their dependencies, for serialized types to support. Progress
+        ///     bars are shown during the scan.
         /// </summary>
         /// <param name="serializedTypes">The serialized types to support.</param>
         /// <param name="scanBuildScenes">Whether to scan the project's build scenes.</param>
         /// <param name="scanAllAssetBundles">Whether to scan all the project's asset bundles.</param>
         /// <param name="scanPreloadedAssets">Whether to scan the project's preloaded assets.</param>
         /// <param name="scanResources">Whether to scan the project's resources.</param>
-        /// <param name="resourcesToScan">An optional list of the resource paths to scan. Only has an effect if the scanResources argument is true. All the resources will be scanned if null.</param>
+        /// <param name="resourcesToScan">
+        ///     An optional list of the resource paths to scan. Only has an effect if the scanResources
+        ///     argument is true. All the resources will be scanned if null.
+        /// </param>
         /// <returns>true if the scan succeeded, false if the scan failed or was cancelled</returns>
-        public static bool ScanProjectForSerializedTypes(out List<Type> serializedTypes, bool scanBuildScenes = true, bool scanAllAssetBundles = true, bool scanPreloadedAssets = true, bool scanResources = true, List<string> resourcesToScan = null, bool scanAddressables = true)
+        public static bool ScanProjectForSerializedTypes(out List<Type> serializedTypes, bool scanBuildScenes = true,
+            bool scanAllAssetBundles = true, bool scanPreloadedAssets = true, bool scanResources = true,
+            List<string> resourcesToScan = null, bool scanAddressables = true)
         {
             using (var scanner = new AOTSupportScanner())
             {
                 scanner.BeginScan();
 
-                if (scanBuildScenes && !scanner.ScanBuildScenes(includeSceneDependencies: true, showProgressBar: true))
+                if (scanBuildScenes && !scanner.ScanBuildScenes(true, true))
                 {
                     Debug.Log("Project scan canceled while scanning scenes and their dependencies.");
                     serializedTypes = null;
                     return false;
                 }
 
-                if (scanResources && !scanner.ScanAllResources(includeResourceDependencies: true, showProgressBar: true, resourcesPaths: resourcesToScan))
+                if (scanResources && !scanner.ScanAllResources(true, true, resourcesToScan))
                 {
                     Debug.Log("Project scan canceled while scanning resources and their dependencies.");
                     serializedTypes = null;
                     return false;
                 }
 
-                if (scanAllAssetBundles && !scanner.ScanAllAssetBundles(showProgressBar: true))
+                if (scanAllAssetBundles && !scanner.ScanAllAssetBundles(true))
                 {
                     Debug.Log("Project scan canceled while scanning asset bundles and their dependencies.");
                     serializedTypes = null;
                     return false;
                 }
 
-                if (scanPreloadedAssets && !scanner.ScanPreloadedAssets(showProgressBar: true))
+                if (scanPreloadedAssets && !scanner.ScanPreloadedAssets(true))
                 {
                     Debug.Log("Project scan canceled while scanning preloaded assets and their dependencies.");
                     serializedTypes = null;
                     return false;
                 }
 
-                if (scanAddressables && !scanner.ScanAllAddressables(includeAssetDependencies: true, showProgressBar: true))
+                if (scanAddressables && !scanner.ScanAllAddressables(true, true))
                 {
                     Debug.Log("Project scan canceled while scanning addressable assets and their dependencies.");
                     serializedTypes = null;
@@ -87,23 +93,32 @@ namespace OdinSerializer.Editor
 
                 serializedTypes = scanner.EndScan();
             }
+
             return true;
         }
 
         /// <summary>
-        /// Generates an AOT DLL, using the given parameters.
+        ///     Generates an AOT DLL, using the given parameters.
         /// </summary>
-        public static void GenerateDLL(string dirPath, string assemblyName, List<Type> supportSerializedTypes, bool generateLinkXml = true)
+        public static void GenerateDLL(string dirPath, string assemblyName, List<Type> supportSerializedTypes,
+            bool generateLinkXml = true)
         {
-            if (!dirPath.EndsWith("/")) dirPath += "/";
+            if (!dirPath.EndsWith("/"))
+            {
+                dirPath += "/";
+            }
 
             var newDllPath = dirPath + assemblyName;
             var fullDllPath = newDllPath + ".dll";
 
-            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(new AssemblyName() { Name = assemblyName }, AssemblyBuilderAccess.Save, dirPath);
-            var module = assembly.DefineDynamicModule(assemblyName);
+            AssemblyBuilder assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(
+                new AssemblyName { Name = assemblyName },
+                AssemblyBuilderAccess.Save, dirPath);
+            ModuleBuilder module = assembly.DefineDynamicModule(assemblyName);
 
-            assembly.SetCustomAttribute(new CustomAttributeBuilder(typeof(EmittedAssemblyAttribute).GetConstructor(new Type[0]), new object[0]));
+            assembly.SetCustomAttribute(
+                new CustomAttributeBuilder(typeof(EmittedAssemblyAttribute).GetConstructor(new Type[0]),
+                    new object[0]));
 
             // The following is a fix for Unity's Mono runtime that doesn't know how to do this sort
             //  of stuff properly
@@ -115,12 +130,14 @@ namespace OdinSerializer.Editor
             // We do this by forcing there to be only one module - the one we just defined, and we set the
             //   manifest module to be that module as well.
             {
-                var modulesField = assembly.GetType().GetField("modules", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                var manifestModuleField = assembly.GetType().GetField("manifest_module", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo modulesField = assembly.GetType().GetField("modules",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                FieldInfo manifestModuleField = assembly.GetType().GetField("manifest_module",
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                 if (modulesField != null)
                 {
-                    modulesField.SetValue(assembly, new ModuleBuilder[] { module });
+                    modulesField.SetValue(assembly, new[] { module });
                 }
 
                 if (manifestModuleField != null)
@@ -129,23 +146,24 @@ namespace OdinSerializer.Editor
                 }
             }
 
-            var type = module.DefineType(assemblyName + ".PreventCodeStrippingViaReferences", TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.NotPublic);
+            TypeBuilder type = module.DefineType(assemblyName + ".PreventCodeStrippingViaReferences",
+                TypeAttributes.Abstract | TypeAttributes.Sealed | TypeAttributes.NotPublic);
 
-            CustomAttributeBuilder attributeBuilder = new CustomAttributeBuilder(typeof(PreserveAttribute).GetConstructor(Type.EmptyTypes), new object[0]);
+            var attributeBuilder = new CustomAttributeBuilder(typeof(PreserveAttribute).GetConstructor(Type.EmptyTypes),
+                new object[0]);
             type.SetCustomAttribute(attributeBuilder);
 
-            var staticConstructor = type.DefineTypeInitializer();
-            var il = staticConstructor.GetILGenerator();
+            ConstructorBuilder staticConstructor = type.DefineTypeInitializer();
+            ILGenerator il = staticConstructor.GetILGenerator();
 
-            var falseLocal = il.DeclareLocal(typeof(bool));
+            LocalBuilder falseLocal = il.DeclareLocal(typeof(bool));
 
-            il.Emit(OpCodes.Ldc_I4_0);                  // Load false
-            il.Emit(OpCodes.Stloc, falseLocal);         // Set to falseLocal
+            il.Emit(OpCodes.Ldc_I4_0); // Load false
+            il.Emit(OpCodes.Stloc, falseLocal); // Set to falseLocal
 
-            HashSet<Type> seenTypes = new HashSet<Type>();
+            var seenTypes = new HashSet<Type>();
 
             if (UnityVersion.Major == 2019 && UnityVersion.Minor == 2)
-            {
                 // This here is a hack that fixes Unity's assembly updater triggering faultily in Unity 2019.2
                 // (and in early 2019.3 alphas/betas, but we're not handling those). When it triggers, it edits
                 // the generated AOT assembly such that it immediately causes Unity to hard crash. Having this 
@@ -154,7 +172,7 @@ namespace OdinSerializer.Editor
                 // 
                 // Unity should have fixed this in 2019.3, but said that a backport to 2019.2 is not guaranteed
                 // to occur, though it might.
-
+            {
                 supportSerializedTypes.Add(typeof(DateTimeFormatter));
             }
 
@@ -163,40 +181,46 @@ namespace OdinSerializer.Editor
                 var allTypesToSupport = new HashSet<Type>(supportSerializedTypes);
 
                 // Look at members and static serializer fields in all formatters to find types to support
-                foreach (var typeToSupport in supportSerializedTypes)
+                foreach (Type typeToSupport in supportSerializedTypes)
                 {
                     RecursivelyAddExtraTypesToSupport(typeToSupport, allTypesToSupport);
                 }
 
                 // Supplement with a hard-coded search for static serializer fields in all defined weak formatters,
                 // as the above will often not find those.
-                foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (Assembly loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (Type loadedType in loadedAssembly.SafeGetTypes())
                 {
-                    foreach (var loadedType in loadedAssembly.SafeGetTypes())
+                    if (!loadedType.IsAbstract && typeof(WeakBaseFormatter).IsAssignableFrom(loadedType))
                     {
-                        if (!loadedType.IsAbstract && typeof(WeakBaseFormatter).IsAssignableFrom(loadedType))
-                        {
-                            GatherExtraTypesToSupportFromStaticFormatterFields(loadedType, allTypesToSupport);
-                        }
+                        GatherExtraTypesToSupportFromStaticFormatterFields(loadedType, allTypesToSupport);
                     }
                 }
 
                 supportSerializedTypes = allTypesToSupport.ToList();
             }
 
-            foreach (var serializedType in supportSerializedTypes)
+            foreach (Type serializedType in supportSerializedTypes)
             {
-                if (serializedType == null) continue;
-
-                bool isAbstract = serializedType.IsAbstract || serializedType.IsInterface;
-                
-                if (serializedType.IsGenericType && (serializedType.IsGenericTypeDefinition || !serializedType.IsFullyConstructedGenericType()))
+                if (serializedType == null)
                 {
-                    Debug.LogError("Skipping type '" + serializedType.GetNiceFullName() + "'! Type is a generic type definition, or its arguments contain generic parameters; type must be a fully constructed generic type.");
                     continue;
                 }
 
-                if (seenTypes.Contains(serializedType)) continue;
+                var isAbstract = serializedType.IsAbstract || serializedType.IsInterface;
+
+                if (serializedType.IsGenericType && (serializedType.IsGenericTypeDefinition ||
+                                                     !serializedType.IsFullyConstructedGenericType()))
+                {
+                    Debug.LogError("Skipping type '" + serializedType.GetNiceFullName() +
+                                   "'! Type is a generic type definition, or its arguments contain generic parameters; type must be a fully constructed generic type.");
+                    continue;
+                }
+
+                if (seenTypes.Contains(serializedType))
+                {
+                    continue;
+                }
 
                 seenTypes.Add(serializedType);
 
@@ -204,14 +228,14 @@ namespace OdinSerializer.Editor
                 {
                     if (serializedType.IsValueType)
                     {
-                        var local = il.DeclareLocal(serializedType);
+                        LocalBuilder local = il.DeclareLocal(serializedType);
 
                         il.Emit(OpCodes.Ldloca, local);
                         il.Emit(OpCodes.Initobj, serializedType);
                     }
                     else if (!isAbstract)
                     {
-                        var constructor = serializedType.GetConstructor(Type.EmptyTypes);
+                        ConstructorInfo constructor = serializedType.GetConstructor(Type.EmptyTypes);
 
                         if (constructor != null)
                         {
@@ -222,9 +246,11 @@ namespace OdinSerializer.Editor
                 }
 
                 // Reference and/or create formatter type
-                if (!FormatterUtilities.IsPrimitiveType(serializedType) && !typeof(UnityEngine.Object).IsAssignableFrom(serializedType) && !isAbstract)
+                if (!FormatterUtilities.IsPrimitiveType(serializedType) &&
+                    !typeof(Object).IsAssignableFrom(serializedType) && !isAbstract)
                 {
-                    var actualFormatter = FormatterLocator.GetFormatter(serializedType, SerializationPolicies.Unity);
+                    IFormatter actualFormatter =
+                        FormatterLocator.GetFormatter(serializedType, SerializationPolicies.Unity);
 
                     if (actualFormatter.GetType().IsDefined<EmittedFormatterAttribute>())
                     {
@@ -241,13 +267,15 @@ namespace OdinSerializer.Editor
                         //}
                     }
 
-                    var formatters = FormatterLocator.GetAllCompatiblePredefinedFormatters(serializedType, SerializationPolicies.Unity);
+                    List<IFormatter> formatters =
+                        FormatterLocator.GetAllCompatiblePredefinedFormatters(serializedType,
+                            SerializationPolicies.Unity);
 
-                    foreach (var formatter in formatters)
+                    foreach (IFormatter formatter in formatters)
                     {
                         // Reference the pre-existing formatter
 
-                        var formatterConstructor = formatter.GetType().GetConstructor(Type.EmptyTypes);
+                        ConstructorInfo formatterConstructor = formatter.GetType().GetConstructor(Type.EmptyTypes);
 
                         if (formatterConstructor != null)
                         {
@@ -256,7 +284,7 @@ namespace OdinSerializer.Editor
                         }
                         else
                         {
-                            formatterConstructor = formatter.GetType().GetConstructor(new Type[] { typeof(Type) });
+                            formatterConstructor = formatter.GetType().GetConstructor(new[] { typeof(Type) });
 
                             if (formatterConstructor != null)
                             {
@@ -285,7 +313,7 @@ namespace OdinSerializer.Editor
                     //   generated for methods in base types of needed types - FX, Serializer<T>.ReadValueWeak()
                     //   may be missing. This only seems to happen in a relevant way for value types.
                     {
-                        var endLabel = il.DefineLabel();
+                        Label endLabel = il.DefineLabel();
 
                         // Load a false local value, then jump to the end of this segment of code due to that
                         //   false value. This is an attempt to trick any potential code flow analysis made
@@ -296,34 +324,38 @@ namespace OdinSerializer.Editor
                         il.Emit(OpCodes.Ldloc, falseLocal);
                         il.Emit(OpCodes.Brfalse, endLabel);
 
-                        var baseSerializerType = typeof(Serializer<>).MakeGenericType(serializedType);
+                        Type baseSerializerType = typeof(Serializer<>).MakeGenericType(serializedType);
 
-                        var readValueWeakMethod = baseSerializerType.GetMethod("ReadValueWeak", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null, new Type[] { typeof(IDataReader) }, null);
-                        var writeValueWeakMethod = baseSerializerType.GetMethod("WriteValueWeak", BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null, new Type[] { typeof(string), typeof(object), typeof(IDataWriter) }, null);
+                        MethodInfo readValueWeakMethod = baseSerializerType.GetMethod("ReadValueWeak",
+                            BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null,
+                            new[] { typeof(IDataReader) }, null);
+                        MethodInfo writeValueWeakMethod = baseSerializerType.GetMethod("WriteValueWeak",
+                            BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly, null,
+                            new[] { typeof(string), typeof(object), typeof(IDataWriter) }, null);
 
-                        il.Emit(OpCodes.Dup);                               // Duplicate serializer instance
-                        il.Emit(OpCodes.Ldnull);                            // Load null argument for IDataReader reader
-                        il.Emit(OpCodes.Callvirt, readValueWeakMethod);     // Call ReadValueWeak on serializer instance
-                        il.Emit(OpCodes.Pop);                               // Pop result of ReadValueWeak
+                        il.Emit(OpCodes.Dup); // Duplicate serializer instance
+                        il.Emit(OpCodes.Ldnull); // Load null argument for IDataReader reader
+                        il.Emit(OpCodes.Callvirt, readValueWeakMethod); // Call ReadValueWeak on serializer instance
+                        il.Emit(OpCodes.Pop); // Pop result of ReadValueWeak
 
-                        il.Emit(OpCodes.Dup);                               // Duplicate serializer instance
-                        il.Emit(OpCodes.Ldnull);                            // Load null argument for string name
-                        il.Emit(OpCodes.Ldnull);                            // Load null argument for object value
-                        il.Emit(OpCodes.Ldnull);                            // Load null argument for IDataWriter writer
-                        il.Emit(OpCodes.Callvirt, writeValueWeakMethod);    // Call WriteValueWeak on serializer instance
+                        il.Emit(OpCodes.Dup); // Duplicate serializer instance
+                        il.Emit(OpCodes.Ldnull); // Load null argument for string name
+                        il.Emit(OpCodes.Ldnull); // Load null argument for object value
+                        il.Emit(OpCodes.Ldnull); // Load null argument for IDataWriter writer
+                        il.Emit(OpCodes.Callvirt, writeValueWeakMethod); // Call WriteValueWeak on serializer instance
 
-                        il.MarkLabel(endLabel);                             // This is where the code always jumps to, skipping the above
+                        il.MarkLabel(endLabel); // This is where the code always jumps to, skipping the above
                     }
 
-                    il.Emit(OpCodes.Pop);       // Pop the serializer instance
+                    il.Emit(OpCodes.Pop); // Pop the serializer instance
                 }
                 else
                 {
-                    serializerConstructor = typeof(ComplexTypeSerializer<>).MakeGenericType(serializedType).GetConstructor(Type.EmptyTypes);
+                    serializerConstructor = typeof(ComplexTypeSerializer<>).MakeGenericType(serializedType)
+                        .GetConstructor(Type.EmptyTypes);
                     il.Emit(OpCodes.Newobj, serializerConstructor);
                     il.Emit(OpCodes.Pop);
                 }
-
             }
 
             //il.MarkLabel(endPoint);
@@ -362,7 +394,7 @@ namespace OdinSerializer.Editor
             if (generateLinkXml)
             {
                 File.WriteAllText(dirPath + "link.xml",
-    @"<linker>
+                    @"<linker>
        <assembly fullname=""" + assemblyName + @""" preserve=""all""/>
 </linker>");
             }
@@ -387,11 +419,11 @@ namespace OdinSerializer.Editor
 
                 // Disable for all standalones
                 pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneLinux64, false);
-                
+
                 if (!UnityVersion.IsVersionOrGreater(2019, 2))
                 {
-                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)17, false);       // StandaloneLinux
-                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)25, false);       // StandaloneLinuxUniversal
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)17, false); // StandaloneLinux
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)25, false); // StandaloneLinuxUniversal
                 }
 
                 // StandaloneOSXUniversal (<= 2017.2) / StandaloneOSX (>= 2017.3)
@@ -399,8 +431,8 @@ namespace OdinSerializer.Editor
 
                 if (!UnityVersion.IsVersionOrGreater(2017, 3))
                 {
-                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)4, false);        // StandaloneOSXIntel
-                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)27, false);       // StandaloneOSXIntel64
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)4, false); // StandaloneOSXIntel
+                    pluginImporter.SetCompatibleWithPlatform((BuildTarget)27, false); // StandaloneOSXIntel64
                 }
 
                 pluginImporter.SetCompatibleWithPlatform(BuildTarget.StandaloneWindows, false);
@@ -416,16 +448,23 @@ namespace OdinSerializer.Editor
 
         private static void RecursivelyAddExtraTypesToSupport(Type typeToSupport, HashSet<Type> allTypesToSupport)
         {
-            if (FormatterUtilities.IsPrimitiveType(typeToSupport)) return;
+            if (FormatterUtilities.IsPrimitiveType(typeToSupport))
+            {
+                return;
+            }
 
-            var serializedMembers = FormatterUtilities.GetSerializableMembers(typeToSupport, SerializationPolicies.Unity);
+            MemberInfo[] serializedMembers =
+                FormatterUtilities.GetSerializableMembers(typeToSupport, SerializationPolicies.Unity);
 
             // Gather all members that would normally be serialized in this type
-            foreach (var member in serializedMembers)
+            foreach (MemberInfo member in serializedMembers)
             {
-                var memberType = member.GetReturnType();
+                Type memberType = member.GetReturnType();
 
-                if (!AOTSupportScanner.AllowRegisterType(memberType)) continue;
+                if (!AOTSupportScanner.AllowRegisterType(memberType))
+                {
+                    continue;
+                }
 
                 if (allTypesToSupport.Add(memberType))
                 {
@@ -433,28 +472,35 @@ namespace OdinSerializer.Editor
                 }
             }
 
-            if (typeof(UnityEngine.Object).IsAssignableFrom(typeToSupport)) return;
+            if (typeof(Object).IsAssignableFrom(typeToSupport))
+            {
+                return;
+            }
 
             // Gather all types referenced by static serializer references
-            var formatters = FormatterLocator.GetAllCompatiblePredefinedFormatters(typeToSupport, SerializationPolicies.Unity);
+            List<IFormatter> formatters =
+                FormatterLocator.GetAllCompatiblePredefinedFormatters(typeToSupport, SerializationPolicies.Unity);
 
-            foreach (var formatter in formatters)
+            foreach (IFormatter formatter in formatters)
             {
                 GatherExtraTypesToSupportFromStaticFormatterFields(formatter.GetType(), allTypesToSupport);
             }
         }
 
-        private static void GatherExtraTypesToSupportFromStaticFormatterFields(Type formatterType, HashSet<Type> allTypesToSupport)
+        private static void GatherExtraTypesToSupportFromStaticFormatterFields(Type formatterType,
+            HashSet<Type> allTypesToSupport)
         {
-            var staticFormatterFields = formatterType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly | BindingFlags.Static);
+            FieldInfo[] staticFormatterFields = formatterType.GetFields(BindingFlags.Public | BindingFlags.NonPublic |
+                                                                        BindingFlags.DeclaredOnly |
+                                                                        BindingFlags.Static);
 
-            foreach (var field in staticFormatterFields)
+            foreach (FieldInfo field in staticFormatterFields)
             {
-                var parameters = field.FieldType.GetArgumentsOfInheritedOpenGenericClass(typeof(Serializer<>));
+                Type[] parameters = field.FieldType.GetArgumentsOfInheritedOpenGenericClass(typeof(Serializer<>));
 
                 if (parameters != null)
                 {
-                    foreach (var parameterType in parameters)
+                    foreach (Type parameterType in parameters)
                     {
                         if (allTypesToSupport.Add(parameterType))
                         {

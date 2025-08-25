@@ -21,13 +21,13 @@
 
 =========================================================================*/
 
-float get_noise_Value( float p )
+float get_noise_Value(float p)
 {
-    float i = floor( p );
-    float f = frac( p );
+    float i = floor(p);
+    float f = frac(p);
 
-    float u = quintic( f );
-    
+    float u = quintic(f);
+
     /*=====================================================================
     
         a(0)         b(1)
@@ -37,10 +37,10 @@ float get_noise_Value( float p )
 
     =====================================================================*/
 
-    float a = hash( i + 0.0 );
-    float b = hash( i + 1.0 );
+    float a = hash(i + 0.0);
+    float b = hash(i + 1.0);
 
-    return remap( lerp( a, b, u ).xxxx, -1, 1, 0, 1 ).x;
+    return remap(lerp(a, b, u).xxxx, -1, 1, 0, 1).x;
 }
 
 /*=========================================================================
@@ -49,12 +49,12 @@ float get_noise_Value( float p )
 
 =========================================================================*/
 
-float get_noise_Value( float2 p )
+float get_noise_Value(float2 p)
 {
-    float2 i = floor( p );
-    float2 f = frac( p );
-    
-    float2 u = quintic( f );
+    float2 i = floor(p);
+    float2 f = frac(p);
+
+    float2 u = quintic(f);
 
     /*=====================================================================
     
@@ -70,15 +70,15 @@ float get_noise_Value( float2 p )
 
     =====================================================================*/
 
-    float2 a = hash( i + float2( 0.0, 0.0 ) );
-    float2 b = hash( i + float2( 1.0, 0.0 ) );
-    float2 c = hash( i + float2( 0.0, 1.0 ) );
-    float2 d = hash( i + float2( 1.0, 1.0 ) );
+    float2 a = hash(i + float2(0.0, 0.0));
+    float2 b = hash(i + float2(1.0, 0.0));
+    float2 c = hash(i + float2(0.0, 1.0));
+    float2 d = hash(i + float2(1.0, 1.0));
 
-    float t1 = lerp( a, b, u.x );   // lerp along bottom edge of cell
-    float t2 = lerp( c, d, u.x );   // lerp along top edge of cell
+    float t1 = lerp(a, b, u.x); // lerp along bottom edge of cell
+    float t2 = lerp(c, d, u.x); // lerp along top edge of cell
 
-    return remap( lerp( t1, t2, u.y ).xxxx, -1, 1, 0, 1 ).x;
+    return remap(lerp(t1, t2, u.y).xxxx, -1, 1, 0, 1).x;
 }
 
 /*=========================================================================
@@ -87,12 +87,12 @@ float get_noise_Value( float2 p )
 
 =========================================================================*/
 
-float get_noise_Value( float3 p )
+float get_noise_Value(float3 p)
 {
-    float3 i = floor( p );
-    float3 f = frac( p );
+    float3 i = floor(p);
+    float3 f = frac(p);
 
-    float3 u = quintic( f );
+    float3 u = quintic(f);
 
     /*=====================================================================
     
@@ -110,24 +110,24 @@ float get_noise_Value( float3 p )
 
     =====================================================================*/
 
-    float3 a1 = hash( i + float3( 0.0, 0.0, 0.0 ) );
-    float3 b1 = hash( i + float3( 1.0, 0.0, 0.0 ) );
-    float3 c1 = hash( i + float3( 0.0, 1.0, 0.0 ) );
-    float3 d1 = hash( i + float3( 1.0, 1.0, 0.0 ) );
+    float3 a1 = hash(i + float3(0.0, 0.0, 0.0));
+    float3 b1 = hash(i + float3(1.0, 0.0, 0.0));
+    float3 c1 = hash(i + float3(0.0, 1.0, 0.0));
+    float3 d1 = hash(i + float3(1.0, 1.0, 0.0));
 
-    float3 a2 = hash( i + float3( 0.0, 0.0, 1.0 ) );
-    float3 b2 = hash( i + float3( 1.0, 0.0, 1.0 ) );
-    float3 c2 = hash( i + float3( 0.0, 1.0, 1.0 ) );
-    float3 d2 = hash( i + float3( 1.0, 1.0, 1.0 ) );
+    float3 a2 = hash(i + float3(0.0, 0.0, 1.0));
+    float3 b2 = hash(i + float3(1.0, 0.0, 1.0));
+    float3 c2 = hash(i + float3(0.0, 1.0, 1.0));
+    float3 d2 = hash(i + float3(1.0, 1.0, 1.0));
 
-    float t1 = lerp( lerp( a1, b1, u.x ), // lerp along bottom edge of cell
-                     lerp( c1, d1, u.x ), // lerp along top edge of cell
-                     u.y );             // lerp between top and bottom edges
-    float t2 = lerp( lerp( a2, b2, u.x ), // lerp along bottom edge of cell
-                     lerp( c2, d2, u.x ), // lerp along top edge of cell
-                     u.y );             // lerp between top and bottom edges
+    float t1 = lerp(lerp(a1, b1, u.x), // lerp along bottom edge of cell
+                    lerp(c1, d1, u.x), // lerp along top edge of cell
+                    u.y); // lerp between top and bottom edges
+    float t2 = lerp(lerp(a2, b2, u.x), // lerp along bottom edge of cell
+                    lerp(c2, d2, u.x), // lerp along top edge of cell
+                    u.y); // lerp between top and bottom edges
 
-    return remap( lerp( t1, t2, u.z ).xxxx, -1, 1, 0, 1 ).x;
+    return remap(lerp(t1, t2, u.z).xxxx, -1, 1, 0, 1).x;
 }
 
 /*=========================================================================
@@ -136,7 +136,7 @@ float get_noise_Value( float3 p )
 
 =========================================================================*/
 
-float get_noise_Value( float4 p )
+float get_noise_Value(float4 p)
 {
     return 0;
 }

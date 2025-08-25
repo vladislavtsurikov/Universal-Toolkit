@@ -12,10 +12,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
     public class FilterSettingsEditor : IMGUIElementEditor
     {
         private Runtime.Common.Settings.FilterSettings.FilterSettings _filterSettings;
+        private MaskFilterComponentSettingsEditor _maskFilterComponentSettingsEditor;
 
         private SimpleFilterEditor _simpleFilterEditor;
-        private MaskFilterComponentSettingsEditor _maskFilterComponentSettingsEditor;
-        
+
         public override void OnEnable()
         {
             _filterSettings = (Runtime.Common.Settings.FilterSettings.FilterSettings)Target;
@@ -25,11 +25,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
             _maskFilterComponentSettingsEditor = new MaskFilterComponentSettingsEditor();
             _maskFilterComponentSettingsEditor.Init(_filterSettings.MaskFilterComponentSettings);
         }
-        
+
         public override void OnGUI()
         {
-            _filterSettings.FilterType = (FilterType)CustomEditorGUILayout.EnumPopup(new GUIContent("Filter Type"), _filterSettings.FilterType);
-            
+            _filterSettings.FilterType =
+                (FilterType)CustomEditorGUILayout.EnumPopup(new GUIContent("Filter Type"), _filterSettings.FilterType);
+
             switch (_filterSettings.FilterType)
             {
                 case FilterType.SimpleFilter:

@@ -9,11 +9,11 @@ public static class ButtonExtensions
         {
             return;
         }
-        
+
         var pointerEventData = new PointerEventData(null) { button = PointerEventData.InputButton.Left };
         button.OnPointerClick(pointerEventData);
     }
-    
+
     public static void SimulatePointerDown(this Button button)
     {
         if (button == null || !button.interactable)

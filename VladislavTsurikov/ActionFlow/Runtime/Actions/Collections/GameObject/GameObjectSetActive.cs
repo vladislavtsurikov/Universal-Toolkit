@@ -10,7 +10,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
         public bool ActiveGameObject;
 
         public override string Name => $"Set Active {GameObject} to {ActiveGameObject}";
-        
+
         protected override UniTask<bool> Run(CancellationToken token)
         {
             GameObject.SetActive(ActiveGameObject);

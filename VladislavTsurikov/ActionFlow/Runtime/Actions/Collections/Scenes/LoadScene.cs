@@ -8,7 +8,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Scenes
     [Name("Scene/Load Scene")]
     public class LoadScene : Action
     {
-        public SceneReference SceneReference = new SceneReference();
+        public SceneReference SceneReference = new();
 
         public override string Name
         {
@@ -18,13 +18,11 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Scenes
                 {
                     return "Load Scene [Set Scene]";
                 }
-                else
-                {
-                    return $"Load Scene [{SceneReference.Scene.name}]";
-                }
+
+                return $"Load Scene [{SceneReference.Scene.name}]";
             }
         }
-        
+
         protected override async UniTask<bool> Run(CancellationToken token)
         {
             await SceneReference.LoadScene();

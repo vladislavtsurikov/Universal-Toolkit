@@ -6,25 +6,22 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class ObjectFilter
     {
-        public int LayerMask = ~0;
-        public List<System.Object> IgnoreObjects = new List<System.Object>();
-        public List<GameObject> FindPrefabs = new List<GameObject>();
-        public bool FindOnlySpecificInstancePrefabs = false;
         public bool FindOnlyInstancePrefabs = false;
+        public bool FindOnlySpecificInstancePrefabs;
+        public List<GameObject> FindPrefabs = new();
+        public List<object> IgnoreObjects = new();
+        public int LayerMask = ~0;
 
-        public void ClearIgnoreObjects()
-        {
-            IgnoreObjects.Clear();
-        }
+        public void ClearIgnoreObjects() => IgnoreObjects.Clear();
 
-        public void SetIgnoreObjects(List<System.Object> ignoreObjects)
+        public void SetIgnoreObjects(List<object> ignoreObjects)
         {
             if (ignoreObjects == null)
             {
                 return;
             }
 
-            IgnoreObjects = new List<System.Object>(ignoreObjects);
+            IgnoreObjects = new List<object>(ignoreObjects);
         }
 
         public void SetFindPrefabs(List<GameObject> prefabs)
@@ -39,85 +36,83 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
             FindPrefabs = new List<GameObject>(prefabs);
         }
 
-        public bool IsObjectIgnored(System.Object obj)
-        {
-            return IgnoreObjects.Contains(obj);
-        }
+        public bool IsObjectIgnored(object obj) => IgnoreObjects.Contains(obj);
 
         public bool Filter(int layer, GameObject prefab, object obj)
         {
-            if(!LayerEx.IsLayerBitSet(LayerMask, layer) || IgnoreObjects.Contains(obj))
+            if (!LayerEx.IsLayerBitSet(LayerMask, layer) || IgnoreObjects.Contains(obj))
             {
                 return false;
             }
 
-            if(FindOnlyInstancePrefabs)
+            if (FindOnlyInstancePrefabs)
             {
-                if(prefab == null)
+                if (prefab == null)
                 {
                     return false;
                 }
             }
-            
-            if(FindOnlySpecificInstancePrefabs)
+
+            if (FindOnlySpecificInstancePrefabs)
             {
-                if(FindPrefabs.Count == 0 || prefab == null)
+                if (FindPrefabs.Count == 0 || prefab == null)
                 {
                     return false;
                 }
-                
+
                 foreach (GameObject findPrefab in FindPrefabs)
                 {
-                    if(GameObjectUtility.IsSameGameObject(findPrefab, prefab))
+                    if (GameObjectUtility.IsSameGameObject(findPrefab, prefab))
                     {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
-            
+
             return true;
         }
 
         public bool Filter(ColliderObject colliderObject)
         {
-            if(colliderObject == null || !colliderObject.IsValid())
-            {
-                return false;
-            }
-            
-            if(!LayerEx.IsLayerBitSet(LayerMask, colliderObject.GetLayer()) || IgnoreObjects.Contains(colliderObject.Obj))
+            if (colliderObject == null || !colliderObject.IsValid())
             {
                 return false;
             }
 
-            if(FindOnlyInstancePrefabs)
+            if (!LayerEx.IsLayerBitSet(LayerMask, colliderObject.GetLayer()) ||
+                IgnoreObjects.Contains(colliderObject.Obj))
             {
-                if(colliderObject.GetPrefab() == null)
+                return false;
+            }
+
+            if (FindOnlyInstancePrefabs)
+            {
+                if (colliderObject.GetPrefab() == null)
                 {
                     return false;
                 }
             }
-            
-            if(FindOnlySpecificInstancePrefabs)
+
+            if (FindOnlySpecificInstancePrefabs)
             {
-                if(FindPrefabs.Count == 0 || colliderObject.GetPrefab() == null)
+                if (FindPrefabs.Count == 0 || colliderObject.GetPrefab() == null)
                 {
                     return false;
                 }
-                
+
                 foreach (GameObject prefab in FindPrefabs)
                 {
-                    if(GameObjectUtility.IsSameGameObject(prefab, colliderObject.GetPrefab()))
+                    if (GameObjectUtility.IsSameGameObject(prefab, colliderObject.GetPrefab()))
                     {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
-            
+
             return true;
         }
     }

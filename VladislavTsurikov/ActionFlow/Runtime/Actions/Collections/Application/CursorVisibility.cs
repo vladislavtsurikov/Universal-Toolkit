@@ -1,15 +1,14 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Application
 {
     [Name("Application/Cursor Visibility")]
     public class CursorVisibility : Action
     {
-        [SerializeField]
-        private bool _isVisible = true;
+        private readonly bool _isVisible = true;
 
         public override string Name => $"Set Cursor Visibility to {_isVisible}";
 

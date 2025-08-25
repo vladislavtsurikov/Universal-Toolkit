@@ -1,35 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 using OdinSerializer;
+using UnityEditor;
+using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabelMap
 {
     [LocationAsset("AddressableLoaderSystem/AddressableLabelMap")]
     public class AddressableLabelMapAsset : SerializedScriptableObjectSingleton<AddressableLabelMapAsset>
     {
+        private static List<string> _cachedLabels;
+
         [OdinSerialize]
         private Dictionary<Type, Dictionary<string, string>> _map = new();
-        
-        private static List<string> _cachedLabels = null;
 
         public bool TryGetLabel(string address, out string label)
         {
-            foreach (var entry in _map.Values)
+            foreach (Dictionary<string, string> entry in _map.Values)
             {
                 if (entry.TryGetValue(address, out label))
+                {
                     return true;
+                }
             }
 
             label = null;
             return false;
         }
 
-        public Dictionary<string, string> GetLabelsByType(Type type)
-        {
-            return _map.TryGetValue(type, out var result) ? result : new();
-        }
-        
+        public Dictionary<string, string> GetLabelsByType(Type type) =>
+            _map.TryGetValue(type, out Dictionary<string, string> result) ? result : new Dictionary<string, string>();
+
         public List<string> GetAllLabels()
         {
             if (_cachedLabels != null)
@@ -39,12 +40,10 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabe
 
             var allLabels = new HashSet<string>();
 
-            foreach (var typeMap in _map.Values)
+            foreach (Dictionary<string, string> typeMap in _map.Values)
+            foreach (var label in typeMap.Values)
             {
-                foreach (var label in typeMap.Values)
-                {
-                    allLabels.Add(label);
-                }
+                allLabels.Add(label);
             }
 
             _cachedLabels = new List<string>(allLabels);
@@ -55,7 +54,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabe
         public void SetMap(Dictionary<Type, Dictionary<string, string>> newMap)
         {
             _map = newMap;
-            UnityEditor.EditorUtility.SetDirty(this);
+            EditorUtility.SetDirty(this);
         }
 #endif
     }

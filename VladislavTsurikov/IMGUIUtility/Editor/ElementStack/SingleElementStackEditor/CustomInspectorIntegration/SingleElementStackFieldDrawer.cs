@@ -10,10 +10,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
 {
     public class SingleElementStackFieldDrawer : IMGUIFieldDrawer
     {
-        public override bool CanDraw(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(SingleElementStack<>);
-        }
+        public override bool CanDraw(Type type) =>
+            type.IsGenericType && type.GetGenericTypeDefinition() == typeof(SingleElementStack<>);
 
         public override object Draw(Rect rect, GUIContent label, Type fieldType, object value)
         {
@@ -29,13 +27,14 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
                 return value;
             }
 
-            Rect labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
-            Rect buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y, rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
+            var labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+            var buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y,
+                rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
 
             EditorGUI.LabelField(labelRect, label);
 
             var currentElement = singleElementStack.GetObjectElement();
-            string currentElementName = currentElement != null ? currentElement.GetType().Name : "No Element";
+            var currentElementName = currentElement != null ? currentElement.GetType().Name : "No Element";
 
             if (GUI.Button(buttonRect, currentElementName))
             {
@@ -47,11 +46,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
 
         private void ShowAddMenu(ISingleElementStack stack, Type elementType)
         {
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
-            foreach (var type in TypeHierarchyHelper.GetDerivedTypes(elementType))
+            foreach (Type type in TypeHierarchyHelper.GetDerivedTypes(elementType))
             {
-                string typeName = type.Name;
+                var typeName = type.Name;
 
                 menu.AddItem(new GUIContent(typeName), false, () => stack.ReplaceElement(type));
             }

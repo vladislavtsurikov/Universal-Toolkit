@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using OdinSerializer;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
@@ -12,21 +12,22 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
     [Serializable]
     public class TerrainManager : SceneData
     {
+        public delegate void ChangedTerrainCount(SceneDataManager sceneDataManager);
+
+        public static ChangedTerrainCount ChangedTerrainCountEvent;
         public Bounds Bounds;
 
         [OdinSerialize]
-        public List<TerrainHelper> TerrainHelperList = new List<TerrainHelper>();
-        [OdinSerialize]
-        public List<GameObject> TerrainGameObjectList = new List<GameObject>();    
+        public List<GameObject> TerrainGameObjectList = new();
 
-        public delegate void ChangedTerrainCount (SceneDataManager sceneDataManager);
-        public static ChangedTerrainCount ChangedTerrainCountEvent;
+        [OdinSerialize]
+        public List<TerrainHelper> TerrainHelperList = new();
 
         protected override void SetupSceneData()
         {
             ChangedTerrainCountEvent -= NewTerrainAction;
             ChangedTerrainCountEvent += NewTerrainAction;
-            
+
             FindAll();
 
             if (RefreshTerrainHelper())
@@ -37,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
         protected override void OnDisableElement()
         {
-            foreach (var item in TerrainHelperList)
+            foreach (TerrainHelper item in TerrainHelperList)
             {
                 item?.OnDisable();
             }
@@ -48,33 +49,30 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
             foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
-                
+
                 AddTerrains(terrainHelperAttribute.GetTerrains(SceneDataManager.Scene));
             }
         }
 
-        public void AddTerrain(GameObject go)
-        {
-            AddTerrains(new List<GameObject> {go});
-        }
+        public void AddTerrain(GameObject go) => AddTerrains(new List<GameObject> { go });
 
         public void AddTerrains(List<GameObject> terrainList)
-        {      
-            bool refreshTerrains = false;
+        {
+            var refreshTerrains = false;
 
-            for (int i = 0; i <= terrainList.Count -1; i++)
+            for (var i = 0; i <= terrainList.Count - 1; i++)
             {
-                if(AllTerrainHelperTypes.HasTerrainMonoBehaviourType(terrainList[i]))
+                if (AllTerrainHelperTypes.HasTerrainMonoBehaviourType(terrainList[i]))
                 {
-                    if (!TerrainGameObjectList.Contains(terrainList[i])) 
+                    if (!TerrainGameObjectList.Contains(terrainList[i]))
                     {
                         TerrainGameObjectList.Add(terrainList[i]);
                         refreshTerrains = true;
                     }
                 }
             }
-            
-            if(refreshTerrains)
+
+            if (refreshTerrains)
             {
                 RefreshTerrainHelper();
 
@@ -83,18 +81,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         }
 
         public void RemoveTerrains(List<GameObject> terrainList)
-        {      
-            if(TerrainGameObjectList.RemoveAll(terrainList.Contains) != 0)
+        {
+            if (TerrainGameObjectList.RemoveAll(terrainList.Contains) != 0)
             {
                 RefreshTerrainHelper();
                 ChangedTerrainCountEvent(SceneDataManager);
-            }            
+            }
         }
 
         public void CalculateBounds()
         {
-            Bounds newBounds = new Bounds(Vector3.zero, Vector3.zero);
-            for (int i = 0; i < TerrainHelperList.Count; i++)
+            var newBounds = new Bounds(Vector3.zero, Vector3.zero);
+            for (var i = 0; i < TerrainHelperList.Count; i++)
             {
                 TerrainHelper terrain = TerrainHelperList[i];
                 if (terrain != null)
@@ -117,7 +115,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         {
             foreach (TerrainHelper terrainHelper in TerrainHelperList)
             {
-                if(terrainHelper != null)
+                if (terrainHelper != null)
                 {
                     terrainHelper.RefreshData();
                 }
@@ -126,10 +124,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
         private bool DeleteInvalidTerrainData()
         {
-            List<GameObject> removeTerrains = new List<GameObject>();
+            var removeTerrains = new List<GameObject>();
             foreach (GameObject gameObject in TerrainGameObjectList)
             {
-                if(gameObject == null || gameObject.scene != SceneDataManager.Scene || !AllTerrainHelperTypes.HasTerrainMonoBehaviourType(gameObject))
+                if (gameObject == null || gameObject.scene != SceneDataManager.Scene ||
+                    !AllTerrainHelperTypes.HasTerrainMonoBehaviourType(gameObject))
                 {
                     removeTerrains.Add(gameObject);
                 }
@@ -140,40 +139,42 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
                 TerrainGameObjectList.Remove(terrain);
             }
 
-            if(removeTerrains.Count != 0)
+            if (removeTerrains.Count != 0)
+            {
                 return true;
-            
+            }
+
             return false;
         }
 
         private bool RefreshTerrainHelper()
         {
-            bool happenedDelete = DeleteInvalidTerrainData();
+            var happenedDelete = DeleteInvalidTerrainData();
             TerrainHelperList.Clear();
 
             foreach (GameObject go in TerrainGameObjectList)
             {
                 TerrainHelper terrainHelper = AllTerrainHelperTypes.CreateTerrainHelper(go);
 
-                if(terrainHelper != null)
+                if (terrainHelper != null)
                 {
                     TerrainHelperList.Add(terrainHelper);
                 }
             }
-            
+
             CalculateBounds();
 
             return happenedDelete;
         }
-        
+
         public void NewTerrainAction(SceneDataManager sceneDataManager)
         {
 #if UNITY_EDITOR
             SceneDataStackUtility.Setup<GameObjectCollider.Editor.GameObjectCollider>(true);
 #endif
         }
-        
-#if UNITY_EDITOR 
+
+#if UNITY_EDITOR
         public void DrawHandles()
         {
             Handles.color = Color.yellow;

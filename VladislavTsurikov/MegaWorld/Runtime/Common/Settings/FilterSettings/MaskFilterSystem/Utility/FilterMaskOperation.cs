@@ -8,18 +8,20 @@ using UnityEngine.Experimental.TerrainAPI;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility
 {
-    public static class FilterMaskOperation 
+    public static class FilterMaskOperation
     {
-        public static Texture2D UpdateMaskTexture(MaskFilterComponentSettings maskFilterComponentSettings, BoxArea boxArea)
+        public static Texture2D UpdateMaskTexture(MaskFilterComponentSettings maskFilterComponentSettings,
+            BoxArea boxArea)
         {
-            if(boxArea.TerrainUnder == null)
+            if (boxArea.TerrainUnder == null)
             {
                 return null;
             }
-            
-            if(maskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
+
+            if (maskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
             {
-                UpdateFilterContext(ref maskFilterComponentSettings.FilterContext, maskFilterComponentSettings.MaskFilterStack, boxArea);
+                UpdateFilterContext(ref maskFilterComponentSettings.FilterContext,
+                    maskFilterComponentSettings.MaskFilterStack, boxArea);
                 RenderTexture filterMaskRT = maskFilterComponentSettings.FilterContext.Output;
                 maskFilterComponentSettings.FilterMaskTexture2D = TextureUtility.ToTexture2D(filterMaskRT);
                 DisposeMaskTexture(maskFilterComponentSettings);
@@ -30,30 +32,31 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             return null;
         }
 
-        public static void UpdateFilterContext(ref MaskFilterContext filterContext, MaskFilterStack maskFilterStack, BoxArea boxArea)
+        public static void UpdateFilterContext(ref MaskFilterContext filterContext, MaskFilterStack maskFilterStack,
+            BoxArea boxArea)
         {
-            if(filterContext != null)
+            if (filterContext != null)
             {
                 filterContext.Dispose();
             }
 
-            TerrainPainterRenderHelper terrainPainterRenderHelper = new TerrainPainterRenderHelper(boxArea);
+            var terrainPainterRenderHelper = new TerrainPainterRenderHelper(boxArea);
 
             PaintContext heightContext = terrainPainterRenderHelper.AcquireHeightmap();
             PaintContext normalContext = terrainPainterRenderHelper.AcquireNormalmap();
 
-            RenderTexture output = new RenderTexture(heightContext.sourceRenderTexture.width, heightContext.sourceRenderTexture.height, heightContext.sourceRenderTexture.depth, RenderTextureFormat.ARGB32)
-                {
-                    enableRandomWrite = true
-                };
+            var output = new RenderTexture(heightContext.sourceRenderTexture.width,
+                heightContext.sourceRenderTexture.height, heightContext.sourceRenderTexture.depth,
+                RenderTextureFormat.ARGB32) { enableRandomWrite = true };
             output.Create();
 
-            filterContext = new MaskFilterContext(maskFilterStack, heightContext, normalContext, output, terrainPainterRenderHelper.BoxArea);
+            filterContext = new MaskFilterContext(maskFilterStack, heightContext, normalContext, output,
+                terrainPainterRenderHelper.BoxArea);
         }
 
         private static void DisposeMaskTexture(MaskFilterComponentSettings maskFilterComponentSettings)
         {
-            if(maskFilterComponentSettings.FilterContext != null)
+            if (maskFilterComponentSettings.FilterContext != null)
             {
                 maskFilterComponentSettings.FilterContext.Dispose();
                 maskFilterComponentSettings.FilterContext = null;

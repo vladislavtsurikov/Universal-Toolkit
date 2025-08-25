@@ -13,18 +13,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ElementsSystem
         public ToolsComponentStackEditor(AdvancedComponentStack<ToolComponentStack> list) : base(list)
         {
         }
-        
+
         public void DrawElements(Type toolType, List<Type> types)
         {
-            foreach (var item in Editors)
+            foreach (ToolStackElementEditor item in Editors)
             {
-                ToolComponentStack toolComponentStack = (ToolComponentStack)item.Target;
+                var toolComponentStack = (ToolComponentStack)item.Target;
 
                 if (toolComponentStack == null)
                 {
                     continue;
                 }
-                
+
                 if (toolComponentStack.ToolType == toolType)
                 {
                     item.GeneralComponentStackEditor.DrawElements(types);

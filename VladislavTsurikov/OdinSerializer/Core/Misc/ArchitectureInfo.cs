@@ -16,26 +16,26 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using UnityEngine;
+
 namespace OdinSerializer
 {
-    using System;
-    using UnityEngine;
-
     /// <summary>
-    /// This class gathers info about the current architecture for the purpose of determinining
-    /// the unaligned read/write capabilities that we have to work with.
+    ///     This class gathers info about the current architecture for the purpose of determinining
+    ///     the unaligned read/write capabilities that we have to work with.
     /// </summary>
-    public unsafe static class ArchitectureInfo
+    public static unsafe class ArchitectureInfo
     {
         public static bool Architecture_Supports_Unaligned_Float32_Reads;
 
         /// <summary>
-        /// This will be false on some ARM architectures, such as ARMv7.
-        /// In these cases, we will have to perform slower but safer int-by-int read/writes of data.
-        /// <para />
-        /// Since this value will never change at runtime, performance hits from checking this 
-        /// everywhere should hopefully be negligible, since branch prediction from speculative
-        /// execution will always predict it correctly.
+        ///     This will be false on some ARM architectures, such as ARMv7.
+        ///     In these cases, we will have to perform slower but safer int-by-int read/writes of data.
+        ///     <para />
+        ///     Since this value will never change at runtime, performance hits from checking this
+        ///     everywhere should hopefully be negligible, since branch prediction from speculative
+        ///     execution will always predict it correctly.
         /// </summary>
         public static bool Architecture_Supports_All_Unaligned_ReadWrites;
 
@@ -82,7 +82,7 @@ namespace OdinSerializer
                         // NullReferenceExceptions, and so we cannot test for
                         // them but must instead look at the architecture.
 
-                        byte[] testArray = new byte[8];
+                        var testArray = new byte[8];
 
                         fixed (byte* test = testArray)
                         {
@@ -93,9 +93,9 @@ namespace OdinSerializer
                             // because as far as I have been able to determine, there are no guarantees about the alignment 
                             // of local stack memory.
 
-                            for (int i = 0; i < 4; i++)
+                            for (var i = 0; i < 4; i++)
                             {
-                                float value = *(float*)(test + i);
+                                var value = *(float*)(test + i);
                             }
 
                             Architecture_Supports_Unaligned_Float32_Reads = true;
@@ -108,18 +108,22 @@ namespace OdinSerializer
 
                     if (Architecture_Supports_Unaligned_Float32_Reads)
                     {
-                        Debug.Log("Odin Serializer detected whitelisted runtime platform " + platform + " and memory read test succeeded; enabling all unaligned memory read/writes.");
+                        Debug.Log("Odin Serializer detected whitelisted runtime platform " + platform +
+                                  " and memory read test succeeded; enabling all unaligned memory read/writes.");
                         Architecture_Supports_All_Unaligned_ReadWrites = true;
                     }
                     else
                     {
-                        Debug.Log("Odin Serializer detected whitelisted runtime platform " + platform + " and memory read test failed; disabling all unaligned memory read/writes.");
+                        Debug.Log("Odin Serializer detected whitelisted runtime platform " + platform +
+                                  " and memory read test failed; disabling all unaligned memory read/writes.");
                     }
+
                     break;
                 default:
                     Architecture_Supports_Unaligned_Float32_Reads = false;
                     Architecture_Supports_All_Unaligned_ReadWrites = false;
-                    Debug.Log("Odin Serializer detected non-white-listed runtime platform " + platform + "; disabling all unaligned memory read/writes.");
+                    Debug.Log("Odin Serializer detected non-white-listed runtime platform " + platform +
+                              "; disabling all unaligned memory read/writes.");
                     break;
             }
         }

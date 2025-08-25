@@ -7,29 +7,26 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
     [Serializable]
-    [CreateComponents(new[]{typeof(MoveAlongDirection), typeof(Scale), typeof(Rotation)})]
+    [CreateComponents(new[] { typeof(MoveAlongDirection), typeof(Scale), typeof(Rotation) })]
     public class MouseActionStack : ComponentStackOnlyDifferentTypes<MouseAction>
     {
-        public bool IsAnyMouseActionActive 
-        { 
-            get 
-            { 
+        public bool IsAnyMouseActionActive
+        {
+            get
+            {
                 foreach (MouseAction data in _elementList)
                 {
                     if (data.Active)
                     {
                         return true;
                     }
-                } 
+                }
 
                 return false;
-            } 
+            }
         }
 
-        protected void OnRemoveInvalidComponents()
-        {
-            RemoveElementsWithSameType();
-        }
+        protected void OnRemoveInvalidComponents() => RemoveElementsWithSameType();
 
         public void OnMouseMove()
         {
@@ -40,20 +37,20 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     data.OnMouseMove();
                     break;
                 }
-            } 
+            }
         }
 
         public void CheckShortcutCombos(GameObject gameObject, RayHit hit)
         {
-            if(hit == null)
+            if (hit == null)
             {
                 return;
             }
-            
+
             foreach (MouseAction data in _elementList)
             {
                 data.CheckShortcutCombos(gameObject, hit.Normal);
-            }   
+            }
         }
 
         public void End()
@@ -61,7 +58,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             foreach (MouseAction data in _elementList)
             {
                 data.End();
-            }   
+            }
         }
 
         public void OnRepaint()
@@ -73,7 +70,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     data.OnRepaint();
                     break;
                 }
-            } 
+            }
         }
     }
 }

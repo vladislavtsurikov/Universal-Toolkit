@@ -7,9 +7,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
     {
         public readonly Type[] Types;
 
-        public AddGlobalComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddGlobalComponentsAttribute(Type[] types) => Types = types;
     }
 }

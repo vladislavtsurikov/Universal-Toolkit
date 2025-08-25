@@ -18,233 +18,101 @@
 
 //#define PREFAB_DEBUG
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization;
+using System.Text;
+using OdinSerializer.Utilities;
 using UnityEditor;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.Events;
+using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
 
 namespace OdinSerializer
 {
-    using System.Globalization;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using Utilities;
-    using UnityEngine;
-    using UnityEngine.Events;
-    using System.Runtime.CompilerServices;
-    using UnityEngine.Assertions;
-    using System.Runtime.Serialization;
-
 #if PREFAB_DEBUG && !SIRENIX_INTERNAL
 #warning "Prefab serialization debugging is enabled outside of Sirenix internal. Are you sure this is right?"
 #endif
 
     /// <summary>
-    /// Provides an array of utility wrapper methods for easy serialization and deserialization of Unity objects of any type.
-    /// Note that, during serialization, it is always assumed that we are running on Unity's main thread. Deserialization can
-    /// happen on any thread, and all API's interacting with deserialization are thread-safe.
-    /// <para />
-    /// Note that setting the IndexReferenceResolver on contexts passed into methods on this class will have no effect, as it will always
-    /// be set to a UnityReferenceResolver.
+    ///     Provides an array of utility wrapper methods for easy serialization and deserialization of Unity objects of any
+    ///     type.
+    ///     Note that, during serialization, it is always assumed that we are running on Unity's main thread. Deserialization
+    ///     can
+    ///     happen on any thread, and all API's interacting with deserialization are thread-safe.
+    ///     <para />
+    ///     Note that setting the IndexReferenceResolver on contexts passed into methods on this class will have no effect, as
+    ///     it will always
+    ///     be set to a UnityReferenceResolver.
     /// </summary>
     public static class UnitySerializationUtility
     {
-        public static readonly Type SerializeReferenceAttributeType = typeof(SerializeField).Assembly.GetType("UnityEngine.SerializeReference");
+        public static readonly Type SerializeReferenceAttributeType =
+            typeof(SerializeField).Assembly.GetType("UnityEngine.SerializeReference");
 
         private static readonly Assembly String_Assembly = typeof(string).Assembly;
         private static readonly Assembly HashSet_Assembly = typeof(HashSet<>).Assembly;
         private static readonly Assembly LinkedList_Assembly = typeof(LinkedList<>).Assembly;
 
-
-#if UNITY_EDITOR        
-        private static bool isDoingDomainReload;
-
-        [UnityEditor.InitializeOnLoadMethod]
-        private static void SubscribeToDomainReloadEvents()
-        {
-            var AssemblyReloadEvents_Type = TwoWaySerializationBinder.Default.BindToType("UnityEditor.AssemblyReloadEvents");
-
-            if (AssemblyReloadEvents_Type == null) return;
-
-            var AssemblyReloadEvents_beforeAssemblyReload_Event = AssemblyReloadEvents_Type.GetEvent("beforeAssemblyReload");
-            var AssemblyReloadEvents_afterAssemblyReload_Event = AssemblyReloadEvents_Type.GetEvent("afterAssemblyReload");
-            var AssemblyReloadEvents_AssemblyReloadCallback_Type = AssemblyReloadEvents_Type.GetNestedType("AssemblyReloadCallback");
-
-            if (AssemblyReloadEvents_beforeAssemblyReload_Event == null || AssemblyReloadEvents_afterAssemblyReload_Event == null || AssemblyReloadEvents_AssemblyReloadCallback_Type == null)
-            {
-                return;
-            }
-
-            var UnitySerializationUtility_OnBeforeAssemblyReload_Method = typeof(UnitySerializationUtility).GetMethod("OnBeforeAssemblyReload", Flags.StaticAnyVisibility);
-            var UnitySerializationUtility_OnAfterAssemblyReload_Method = typeof(UnitySerializationUtility).GetMethod("OnAfterAssemblyReload", Flags.StaticAnyVisibility);
-
-            var onBeforeDelegate = Delegate.CreateDelegate(AssemblyReloadEvents_AssemblyReloadCallback_Type, UnitySerializationUtility_OnBeforeAssemblyReload_Method);
-            var onAfterDelegate = Delegate.CreateDelegate(AssemblyReloadEvents_AssemblyReloadCallback_Type, UnitySerializationUtility_OnAfterAssemblyReload_Method);
-
-            AssemblyReloadEvents_beforeAssemblyReload_Event.AddEventHandler(null, onBeforeDelegate);
-            AssemblyReloadEvents_afterAssemblyReload_Event.AddEventHandler(null, onAfterDelegate);
-        }
-
-        private static void OnBeforeAssemblyReload()
-        {
-            isDoingDomainReload = true;
-        }
-
-        private static void OnAfterAssemblyReload()
-        {
-            isDoingDomainReload = false;
-        }
-
-        /// <summary>
-        /// From the new scriptable build pipeline package
-        /// </summary>
-        [NonSerialized]
-        private static readonly Type SBP_ContentPipelineType = TwoWaySerializationBinder.Default.BindToType("UnityEditor.Build.Pipeline.ContentPipeline");
-
-        [NonSerialized]
-        private static readonly MethodInfo PrefabUtility_IsComponentAddedToPrefabInstance_MethodInfo = typeof(UnityEditor.PrefabUtility).GetMethod("IsComponentAddedToPrefabInstance");
-
-        [NonSerialized]
-        private static readonly HashSet<UnityEngine.Object> UnityObjectsWaitingForDelayedModificationApply = new HashSet<UnityEngine.Object>(ReferenceEqualityComparer<UnityEngine.Object>.Default);
-
-        [NonSerialized]
-        private static readonly Dictionary<UnityEngine.Object, List<PrefabModification>> RegisteredPrefabModifications = new Dictionary<UnityEngine.Object, List<PrefabModification>>(ReferenceEqualityComparer<UnityEngine.Object>.Default);
-
-        private static class PrefabDeserializeUtility
-        {
-            private static int updateCount = 0;
-
-            [NonSerialized]
-            public static readonly HashSet<UnityEngine.Object> PrefabsWithValuesApplied = new HashSet<UnityEngine.Object>(ReferenceEqualityComparer<UnityEngine.Object>.Default);
-
-            [NonSerialized]
-            private static readonly Dictionary<UnityEngine.Object, HashSet<object>> SceneObjectsToKeepOnApply = new Dictionary<UnityEngine.Object, HashSet<object>>(ReferenceEqualityComparer<UnityEngine.Object>.Default);
-
-            [NonSerialized]
-            public static readonly object DeserializePrefabs_LOCK = new object();
-
-            private static readonly List<UnityEngine.Object> toRemove = new List<UnityEngine.Object>();
-
-            static PrefabDeserializeUtility()
-            {
-                UnityEditor.EditorApplication.update += OnEditorUpdate;
-            }
-
-            /// <summary>
-            /// Note: it is assumed that code calling this is holding the DeserializePrefabCaches_LOCK lock, and will continue to hold it while the returned hashset is being modified
-            /// </summary>
-            public static HashSet<object> GetSceneObjectsToKeepSet(UnityEngine.Object unityObject, bool createIfDoesntExist)
-            {
-                HashSet<object> keep;
-
-                if (!SceneObjectsToKeepOnApply.TryGetValue(unityObject, out keep))
-                {
-                    keep = new HashSet<object>(ReferenceEqualityComparer<object>.Default);
-                    SceneObjectsToKeepOnApply.Add(unityObject, keep);
-                }
-
-                return keep;
-            }
-
-            public static void CleanSceneObjectToKeepOnApply()
-            {
-                lock (DeserializePrefabs_LOCK)
-                {
-                    foreach (var obj in SceneObjectsToKeepOnApply.Keys)
-                    {
-                        if (obj == null)
-                        {
-                            toRemove.Add(obj);
-                        }
-                    }
-
-                    for (int i = 0; i < toRemove.Count; i++)
-                    {
-                        SceneObjectsToKeepOnApply.Remove(toRemove[i]);
-                    }
-
-                    toRemove.Clear();
-                }
-            }
-
-            private static void OnEditorUpdate()
-            {
-                lock (DeserializePrefabs_LOCK)
-                {
-                    updateCount++;
-
-                    if (updateCount >= 1000)
-                    {
-                        SceneObjectsToKeepOnApply.Clear();
-                        updateCount = 0;
-                    }
-                }
-            }
-        }
-
-#endif
-
         // Note: Code that accesses any of these four caches should lock on the cache data structure itself
-        private static readonly Dictionary<MemberInfo, WeakValueGetter> UnityMemberGetters = new Dictionary<MemberInfo, WeakValueGetter>();
-        private static readonly Dictionary<MemberInfo, WeakValueSetter> UnityMemberSetters = new Dictionary<MemberInfo, WeakValueSetter>();
-        private static readonly Dictionary<MemberInfo, bool> UnityWillSerializeMembersCache = new Dictionary<MemberInfo, bool>();
-        private static readonly Dictionary<Type, bool> UnityWillSerializeTypesCache = new Dictionary<Type, bool>();
+        private static readonly Dictionary<MemberInfo, WeakValueGetter> UnityMemberGetters = new();
+        private static readonly Dictionary<MemberInfo, WeakValueSetter> UnityMemberSetters = new();
+        private static readonly Dictionary<MemberInfo, bool> UnityWillSerializeMembersCache = new();
+        private static readonly Dictionary<Type, bool> UnityWillSerializeTypesCache = new();
 
-        private static readonly HashSet<Type> UnityNeverSerializesTypes = new HashSet<Type>()
-        {
-            typeof(Coroutine)
-        };
+        private static readonly HashSet<Type> UnityNeverSerializesTypes = new() { typeof(Coroutine) };
 
-        private static readonly HashSet<string> UnityNeverSerializesTypeNames = new HashSet<string>()
-        {
-            "UnityEngine.AnimationState"
-        };
+        private static readonly HashSet<string> UnityNeverSerializesTypeNames = new() { "UnityEngine.AnimationState" };
 
-#if UNITY_EDITOR
+        private static readonly ISerializationPolicy UnityPolicy = SerializationPolicies.Unity;
+        private static readonly ISerializationPolicy EverythingPolicy = SerializationPolicies.Everything;
+        private static readonly ISerializationPolicy StrictPolicy = SerializationPolicies.Strict;
 
-        /// <summary>
-        /// Whether to always force editor mode serialization. This member only exists in the editor.
-        /// </summary>
-        public static bool ForceEditorModeSerialization { get; set; }
+        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult>
+            OdinWillSerializeCache_UnityPolicy = new(ReferenceEqualityComparer<MemberInfo>.Default);
 
-        /// <summary>
-        /// Not yet documented.
-        /// </summary>
-        public static List<PrefabModification> GetRegisteredPrefabModifications(UnityEngine.Object obj)
-        {
-            List<PrefabModification> result;
-            RegisteredPrefabModifications.TryGetValue(obj, out result);
-            return result;
-        }
+        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult>
+            OdinWillSerializeCache_EverythingPolicy = new(ReferenceEqualityComparer<MemberInfo>.Default);
 
-        public static bool HasModificationsWaitingForDelayedApply(UnityEngine.Object obj)
-        {
-            return UnityObjectsWaitingForDelayedModificationApply.Contains(obj);
-        }
+        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult>
+            OdinWillSerializeCache_StrictPolicy = new(ReferenceEqualityComparer<MemberInfo>.Default);
 
-#endif
+        private static readonly
+            Dictionary<ISerializationPolicy, Dictionary<MemberInfo, CachedSerializationBackendResult>>
+            OdinWillSerializeCache_CustomPolicies = new(ReferenceEqualityComparer<ISerializationPolicy>.Default);
 
         /// <summary>
-        /// Checks whether Odin will serialize a given member.
+        ///     Checks whether Odin will serialize a given member.
         /// </summary>
         /// <param name="member">The member to check.</param>
         /// <param name="serializeUnityFields">Whether to allow serialization of members that will also be serialized by Unity.</param>
-        /// <param name="policy">The policy that Odin should be using for serialization of the given member. If this parameter is null, it defaults to <see cref="SerializationPolicies.Unity"/>.</param>
+        /// <param name="policy">
+        ///     The policy that Odin should be using for serialization of the given member. If this parameter is
+        ///     null, it defaults to <see cref="SerializationPolicies.Unity" />.
+        /// </param>
         /// <returns>True if Odin will serialize the member, otherwise false.</returns>
-        public static bool OdinWillSerialize(MemberInfo member, bool serializeUnityFields, ISerializationPolicy policy = null)
+        public static bool OdinWillSerialize(MemberInfo member, bool serializeUnityFields,
+            ISerializationPolicy policy = null)
         {
             Dictionary<MemberInfo, CachedSerializationBackendResult> cacheForPolicy;
-            
-            if (policy == null || object.ReferenceEquals(policy, UnityPolicy))
+
+            if (policy == null || ReferenceEquals(policy, UnityPolicy))
             {
                 cacheForPolicy = OdinWillSerializeCache_UnityPolicy;
             }
-            else if (object.ReferenceEquals(policy, EverythingPolicy))
+            else if (ReferenceEquals(policy, EverythingPolicy))
             {
                 cacheForPolicy = OdinWillSerializeCache_EverythingPolicy;
             }
-            else if (object.ReferenceEquals(policy, StrictPolicy))
+            else if (ReferenceEquals(policy, StrictPolicy))
             {
                 cacheForPolicy = OdinWillSerializeCache_StrictPolicy;
             }
@@ -254,7 +122,9 @@ namespace OdinSerializer
                 {
                     if (!OdinWillSerializeCache_CustomPolicies.TryGetValue(policy, out cacheForPolicy))
                     {
-                        cacheForPolicy = new Dictionary<MemberInfo, CachedSerializationBackendResult>(ReferenceEqualityComparer<MemberInfo>.Default);
+                        cacheForPolicy =
+                            new Dictionary<MemberInfo, CachedSerializationBackendResult>(
+                                ReferenceEqualityComparer<MemberInfo>.Default);
                         OdinWillSerializeCache_CustomPolicies.Add(policy, cacheForPolicy);
                     }
                 }
@@ -266,16 +136,18 @@ namespace OdinSerializer
             {
                 if (!cacheForPolicy.TryGetValue(member, out result))
                 {
-                    result = default(CachedSerializationBackendResult);
+                    result = default;
 
                     if (serializeUnityFields)
                     {
-                        result.SerializeUnityFieldsTrueResult = CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
+                        result.SerializeUnityFieldsTrueResult =
+                            CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
                         result.HasCalculatedSerializeUnityFieldsTrueResult = true;
                     }
                     else
                     {
-                        result.SerializeUnityFieldsFalseResult = CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
+                        result.SerializeUnityFieldsFalseResult =
+                            CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
                         result.HasCalculatedSerializeUnityFieldsFalseResult = true;
                     }
 
@@ -285,28 +157,40 @@ namespace OdinSerializer
                 {
                     if (serializeUnityFields && !result.HasCalculatedSerializeUnityFieldsTrueResult)
                     {
-                        result.SerializeUnityFieldsTrueResult = CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
+                        result.SerializeUnityFieldsTrueResult =
+                            CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
                         result.HasCalculatedSerializeUnityFieldsTrueResult = true;
 
                         cacheForPolicy[member] = result;
                     }
                     else if (!serializeUnityFields && !result.HasCalculatedSerializeUnityFieldsFalseResult)
                     {
-                        result.SerializeUnityFieldsFalseResult = CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
+                        result.SerializeUnityFieldsFalseResult =
+                            CalculateOdinWillSerialize(member, serializeUnityFields, policy ?? UnityPolicy);
                         result.HasCalculatedSerializeUnityFieldsFalseResult = true;
 
                         cacheForPolicy[member] = result;
                     }
                 }
 
-                return serializeUnityFields ? result.SerializeUnityFieldsTrueResult : result.SerializeUnityFieldsFalseResult;
+                return serializeUnityFields
+                    ? result.SerializeUnityFieldsTrueResult
+                    : result.SerializeUnityFieldsFalseResult;
             }
         }
 
-        private static bool CalculateOdinWillSerialize(MemberInfo member, bool serializeUnityFields, ISerializationPolicy policy)
+        private static bool CalculateOdinWillSerialize(MemberInfo member, bool serializeUnityFields,
+            ISerializationPolicy policy)
         {
-            if (member.DeclaringType == typeof(UnityEngine.Object)) return false;
-            if (!policy.ShouldSerializeMember(member)) return false;
+            if (member.DeclaringType == typeof(Object))
+            {
+                return false;
+            }
+
+            if (!policy.ShouldSerializeMember(member))
+            {
+                return false;
+            }
 
             // Allow serialization of fields with [OdinSerialize], regardless of whether Unity
             // serializes the field or not
@@ -316,46 +200,37 @@ namespace OdinSerializer
             }
 
             // No need to check whether Unity serializes it or not, our answer will always be the same
-            if (serializeUnityFields) return true;
+            if (serializeUnityFields)
+            {
+                return true;
+            }
 
             try
             {
                 if (SerializeReferenceAttributeType != null && member.IsDefined(SerializeReferenceAttributeType, true))
-                {
                     // Unity is serializing it as a polymorphic value
+                {
                     return false;
                 }
             }
-            catch { }
+            catch
+            {
+            }
 
-            if (GuessIfUnityWillSerialize(member)) return false;
+            if (GuessIfUnityWillSerialize(member))
+            {
+                return false;
+            }
 
             return true;
         }
 
-        private struct CachedSerializationBackendResult
-        {
-            public bool HasCalculatedSerializeUnityFieldsTrueResult;
-            public bool HasCalculatedSerializeUnityFieldsFalseResult;
-
-            public bool SerializeUnityFieldsTrueResult;
-            public bool SerializeUnityFieldsFalseResult;
-        }
-
-        private static readonly ISerializationPolicy UnityPolicy = SerializationPolicies.Unity;
-        private static readonly ISerializationPolicy EverythingPolicy = SerializationPolicies.Everything;
-        private static readonly ISerializationPolicy StrictPolicy = SerializationPolicies.Strict;
-        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult> OdinWillSerializeCache_UnityPolicy = new Dictionary<MemberInfo, CachedSerializationBackendResult>(ReferenceEqualityComparer<MemberInfo>.Default);
-        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult> OdinWillSerializeCache_EverythingPolicy = new Dictionary<MemberInfo, CachedSerializationBackendResult>(ReferenceEqualityComparer<MemberInfo>.Default);
-        private static readonly Dictionary<MemberInfo, CachedSerializationBackendResult> OdinWillSerializeCache_StrictPolicy = new Dictionary<MemberInfo, CachedSerializationBackendResult>(ReferenceEqualityComparer<MemberInfo>.Default);
-        private static readonly Dictionary<ISerializationPolicy, Dictionary<MemberInfo, CachedSerializationBackendResult>> OdinWillSerializeCache_CustomPolicies = new Dictionary<ISerializationPolicy, Dictionary<MemberInfo, CachedSerializationBackendResult>>(ReferenceEqualityComparer<ISerializationPolicy>.Default);
-
         /// <summary>
-        /// Guesses whether or not Unity will serialize a given member. This is not completely accurate.
+        ///     Guesses whether or not Unity will serialize a given member. This is not completely accurate.
         /// </summary>
         /// <param name="member">The member to check.</param>
         /// <returns>True if it is guessed that Unity will serialize the member, otherwise false.</returns>
-        /// <exception cref="System.ArgumentNullException">The parameter <paramref name="member"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">The parameter <paramref name="member" /> is null.</exception>
         public static bool GuessIfUnityWillSerialize(MemberInfo member)
         {
             if (member == null)
@@ -379,7 +254,7 @@ namespace OdinSerializer
 
         private static bool GuessIfUnityWillSerializePrivate(MemberInfo member)
         {
-            FieldInfo fieldInfo = member as FieldInfo;
+            var fieldInfo = member as FieldInfo;
 
             if (fieldInfo == null || fieldInfo.IsStatic || fieldInfo.IsInitOnly)
             {
@@ -391,14 +266,15 @@ namespace OdinSerializer
                 return false;
             }
 
-            if (SerializeReferenceAttributeType != null && fieldInfo.IsDefined(SerializeReferenceAttributeType, true))
+            if (SerializeReferenceAttributeType != null &&
+                fieldInfo.IsDefined(SerializeReferenceAttributeType, true))
             {
                 return true;
             }
 
-            if (!typeof(UnityEngine.Object).IsAssignableFrom(fieldInfo.FieldType) && fieldInfo.FieldType == fieldInfo.DeclaringType)
-            {
+            if (!typeof(Object).IsAssignableFrom(fieldInfo.FieldType) && fieldInfo.FieldType == fieldInfo.DeclaringType)
                 // Unity will not serialize references that are obviously cyclical
+            {
                 return false;
             }
 
@@ -416,11 +292,11 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Guesses whether or not Unity will serialize a given type. This is not completely accurate.
+        ///     Guesses whether or not Unity will serialize a given type. This is not completely accurate.
         /// </summary>
         /// <param name="type">The type to check.</param>
         /// <returns>True if it is guessed that Unity will serialize the type, otherwise false.</returns>
-        /// <exception cref="System.ArgumentNullException">The parameter <paramref name="type"/> is null.</exception>
+        /// <exception cref="System.ArgumentNullException">The parameter <paramref name="type" /> is null.</exception>
         public static bool GuessIfUnityWillSerialize(Type type)
         {
             if (type == null)
@@ -444,12 +320,13 @@ namespace OdinSerializer
 
         private static bool GuessIfUnityWillSerializePrivate(Type type)
         {
-            if (UnityNeverSerializesTypes.Contains(type) || UnityNeverSerializesTypeNames.Contains(type.FullName))
+            if (UnityNeverSerializesTypes.Contains(type) ||
+                UnityNeverSerializesTypeNames.Contains(type.FullName))
             {
                 return false;
             }
 
-            if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+            if (typeof(Object).IsAssignableFrom(type))
             {
                 if (type.IsGenericType)
                 {
@@ -468,16 +345,14 @@ namespace OdinSerializer
 
             if (type.IsEnum)
             {
-                var underlyingType = Enum.GetUnderlyingType(type);
+                Type underlyingType = Enum.GetUnderlyingType(type);
 
                 if (UnityVersion.IsVersionOrGreater(5, 6))
                 {
                     return underlyingType != typeof(long) && underlyingType != typeof(ulong);
                 }
-                else
-                {
-                    return underlyingType == typeof(int) || underlyingType == typeof(byte);
-                }
+
+                return underlyingType == typeof(int) || underlyingType == typeof(byte);
             }
 
             if (type.IsPrimitive || type == typeof(string))
@@ -497,35 +372,38 @@ namespace OdinSerializer
                     return false;
                 }
 
-                return (type == typeof(UnityEvent) || type.IsDefined<SerializableAttribute>(false));
+                return type == typeof(UnityEvent) || type.IsDefined<SerializableAttribute>(false);
             }
 
             if (type.IsArray)
             {
                 // Unity does not support multidim arrays, or arrays of lists or arrays.
-                var elementType = type.GetElementType();
+                Type elementType = type.GetElementType();
 
                 return type.GetArrayRank() == 1
-                    && !elementType.IsArray
-                    && !elementType.ImplementsOpenGenericClass(typeof(List<>))
-                    && GuessIfUnityWillSerialize(elementType);
+                       && !elementType.IsArray
+                       && !elementType.ImplementsOpenGenericClass(typeof(List<>))
+                       && GuessIfUnityWillSerialize(elementType);
             }
 
-            if (type.IsGenericType && !type.IsGenericTypeDefinition && type.GetGenericTypeDefinition() == typeof(List<>))
+            if (type.IsGenericType && !type.IsGenericTypeDefinition &&
+                type.GetGenericTypeDefinition() == typeof(List<>))
             {
                 // Unity does not support lists or arrays in lists.
-                var elementType = type.GetArgumentsOfInheritedOpenGenericClass(typeof(List<>))[0];
+                Type elementType = type.GetArgumentsOfInheritedOpenGenericClass(typeof(List<>))[0];
                 if (elementType.IsArray || elementType.ImplementsOpenGenericClass(typeof(List<>)))
                 {
                     return false;
                 }
+
                 return GuessIfUnityWillSerialize(elementType);
             }
 
-            if (type.Assembly.FullName.StartsWith("UnityEngine", StringComparison.InvariantCulture) || type.Assembly.FullName.StartsWith("UnityEditor", StringComparison.InvariantCulture))
-            {
+            if (type.Assembly.FullName.StartsWith("UnityEngine", StringComparison.InvariantCulture) ||
+                type.Assembly.FullName.StartsWith("UnityEditor", StringComparison.InvariantCulture))
                 // We assume Unity will serialize all of their own structs and classes (many of them are not marked serializable).
                 // If not, well, too bad - the user can use the [OdinSerialize] attribute on their field/property in that case to trigger custom serialization.
+            {
                 return true;
             }
 
@@ -537,7 +415,8 @@ namespace OdinSerializer
 
             // Unity does not serialize [Serializable] structs and classes if they are defined in mscorlib, System.dll or System.Core.dll if those are present
             // Checking against the assemblies that declare System.String, HashSet<T> and LinkedList<T> is a simple way to do this.
-            if (type.Assembly == String_Assembly || type.Assembly == HashSet_Assembly || type.Assembly == LinkedList_Assembly)
+            if (type.Assembly == String_Assembly || type.Assembly == HashSet_Assembly ||
+                type.Assembly == LinkedList_Assembly)
             {
                 return false;
             }
@@ -549,36 +428,38 @@ namespace OdinSerializer
                 {
                     return true;
                 }
-                else
-                {
-                    return type.IsClass;
-                }
+
+                return type.IsClass;
             }
 
             // Check for synclists if legacy networking is present
             // it was removed in 2018.2
-            if (!UnityVersion.IsVersionOrGreater(2018, 2)) 
+            if (!UnityVersion.IsVersionOrGreater(2018, 2))
             {
                 Type current = type.BaseType;
 
                 while (current != null && current != typeof(object))
                 {
-                    if (current.IsGenericType && current.GetGenericTypeDefinition().FullName == "UnityEngine.Networking.SyncListStruct`1")
+                    if (current.IsGenericType && current.GetGenericTypeDefinition().FullName ==
+                        "UnityEngine.Networking.SyncListStruct`1")
                     {
                         return true;
                     }
 
                     current = current.BaseType;
-                };
+                }
+
+                ;
             }
 
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void SerializeUnityObject(UnityEngine.Object unityObject, ref SerializationData data, bool serializeUnityFields = false, SerializationContext context = null)
+        public static void SerializeUnityObject(Object unityObject, ref SerializationData data,
+            bool serializeUnityFields = false, SerializationContext context = null)
         {
             if (unityObject == null)
             {
@@ -589,11 +470,11 @@ namespace OdinSerializer
 
             if (OdinPrefabSerializationEditorUtility.HasNewPrefabWorkflow)
             {
-                ISupportsPrefabSerialization supporter = unityObject as ISupportsPrefabSerialization;
+                var supporter = unityObject as ISupportsPrefabSerialization;
 
                 if (supporter != null)
                 {
-                    var sData = supporter.SerializationData;
+                    SerializationData sData = supporter.SerializationData;
 
                     //if (!sData.ContainsData)
                     //{
@@ -606,7 +487,7 @@ namespace OdinSerializer
             }
 
             {
-                bool pretendIsPlayer = Application.isPlaying && !UnityEditor.AssetDatabase.Contains(unityObject);
+                var pretendIsPlayer = Application.isPlaying && !AssetDatabase.Contains(unityObject);
 
                 //
                 // Look through a stack trace to determine some things about the current serialization context.
@@ -615,26 +496,28 @@ namespace OdinSerializer
                 //
 
                 {
-                    var stackFrames = new System.Diagnostics.StackTrace().GetFrames();
-                    Type buildPipelineType = typeof(UnityEditor.BuildPipeline);
-                    Type prefabUtilityType = typeof(UnityEditor.PrefabUtility);
-                    
+                    StackFrame[] stackFrames = new StackTrace().GetFrames();
+                    Type buildPipelineType = typeof(BuildPipeline);
+                    Type prefabUtilityType = typeof(PrefabUtility);
 
-                    for (int i = 0; i < stackFrames.Length; i++)
+
+                    for (var i = 0; i < stackFrames.Length; i++)
                     {
-                        var frame = stackFrames[i];
-                        var method = frame.GetMethod();
+                        StackFrame frame = stackFrames[i];
+                        MethodBase method = frame.GetMethod();
 
-                        if (method.DeclaringType == buildPipelineType || method.DeclaringType == SBP_ContentPipelineType)
+                        if (method.DeclaringType == buildPipelineType ||
+                            method.DeclaringType == SBP_ContentPipelineType)
                         {
                             // We are currently building a player
                             pretendIsPlayer = true;
                             break;
                         }
 
-                        if (method.DeclaringType == prefabUtilityType && method.Name == "RecordPrefabInstancePropertyModifications")
-                        {
+                        if (method.DeclaringType == prefabUtilityType &&
+                            method.Name == "RecordPrefabInstancePropertyModifications")
                             // Do nothing whatsoever and return immediately, lest we break Unity's "smart" modification recording
+                        {
                             return;
                         }
                     }
@@ -652,19 +535,19 @@ namespace OdinSerializer
                 // that supports special prefab serialization, we enter a special bail-out case.
                 //
 
-                if (!pretendIsPlayer && !isDoingDomainReload) // Recently some Unity versions started breaking if the prefab API was accessed during a domain reload, so no prefab stuff for domain reloads!
+                if (!pretendIsPlayer &&
+                    !isDoingDomainReload) // Recently some Unity versions started breaking if the prefab API was accessed during a domain reload, so no prefab stuff for domain reloads!
                 {
-                    UnityEngine.Object prefab = null;
-                    SerializationData prefabData = default(SerializationData);
+                    Object prefab = null;
+                    var prefabData = default(SerializationData);
 
-                    bool prefabDataIsFromSelf = false;
+                    var prefabDataIsFromSelf = false;
 
                     if (OdinPrefabSerializationEditorUtility.ObjectIsPrefabInstance(unityObject))
                     {
                         prefab = OdinPrefabSerializationEditorUtility.GetCorrespondingObjectFromSource(unityObject);
 
-                        if (prefab.SafeIsUnityNull() && !object.ReferenceEquals(data.Prefab, null))
-                        {
+                        if (prefab.SafeIsUnityNull() && !ReferenceEquals(data.Prefab, null))
                             // Sometimes, GetPrefabParent does not return the prefab,
                             // because Unity is just completely unreliable.
                             //
@@ -672,15 +555,15 @@ namespace OdinSerializer
                             // prefab in the data. If so, we can use that instead.
                             //
                             // Even though that reference is "fake null".
-
+                        {
                             prefab = data.Prefab;
                         }
 
-                        if (!object.ReferenceEquals(prefab, null))
+                        if (!ReferenceEquals(prefab, null))
                         {
                             if (prefab is ISupportsPrefabSerialization)
                             {
-                                var pData = (prefab as ISupportsPrefabSerialization).SerializationData;
+                                SerializationData pData = (prefab as ISupportsPrefabSerialization).SerializationData;
 
                                 if (pData.ContainsData)
                                 {
@@ -693,7 +576,7 @@ namespace OdinSerializer
                                     prefabDataIsFromSelf = true;
                                 }
                             }
-                            else if (prefab.GetType() != typeof(UnityEngine.Object))
+                            else if (prefab.GetType() != typeof(Object))
                             {
                                 //Debug.LogWarning(unityObject.name + " is a prefab instance, but the prefab reference type " + prefab.GetType().GetNiceName() + " does not implement the interface " + typeof(ISupportsPrefabSerialization).GetNiceName() + "; non-Unity-serialized data will most likely not be updated properly from the prefab any more.");
                                 //prefab = null;
@@ -705,11 +588,12 @@ namespace OdinSerializer
                         }
                     }
 
-                    if (!object.ReferenceEquals(prefab, null))
+                    if (!ReferenceEquals(prefab, null))
                     {
                         // We will bail out. But first...
 
-                        if (!prefabDataIsFromSelf && prefabData.PrefabModifications != null && prefabData.PrefabModifications.Count > 0)
+                        if (!prefabDataIsFromSelf && prefabData.PrefabModifications != null &&
+                            prefabData.PrefabModifications.Count > 0)
                         {
                             //
                             // This is a special case that can happen after changes to a prefab instance
@@ -740,9 +624,9 @@ namespace OdinSerializer
                             {
                                 if (prefab)
                                 {
-                                    UnityEditor.EditorUtility.SetDirty(prefab);
-                                    //UnityEditor.AssetDatabase.SaveAssets(); // Has a tendency to cause infinite serialization loops
+                                    EditorUtility.SetDirty(prefab);
                                 }
+                                //UnityEditor.AssetDatabase.SaveAssets(); // Has a tendency to cause infinite serialization loops
                             };
 
                             prefabData = (prefab as ISupportsPrefabSerialization).SerializationData;
@@ -750,17 +634,19 @@ namespace OdinSerializer
 
                         // Now we determine the modifications string to keep
 
-                        bool newModifications = false;
+                        var newModifications = false;
                         List<string> modificationsToKeep;
                         List<PrefabModification> modificationsList;
-                        List<UnityEngine.Object> modificationsReferencedUnityObjects = data.PrefabModificationsReferencedUnityObjects;
+                        List<Object> modificationsReferencedUnityObjects =
+                            data.PrefabModificationsReferencedUnityObjects;
 
                         if (RegisteredPrefabModifications.TryGetValue(unityObject, out modificationsList))
                         {
                             RegisteredPrefabModifications.Remove(unityObject);
 
                             // We have to generate a new prefab modification string from the registered changes
-                            modificationsToKeep = SerializePrefabModifications(modificationsList, ref modificationsReferencedUnityObjects);
+                            modificationsToKeep = SerializePrefabModifications(modificationsList,
+                                ref modificationsReferencedUnityObjects);
 
 #if PREFAB_DEBUG
                             Debug.Log("Setting new modifications: ", unityObject);
@@ -780,7 +666,7 @@ namespace OdinSerializer
                         }
 
                         // Make sure we have the same base data as the prefab (except UnityObject references), then change the rest
-                        var unityObjects = data.ReferencedUnityObjects;
+                        List<Object> unityObjects = data.ReferencedUnityObjects;
 
                         data = prefabData;
                         data.ReferencedUnityObjects = unityObjects;
@@ -815,28 +701,46 @@ namespace OdinSerializer
 
                             lock (PrefabDeserializeUtility.DeserializePrefabs_LOCK)
                             {
-                                HashSet<object> keep = PrefabDeserializeUtility.GetSceneObjectsToKeepSet(unityObject, true);
+                                HashSet<object> keep =
+                                    PrefabDeserializeUtility.GetSceneObjectsToKeepSet(unityObject, true);
                                 keep.Clear();
 
-                                if (data.PrefabModificationsReferencedUnityObjects != null && data.PrefabModificationsReferencedUnityObjects.Count > 0)
+                                if (data.PrefabModificationsReferencedUnityObjects != null &&
+                                    data.PrefabModificationsReferencedUnityObjects.Count > 0)
                                 {
-                                    var instanceRoot = UnityEditor.PrefabUtility.GetOutermostPrefabInstanceRoot(((Component)unityObject).gameObject);
+                                    GameObject instanceRoot =
+                                        PrefabUtility.GetOutermostPrefabInstanceRoot(
+                                            ((Component)unityObject).gameObject);
 
-                                    foreach (var reference in data.PrefabModificationsReferencedUnityObjects)
+                                    foreach (Object reference in data.PrefabModificationsReferencedUnityObjects)
                                     {
-                                        if (reference == null) continue;
-                                        if (!(reference is GameObject || reference is Component)) continue;
-                                        if (UnityEditor.AssetDatabase.Contains(reference)) continue;
-                                        
-                                        var referencePrefabType = PrefabUtility.GetPrefabAssetType(reference);
+                                        if (reference == null)
+                                        {
+                                            continue;
+                                        }
 
-                                        bool mightBeInPrefab = referencePrefabType != PrefabAssetType.NotAPrefab;
+                                        if (!(reference is GameObject || reference is Component))
+                                        {
+                                            continue;
+                                        }
+
+                                        if (AssetDatabase.Contains(reference))
+                                        {
+                                            continue;
+                                        }
+
+                                        PrefabAssetType referencePrefabType =
+                                            PrefabUtility.GetPrefabAssetType(reference);
+
+                                        var mightBeInPrefab = referencePrefabType != PrefabAssetType.NotAPrefab;
 
                                         if (!mightBeInPrefab)
                                         {
                                             if (PrefabUtility_IsComponentAddedToPrefabInstance_MethodInfo != null)
                                             {
-                                                if (reference is Component && (bool)PrefabUtility_IsComponentAddedToPrefabInstance_MethodInfo.Invoke(null, new object[] { reference }))
+                                                if (reference is Component &&
+                                                    (bool)PrefabUtility_IsComponentAddedToPrefabInstance_MethodInfo
+                                                        .Invoke(null, new object[] { reference }))
                                                 {
                                                     mightBeInPrefab = true;
                                                 }
@@ -849,9 +753,12 @@ namespace OdinSerializer
                                             continue;
                                         }
 
-                                        var gameObject = (GameObject)(reference is GameObject ? reference : (reference as Component).gameObject);
-                                        
-                                        var referenceRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
+                                        var gameObject = (GameObject)(reference is GameObject
+                                            ? reference
+                                            : (reference as Component).gameObject);
+
+                                        GameObject referenceRoot =
+                                            PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
 
                                         if (referenceRoot != instanceRoot)
                                         {
@@ -879,7 +786,7 @@ namespace OdinSerializer
 
                 // Get the format to serialize as
                 {
-                    IOverridesSerializationFormat formatOverride = unityObject as IOverridesSerializationFormat;
+                    var formatOverride = unityObject as IOverridesSerializationFormat;
 
                     if (formatOverride != null)
                     {
@@ -910,7 +817,7 @@ namespace OdinSerializer
 
                 // Get the policy to serialize with
                 {
-                    IOverridesSerializationPolicy policyOverride = unityObject as IOverridesSerializationPolicy;
+                    var policyOverride = unityObject as IOverridesSerializationPolicy;
 
                     if (policyOverride != null)
                     {
@@ -923,7 +830,6 @@ namespace OdinSerializer
 
                         serializeUnityFields = policyOverride.OdinSerializesUnityFields;
                     }
-
                 }
 
                 if (pretendIsPlayer)
@@ -931,11 +837,14 @@ namespace OdinSerializer
                     // We pretend as though we're serializing outside of the editor
                     if (format == DataFormat.Nodes)
                     {
-                        Debug.LogWarning("The serialization format '" + format.ToString() + "' is disabled in play mode, and when building a player. Defaulting to the format '" + DataFormat.Binary.ToString() + "' instead.");
+                        Debug.LogWarning("The serialization format '" + format +
+                                         "' is disabled in play mode, and when building a player. Defaulting to the format '" +
+                                         DataFormat.Binary + "' instead.");
                         format = DataFormat.Binary;
                     }
 
-                    UnitySerializationUtility.SerializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, format, serializeUnityFields, context);
+                    SerializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, format,
+                        serializeUnityFields, context);
                     data.SerializedFormat = format;
                 }
                 else
@@ -960,10 +869,10 @@ namespace OdinSerializer
 
                                 newContext.Value.Config.SerializationPolicy = serializationPolicy;
                                 newContext.Value.IndexReferenceResolver = resolver.Value;
-                                
+
                                 writer.Context = newContext;
 
-                                UnitySerializationUtility.SerializeUnityObject(unityObject, writer, serializeUnityFields);
+                                SerializeUnityObject(unityObject, writer, serializeUnityFields);
                                 data.SerializationNodes = writer.Nodes;
                                 data.ReferencedUnityObjects = resolver.Value.GetReferencedUnityObjects();
                             }
@@ -983,7 +892,7 @@ namespace OdinSerializer
                                 resolver.Value.SetReferencedUnityObjects(data.ReferencedUnityObjects);
                                 context.IndexReferenceResolver = resolver.Value;
 
-                                UnitySerializationUtility.SerializeUnityObject(unityObject, writer, serializeUnityFields);
+                                SerializeUnityObject(unityObject, writer, serializeUnityFields);
                                 data.SerializationNodes = writer.Nodes;
                                 data.ReferencedUnityObjects = resolver.Value.GetReferencedUnityObjects();
                             }
@@ -991,7 +900,8 @@ namespace OdinSerializer
                     }
                     else
                     {
-                        UnitySerializationUtility.SerializeUnityObject(unityObject, ref data.SerializedBytesString, ref data.ReferencedUnityObjects, format, serializeUnityFields, context);
+                        SerializeUnityObject(unityObject, ref data.SerializedBytesString,
+                            ref data.ReferencedUnityObjects, format, serializeUnityFields, context);
                     }
 
                     data.SerializedFormat = format;
@@ -1029,7 +939,7 @@ namespace OdinSerializer
 
 #if UNITY_EDITOR
 
-        private static void SetUnityObjectModifications(UnityEngine.Object unityObject, ref SerializationData data, UnityEngine.Object prefab)
+        private static void SetUnityObjectModifications(Object unityObject, ref SerializationData data, Object prefab)
         {
             //
             // We need to set the modifications to the prefab instance manually,
@@ -1037,32 +947,40 @@ namespace OdinSerializer
             //
 
             Type unityObjectType = unityObject.GetType();
-            var serializedDataField = unityObjectType.GetAllMembers<FieldInfo>(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                                                     .Where(field => field.FieldType == typeof(SerializationData) && UnitySerializationUtility.GuessIfUnityWillSerialize(field))
-                                                     .LastOrDefault();
+            FieldInfo serializedDataField = unityObjectType
+                .GetAllMembers<FieldInfo>(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => field.FieldType == typeof(SerializationData) && GuessIfUnityWillSerialize(field))
+                .LastOrDefault();
 
             if (serializedDataField == null)
             {
-                Debug.LogError("Could not find a field of type " + typeof(SerializationData).Name + " on the serializing type " + unityObjectType.GetNiceName() + " when trying to manually set prefab modifications. It is possible that prefab instances of this type will be corrupted if changes are ever applied to prefab.", prefab);
+                Debug.LogError(
+                    "Could not find a field of type " + typeof(SerializationData).Name + " on the serializing type " +
+                    unityObjectType.GetNiceName() +
+                    " when trying to manually set prefab modifications. It is possible that prefab instances of this type will be corrupted if changes are ever applied to prefab.",
+                    prefab);
             }
             else
             {
-                string serializedDataPath = serializedDataField.Name + ".";
-                string referencedUnityObjectsPath = serializedDataPath + SerializationData.PrefabModificationsReferencedUnityObjectsFieldName + ".Array.";
-                string modificationsPath = serializedDataPath + SerializationData.PrefabModificationsFieldName + ".Array.";
-                string prefabPath = serializedDataPath + SerializationData.PrefabFieldName;
+                var serializedDataPath = serializedDataField.Name + ".";
+                var referencedUnityObjectsPath = serializedDataPath +
+                                                 SerializationData.PrefabModificationsReferencedUnityObjectsFieldName +
+                                                 ".Array.";
+                var modificationsPath = serializedDataPath + SerializationData.PrefabModificationsFieldName + ".Array.";
+                var prefabPath = serializedDataPath + SerializationData.PrefabFieldName;
 
-                var mods = UnityEditor.PrefabUtility.GetPropertyModifications(unityObject).ToList();
+                var mods = PrefabUtility.GetPropertyModifications(unityObject).ToList();
 
                 //
                 // Clear all old modifications to serialized data out
                 //
 
-                for (int i = 0; i < mods.Count; i++)
+                for (var i = 0; i < mods.Count; i++)
                 {
-                    var mod = mods[i];
+                    PropertyModification mod = mods[i];
 
-                    if (mod.propertyPath.StartsWith(serializedDataPath, StringComparison.InvariantCulture) && object.ReferenceEquals(mod.target, prefab))
+                    if (mod.propertyPath.StartsWith(serializedDataPath, StringComparison.InvariantCulture) &&
+                        ReferenceEquals(mod.target, prefab))
                     {
                         mods.RemoveAt(i);
                         i--;
@@ -1074,45 +992,47 @@ namespace OdinSerializer
                 //
 
                 // Array length changes seem to always come first? Let's do that to be sure...
-                mods.Insert(0, new UnityEditor.PropertyModification()
+                mods.Insert(0, new PropertyModification
                 {
                     target = prefab,
                     propertyPath = referencedUnityObjectsPath + "size",
-                    value = data.PrefabModificationsReferencedUnityObjects.Count.ToString("D", CultureInfo.InvariantCulture)
+                    value = data.PrefabModificationsReferencedUnityObjects.Count.ToString("D",
+                        CultureInfo.InvariantCulture)
                 });
 
-                mods.Insert(0, new UnityEditor.PropertyModification()
-                {
-                    target = prefab,
-                    propertyPath = modificationsPath + "size",
-                    value = data.PrefabModifications.Count.ToString("D", CultureInfo.InvariantCulture)
-                });
+                mods.Insert(0,
+                    new PropertyModification
+                    {
+                        target = prefab,
+                        propertyPath = modificationsPath + "size",
+                        value = data.PrefabModifications.Count.ToString("D", CultureInfo.InvariantCulture)
+                    });
 
                 // Then the prefab object reference
-                mods.Add(new UnityEditor.PropertyModification()
+                mods.Add(new PropertyModification
                 {
-                    target = prefab,
-                    propertyPath = prefabPath,
-                    objectReference = prefab
+                    target = prefab, propertyPath = prefabPath, objectReference = prefab
                 });
 
                 // Then the actual array values
-                for (int i = 0; i < data.PrefabModificationsReferencedUnityObjects.Count; i++)
+                for (var i = 0; i < data.PrefabModificationsReferencedUnityObjects.Count; i++)
                 {
-                    mods.Add(new UnityEditor.PropertyModification()
+                    mods.Add(new PropertyModification
                     {
                         target = prefab,
-                        propertyPath = referencedUnityObjectsPath + "data[" + i.ToString("D", CultureInfo.InvariantCulture) + "]",
+                        propertyPath = referencedUnityObjectsPath + "data[" +
+                                       i.ToString("D", CultureInfo.InvariantCulture) + "]",
                         objectReference = data.PrefabModificationsReferencedUnityObjects[i]
                     });
                 }
 
-                for (int i = 0; i < data.PrefabModifications.Count; i++)
+                for (var i = 0; i < data.PrefabModifications.Count; i++)
                 {
-                    mods.Add(new UnityEditor.PropertyModification()
+                    mods.Add(new PropertyModification
                     {
                         target = prefab,
-                        propertyPath = modificationsPath + "data[" + i.ToString("D", CultureInfo.InvariantCulture) + "]",
+                        propertyPath =
+                            modificationsPath + "data[" + i.ToString("D", CultureInfo.InvariantCulture) + "]",
                         value = data.PrefabModifications[i]
                     });
                 }
@@ -1156,7 +1076,7 @@ namespace OdinSerializer
 #endif
 
                     UnityObjectsWaitingForDelayedModificationApply.Remove(unityObject);
-                    UnityEditor.PrefabUtility.SetPropertyModifications(unityObject, mods.ToArray());
+                    PrefabUtility.SetPropertyModifications(unityObject, mods.ToArray());
                 };
 
                 UnityObjectsWaitingForDelayedModificationApply.Add(unityObject);
@@ -1166,19 +1086,24 @@ namespace OdinSerializer
 #endif
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void SerializeUnityObject(UnityEngine.Object unityObject, ref string base64Bytes, ref List<UnityEngine.Object> referencedUnityObjects, DataFormat format, bool serializeUnityFields = false, SerializationContext context = null)
+        public static void SerializeUnityObject(Object unityObject, ref string base64Bytes,
+            ref List<Object> referencedUnityObjects, DataFormat format, bool serializeUnityFields = false,
+            SerializationContext context = null)
         {
             byte[] bytes = null;
-            SerializeUnityObject(unityObject, ref bytes, ref referencedUnityObjects, format, serializeUnityFields, context);
+            SerializeUnityObject(unityObject, ref bytes, ref referencedUnityObjects, format, serializeUnityFields,
+                context);
             base64Bytes = Convert.ToBase64String(bytes);
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void SerializeUnityObject(UnityEngine.Object unityObject, ref byte[] bytes, ref List<UnityEngine.Object> referencedUnityObjects, DataFormat format, bool serializeUnityFields = false, SerializationContext context = null)
+        public static void SerializeUnityObject(Object unityObject, ref byte[] bytes,
+            ref List<Object> referencedUnityObjects, DataFormat format, bool serializeUnityFields = false,
+            SerializationContext context = null)
         {
             if (unityObject == null)
             {
@@ -1187,13 +1112,14 @@ namespace OdinSerializer
 
             if (format == DataFormat.Nodes)
             {
-                Debug.LogError("The serialization data format '" + format.ToString() + "' is not supported by this method. You must create your own writer.");
+                Debug.LogError("The serialization data format '" + format +
+                               "' is not supported by this method. You must create your own writer.");
                 return;
             }
 
             if (referencedUnityObjects == null)
             {
-                referencedUnityObjects = new List<UnityEngine.Object>();
+                referencedUnityObjects = new List<Object>();
             }
             else
             {
@@ -1208,7 +1134,7 @@ namespace OdinSerializer
                 if (context != null)
                 {
                     context.IndexReferenceResolver = resolver.Value;
-                    using (var writerCache = GetCachedUnityWriter(format, stream.Value.MemoryStream, context))
+                    using (ICache writerCache = GetCachedUnityWriter(format, stream.Value.MemoryStream, context))
                     {
                         SerializeUnityObject(unityObject, writerCache.Value as IDataWriter, serializeUnityFields);
                     }
@@ -1230,8 +1156,10 @@ namespace OdinSerializer
                         if (GlobalSerializationConfig.HasInstanceLoaded)
                         {
                             //Debug.Log("Serializing " + unityObject.GetType().Name + " WITH loaded!");
-                            con.Value.Config.DebugContext.ErrorHandlingPolicy = GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
-                            con.Value.Config.DebugContext.LoggingPolicy = GlobalSerializationConfig.Instance.LoggingPolicy;
+                            con.Value.Config.DebugContext.ErrorHandlingPolicy =
+                                GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
+                            con.Value.Config.DebugContext.LoggingPolicy =
+                                GlobalSerializationConfig.Instance.LoggingPolicy;
                             con.Value.Config.DebugContext.Logger = GlobalSerializationConfig.Instance.Logger;
                         }
                         else
@@ -1244,7 +1172,7 @@ namespace OdinSerializer
 
                         con.Value.IndexReferenceResolver = resolver.Value;
 
-                        using (var writerCache = GetCachedUnityWriter(format, stream.Value.MemoryStream, con))
+                        using (ICache writerCache = GetCachedUnityWriter(format, stream.Value.MemoryStream, con))
                         {
                             SerializeUnityObject(unityObject, writerCache.Value as IDataWriter, serializeUnityFields);
                         }
@@ -1256,9 +1184,10 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void SerializeUnityObject(UnityEngine.Object unityObject, IDataWriter writer, bool serializeUnityFields = false)
+        public static void SerializeUnityObject(Object unityObject, IDataWriter writer,
+            bool serializeUnityFields = false)
         {
             if (unityObject == null)
             {
@@ -1294,22 +1223,24 @@ namespace OdinSerializer
             {
                 writer.PrepareNewSerializationSession();
 
-                var members = FormatterUtilities.GetSerializableMembers(unityObject.GetType(), writer.Context.Config.SerializationPolicy);
+                MemberInfo[] members = FormatterUtilities.GetSerializableMembers(unityObject.GetType(),
+                    writer.Context.Config.SerializationPolicy);
                 object unityObjectInstance = unityObject;
 
-                for (int i = 0; i < members.Length; i++)
+                for (var i = 0; i < members.Length; i++)
                 {
-                    var member = members[i];
+                    MemberInfo member = members[i];
                     WeakValueGetter getter = null;
 
-                    if (!OdinWillSerialize(member, serializeUnityFields, writer.Context.Config.SerializationPolicy) || (getter = GetCachedUnityMemberGetter(member)) == null)
+                    if (!OdinWillSerialize(member, serializeUnityFields, writer.Context.Config.SerializationPolicy) ||
+                        (getter = GetCachedUnityMemberGetter(member)) == null)
                     {
                         continue;
                     }
 
                     var value = getter(ref unityObjectInstance);
 
-                    bool isNull = object.ReferenceEquals(value, null);
+                    var isNull = ReferenceEquals(value, null);
 
                     // Never serialize serialization data. That way lies madness.
                     if (!isNull && value.GetType() == typeof(SerializationData))
@@ -1317,7 +1248,7 @@ namespace OdinSerializer
                         continue;
                     }
 
-                    Serializer serializer = Serializer.Get(FormatterUtilities.GetContainedType(member));
+                    var serializer = Serializer.Get(FormatterUtilities.GetContainedType(member));
 
                     try
                     {
@@ -1333,28 +1264,31 @@ namespace OdinSerializer
             }
             catch (SerializationAbortException ex)
             {
-                throw new SerializationAbortException("Serialization of type '" + unityObject.GetType().GetNiceFullName() + "' aborted.", ex);
+                throw new SerializationAbortException(
+                    "Serialization of type '" + unityObject.GetType().GetNiceFullName() + "' aborted.", ex);
             }
             catch (Exception ex)
             {
-                Debug.LogException(new Exception("Exception thrown while serializing type '" + unityObject.GetType().GetNiceFullName() + "': " + ex.Message, ex));
+                Debug.LogException(new Exception(
+                    "Exception thrown while serializing type '" + unityObject.GetType().GetNiceFullName() + "': " +
+                    ex.Message, ex));
             }
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void DeserializeUnityObject(UnityEngine.Object unityObject, ref SerializationData data, DeserializationContext context = null)
-        {
+        public static void DeserializeUnityObject(Object unityObject, ref SerializationData data,
+            DeserializationContext context = null) =>
             //#if UNITY_EDITOR
-            DeserializeUnityObject(unityObject, ref data, context, isPrefabData: false, prefabInstanceUnityObjects: null);
-            //#else
-            //            UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, data.SerializedFormat, context);
-            //            data = default(SerializationData); // Free all data for GC
-            //#endif
-        }
+            DeserializeUnityObject(unityObject, ref data, context, false, null);
 
-        private static void DeserializeUnityObject(UnityEngine.Object unityObject, ref SerializationData data, DeserializationContext context, bool isPrefabData, List<UnityEngine.Object> prefabInstanceUnityObjects)
+        //#else
+        //            UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, data.SerializedFormat, context);
+        //            data = default(SerializationData); // Free all data for GC
+        //#endif
+        private static void DeserializeUnityObject(Object unityObject, ref SerializationData data,
+            DeserializationContext context, bool isPrefabData, List<Object> prefabInstanceUnityObjects)
         {
             if (unityObject == null)
             {
@@ -1363,17 +1297,17 @@ namespace OdinSerializer
 
             if (isPrefabData && prefabInstanceUnityObjects == null)
             {
-                prefabInstanceUnityObjects = new List<UnityEngine.Object>(); // There's likely no data at all
+                prefabInstanceUnityObjects = new List<Object>(); // There's likely no data at all
             }
 
 #if UNITY_EDITOR
             if (OdinPrefabSerializationEditorUtility.HasNewPrefabWorkflow)
             {
-                ISupportsPrefabSerialization supporter = unityObject as ISupportsPrefabSerialization;
+                var supporter = unityObject as ISupportsPrefabSerialization;
 
                 if (supporter != null)
                 {
-                    var sData = supporter.SerializationData;
+                    SerializationData sData = supporter.SerializationData;
 
                     if (!sData.ContainsData)
                     {
@@ -1424,7 +1358,8 @@ namespace OdinSerializer
             //}
 #endif
 
-            if ((data.SerializedBytes != null && data.SerializedBytes.Length > 0) && (data.SerializationNodes == null || data.SerializationNodes.Count == 0))
+            if (data.SerializedBytes != null && data.SerializedBytes.Length > 0 &&
+                (data.SerializationNodes == null || data.SerializationNodes.Count == 0))
             {
                 // If it happens that we have bytes in the serialized bytes array
                 // then we deserialize from that instead.
@@ -1436,25 +1371,34 @@ namespace OdinSerializer
                 {
                     // The stored format says nodes, but there is no serialized node data.
                     // Figure out what format the serialized bytes are in, and deserialize that format instead
-                    
+
                     DataFormat formatGuess = data.SerializedBytes[0] == '{' ? DataFormat.JSON : DataFormat.Binary;
 
                     try
                     {
                         var bytesStr = ProperBitConverter.BytesToHexString(data.SerializedBytes);
-                        Debug.LogWarning("Serialization data has only bytes stored, but the serialized format is marked as being 'Nodes', which is incompatible with data stored as a byte array. Based on the appearance of the serialized bytes, Odin has guessed that the data format is '" + formatGuess + "', and will attempt to deserialize the bytes using that format. The serialized bytes follow, converted to a hex string: " + bytesStr);
+                        Debug.LogWarning(
+                            "Serialization data has only bytes stored, but the serialized format is marked as being 'Nodes', which is incompatible with data stored as a byte array. Based on the appearance of the serialized bytes, Odin has guessed that the data format is '" +
+                            formatGuess +
+                            "', and will attempt to deserialize the bytes using that format. The serialized bytes follow, converted to a hex string: " +
+                            bytesStr);
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
-                    UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, formatGuess, context);
+                    DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects,
+                        formatGuess, context);
                 }
                 else
                 {
-                    UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects, data.SerializedFormat, context);
+                    DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref data.ReferencedUnityObjects,
+                        data.SerializedFormat, context);
                 }
 
                 // If there are any prefab modifications, we should *always* apply those
-                ApplyPrefabModifications(unityObject, data.PrefabModifications, data.PrefabModificationsReferencedUnityObjects);
+                ApplyPrefabModifications(unityObject, data.PrefabModifications,
+                    data.PrefabModificationsReferencedUnityObjects);
             }
             else
             {
@@ -1480,8 +1424,10 @@ namespace OdinSerializer
                         if (GlobalSerializationConfig.HasInstanceLoaded)
                         {
                             //Debug.Log("Deserializing " + unityObject.GetType().Name + " WITH loaded!");
-                            context.Config.DebugContext.ErrorHandlingPolicy = GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
-                            context.Config.DebugContext.LoggingPolicy = GlobalSerializationConfig.Instance.LoggingPolicy;
+                            context.Config.DebugContext.ErrorHandlingPolicy =
+                                GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
+                            context.Config.DebugContext.LoggingPolicy =
+                                GlobalSerializationConfig.Instance.LoggingPolicy;
                             context.Config.DebugContext.Logger = GlobalSerializationConfig.Instance.Logger;
                         }
                         else
@@ -1495,25 +1441,25 @@ namespace OdinSerializer
 
                     // If we have a policy override, use that
                     {
-                        IOverridesSerializationPolicy policyOverride = unityObject as IOverridesSerializationPolicy;
+                        var policyOverride = unityObject as IOverridesSerializationPolicy;
 
                         if (policyOverride != null)
                         {
-                            var serializationPolicy = policyOverride.SerializationPolicy;
+                            ISerializationPolicy serializationPolicy = policyOverride.SerializationPolicy;
 
                             if (serializationPolicy != null)
                             {
                                 context.Config.SerializationPolicy = serializationPolicy;
                             }
                         }
-
                     }
 
                     if (!isPrefabData && !data.Prefab.SafeIsUnityNull())
                     {
                         if (data.Prefab is ISupportsPrefabSerialization)
                         {
-                            if (object.ReferenceEquals(data.Prefab, unityObject) && data.PrefabModifications != null && data.PrefabModifications.Count > 0)
+                            if (ReferenceEquals(data.Prefab, unityObject) && data.PrefabModifications != null &&
+                                data.PrefabModifications.Count > 0)
                             {
                                 // We are deserializing a prefab, which has *just* had changes applied
                                 // from an instance of itself.
@@ -1536,7 +1482,8 @@ namespace OdinSerializer
                             else
                             {
                                 // We are dealing with a prefab instance, which is a special bail-out case
-                                SerializationData prefabData = (data.Prefab as ISupportsPrefabSerialization).SerializationData;
+                                SerializationData prefabData =
+                                    (data.Prefab as ISupportsPrefabSerialization).SerializationData;
 
 #if UNITY_EDITOR
                                 lock (PrefabDeserializeUtility.DeserializePrefabs_LOCK)
@@ -1544,25 +1491,31 @@ namespace OdinSerializer
                                     // Only perform this check in the editor, as we are never dealing with a prefab
                                     // instance outside of the editor - even if the serialized data is weird
                                     if (PrefabDeserializeUtility.PrefabsWithValuesApplied.Contains(data.Prefab))
-                                    {
                                         // Our prefab has had values applied; now to check if the object we're
                                         // deserializing was the one to apply those values. If it is, then we
                                         // have to wipe all of this object's prefab modifications clean.
                                         //
                                         // So far, the only way we know how to do that, is checking whether this
                                         // object is currently selected.
-
+                                    {
                                         if (PrefabSelectionTracker.IsCurrentlySelectedPrefabRoot(unityObject))
                                         {
                                             PrefabDeserializeUtility.PrefabsWithValuesApplied.Remove(data.Prefab);
 
                                             List<PrefabModification> newModifications = null;
-                                            HashSet<object> keep = PrefabDeserializeUtility.GetSceneObjectsToKeepSet(unityObject, false);
+                                            HashSet<object> keep = PrefabDeserializeUtility.GetSceneObjectsToKeepSet(
+                                                unityObject,
+                                                false);
 
-                                            if (data.PrefabModificationsReferencedUnityObjects.Count > 0 && keep != null && keep.Count > 0)
+                                            if (data.PrefabModificationsReferencedUnityObjects.Count > 0 &&
+                                                keep != null && keep.Count > 0)
                                             {
-                                                newModifications = DeserializePrefabModifications(data.PrefabModifications, data.PrefabModificationsReferencedUnityObjects);
-                                                newModifications.RemoveAll(n => object.ReferenceEquals(n.ModifiedValue, null) || !keep.Contains(n.ModifiedValue));
+                                                newModifications =
+                                                    DeserializePrefabModifications(data.PrefabModifications,
+                                                        data.PrefabModificationsReferencedUnityObjects);
+                                                newModifications.RemoveAll(n =>
+                                                    ReferenceEquals(n.ModifiedValue, null) ||
+                                                    !keep.Contains(n.ModifiedValue));
                                             }
                                             else
                                             {
@@ -1578,7 +1531,8 @@ namespace OdinSerializer
                                             }
 
                                             newModifications = newModifications ?? new List<PrefabModification>();
-                                            PrefabModificationCache.CachePrefabModifications(unityObject, newModifications);
+                                            PrefabModificationCache.CachePrefabModifications(unityObject,
+                                                newModifications);
 
                                             RegisterPrefabModificationsChange(unityObject, newModifications);
                                         }
@@ -1587,7 +1541,6 @@ namespace OdinSerializer
 #endif
 
                                 if (!prefabData.ContainsData)
-                                {
                                     // Sometimes, the prefab hasn't actually been deserialized yet, because
                                     // Unity doesn't do anything in a sensible way at all.
                                     //
@@ -1597,34 +1550,40 @@ namespace OdinSerializer
                                     // it is on the prefab itself.
                                     //
                                     // This case occurs often during editor recompile reloads.
-
-                                    DeserializeUnityObject(unityObject, ref data, context, isPrefabData: true, prefabInstanceUnityObjects: data.ReferencedUnityObjects);
+                                {
+                                    DeserializeUnityObject(unityObject, ref data, context, true,
+                                        data.ReferencedUnityObjects);
                                 }
                                 else
-                                {
                                     // Deserialize the current object with the prefab's data
-                                    DeserializeUnityObject(unityObject, ref prefabData, context, isPrefabData: true, prefabInstanceUnityObjects: data.ReferencedUnityObjects);
+                                {
+                                    DeserializeUnityObject(unityObject, ref prefabData, context, true,
+                                        data.ReferencedUnityObjects);
                                 }
 
                                 // Then apply the prefab modifications using the deserialization context
-                                ApplyPrefabModifications(unityObject, data.PrefabModifications, data.PrefabModificationsReferencedUnityObjects);
+                                ApplyPrefabModifications(unityObject, data.PrefabModifications,
+                                    data.PrefabModificationsReferencedUnityObjects);
 
                                 return; // Buh bye
                             }
                         }
                         // A straight UnityEngine.Object instance means that the type has been lost to Unity due to a deleted or renamed script
                         // We shouldn't complain in this case, as Unity itself will make it clear to the user that there is something wrong.
-                        else if (data.Prefab.GetType() != typeof(UnityEngine.Object))
+                        else if (data.Prefab.GetType() != typeof(Object))
                         {
-                            Debug.LogWarning("The type " + data.Prefab.GetType().GetNiceName() + " no longer supports special prefab serialization (the interface " + typeof(ISupportsPrefabSerialization).GetNiceName() + ") upon deserialization of an instance of a prefab; prefab data may be lost. Has a type been lost?");
+                            Debug.LogWarning("The type " + data.Prefab.GetType().GetNiceName() +
+                                             " no longer supports special prefab serialization (the interface " +
+                                             typeof(ISupportsPrefabSerialization).GetNiceName() +
+                                             ") upon deserialization of an instance of a prefab; prefab data may be lost. Has a type been lost?");
                         }
                     }
 
-                    var unityObjects = isPrefabData ? prefabInstanceUnityObjects : data.ReferencedUnityObjects;
+                    List<Object> unityObjects = isPrefabData ? prefabInstanceUnityObjects : data.ReferencedUnityObjects;
 
                     if (data.SerializedFormat == DataFormat.Nodes)
-                    {
                         // Special case for node format
+                    {
                         using (var reader = new SerializationNodeDataReader(context))
                         using (var resolver = Cache<UnityReferenceResolver>.Claim())
                         {
@@ -1633,20 +1592,23 @@ namespace OdinSerializer
 
                             reader.Nodes = data.SerializationNodes;
 
-                            UnitySerializationUtility.DeserializeUnityObject(unityObject, reader);
+                            DeserializeUnityObject(unityObject, reader);
                         }
                     }
                     else if (data.SerializedBytes != null && data.SerializedBytes.Length > 0)
                     {
-                        UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref unityObjects, data.SerializedFormat, context);
+                        DeserializeUnityObject(unityObject, ref data.SerializedBytes, ref unityObjects,
+                            data.SerializedFormat, context);
                     }
                     else
                     {
-                        UnitySerializationUtility.DeserializeUnityObject(unityObject, ref data.SerializedBytesString, ref unityObjects, data.SerializedFormat, context);
+                        DeserializeUnityObject(unityObject, ref data.SerializedBytesString, ref unityObjects,
+                            data.SerializedFormat, context);
                     }
 
                     // We may have a prefab that has had changes applied to it; either way, apply the stored modifications.
-                    ApplyPrefabModifications(unityObject, data.PrefabModifications, data.PrefabModificationsReferencedUnityObjects);
+                    ApplyPrefabModifications(unityObject, data.PrefabModifications,
+                        data.PrefabModificationsReferencedUnityObjects);
                 }
                 finally
                 {
@@ -1659,9 +1621,10 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void DeserializeUnityObject(UnityEngine.Object unityObject, ref string base64Bytes, ref List<UnityEngine.Object> referencedUnityObjects, DataFormat format, DeserializationContext context = null)
+        public static void DeserializeUnityObject(Object unityObject, ref string base64Bytes,
+            ref List<Object> referencedUnityObjects, DataFormat format, DeserializationContext context = null)
         {
             if (string.IsNullOrEmpty(base64Bytes))
             {
@@ -1686,9 +1649,10 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void DeserializeUnityObject(UnityEngine.Object unityObject, ref byte[] bytes, ref List<UnityEngine.Object> referencedUnityObjects, DataFormat format, DeserializationContext context = null)
+        public static void DeserializeUnityObject(Object unityObject, ref byte[] bytes,
+            ref List<Object> referencedUnityObjects, DataFormat format, DeserializationContext context = null)
         {
             if (unityObject == null)
             {
@@ -1704,15 +1668,19 @@ namespace OdinSerializer
             {
                 try
                 {
-                    Debug.LogError("The serialization data format '" + format.ToString() + "' is not supported by this method. You must create your own reader.");
+                    Debug.LogError("The serialization data format '" + format +
+                                   "' is not supported by this method. You must create your own reader.");
                 }
-                catch { }
+                catch
+                {
+                }
+
                 return;
             }
 
             if (referencedUnityObjects == null)
             {
-                referencedUnityObjects = new List<UnityEngine.Object>();
+                referencedUnityObjects = new List<Object>();
             }
 
             using (var stream = Cache<CachedMemoryStream>.Claim())
@@ -1727,7 +1695,7 @@ namespace OdinSerializer
                 {
                     context.IndexReferenceResolver = resolver.Value;
 
-                    using (var readerCache = GetCachedUnityReader(format, stream.Value.MemoryStream, context))
+                    using (ICache readerCache = GetCachedUnityReader(format, stream.Value.MemoryStream, context))
                     {
                         DeserializeUnityObject(unityObject, readerCache.Value as IDataReader);
                     }
@@ -1749,8 +1717,10 @@ namespace OdinSerializer
                         if (GlobalSerializationConfig.HasInstanceLoaded)
                         {
                             //Debug.Log("Deserializing " + unityObject.GetType().Name + " WITH loaded!");
-                            con.Value.Config.DebugContext.ErrorHandlingPolicy = GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
-                            con.Value.Config.DebugContext.LoggingPolicy = GlobalSerializationConfig.Instance.LoggingPolicy;
+                            con.Value.Config.DebugContext.ErrorHandlingPolicy =
+                                GlobalSerializationConfig.Instance.ErrorHandlingPolicy;
+                            con.Value.Config.DebugContext.LoggingPolicy =
+                                GlobalSerializationConfig.Instance.LoggingPolicy;
                             con.Value.Config.DebugContext.Logger = GlobalSerializationConfig.Instance.Logger;
                         }
                         else
@@ -1763,7 +1733,7 @@ namespace OdinSerializer
 
                         con.Value.IndexReferenceResolver = resolver.Value;
 
-                        using (var readerCache = GetCachedUnityReader(format, stream.Value.MemoryStream, con))
+                        using (ICache readerCache = GetCachedUnityReader(format, stream.Value.MemoryStream, con))
                         {
                             DeserializeUnityObject(unityObject, readerCache.Value as IDataReader);
                         }
@@ -1773,9 +1743,9 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void DeserializeUnityObject(UnityEngine.Object unityObject, IDataReader reader)
+        public static void DeserializeUnityObject(Object unityObject, IDataReader reader)
         {
             if (unityObject == null)
             {
@@ -1791,7 +1761,7 @@ namespace OdinSerializer
 
             if (policyOverride != null)
             {
-                var policy = policyOverride.SerializationPolicy;
+                ISerializationPolicy policy = policyOverride.SerializationPolicy;
 
                 if (policy != null)
                 {
@@ -1803,25 +1773,30 @@ namespace OdinSerializer
             {
                 reader.PrepareNewSerializationSession();
 
-                var members = FormatterUtilities.GetSerializableMembersMap(unityObject.GetType(), reader.Context.Config.SerializationPolicy);
+                Dictionary<string, MemberInfo> members = FormatterUtilities.GetSerializableMembersMap(
+                    unityObject.GetType(),
+                    reader.Context.Config.SerializationPolicy);
 
-                int count = 0;
+                var count = 0;
                 string name;
                 EntryType entryType;
                 object unityObjectInstance = unityObject;
 
-                while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode && entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
+                while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode &&
+                       entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
                 {
                     MemberInfo member = null;
                     WeakValueSetter setter = null;
 
-                    bool skip = false;
+                    var skip = false;
 
                     if (entryType == EntryType.Invalid)
                     {
                         // Oh boy. We have a lot of logging to do!
 
-                        var message = "Encountered invalid entry while reading serialization data for Unity object of type '" + unityObject.GetType().GetNiceFullName() + "'. " +
+                        var message =
+                            "Encountered invalid entry while reading serialization data for Unity object of type '" +
+                            unityObject.GetType().GetNiceFullName() + "'. " +
                             "This likely means that Unity has filled Odin's stored serialization data with garbage, which can randomly happen after upgrading the Unity version of the project, or when otherwise doing things that have a lot of fragile interactions with the asset database. " +
                             "Locating the asset which causes this error log and causing it to reserialize (IE, modifying it and then causing it to be saved to disk) is likely to 'fix' the issue and make this message go away. " +
                             "Experience shows that this issue is particularly likely to occur on prefab instances, and if this is the case, the parent prefab is also under suspicion, and should be re-saved and re-imported. " +
@@ -1831,14 +1806,17 @@ namespace OdinSerializer
                         // Schedule a delayed log:
                         try
                         {
-                            message += "A delayed error message containing the originating object's name, type and scene/asset path (if applicable) will be scheduled for logging on Unity's main thread. Search for \"DELAYED SERIALIZATION LOG\". " +
+                            message +=
+                                "A delayed error message containing the originating object's name, type and scene/asset path (if applicable) will be scheduled for logging on Unity's main thread. Search for \"DELAYED SERIALIZATION LOG\". " +
                                 "This logging callback will also mark the object dirty if it is an asset, hopefully making the issue 'fix' itself. HOWEVER, THERE MAY STILL BE DATA LOSS.\n\n\n";
 
                             EditorApplication_delayCall_Alias += () =>
                             {
-                                var log = "DELAYED SERIALIZATION LOG: Name = " + (unityObject != null ? unityObject.name : "(DESTROYED UNITY OBJECT)") + ", Type = " + unityObject.GetType().GetNiceFullName();
+                                var log = "DELAYED SERIALIZATION LOG: Name = " +
+                                          (unityObject != null ? unityObject.name : "(DESTROYED UNITY OBJECT)") +
+                                          ", Type = " + unityObject.GetType().GetNiceFullName();
 
-                                UnityEngine.Object toPing = unityObject;
+                                Object toPing = unityObject;
 
                                 var component = unityObject as Component;
 
@@ -1847,17 +1825,20 @@ namespace OdinSerializer
                                     log += ", ScenePath = " + component.gameObject.scene.path;
                                 }
 
-                                if (UnityEditor.AssetDatabase.Contains(unityObject))
+                                if (AssetDatabase.Contains(unityObject))
                                 {
-                                    var path = UnityEditor.AssetDatabase.GetAssetPath(unityObject);
+                                    var path = AssetDatabase.GetAssetPath(unityObject);
                                     log += ", AssetPath = " + path;
 
-                                    toPing = UnityEditor.AssetDatabase.LoadMainAssetAtPath(path);
+                                    toPing = AssetDatabase.LoadMainAssetAtPath(path);
 
-                                    if (toPing == null) toPing = unityObject;
+                                    if (toPing == null)
+                                    {
+                                        toPing = unityObject;
+                                    }
 
-                                    UnityEditor.EditorUtility.SetDirty(unityObject);
-                                    UnityEditor.AssetDatabase.SaveAssets();
+                                    EditorUtility.SetDirty(unityObject);
+                                    AssetDatabase.SaveAssets();
                                 }
 
                                 Debug.LogError(log, toPing);
@@ -1865,11 +1846,12 @@ namespace OdinSerializer
                         }
                         catch
                         {
-                            Debug.LogWarning("DELAYED SERIALIZATION LOG: Delaying log to main thread failed, likely due to a race condition when subscribing to EditorApplication.delayCall; this cannot be guarded against from our code. Try to provoke the error again and hope to get luckier next time!");
+                            Debug.LogWarning(
+                                "DELAYED SERIALIZATION LOG: Delaying log to main thread failed, likely due to a race condition when subscribing to EditorApplication.delayCall; this cannot be guarded against from our code. Try to provoke the error again and hope to get luckier next time!");
                         }
 #endif
 
-                        message += 
+                        message +=
                             "IF YOU HAVE CONSISTENT REPRODUCTION STEPS THAT MAKE THIS ISSUE REOCCUR, please report it at this issue at 'https://bitbucket.org/sirenix/odin-inspector/issues/526', and copy paste this debug message into your comment, along with any potential actions or recent changes in the project that might have happened to cause this message to occur. " +
                             "If the data dump in this message is cut off, please find the editor's log file (see https://docs.unity3d.com/Manual/LogFiles.html) and copy paste the full version of this message from there.\n\n\n" +
                             "Data dump:\n\n" +
@@ -1896,10 +1878,12 @@ namespace OdinSerializer
                     }
                     else if (string.IsNullOrEmpty(name))
                     {
-                        reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" + reader.CurrentNodeName + "\" is missing a name.");
+                        reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" +
+                                                                    reader.CurrentNodeName + "\" is missing a name.");
                         skip = true;
                     }
-                    else if (members.TryGetValue(name, out member) == false || (setter = GetCachedUnityMemberSetter(member)) == null)
+                    else if (members.TryGetValue(name, out member) == false ||
+                             (setter = GetCachedUnityMemberSetter(member)) == null)
                     {
                         skip = true;
                     }
@@ -1912,11 +1896,11 @@ namespace OdinSerializer
 
                     {
                         Type expectedType = FormatterUtilities.GetContainedType(member);
-                        Serializer serializer = Serializer.Get(expectedType);
+                        var serializer = Serializer.Get(expectedType);
 
                         try
                         {
-                            object value = serializer.ReadValueWeak(reader);
+                            var value = serializer.ReadValueWeak(reader);
                             setter(ref unityObjectInstance, value);
                         }
                         catch (Exception ex)
@@ -1929,29 +1913,34 @@ namespace OdinSerializer
 
                     if (count > 1000)
                     {
-                        reader.Context.Config.DebugContext.LogError("Breaking out of infinite reading loop! (Read more than a thousand entries for one type!)");
+                        reader.Context.Config.DebugContext.LogError(
+                            "Breaking out of infinite reading loop! (Read more than a thousand entries for one type!)");
                         break;
                     }
                 }
             }
             catch (SerializationAbortException ex)
             {
-                throw new SerializationAbortException("Deserialization of type '" + unityObject.GetType().GetNiceFullName() + "' aborted.", ex);
+                throw new SerializationAbortException(
+                    "Deserialization of type '" + unityObject.GetType().GetNiceFullName() + "' aborted.", ex);
             }
             catch (Exception ex)
             {
-                Debug.LogException(new Exception("Exception thrown while deserializing type '" + unityObject.GetType().GetNiceFullName() + "': " + ex.Message, ex));
+                Debug.LogException(new Exception(
+                    "Exception thrown while deserializing type '" + unityObject.GetType().GetNiceFullName() + "': " +
+                    ex.Message, ex));
             }
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static List<string> SerializePrefabModifications(List<PrefabModification> modifications, ref List<UnityEngine.Object> referencedUnityObjects)
+        public static List<string> SerializePrefabModifications(List<PrefabModification> modifications,
+            ref List<Object> referencedUnityObjects)
         {
             if (referencedUnityObjects == null)
             {
-                referencedUnityObjects = new List<UnityEngine.Object>();
+                referencedUnityObjects = new List<Object>();
             }
             else if (referencedUnityObjects.Count > 0)
             {
@@ -1967,15 +1956,20 @@ namespace OdinSerializer
             // to child paths are always applied after modifications to the parent paths
             modifications.Sort((a, b) =>
             {
-                int compared = a.Path.CompareTo(b.Path);
+                var compared = a.Path.CompareTo(b.Path);
 
                 if (compared == 0)
                 {
-                    if ((a.ModificationType == PrefabModificationType.ListLength || a.ModificationType == PrefabModificationType.Dictionary) && b.ModificationType == PrefabModificationType.Value)
+                    if ((a.ModificationType == PrefabModificationType.ListLength ||
+                         a.ModificationType == PrefabModificationType.Dictionary) &&
+                        b.ModificationType == PrefabModificationType.Value)
                     {
                         return 1;
                     }
-                    else if (a.ModificationType == PrefabModificationType.Value && (b.ModificationType == PrefabModificationType.ListLength || b.ModificationType == PrefabModificationType.Dictionary))
+
+                    if (a.ModificationType == PrefabModificationType.Value &&
+                        (b.ModificationType == PrefabModificationType.ListLength ||
+                         b.ModificationType == PrefabModificationType.Dictionary))
                     {
                         return -1;
                     }
@@ -1984,14 +1978,14 @@ namespace OdinSerializer
                 return compared;
             });
 
-            List<string> result = new List<string>();
+            var result = new List<string>();
 
             using (var context = Cache<SerializationContext>.Claim())
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             using (var writerCache = Cache<JsonDataWriter>.Claim())
             using (var resolver = Cache<UnityReferenceResolver>.Claim())
             {
-                var writer = writerCache.Value;
+                JsonDataWriter writer = writerCache.Value;
 
                 writer.Context = context;
                 writer.Stream = stream.Value.MemoryStream;
@@ -2002,9 +1996,9 @@ namespace OdinSerializer
                 resolver.Value.SetReferencedUnityObjects(referencedUnityObjects);
                 writer.Context.IndexReferenceResolver = resolver.Value;
 
-                for (int i = 0; i < modifications.Count; i++)
+                for (var i = 0; i < modifications.Count; i++)
                 {
-                    var mod = modifications[i];
+                    PrefabModification mod = modifications[i];
 
                     if (mod.ModificationType == PrefabModificationType.ListLength)
                     {
@@ -2024,7 +2018,7 @@ namespace OdinSerializer
                         {
                             writer.BeginStructNode("references", null);
                             {
-                                for (int j = 0; j < mod.ReferencePaths.Count; j++)
+                                for (var j = 0; j < mod.ReferencePaths.Count; j++)
                                 {
                                     writer.WriteString(null, mod.ReferencePaths[j]);
                                 }
@@ -2060,7 +2054,7 @@ namespace OdinSerializer
 
         private static string GetStringFromStreamAndReset(Stream stream)
         {
-            byte[] bytes = new byte[stream.Position];
+            var bytes = new byte[stream.Position];
             stream.Position = 0;
             stream.Read(bytes, 0, bytes.Length);
             stream.Position = 0;
@@ -2069,23 +2063,24 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static List<PrefabModification> DeserializePrefabModifications(List<string> modifications, List<UnityEngine.Object> referencedUnityObjects)
+        public static List<PrefabModification> DeserializePrefabModifications(List<string> modifications,
+            List<Object> referencedUnityObjects)
         {
             if (modifications == null || modifications.Count == 0)
-            {
                 // Nothing to apply
+            {
                 return new List<PrefabModification>();
             }
 
-            List<PrefabModification> result = new List<PrefabModification>();
+            var result = new List<PrefabModification>();
 
-            int longestByteCount = 0;
+            var longestByteCount = 0;
 
-            for (int i = 0; i < modifications.Count; i++)
+            for (var i = 0; i < modifications.Count; i++)
             {
-                int count = modifications[i].Length * 2;
+                var count = modifications[i].Length * 2;
 
                 if (count > longestByteCount)
                 {
@@ -2094,12 +2089,15 @@ namespace OdinSerializer
             }
 
             using (var context = Cache<DeserializationContext>.Claim())
-            using (var streamCache = CachedMemoryStream.Claim(longestByteCount))
-            using (var readerCache = Cache<JsonDataReader>.Claim())// GetCachedUnityReader(DataFormat.JSON, streamCache.Value.MemoryStream, context))
+            using (Cache<CachedMemoryStream> streamCache = CachedMemoryStream.Claim(longestByteCount))
+            using
+                (var readerCache =
+                 Cache<JsonDataReader>
+                     .Claim()) // GetCachedUnityReader(DataFormat.JSON, streamCache.Value.MemoryStream, context))
             using (var resolver = Cache<UnityReferenceResolver>.Claim())
             {
-                var stream = streamCache.Value.MemoryStream;
-                var reader = readerCache.Value;
+                MemoryStream stream = streamCache.Value.MemoryStream;
+                JsonDataReader reader = readerCache.Value;
 
                 reader.Context = context;
                 reader.Stream = stream;
@@ -2107,17 +2105,17 @@ namespace OdinSerializer
                 resolver.Value.SetReferencedUnityObjects(referencedUnityObjects);
                 reader.Context.IndexReferenceResolver = resolver.Value;
 
-                for (int i = 0; i < modifications.Count; i++)
+                for (var i = 0; i < modifications.Count; i++)
                 {
-                    string modStr = modifications[i];
-                    byte[] bytes = Encoding.UTF8.GetBytes(modStr);
+                    var modStr = modifications[i];
+                    var bytes = Encoding.UTF8.GetBytes(modStr);
 
                     stream.SetLength(bytes.Length);
                     stream.Position = 0;
                     stream.Write(bytes, 0, bytes.Length);
                     stream.Position = 0;
 
-                    PrefabModification modification = new PrefabModification();
+                    var modification = new PrefabModification();
 
                     string entryName;
                     EntryType entryType;
@@ -2127,13 +2125,14 @@ namespace OdinSerializer
                     entryType = reader.PeekEntry(out entryName);
 
                     if (entryType == EntryType.EndOfStream)
-                    {
                         // We might have reached the end of stream from a prior modification string
                         // If we have, force our way into the first entry in the new string
+                    {
                         reader.SkipEntry();
                     }
 
-                    while ((entryType = reader.PeekEntry(out entryName)) != EntryType.EndOfNode && entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
+                    while ((entryType = reader.PeekEntry(out entryName)) != EntryType.EndOfNode &&
+                           entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
                     {
                         if (entryName == null)
                         {
@@ -2184,18 +2183,19 @@ namespace OdinSerializer
                         }
                         else
                         {
-                            Debug.LogError("Unexpected entry name '" + entryName + "' while deserializing prefab modifications.");
+                            Debug.LogError("Unexpected entry name '" + entryName +
+                                           "' while deserializing prefab modifications.");
                             reader.SkipEntry();
                         }
                     }
 
                     if (modification.Path == null)
-                    {
                         // This happens quite often if you change the structure of a class which cointains prefab modifications made to it.
                         // Those invalid prefab modifications should be removed, which they seem to be in most cases, but apparently not some.
                         //
                         // And debugging a warning here makes give errors because of the bug in VS Bridge. And prevents people from bulding.
                         // Debug.LogWarning("Error when deserializing prefab modification; no path found. Modification lost; string was: '" + modStr + "'.");
+                    {
                         continue;
                     }
 
@@ -2209,9 +2209,9 @@ namespace OdinSerializer
 #if UNITY_EDITOR
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static void RegisterPrefabModificationsChange(UnityEngine.Object unityObject, List<PrefabModification> modifications)
+        public static void RegisterPrefabModificationsChange(Object unityObject, List<PrefabModification> modifications)
         {
             if (unityObject == null)
             {
@@ -2263,7 +2263,8 @@ namespace OdinSerializer
 #endif
 
         /// <summary>
-        /// Creates an object with default values initialized in the style of Unity; strings will be "", classes will be instantiated recursively with default values, and so on.
+        ///     Creates an object with default values initialized in the style of Unity; strings will be "", classes will be
+        ///     instantiated recursively with default values, and so on.
         /// </summary>
         public static object CreateDefaultUnityInitializedObject(Type type)
         {
@@ -2281,7 +2282,7 @@ namespace OdinSerializer
                 return null;
             }
 
-            if (!UnitySerializationUtility.GuessIfUnityWillSerialize(type))
+            if (!GuessIfUnityWillSerialize(type))
             {
                 return type.IsValueType ? Activator.CreateInstance(type) : null;
             }
@@ -2290,21 +2291,25 @@ namespace OdinSerializer
             {
                 return "";
             }
-            else if (type.IsEnum)
+
+            if (type.IsEnum)
             {
-                var values = Enum.GetValues(type);
+                Array values = Enum.GetValues(type);
                 return values.Length > 0 ? values.GetValue(0) : Enum.ToObject(type, 0);
             }
-            else if (type.IsPrimitive)
+
+            if (type.IsPrimitive)
             {
                 return Activator.CreateInstance(type);
             }
-            else if (type.IsArray)
+
+            if (type.IsArray)
             {
                 Assert.IsTrue(type.GetArrayRank() == 1);
                 return Array.CreateInstance(type.GetElementType(), 0);
             }
-            else if (type.ImplementsOpenGenericClass(typeof(List<>)) || typeof(UnityEventBase).IsAssignableFrom(type))
+
+            if (type.ImplementsOpenGenericClass(typeof(List<>)) || typeof(UnityEventBase).IsAssignableFrom(type))
             {
                 try
                 {
@@ -2315,11 +2320,15 @@ namespace OdinSerializer
                     return null;
                 }
             }
-            else if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+
+            if (typeof(Object).IsAssignableFrom(type))
             {
                 return null;
             }
-            else if ((type.Assembly.GetName().Name.StartsWith("UnityEngine") || type.Assembly.GetName().Name.StartsWith("UnityEditor")) && type.GetConstructor(Type.EmptyTypes) != null)
+
+            if ((type.Assembly.GetName().Name.StartsWith("UnityEngine") ||
+                 type.Assembly.GetName().Name.StartsWith("UnityEditor")) &&
+                type.GetConstructor(Type.EmptyTypes) != null)
             {
                 try
                 {
@@ -2341,11 +2350,11 @@ namespace OdinSerializer
 
             value = FormatterServices.GetUninitializedObject(type);
 
-            var fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-            for (int i = 0; i < fields.Length; i++)
+            for (var i = 0; i < fields.Length; i++)
             {
-                var field = fields[i];
+                FieldInfo field = fields[i];
                 if (GuessIfUnityWillSerialize(field))
                 {
                     field.SetValue(value, CreateDefaultUnityInitializedObject(field.FieldType, depth + 1));
@@ -2355,7 +2364,8 @@ namespace OdinSerializer
             return value;
         }
 
-        private static void ApplyPrefabModifications(UnityEngine.Object unityObject, List<string> modificationData, List<UnityEngine.Object> referencedUnityObjects)
+        private static void ApplyPrefabModifications(Object unityObject, List<string> modificationData,
+            List<Object> referencedUnityObjects)
         {
             if (unityObject == null)
             {
@@ -2372,15 +2382,16 @@ namespace OdinSerializer
                 return;
             }
 
-            var modifications = DeserializePrefabModifications(modificationData, referencedUnityObjects);
+            List<PrefabModification> modifications =
+                DeserializePrefabModifications(modificationData, referencedUnityObjects);
 
 #if UNITY_EDITOR
             PrefabModificationCache.CachePrefabModifications(unityObject, modifications);
 #endif
 
-            for (int i = 0; i < modifications.Count; i++)
+            for (var i = 0; i < modifications.Count; i++)
             {
-                var mod = modifications[i];
+                PrefabModification mod = modifications[i];
 
                 try
                 {
@@ -2388,7 +2399,9 @@ namespace OdinSerializer
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log("The following exception was thrown when trying to apply a prefab modification for path '" + mod.Path + "':");
+                    Debug.Log(
+                        "The following exception was thrown when trying to apply a prefab modification for path '" +
+                        mod.Path + "':");
                     Debug.LogException(ex);
                 }
             }
@@ -2408,11 +2421,12 @@ namespace OdinSerializer
                     }
                     else if (member is PropertyInfo)
                     {
-                        result = EmitUtilities.CreateWeakInstancePropertyGetter(member.DeclaringType, member as PropertyInfo);
+                        result = EmitUtilities.CreateWeakInstancePropertyGetter(member.DeclaringType,
+                            member as PropertyInfo);
                     }
                     else
                     {
-                        result = delegate (ref object instance)
+                        result = delegate(ref object instance)
                         {
                             return FormatterUtilities.GetMemberValue(member, instance);
                         };
@@ -2439,11 +2453,12 @@ namespace OdinSerializer
                     }
                     else if (member is PropertyInfo)
                     {
-                        result = EmitUtilities.CreateWeakInstancePropertySetter(member.DeclaringType, member as PropertyInfo);
+                        result = EmitUtilities.CreateWeakInstancePropertySetter(member.DeclaringType,
+                            member as PropertyInfo);
                     }
                     else
                     {
-                        result = delegate (ref object instance, object value)
+                        result = delegate(ref object instance, object value)
                         {
                             FormatterUtilities.SetMemberValue(member, instance, value);
                         };
@@ -2463,18 +2478,18 @@ namespace OdinSerializer
             switch (format)
             {
                 case DataFormat.Binary:
-                    {
-                        var c = Cache<BinaryDataWriter>.Claim();
-                        c.Value.Stream = stream;
-                        cache = c;
-                    }
+                {
+                    var c = Cache<BinaryDataWriter>.Claim();
+                    c.Value.Stream = stream;
+                    cache = c;
+                }
                     break;
                 case DataFormat.JSON:
-                    {
-                        var c = Cache<JsonDataWriter>.Claim();
-                        c.Value.Stream = stream;
-                        cache = c;
-                    }
+                {
+                    var c = Cache<JsonDataWriter>.Claim();
+                    c.Value.Stream = stream;
+                    cache = c;
+                }
                     break;
                 case DataFormat.Nodes:
                     throw new InvalidOperationException("Don't do this for nodes!");
@@ -2517,18 +2532,18 @@ namespace OdinSerializer
             switch (format)
             {
                 case DataFormat.Binary:
-                    {
-                        var c = Cache<BinaryDataReader>.Claim();
-                        c.Value.Stream = stream;
-                        cache = c;
-                    }
+                {
+                    var c = Cache<BinaryDataReader>.Claim();
+                    c.Value.Stream = stream;
+                    cache = c;
+                }
                     break;
                 case DataFormat.JSON:
-                    {
-                        var c = Cache<JsonDataReader>.Claim();
-                        c.Value.Stream = stream;
-                        cache = c;
-                    }
+                {
+                    var c = Cache<JsonDataReader>.Claim();
+                    c.Value.Stream = stream;
+                    cache = c;
+                }
                     break;
                 case DataFormat.Nodes:
                     throw new InvalidOperationException("Don't do this for nodes!");
@@ -2562,22 +2577,193 @@ namespace OdinSerializer
             //return reader;
         }
 
+        private struct CachedSerializationBackendResult
+        {
+            public bool HasCalculatedSerializeUnityFieldsTrueResult;
+            public bool HasCalculatedSerializeUnityFieldsFalseResult;
+
+            public bool SerializeUnityFieldsTrueResult;
+            public bool SerializeUnityFieldsFalseResult;
+        }
+
+
+#if UNITY_EDITOR
+        private static bool isDoingDomainReload;
+
+        [InitializeOnLoadMethod]
+        private static void SubscribeToDomainReloadEvents()
+        {
+            Type AssemblyReloadEvents_Type =
+                TwoWaySerializationBinder.Default.BindToType("UnityEditor.AssemblyReloadEvents");
+
+            if (AssemblyReloadEvents_Type == null)
+            {
+                return;
+            }
+
+            EventInfo AssemblyReloadEvents_beforeAssemblyReload_Event =
+                AssemblyReloadEvents_Type.GetEvent("beforeAssemblyReload");
+            EventInfo AssemblyReloadEvents_afterAssemblyReload_Event =
+                AssemblyReloadEvents_Type.GetEvent("afterAssemblyReload");
+            Type AssemblyReloadEvents_AssemblyReloadCallback_Type =
+                AssemblyReloadEvents_Type.GetNestedType("AssemblyReloadCallback");
+
+            if (AssemblyReloadEvents_beforeAssemblyReload_Event == null ||
+                AssemblyReloadEvents_afterAssemblyReload_Event == null ||
+                AssemblyReloadEvents_AssemblyReloadCallback_Type == null)
+            {
+                return;
+            }
+
+            MethodInfo UnitySerializationUtility_OnBeforeAssemblyReload_Method =
+                typeof(UnitySerializationUtility).GetMethod("OnBeforeAssemblyReload", Flags.StaticAnyVisibility);
+            MethodInfo UnitySerializationUtility_OnAfterAssemblyReload_Method =
+                typeof(UnitySerializationUtility).GetMethod("OnAfterAssemblyReload", Flags.StaticAnyVisibility);
+
+            var onBeforeDelegate = Delegate.CreateDelegate(AssemblyReloadEvents_AssemblyReloadCallback_Type,
+                UnitySerializationUtility_OnBeforeAssemblyReload_Method);
+            var onAfterDelegate = Delegate.CreateDelegate(AssemblyReloadEvents_AssemblyReloadCallback_Type,
+                UnitySerializationUtility_OnAfterAssemblyReload_Method);
+
+            AssemblyReloadEvents_beforeAssemblyReload_Event.AddEventHandler(null, onBeforeDelegate);
+            AssemblyReloadEvents_afterAssemblyReload_Event.AddEventHandler(null, onAfterDelegate);
+        }
+
+        private static void OnBeforeAssemblyReload() => isDoingDomainReload = true;
+
+        private static void OnAfterAssemblyReload() => isDoingDomainReload = false;
+
+        /// <summary>
+        ///     From the new scriptable build pipeline package
+        /// </summary>
+        [NonSerialized]
+        private static readonly Type SBP_ContentPipelineType =
+            TwoWaySerializationBinder.Default.BindToType("UnityEditor.Build.Pipeline.ContentPipeline");
+
+        [NonSerialized]
+        private static readonly MethodInfo PrefabUtility_IsComponentAddedToPrefabInstance_MethodInfo =
+            typeof(PrefabUtility).GetMethod("IsComponentAddedToPrefabInstance");
+
+        [NonSerialized]
+        private static readonly HashSet<Object> UnityObjectsWaitingForDelayedModificationApply =
+            new(ReferenceEqualityComparer<Object>.Default);
+
+        [NonSerialized]
+        private static readonly Dictionary<Object, List<PrefabModification>> RegisteredPrefabModifications =
+            new(ReferenceEqualityComparer<Object>.Default);
+
+        private static class PrefabDeserializeUtility
+        {
+            private static int updateCount;
+
+            [NonSerialized]
+            public static readonly HashSet<Object> PrefabsWithValuesApplied =
+                new(ReferenceEqualityComparer<Object>.Default);
+
+            [NonSerialized]
+            private static readonly Dictionary<Object, HashSet<object>> SceneObjectsToKeepOnApply =
+                new(ReferenceEqualityComparer<Object>.Default);
+
+            [NonSerialized]
+            public static readonly object DeserializePrefabs_LOCK = new();
+
+            private static readonly List<Object> toRemove = new();
+
+            static PrefabDeserializeUtility() => EditorApplication.update += OnEditorUpdate;
+
+            /// <summary>
+            ///     Note: it is assumed that code calling this is holding the DeserializePrefabCaches_LOCK lock, and will continue to
+            ///     hold it while the returned hashset is being modified
+            /// </summary>
+            public static HashSet<object> GetSceneObjectsToKeepSet(Object unityObject, bool createIfDoesntExist)
+            {
+                HashSet<object> keep;
+
+                if (!SceneObjectsToKeepOnApply.TryGetValue(unityObject, out keep))
+                {
+                    keep = new HashSet<object>(ReferenceEqualityComparer<object>.Default);
+                    SceneObjectsToKeepOnApply.Add(unityObject, keep);
+                }
+
+                return keep;
+            }
+
+            public static void CleanSceneObjectToKeepOnApply()
+            {
+                lock (DeserializePrefabs_LOCK)
+                {
+                    foreach (Object obj in SceneObjectsToKeepOnApply.Keys)
+                    {
+                        if (obj == null)
+                        {
+                            toRemove.Add(obj);
+                        }
+                    }
+
+                    for (var i = 0; i < toRemove.Count; i++)
+                    {
+                        SceneObjectsToKeepOnApply.Remove(toRemove[i]);
+                    }
+
+                    toRemove.Clear();
+                }
+            }
+
+            private static void OnEditorUpdate()
+            {
+                lock (DeserializePrefabs_LOCK)
+                {
+                    updateCount++;
+
+                    if (updateCount >= 1000)
+                    {
+                        SceneObjectsToKeepOnApply.Clear();
+                        updateCount = 0;
+                    }
+                }
+            }
+        }
+
+#endif
+
 #if UNITY_EDITOR
 
-        [UnityEditor.InitializeOnLoad]
+        /// <summary>
+        ///     Whether to always force editor mode serialization. This member only exists in the editor.
+        /// </summary>
+        public static bool ForceEditorModeSerialization { get; set; }
+
+        /// <summary>
+        ///     Not yet documented.
+        /// </summary>
+        public static List<PrefabModification> GetRegisteredPrefabModifications(Object obj)
+        {
+            List<PrefabModification> result;
+            RegisteredPrefabModifications.TryGetValue(obj, out result);
+            return result;
+        }
+
+        public static bool HasModificationsWaitingForDelayedApply(Object obj) =>
+            UnityObjectsWaitingForDelayedModificationApply.Contains(obj);
+
+#endif
+
+#if UNITY_EDITOR
+
+        [InitializeOnLoad]
         private static class PrefabSelectionTracker
         {
-            private static readonly object LOCK = new object();
-            private static readonly HashSet<UnityEngine.Object> selectedPrefabObjects;
+            private static readonly object LOCK = new();
+            private static readonly HashSet<Object> selectedPrefabObjects;
 
             static PrefabSelectionTracker()
             {
-                selectedPrefabObjects = new HashSet<UnityEngine.Object>(ReferenceEqualityComparer<UnityEngine.Object>.Default);
-                UnityEditor.Selection.selectionChanged += OnSelectionChanged;
+                selectedPrefabObjects = new HashSet<Object>(ReferenceEqualityComparer<Object>.Default);
+                Selection.selectionChanged += OnSelectionChanged;
                 OnSelectionChanged();
             }
 
-            public static bool IsCurrentlySelectedPrefabRoot(UnityEngine.Object obj)
+            public static bool IsCurrentlySelectedPrefabRoot(Object obj)
             {
                 lock (LOCK)
                 {
@@ -2615,19 +2801,21 @@ namespace OdinSerializer
                 {
                     selectedPrefabObjects.Clear();
 
-                    var rootPrefabs = UnityEditor.Selection.objects
+                    IEnumerable<GameObject> rootPrefabs = Selection.objects
                         .Where(n =>
                         {
-                            if (!(n is GameObject)) return false;
+                            if (!(n is GameObject))
+                            {
+                                return false;
+                            }
 
-                            var prefabType = PrefabUtility.GetPrefabAssetType(n);
+                            PrefabAssetType prefabType = PrefabUtility.GetPrefabAssetType(n);
                             return prefabType != PrefabAssetType.NotAPrefab;
-                            
                         })
                         .Select(n => PrefabUtility.GetOutermostPrefabInstanceRoot((GameObject)n))
                         .Distinct();
 
-                    foreach (var root in rootPrefabs)
+                    foreach (GameObject root in rootPrefabs)
                     {
                         RegisterRecursive(root);
                     }
@@ -2656,18 +2844,18 @@ namespace OdinSerializer
 
                 selectedPrefabObjects.Add(go);
 
-                var components = go.GetComponents<Component>();
+                Component[] components = go.GetComponents<Component>();
 
-                for (int i = 0; i < components.Length; i++)
+                for (var i = 0; i < components.Length; i++)
                 {
                     selectedPrefabObjects.Add(components[i]);
                 }
 
-                var transform = go.transform;
+                Transform transform = go.transform;
 
-                for (int i = 0; i < transform.childCount; i++)
+                for (var i = 0; i < transform.childCount; i++)
                 {
-                    var child = transform.GetChild(i);
+                    Transform child = transform.GetChild(i);
                     RegisterRecursive(child.gameObject);
                 }
             }
@@ -2676,14 +2864,18 @@ namespace OdinSerializer
 
         public static class PrefabModificationCache
         {
-            private static readonly Dictionary<object, List<PrefabModification>> CachedDeserializedModifications = new Dictionary<object, List<PrefabModification>>(ReferenceEqualityComparer<object>.Default);
-            private static readonly Dictionary<object, int> CachedDeserializedModificationTimes = new Dictionary<object, int>(ReferenceEqualityComparer<object>.Default);
+            private static readonly Dictionary<object, List<PrefabModification>> CachedDeserializedModifications =
+                new(ReferenceEqualityComparer<object>.Default);
 
-            private static readonly object Caches_LOCK = new object();
+            private static readonly Dictionary<object, int> CachedDeserializedModificationTimes =
+                new(ReferenceEqualityComparer<object>.Default);
 
-            private static int counter = 0;
+            private static readonly object Caches_LOCK = new();
 
-            public static List<PrefabModification> DeserializePrefabModificationsCached(UnityEngine.Object obj, List<string> modifications, List<UnityEngine.Object> referencedUnityObjects)
+            private static int counter;
+
+            public static List<PrefabModification> DeserializePrefabModificationsCached(Object obj,
+                List<string> modifications, List<Object> referencedUnityObjects)
             {
                 lock (Caches_LOCK)
                 {
@@ -2702,7 +2894,7 @@ namespace OdinSerializer
                 }
             }
 
-            public static void CachePrefabModifications(UnityEngine.Object obj, List<PrefabModification> modifications)
+            public static void CachePrefabModifications(Object obj, List<PrefabModification> modifications)
             {
                 lock (Caches_LOCK)
                 {
@@ -2724,14 +2916,14 @@ namespace OdinSerializer
 
                 // Once, this was a 'while count > CACHE_SIZE' loop, but in certain cases that can infinite loop
                 //   so now it's a simpler and harder-to-break for loop with extra debugging clauses in the body.
-                int removeCount = CachedDeserializedModificationTimes.Count - CACHE_SIZE;
-                    
-                for (int i = 0; i < removeCount; i++)
+                var removeCount = CachedDeserializedModificationTimes.Count - CACHE_SIZE;
+
+                for (var i = 0; i < removeCount; i++)
                 {
                     object lowestObj = null;
-                    int lowestTime = int.MaxValue;
+                    var lowestTime = int.MaxValue;
 
-                    foreach (var pair in CachedDeserializedModificationTimes)
+                    foreach (KeyValuePair<object, int> pair in CachedDeserializedModificationTimes)
                     {
                         if (pair.Value < lowestTime)
                         {
@@ -2743,7 +2935,10 @@ namespace OdinSerializer
                     CachedDeserializedModifications.Remove(lowestObj);
                     if (!CachedDeserializedModificationTimes.Remove(lowestObj))
                     {
-                        Debug.LogError("A Unity object instance of type '" + lowestObj.GetType().GetNiceName() + "' has likely become corrupt or destroyed somehow, yet deserialization has been invoked for it. If you're in the editor, you can click this log message to attempt to highlight the object. (It probably won't work, but there's a chance. If the highlighting doesn't work, the object instance is so broken that Odin cannot give you any more info about it than this message contains. Good luck!)", lowestObj as UnityEngine.Object);
+                        Debug.LogError(
+                            "A Unity object instance of type '" + lowestObj.GetType().GetNiceName() +
+                            "' has likely become corrupt or destroyed somehow, yet deserialization has been invoked for it. If you're in the editor, you can click this log message to attempt to highlight the object. (It probably won't work, but there's a chance. If the highlighting doesn't work, the object instance is so broken that Odin cannot give you any more info about it than this message contains. Good luck!)",
+                            lowestObj as Object);
 
                         // There are bad keys in the dictionaries; we have to clear them and just rebuild the cache.
                         // This theory isn't confirmed, but it's probably because UnityEngine.Object.GetHashCode() 
@@ -2759,22 +2954,28 @@ namespace OdinSerializer
             }
         }
 
-        private static readonly MemberInfo EditorApplication_delayCall_Member = typeof(UnityEditor.EditorApplication).GetMember("delayCall", Flags.StaticAnyVisibility).FirstOrDefault();
+        private static readonly MemberInfo EditorApplication_delayCall_Member = typeof(EditorApplication)
+            .GetMember("delayCall", Flags.StaticAnyVisibility).FirstOrDefault();
 
         /// <summary>
-        /// In 2020.1, Unity changed EditorApplication.delayCall from a field to an event, meaning 
-        /// we now have to use reflection to access it consistently across all versions of Unity.
+        ///     In 2020.1, Unity changed EditorApplication.delayCall from a field to an event, meaning
+        ///     we now have to use reflection to access it consistently across all versions of Unity.
         /// </summary>
         private static event Action EditorApplication_delayCall_Alias
         {
             add
             {
-                if (EditorApplication_delayCall_Member == null) throw new InvalidOperationException("EditorApplication.delayCall field or event could not be found. Odin will be broken.");
+                if (EditorApplication_delayCall_Member == null)
+                {
+                    throw new InvalidOperationException(
+                        "EditorApplication.delayCall field or event could not be found. Odin will be broken.");
+                }
 
                 if (EditorApplication_delayCall_Member is FieldInfo)
                 {
-                    UnityEditor.EditorApplication.CallbackFunction val = (UnityEditor.EditorApplication.CallbackFunction)(EditorApplication_delayCall_Member as FieldInfo).GetValue(null);
-                    val += value.ConvertDelegate<UnityEditor.EditorApplication.CallbackFunction>();
+                    var val = (EditorApplication.CallbackFunction)(EditorApplication_delayCall_Member as FieldInfo)
+                        .GetValue(null);
+                    val += value.ConvertDelegate<EditorApplication.CallbackFunction>();
                     (EditorApplication_delayCall_Member as FieldInfo).SetValue(null, val);
                 }
                 else if (EditorApplication_delayCall_Member is EventInfo)
@@ -2783,17 +2984,26 @@ namespace OdinSerializer
                 }
                 else
                 {
-                    if (EditorApplication_delayCall_Member == null) throw new InvalidOperationException("EditorApplication.delayCall was not a field or an event. Odin will be broken.");
+                    if (EditorApplication_delayCall_Member == null)
+                    {
+                        throw new InvalidOperationException(
+                            "EditorApplication.delayCall was not a field or an event. Odin will be broken.");
+                    }
                 }
             }
             remove
             {
-                if (EditorApplication_delayCall_Member == null) throw new InvalidOperationException("EditorApplication.delayCall field or event could not be found. Odin will be broken.");
+                if (EditorApplication_delayCall_Member == null)
+                {
+                    throw new InvalidOperationException(
+                        "EditorApplication.delayCall field or event could not be found. Odin will be broken.");
+                }
 
                 if (EditorApplication_delayCall_Member is FieldInfo)
                 {
-                    UnityEditor.EditorApplication.CallbackFunction val = (UnityEditor.EditorApplication.CallbackFunction)(EditorApplication_delayCall_Member as FieldInfo).GetValue(null);
-                    val -= value.ConvertDelegate<UnityEditor.EditorApplication.CallbackFunction>();
+                    var val = (EditorApplication.CallbackFunction)(EditorApplication_delayCall_Member as FieldInfo)
+                        .GetValue(null);
+                    val -= value.ConvertDelegate<EditorApplication.CallbackFunction>();
                     (EditorApplication_delayCall_Member as FieldInfo).SetValue(null, val);
                 }
                 else if (EditorApplication_delayCall_Member is EventInfo)
@@ -2802,7 +3012,11 @@ namespace OdinSerializer
                 }
                 else
                 {
-                    if (EditorApplication_delayCall_Member == null) throw new InvalidOperationException("EditorApplication.delayCall was not a field or an event. Odin will be broken.");
+                    if (EditorApplication_delayCall_Member == null)
+                    {
+                        throw new InvalidOperationException(
+                            "EditorApplication.delayCall was not a field or an event. Odin will be broken.");
+                    }
                 }
             }
         }
@@ -2810,16 +3024,17 @@ namespace OdinSerializer
         private static T ConvertDelegate<T>(this Delegate src)
         {
             if (src == null || src.GetType() == typeof(T))
+            {
                 return (T)(object)src;
+            }
 
             if (src.GetInvocationList().Count() == 1)
             {
                 return (T)(object)Delegate.CreateDelegate(typeof(T), src.Target, src.Method);
             }
-            else
-            {
-                return (T)(object)src.GetInvocationList().Aggregate<Delegate, Delegate>(null, (current, d) => Delegate.Combine(current, (Delegate)(object)ConvertDelegate<T>(d)));
-            }
+
+            return (T)(object)src.GetInvocationList().Aggregate<Delegate, Delegate>(null,
+                (current, d) => Delegate.Combine(current, (Delegate)(object)ConvertDelegate<T>(d)));
         }
 
 #endif

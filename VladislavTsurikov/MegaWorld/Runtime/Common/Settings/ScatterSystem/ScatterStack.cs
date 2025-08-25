@@ -12,23 +12,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
     {
         private WaitingNextFrame _waitingNextFrame;
 
-        public async UniTask Samples(BoxArea boxArea, Action<Vector2> onAddSample, CancellationToken token = default(CancellationToken))
+        public async UniTask Samples(BoxArea boxArea, Action<Vector2> onAddSample, CancellationToken token = default)
         {
-            List<Scatter> enabledScatter = new List<Scatter>(_elementList.FindAll(scatter => scatter.Active));
+            var enabledScatter = new List<Scatter>(_elementList.FindAll(scatter => scatter.Active));
 
-            List<Vector2> samples = new List<Vector2>();
+            var samples = new List<Vector2>();
 
-            for (int i = 0; i < enabledScatter.Count; i++)
+            for (var i = 0; i < enabledScatter.Count; i++)
             {
                 await enabledScatter[i]
                     .Samples(token, boxArea, samples, i == enabledScatter.Count - 1 ? onAddSample : null);
             }
         }
 
-        public void SetWaitingNextFrame(WaitingNextFrame waitingNextFrame)
-        {
-            _waitingNextFrame = waitingNextFrame;
-        }
+        public void SetWaitingNextFrame(WaitingNextFrame waitingNextFrame) => _waitingNextFrame = waitingNextFrame;
 
         public bool IsWaitForNextFrame()
         {

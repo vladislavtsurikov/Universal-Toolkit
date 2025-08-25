@@ -13,7 +13,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             None,
             NotAllProtoAvailable,
-            MissingPrototypes,
+            MissingPrototypes
         }
 
         public static TerrainResourcesSyncError SyncError = TerrainResourcesSyncError.None;
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             bool found;
 
             DetailPrototype newDetail;
-            List<DetailPrototype> terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
+            var terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
             foreach (PrototypeTerrainDetail proto in protoTerrainDetailList)
             {
                 found = false;
@@ -38,11 +38,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 {
                     if (proto.PrefabType == PrefabType.Texture)
                     {
-                        if (TextureUtility.IsSameTexture(dp.prototypeTexture, proto.DetailTexture, false))
+                        if (TextureUtility.IsSameTexture(dp.prototypeTexture, proto.DetailTexture))
                         {
                             found = true;
                         }
-                        if (GameObjectUtility.IsSameGameObject(dp.prototype, proto.Prefab, false))
+
+                        if (GameObjectUtility.IsSameGameObject(dp.prototype, proto.Prefab))
                         {
                             found = true;
                         }
@@ -77,19 +78,20 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             if (group.PrototypeType == typeof(PrototypeTerrainDetail))
             {
-                List<DetailPrototype> terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
+                var terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
 
-                foreach (var prototype in group.PrototypeList)
+                foreach (Prototype prototype in group.PrototypeList)
                 {
                     var proto = (PrototypeTerrainDetail)prototype;
 
-                    for (int id = 0; id < terrainDetails.Count; id++)
+                    for (var id = 0; id < terrainDetails.Count; id++)
                     {
-                        if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture, false))
+                        if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture))
                         {
                             proto.TerrainProtoId = id;
                         }
-                        if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab, false))
+
+                        if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab))
                         {
                             proto.TerrainProtoId = id;
                         }
@@ -105,28 +107,29 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 Debug.LogWarning("Missing active terrain.");
                 return;
             }
-            
-            List<PrototypeTerrainDetail> protoTerrainDetailRemoveList = new List<PrototypeTerrainDetail>();
 
-            List<DetailPrototype> terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
+            var protoTerrainDetailRemoveList = new List<PrototypeTerrainDetail>();
+
+            var terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
 
             foreach (PrototypeTerrainDetail proto in group.PrototypeList)
             {
-                bool find = false;
+                var find = false;
 
-                for (int id = 0; id < terrainDetails.Count; id++)
+                for (var id = 0; id < terrainDetails.Count; id++)
                 {
-                    if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture, false))
+                    if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture))
                     {
                         find = true;
                     }
-                    if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab, false))
+
+                    if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab))
                     {
                         find = true;
                     }
                 }
 
-                if(find == false)
+                if (find == false)
                 {
                     protoTerrainDetailRemoveList.Add(proto);
                 }
@@ -140,26 +143,27 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             DetailPrototype unityProto;
             PrototypeTerrainDetail localProto;
 
-            for (int id = 0; id < terrainDetails.Count; id++)
+            for (var id = 0; id < terrainDetails.Count; id++)
             {
-                bool find = false;
+                var find = false;
 
                 foreach (PrototypeTerrainDetail proto in group.PrototypeList)
                 {
-                    if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture, false))
+                    if (TextureUtility.IsSameTexture(terrainDetails[id].prototypeTexture, proto.DetailTexture))
                     {
                         find = true;
                     }
-                    if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab, false))
+
+                    if (GameObjectUtility.IsSameGameObject(terrainDetails[id].prototype, proto.Prefab))
                     {
                         find = true;
                     }
                 }
 
-                if(find == false)
+                if (find == false)
                 {
                     unityProto = terrain.terrainData.detailPrototypes[id];
-                    
+
                     if (unityProto.prototype != null)
                     {
                         localProto = (PrototypeTerrainDetail)group.AddMissingPrototype(unityProto.prototype);
@@ -182,8 +186,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             {
                 return;
             }
-            
-            if(group.PrototypeList.Count == 0)
+
+            if (group.PrototypeList.Count == 0)
             {
                 SyncError = TerrainResourcesSyncError.MissingPrototypes;
                 return;
@@ -193,23 +197,24 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             {
                 foreach (PrototypeTerrainDetail proto in group.PrototypeList)
                 {
-                    bool find = false;
+                    var find = false;
 
                     foreach (DetailPrototype unityProto in terrain.terrainData.detailPrototypes)
                     {
-                        if (TextureUtility.IsSameTexture(unityProto.prototypeTexture, proto.DetailTexture, false))
+                        if (TextureUtility.IsSameTexture(unityProto.prototypeTexture, proto.DetailTexture))
                         {
                             find = true;
                             break;
                         }
-                        if (GameObjectUtility.IsSameGameObject(unityProto.prototype, proto.Prefab, false))
+
+                        if (GameObjectUtility.IsSameGameObject(unityProto.prototype, proto.Prefab))
                         {
                             find = true;
                             break;
                         }
                     }
 
-                    if(!find)
+                    if (!find)
                     {
                         SyncError = TerrainResourcesSyncError.NotAllProtoAvailable;
                         return;
@@ -224,11 +229,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             DetectSyncError(group, terrain);
 
-            if(TerrainResourcesSyncError.NotAllProtoAvailable == SyncError)
+            if (TerrainResourcesSyncError.NotAllProtoAvailable == SyncError)
             {
                 if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
-                    Debug.LogWarning("You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");
+                    Debug.LogWarning(
+                        "You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");
                     return true;
                 }
             }
@@ -238,8 +244,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 
         public static void RemoveAllNullTerrainData(Terrain terrain)
         {
-            List<DetailPrototype> currentDetailPrototypes = terrain.terrainData.detailPrototypes.ToList();
-            currentDetailPrototypes.RemoveAll(prototype =>  prototype == null);
+            var currentDetailPrototypes = terrain.terrainData.detailPrototypes.ToList();
+            currentDetailPrototypes.RemoveAll(prototype => prototype == null);
             terrain.terrainData.detailPrototypes = currentDetailPrototypes.ToArray();
         }
 
@@ -247,7 +253,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             if (group.PrototypeType == typeof(PrototypeTerrainDetail))
             {
-                List<DetailPrototype> terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
+                var terrainDetails = new List<DetailPrototype>(terrain.terrainData.detailPrototypes);
 
                 foreach (Terrain item in Terrain.activeTerrains)
                 {

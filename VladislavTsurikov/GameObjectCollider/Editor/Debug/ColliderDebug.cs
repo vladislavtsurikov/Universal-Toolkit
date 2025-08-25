@@ -95,8 +95,10 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
 
         public Color HitTriangleColor = Color.red;
         public Color NodeColor = Color.white;
-        public Vector3 OverlapBoxSize { get { return _overlapBoxSize; } set { _overlapBoxSize = Vector3.Max(value, Vector3.one * 1e-5f); } }
-        public float OverlapSphereRadius { get { return _overlapSphereRadius; } set { _overlapSphereRadius = Mathf.Max(value, 1e-5f); } }
+        public Vector3 OverlapBoxSize { get { return _overlapBoxSize; } set { _overlapBoxSize =
+ Vector3.Max(value, Vector3.one * 1e-5f); } }
+        public float OverlapSphereRadius { get { return _overlapSphereRadius; } set { _overlapSphereRadius =
+ Mathf.Max(value, 1e-5f); } }
         public float HitPointSize { get { return _hitPointSize; } set { _hitPointSize = Mathf.Max(1e-5f, value); } }
 
         /// <summary>
@@ -256,7 +258,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
                 style.normal.textColor = Color.yellow;
 
                 // Build the label text. We will show the coordinates of the hit point and the hit point normal.
-                var labelText = "Hit Point: " + _objectRayHit.Point.ToString() + "; \r\nHit Normal: " + _objectRayHit.Normal.ToString();
+                var labelText =
+ "Hit Point: " + _objectRayHit.Point.ToString() + "; \r\nHit Normal: " + _objectRayHit.Normal.ToString();
                 Handles.Label(_objectRayHit.Point, new GUIContent(labelText), style);
 
                 // Draw a sphere centered on the position of the hit point and a normal emenating from that point
@@ -279,7 +282,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
 
                         // Activate the triangle color and retrieve the triangle vertices
                         GizmosEx.PushColor(HitTriangleColor);
-                        var triangleVerts = editorMesh.GetTriangleVerts(_objectRayHit.MeshRayHit.TriangleIndex, _bvhObject.GetMatrix());
+                        var triangleVerts =
+ editorMesh.GetTriangleVerts(_objectRayHit.MeshRayHit.TriangleIndex, _bvhObject.GetMatrix());
                         for(int vertIndex = 0; vertIndex < 3; ++vertIndex)
                         {
                             // Draw the current line
@@ -330,7 +334,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
                                 ObjectFilter objectFilter = new ObjectFilter();
                                 objectFilter.LayerMask = LayerMask;
 
-                                _objectRayHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
+                                _objectRayHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
 
                                 if(_objectRayHit != null)
                                 {
@@ -352,21 +357,25 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
 
                                 if (_demoMode == OverlapMode.BoxOverlap)
                                 {
-                                    RayHit objectHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
+                                    RayHit objectHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
                                     if (objectHit != null)
                                     {
                                         // Perform the overlap test
                                         _overlapBoxCenter = objectHit.Point;
-                                        _overlappedObjects = GameObjectColliderUtility.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler), overlapObjecFilter);
+                                        _overlappedObjects =
+ GameObjectColliderUtility.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler), overlapObjecFilter);
                                     }
                                 }
                                 else if (_demoMode == OverlapMode.SphereOverlap)
                                 {
-                                    var objectHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
+                                    var objectHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
                                     if (objectHit != null)
                                     {
                                         _overlapSphereCenter = objectHit.Point;
-                                        _overlappedObjects = GameObjectColliderUtility.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius, overlapObjecFilter);
+                                        _overlappedObjects =
+ GameObjectColliderUtility.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius, overlapObjecFilter);
                                     }
                                 }
                                 break;
@@ -385,25 +394,30 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
 
                                 if (_demoMode == OverlapMode.BoxOverlap)
                                 {
-                                    RayHit objectHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
+                                    RayHit objectHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
                                     if(objectHit == null)
                                     {
-                                        objectHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), LayerMask);
+                                        objectHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), LayerMask);
                                     }
                                     if (objectHit != null)
                                     {
                                         // Perform the overlap test
                                         _overlapBoxCenter = objectHit.Point;
-                                        _overlappedScenes = SceneDataManagerFinder.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler));
+                                        _overlappedScenes =
+ SceneDataManagerFinder.OverlapBox(_overlapBoxCenter, _overlapBoxSize, Quaternion.Euler(_overlapBoxEuler));
                                     }
                                 }
                                 else if (_demoMode == OverlapMode.SphereOverlap)
                                 {
-                                    var objectHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
+                                    var objectHit =
+ ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(e.mousePosition), objectFilter);
                                     if (objectHit != null)
                                     {
                                         _overlapSphereCenter = objectHit.Point;
-                                        _overlappedScenes = SceneDataManagerFinder.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius);
+                                        _overlappedScenes =
+ SceneDataManagerFinder.OverlapSphere(_overlapSphereCenter, _overlapSphereRadius);
                                     }
                                 }
                                 break;
@@ -451,7 +465,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
             GizmosEx.PushColor(_overlappedSolidColor);
             foreach (var sceneDataManager in _overlappedScenes)
             {
-                AABB aabb = SectorLayer.GetCurrentSectorLayers()[0].SectorBvhTree.GetAABB(SectorLayerManager.Instance.GetSector(sceneDataManager.Scene));
+                AABB aabb =
+ SectorLayer.GetCurrentSectorLayers()[0].SectorBvhTree.GetAABB(SectorLayerManager.Instance.GetSector(sceneDataManager.Scene));
                 OBB worldObb = new OBB(aabb.Center, aabb.Size);
             
                 if (worldObb.IsValid)
@@ -478,7 +493,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
         {
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                GameObjectCollider gameObjectCollider = (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
+                GameObjectCollider gameObjectCollider =
+ (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
 
                 if(gameObjectCollider != null)
                 {
@@ -491,7 +507,8 @@ namespace VladislavTsurikov.GameObjectCollider.Editor.Debug
         {
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                GameObjectCollider gameObjectCollider = (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
+                GameObjectCollider gameObjectCollider =
+ (GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider));
 
                 if(gameObjectCollider != null)
                 {

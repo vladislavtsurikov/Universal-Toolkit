@@ -10,12 +10,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSetting
     {
         public static void Draw(Bounds bounds, SelectionData data, bool visualizeSelectedProto = true)
         {
-            if(data.SelectedData.GetSelectedPrototypes(typeof(PrototypeGameObject)).Count != 0)
+            if (data.SelectedData.GetSelectedPrototypes(typeof(PrototypeGameObject)).Count != 0)
             {
                 VisualizeOverlapForGameObject(bounds, visualizeSelectedProto);
             }
 
-            if(data.SelectedData.GetSelectedPrototypes(typeof(PrototypeTerrainObject)).Count != 0)
+            if (data.SelectedData.GetSelectedPrototypes(typeof(PrototypeTerrainObject)).Count != 0)
             {
                 VisualizeOverlapForTerrainObject(bounds, visualizeSelectedProto);
             }
@@ -34,7 +34,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSetting
                     }
                 }
                 
-                Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings overlapCheckSettings = (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
+                Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings overlapCheckSettings =
+ (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
 
                 overlapCheckSettings.CurrentOverlapShape?.DrawOverlapVisualisation(terrainObjectInstance.Position, terrainObjectInstance.Scale, terrainObjectInstance.Rotation, proto.Extents);
                 
@@ -43,8 +44,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSetting
 #endif
         }
 
-        private static void VisualizeOverlapForGameObject(Bounds bounds, bool visualizeSelectedProto = true)
-        {
+        private static void VisualizeOverlapForGameObject(Bounds bounds, bool visualizeSelectedProto = true) =>
             PrototypeGameObjectOverlap.OverlapBox(bounds, (proto, go) =>
             {
                 if (visualizeSelectedProto)
@@ -54,14 +54,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.OverlapCheckSetting
                         return true;
                     }
                 }
-                
-                Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings overlapCheckSettings = (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
 
-                overlapCheckSettings.CurrentOverlapShape?.DrawOverlapVisualisation(go.transform.position, go.transform.lossyScale, go.transform.rotation, proto.Extents);
-                
+                var overlapCheckSettings =
+                    (Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings)proto.GetElement(
+                        typeof(Runtime.Common.Settings.OverlapCheckSettings.OverlapCheckSettings));
+
+                overlapCheckSettings.CurrentOverlapShape?.DrawOverlapVisualisation(go.transform.position,
+                    go.transform.lossyScale, go.transform.rotation, proto.Extents);
+
                 return true;
             });
-        }
     }
 }
 #endif

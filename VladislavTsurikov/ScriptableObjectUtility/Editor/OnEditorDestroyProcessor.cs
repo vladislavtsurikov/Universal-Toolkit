@@ -9,12 +9,12 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Editor
     {
         public void OnEditorDestroy();
     }
-    
+
     public class OnEditorDestroyProcessor : AssetModificationProcessor
     {
-        private static Type _type = typeof(IOnEditorDestroy);
+        private static readonly Type _type = typeof(IOnEditorDestroy);
 
-        private static string _fileEnding = ".asset";
+        private static readonly string _fileEnding = ".asset";
 
         public static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions _)
         {
@@ -23,11 +23,11 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Editor
                 return AssetDeleteResult.DidNotDelete;
             }
 
-            var assetType = AssetDatabase.GetMainAssetTypeAtPath(path);
+            Type assetType = AssetDatabase.GetMainAssetTypeAtPath(path);
             if (assetType != null && (assetType.IsSubclassOf(_type) || _type.IsAssignableFrom(assetType)))
             {
-                var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
-                
+                ScriptableObject asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+
                 ((IOnEditorDestroy)asset).OnEditorDestroy();
             }
 

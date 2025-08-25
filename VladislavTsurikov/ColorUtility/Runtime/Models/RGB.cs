@@ -19,24 +19,20 @@ namespace VladislavTsurikov.ColorUtility.Runtime
 
         /// <summary> Red - r ∊ [0, 1] </summary>
         public float r;
-        
+
         /// <summary> Green - g ∊ [0, 1] </summary>
         public float g;
-        
+
         /// <summary> Blue - b ∊ [0, 1] </summary>
         public float b;
 
-        public RGB Copy() =>
-            new RGB(r, g, b);
+        public RGB Copy() => new(r, g, b);
 
-        public UnityEngine.Color ToColor(float alpha = 1) =>
-            new UnityEngine.Color(r, g, b, Mathf.Clamp(alpha, 0, 1));
+        public Color ToColor(float alpha = 1) => new(r, g, b, Mathf.Clamp(alpha, 0, 1));
 
-        public HSL ToHSL() =>
-            ColorUtils.RGBtoHSL(this);
+        public HSL ToHSL() => ColorUtils.RGBtoHSL(this);
 
-        public HSV ToHSV() =>
-            ColorUtils.RGBtoHSV(this);
+        public HSV ToHSV() => ColorUtils.RGBtoHSV(this);
 
         public RGB Validate()
         {
@@ -46,11 +42,10 @@ namespace VladislavTsurikov.ColorUtility.Runtime
             return this;
         }
 
-        private float ValidateColor(float value, float min, float max) =>
-            Mathf.Max(min, Mathf.Min(max, value));
+        private float ValidateColor(float value, float min, float max) => Mathf.Max(min, Mathf.Min(max, value));
 
         public Vector3 Factorize() =>
-            new Vector3
+            new()
             {
                 x = FactorizeColor(r, R.MIN, R.MAX, R.F),
                 y = FactorizeColor(g, G.MIN, G.MAX, G.F),
@@ -61,17 +56,20 @@ namespace VladislavTsurikov.ColorUtility.Runtime
             (int)Mathf.Max(min * f, Mathf.Min(max * f, Mathf.Round(value * f)));
 
         public string ToString(bool factorize = false) =>
-            factorize 
+            factorize
                 ? $"rgb({Factorize().x}, {Factorize().y}, {Factorize().z})"
                 : $"rgb({r}, {g}, {b})";
 
         /// <summary>
-        /// A hex triplet is a six-digit, three-byte hexadecimal number used in HTML, CSS, SVG, and other computing applications to represent colors.
-        /// <para/>The bytes represent the red, green and blue components of the color.
-        /// <para/>One byte represents a number in the range 00 to FF (in hexadecimal notation), or 0 to 255 in decimal notation.
+        ///     A hex triplet is a six-digit, three-byte hexadecimal number used in HTML, CSS, SVG, and other computing
+        ///     applications to represent colors.
+        ///     <para />
+        ///     The bytes represent the red, green and blue components of the color.
+        ///     <para />
+        ///     One byte represents a number in the range 00 to FF (in hexadecimal notation), or 0 to 255 in decimal notation.
         /// </summary>
         public string ToHEX(bool addHashTag = true) =>
-            (addHashTag ? "#" : "") + UnityEngine.ColorUtility.ToHtmlStringRGB(ToColor(1));
+            (addHashTag ? "#" : "") + UnityEngine.ColorUtility.ToHtmlStringRGB(ToColor());
 
         /// <summary> Red </summary>
         public struct R
@@ -80,7 +78,7 @@ namespace VladislavTsurikov.ColorUtility.Runtime
             public const float MAX = 1;
             public const int F = 255;
         }
-        
+
         /// <summary> Green </summary>
         public struct G
         {
@@ -88,7 +86,7 @@ namespace VladislavTsurikov.ColorUtility.Runtime
             public const float MAX = 1;
             public const int F = 255;
         }
-        
+
         /// <summary> Blue </summary>
         public struct B
         {

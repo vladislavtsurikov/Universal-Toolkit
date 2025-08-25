@@ -5,26 +5,15 @@ using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.ComponentStack.Editor.Core
 {
-    public abstract class ComponentStackEditor<T, N> 
-        where T: Runtime_Core_Component
-        where N: ElementEditor
+    public abstract class ComponentStackEditor<T, N>
+        where T : Runtime_Core_Component
+        where N : ElementEditor
     {
-        public ComponentStack<T> Stack {get;}
         protected List<N> Editors;
-        
-        public N SelectedEditor
-        {
-            get
-            {
-                return Editors.FirstOrDefault(t => ((Runtime_Core_Component)t.Target).Selected);
-            }
-        }
 
         protected ComponentStackEditor(ComponentStack<T> stack)
         {
@@ -32,12 +21,16 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
             Editors = new List<N>();
             RefreshEditors();
         }
-        
+
+        public ComponentStack<T> Stack { get; }
+
+        public N SelectedEditor => Editors.FirstOrDefault(t => ((Runtime_Core_Component)t.Target).Selected);
+
         protected virtual void Create(T settings, int index = -1)
         {
-            var settingsType = settings.GetType();
+            Type settingsType = settings.GetType();
 
-            if (AllEditorTypes<T>.Types.TryGetValue(settingsType, out var editorType))
+            if (AllEditorTypes<T>.Types.TryGetValue(settingsType, out Type editorType))
             {
                 if (editorType.GetAttribute(typeof(DontDrawAttribute)) != null)
                 {
@@ -83,8 +76,8 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
             Editors = new List<N>();
 
             Stack.RemoveInvalidElements();
-            
-            foreach (var t in Stack.ElementList)
+
+            foreach (T t in Stack.ElementList)
             {
                 Create(t);
             }

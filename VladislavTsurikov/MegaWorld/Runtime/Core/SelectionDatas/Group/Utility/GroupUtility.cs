@@ -14,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
         internal static Group CreateGroup(Type prototypeType)
         {
             Directory.CreateDirectory(MegaWorldPath.PathToGroup);
-            
+
             var path = string.Empty;
 
             path += "Group.asset";
@@ -25,7 +25,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
             Group asset = ScriptableObject.CreateInstance<Group>();
 
             asset.Init(prototypeType);
-            
+
             AssetDatabase.CreateAsset(asset, path);
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -39,16 +39,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
             {
                 return groups.Last().PrototypeType;
             }
-            
+
             Type prototypeType = null;
 
-            for (int i = 0; i < groups.Count; i++)
+            for (var i = 0; i < groups.Count; i++)
             {
                 if (i == 0)
                 {
                     prototypeType = groups[i].PrototypeType;
                 }
-                else if(prototypeType != groups[i].PrototypeType)
+                else if (prototypeType != groups[i].PrototypeType)
                 {
                     return null;
                 }

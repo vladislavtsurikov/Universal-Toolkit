@@ -16,20 +16,19 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using OdinSerializer;
+using OdinSerializer.Utilities;
 
-[assembly: RegisterFormatter(typeof(StackFormatter<,>), weakFallback: typeof(WeakStackFormatter))]
+[assembly: RegisterFormatter(typeof(StackFormatter<,>), typeof(WeakStackFormatter))]
 
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     /// <summary>
-    /// Custom generic formatter for the generic type definition <see cref="Stack{T}"/> and types derived from it.
+    ///     Custom generic formatter for the generic type definition <see cref="Stack{T}" /> and types derived from it.
     /// </summary>
     /// <typeparam name="T">The element type of the formatted stack.</typeparam>
     /// <seealso cref="BaseFormatter{System.Collections.Generic.Stack{T}}" />
@@ -39,38 +38,31 @@ namespace OdinSerializer
         private static readonly Serializer<TValue> TSerializer = Serializer.Get<TValue>();
         private static readonly bool IsPlainStack = typeof(TStack) == typeof(Stack<TValue>);
 
-        static StackFormatter()
-        {
+        static StackFormatter() =>
             // This exists solely to prevent IL2CPP code stripping from removing the generic type's instance constructor
             // which it otherwise seems prone to do, regardless of what might be defined in any link.xml file.
-
             new StackFormatter<Stack<int>, int>();
-        }
-
-        public StackFormatter()
-        {
-        }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override TStack GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override TStack GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref TStack value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -89,15 +81,17 @@ namespace OdinSerializer
                     }
 
                     // We must remember to register the stack reference ourselves, since we return null in GetUninitializedObject
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
                     // There aren't any OnDeserializing callbacks on stacks.
                     // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
@@ -106,7 +100,8 @@ namespace OdinSerializer
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -123,7 +118,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -135,15 +130,15 @@ namespace OdinSerializer
 
                 using (var listCache = Cache<List<TValue>>.Claim())
                 {
-                    var list = listCache.Value;
+                    List<TValue> list = listCache.Value;
                     list.Clear();
 
-                    foreach (var element in value)
+                    foreach (TValue element in value)
                     {
                         list.Add(element);
                     }
 
-                    for (int i = list.Count - 1; i >= 0; i--)
+                    for (var i = list.Count - 1; i >= 0; i--)
                     {
                         try
                         {
@@ -171,25 +166,23 @@ namespace OdinSerializer
 
         public WeakStackFormatter(Type serializedType) : base(serializedType)
         {
-            var args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Stack<>));
-            this.ElementSerializer = Serializer.Get(args[0]);
-            this.IsPlainStack = serializedType.IsGenericType && serializedType.GetGenericTypeDefinition() == typeof(Stack<>);
+            Type[] args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Stack<>));
+            ElementSerializer = Serializer.Get(args[0]);
+            IsPlainStack = serializedType.IsGenericType && serializedType.GetGenericTypeDefinition() == typeof(Stack<>);
 
-            if (this.PushMethod == null)
+            if (PushMethod == null)
             {
-                throw new SerializationAbortException("Can't serialize type '" + serializedType.GetNiceFullName() + "' because no proper Push method was found.");
+                throw new SerializationAbortException("Can't serialize type '" + serializedType.GetNiceFullName() +
+                                                      "' because no proper Push method was found.");
             }
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -200,35 +193,38 @@ namespace OdinSerializer
 
                     if (IsPlainStack)
                     {
-                        value = Activator.CreateInstance(this.SerializedType, (int)length);
+                        value = Activator.CreateInstance(SerializedType, (int)length);
                     }
                     else
                     {
-                        value = Activator.CreateInstance(this.SerializedType);
+                        value = Activator.CreateInstance(SerializedType);
                     }
 
                     // We must remember to register the stack reference ourselves, since we return null in GetUninitializedObject
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
                     var pushParams = new object[1];
 
                     // There aren't any OnDeserializing callbacks on stacks.
                     // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
-                        pushParams[0] = this.ElementSerializer.ReadValueWeak(reader);
+                        pushParams[0] = ElementSerializer.ReadValueWeak(reader);
                         PushMethod.Invoke(value, pushParams);
 
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -245,7 +241,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -253,13 +249,13 @@ namespace OdinSerializer
         {
             try
             {
-                ICollection collection = (ICollection)value;
+                var collection = (ICollection)value;
 
                 writer.BeginArrayNode(collection.Count);
 
                 using (var listCache = Cache<List<object>>.Claim())
                 {
-                    var list = listCache.Value;
+                    List<object> list = listCache.Value;
                     list.Clear();
 
                     foreach (var element in collection)
@@ -267,11 +263,11 @@ namespace OdinSerializer
                         list.Add(element);
                     }
 
-                    for (int i = list.Count - 1; i >= 0; i--)
+                    for (var i = list.Count - 1; i >= 0; i--)
                     {
                         try
                         {
-                            this.ElementSerializer.WriteValueWeak(list[i], writer);
+                            ElementSerializer.WriteValueWeak(list[i], writer);
                         }
                         catch (Exception ex)
                         {

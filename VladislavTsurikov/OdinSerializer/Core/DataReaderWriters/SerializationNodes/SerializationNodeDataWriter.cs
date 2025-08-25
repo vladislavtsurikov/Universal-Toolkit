@@ -15,35 +15,58 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public class SerializationNodeDataWriter : BaseDataWriter
     {
+        private readonly Dictionary<Type, Delegate> primitiveTypeWriters;
         private List<SerializationNode> nodes;
-        private Dictionary<Type, Delegate> primitiveTypeWriters;
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
+        /// </summary>
+        public SerializationNodeDataWriter(SerializationContext context) : base(null, context) =>
+            primitiveTypeWriters = new Dictionary<Type, Delegate>
+            {
+                { typeof(char), (Action<string, char>)WriteChar },
+                { typeof(sbyte), (Action<string, sbyte>)WriteSByte },
+                { typeof(short), (Action<string, short>)WriteInt16 },
+                { typeof(int), (Action<string, int>)WriteInt32 },
+                { typeof(long), (Action<string, long>)WriteInt64 },
+                { typeof(byte), (Action<string, byte>)WriteByte },
+                { typeof(ushort), (Action<string, ushort>)WriteUInt16 },
+                { typeof(uint), (Action<string, uint>)WriteUInt32 },
+                { typeof(ulong), (Action<string, ulong>)WriteUInt64 },
+                { typeof(decimal), (Action<string, decimal>)WriteDecimal },
+                { typeof(bool), (Action<string, bool>)WriteBoolean },
+                { typeof(float), (Action<string, float>)WriteSingle },
+                { typeof(double), (Action<string, double>)WriteDouble },
+                { typeof(Guid), (Action<string, Guid>)WriteGuid }
+            };
+
+        /// <summary>
+        ///     Not yet documented.
         /// </summary>
         public List<SerializationNode> Nodes
         {
             get
             {
-                if (this.nodes == null)
+                if (nodes == null)
                 {
-                    this.nodes = new List<SerializationNode>();
+                    nodes = new List<SerializationNode>();
                 }
 
-                return this.nodes;
+                return nodes;
             }
 
             set
@@ -53,334 +76,244 @@ namespace OdinSerializer
                     throw new ArgumentNullException();
                 }
 
-                this.nodes = value;
+                nodes = value;
             }
         }
 
         /// <summary>
-        /// Not yet documented.
-        /// </summary>
-        public SerializationNodeDataWriter(SerializationContext context) : base(null, context)
-        {
-            this.primitiveTypeWriters = new Dictionary<Type, Delegate>()
-        {
-            { typeof(char), (Action<string, char>)this.WriteChar },
-            { typeof(sbyte), (Action<string, sbyte>)this.WriteSByte },
-            { typeof(short), (Action<string, short>)this.WriteInt16 },
-            { typeof(int), (Action<string, int>)this.WriteInt32 },
-            { typeof(long), (Action<string, long>)this.WriteInt64 },
-            { typeof(byte), (Action<string, byte>)this.WriteByte },
-            { typeof(ushort), (Action<string, ushort>)this.WriteUInt16 },
-            { typeof(uint),   (Action<string, uint>)this.WriteUInt32 },
-            { typeof(ulong),  (Action<string, ulong>)this.WriteUInt64 },
-            { typeof(decimal),   (Action<string, decimal>)this.WriteDecimal },
-            { typeof(bool),  (Action<string, bool>)this.WriteBoolean },
-            { typeof(float),  (Action<string, float>)this.WriteSingle },
-            { typeof(double),  (Action<string, double>)this.WriteDouble },
-            { typeof(Guid),  (Action<string, Guid>)this.WriteGuid }
-        };
-        }
-
-        /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override Stream Stream
         {
-            get { throw new NotSupportedException("This data writer has no stream."); }
+            get => throw new NotSupportedException("This data writer has no stream.");
 
-            set { throw new NotSupportedException("This data writer has no stream."); }
+            set => throw new NotSupportedException("This data writer has no stream.");
         }
 
         /// <summary>
-        /// Begins an array node of the given length.
+        ///     Begins an array node of the given length.
         /// </summary>
         /// <param name="length">The length of the array to come.</param>
         /// <exception cref="System.NotImplementedException"></exception>
         public override void BeginArrayNode(long length)
         {
-            this.Nodes.Add(new SerializationNode()
+            Nodes.Add(new SerializationNode
             {
                 Name = string.Empty,
                 Entry = EntryType.StartOfArray,
                 Data = length.ToString(CultureInfo.InvariantCulture)
             });
 
-            this.PushArray();
+            PushArray();
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void BeginReferenceNode(string name, Type type, int id)
         {
-            this.Nodes.Add(new SerializationNode()
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.StartOfNode,
-                Data = type != null ? (id.ToString(CultureInfo.InvariantCulture) + SerializationNodeDataReaderWriterConfig.NodeIdSeparator + this.Context.Binder.BindToName(type, this.Context.Config.DebugContext)) : id.ToString(CultureInfo.InvariantCulture)
+                Data = type != null
+                    ? id.ToString(CultureInfo.InvariantCulture) +
+                      SerializationNodeDataReaderWriterConfig.NodeIdSeparator +
+                      Context.Binder.BindToName(type, Context.Config.DebugContext)
+                    : id.ToString(CultureInfo.InvariantCulture)
             });
 
-            this.PushNode(name, id, type);
+            PushNode(name, id, type);
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void BeginStructNode(string name, Type type)
         {
-            this.Nodes.Add(new SerializationNode()
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.StartOfNode,
-                Data = type != null ? this.Context.Binder.BindToName(type, this.Context.Config.DebugContext) : ""
+                Data = type != null ? Context.Binder.BindToName(type, Context.Config.DebugContext) : ""
             });
 
-            this.PushNode(name, -1, type);
+            PushNode(name, -1, type);
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void Dispose()
-        {
-            this.nodes = null;
-        }
+        public override void Dispose() => nodes = null;
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void EndArrayNode()
         {
-            this.PopArray();
+            PopArray();
 
-            this.Nodes.Add(new SerializationNode()
-            {
-                Name = string.Empty,
-                Entry = EntryType.EndOfArray,
-                Data = string.Empty
-            });
+            Nodes.Add(new SerializationNode { Name = string.Empty, Entry = EntryType.EndOfArray, Data = string.Empty });
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void EndNode(string name)
         {
-            this.PopNode(name);
+            PopNode(name);
 
-            this.Nodes.Add(new SerializationNode()
+            Nodes.Add(new SerializationNode { Name = string.Empty, Entry = EntryType.EndOfNode, Data = string.Empty });
+        }
+
+        /// <summary>
+        ///     Not yet documented.
+        /// </summary>
+        public override void PrepareNewSerializationSession() => base.PrepareNewSerializationSession();
+
+        /// <summary>
+        ///     Not yet documented.
+        /// </summary>
+        public override void WriteBoolean(string name, bool value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = string.Empty,
-                Entry = EntryType.EndOfNode,
-                Data = string.Empty
+                Name = name, Entry = EntryType.Boolean, Data = value ? "true" : "false"
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void PrepareNewSerializationSession()
-        {
-            base.PrepareNewSerializationSession();
-        }
-
-        /// <summary>
-        /// Not yet documented.
-        /// </summary>
-        public override void WriteBoolean(string name, bool value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteByte(string name, byte value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Boolean,
-                Data = value ? "true" : "false"
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteByte(string name, byte value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteChar(string name, char value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.String, Data = value.ToString(CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteChar(string name, char value)
-        {
-            this.Nodes.Add(new SerializationNode()
-            {
-                Name = name,
-                Entry = EntryType.String,
-                Data = value.ToString(CultureInfo.InvariantCulture)
-            });
-        }
-
-        /// <summary>
-        /// Not yet documented.
-        /// </summary>
-        public override void WriteDecimal(string name, decimal value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteDecimal(string name, decimal value) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.FloatingPoint,
                 Data = value.ToString("G", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteSingle(string name, float value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteSingle(string name, float value) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.FloatingPoint,
                 Data = value.ToString("R", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteDouble(string name, double value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteDouble(string name, double value) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.FloatingPoint,
                 Data = value.ToString("R", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteExternalReference(string name, Guid guid)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteExternalReference(string name, Guid guid) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.ExternalReferenceByGuid,
                 Data = guid.ToString("N", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteExternalReference(string name, string id)
-        {
-            this.Nodes.Add(new SerializationNode()
-            {
-                Name = name,
-                Entry = EntryType.ExternalReferenceByString,
-                Data = id
-            });
-        }
+        public override void WriteExternalReference(string name, string id) =>
+            Nodes.Add(new SerializationNode { Name = name, Entry = EntryType.ExternalReferenceByString, Data = id });
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteExternalReference(string name, int index)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteExternalReference(string name, int index) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.ExternalReferenceByIndex,
                 Data = index.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteGuid(string name, Guid value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteGuid(string name, Guid value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Guid,
-                Data = value.ToString("N", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Guid, Data = value.ToString("N", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteInt16(string name, short value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteInt16(string name, short value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteInt32(string name, int value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteInt32(string name, int value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteInt64(string name, long value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteInt64(string name, long value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteInternalReference(string name, int id)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteInternalReference(string name, int id) =>
+            Nodes.Add(new SerializationNode
             {
                 Name = name,
                 Entry = EntryType.InternalReference,
                 Data = id.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteNull(string name)
-        {
-            this.Nodes.Add(new SerializationNode()
-            {
-                Name = name,
-                Entry = EntryType.Null,
-                Data = string.Empty
-            });
-        }
+        public override void WriteNull(string name) =>
+            Nodes.Add(new SerializationNode { Name = name, Entry = EntryType.Null, Data = string.Empty });
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void WritePrimitiveArray<T>(T[] array)
         {
@@ -391,104 +324,76 @@ namespace OdinSerializer
 
             if (typeof(T) == typeof(byte))
             {
-                string hex = ProperBitConverter.BytesToHexString((byte[])(object)array);
+                var hex = ProperBitConverter.BytesToHexString((byte[])(object)array);
 
-                this.Nodes.Add(new SerializationNode()
-                {
-                    Name = string.Empty,
-                    Entry = EntryType.PrimitiveArray,
-                    Data = hex
-                });
+                Nodes.Add(new SerializationNode { Name = string.Empty, Entry = EntryType.PrimitiveArray, Data = hex });
             }
             else
             {
-                this.Nodes.Add(new SerializationNode()
+                Nodes.Add(new SerializationNode
                 {
                     Name = string.Empty,
                     Entry = EntryType.PrimitiveArray,
                     Data = array.LongLength.ToString(CultureInfo.InvariantCulture)
                 });
 
-                this.PushArray();
+                PushArray();
 
-                Action<string, T> writer = (Action<string, T>)this.primitiveTypeWriters[typeof(T)];
+                var writer = (Action<string, T>)primitiveTypeWriters[typeof(T)];
 
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
                     writer(string.Empty, array[i]);
                 }
 
-                this.EndArrayNode();
+                EndArrayNode();
             }
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteSByte(string name, sbyte value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteSByte(string name, sbyte value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteString(string name, string value)
-        {
-            this.Nodes.Add(new SerializationNode()
-            {
-                Name = name,
-                Entry = EntryType.String,
-                Data = value
-            });
-        }
+        public override void WriteString(string name, string value) =>
+            Nodes.Add(new SerializationNode { Name = name, Entry = EntryType.String, Data = value });
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteUInt16(string name, ushort value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteUInt16(string name, ushort value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteUInt32(string name, uint value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteUInt32(string name, uint value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override void WriteUInt64(string name, ulong value)
-        {
-            this.Nodes.Add(new SerializationNode()
+        public override void WriteUInt64(string name, ulong value) =>
+            Nodes.Add(new SerializationNode
             {
-                Name = name,
-                Entry = EntryType.Integer,
-                Data = value.ToString("D", CultureInfo.InvariantCulture)
+                Name = name, Entry = EntryType.Integer, Data = value.ToString("D", CultureInfo.InvariantCulture)
             });
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void FlushToStream()
         {
@@ -497,13 +402,13 @@ namespace OdinSerializer
 
         public override string GetDataDump()
         {
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
 
             sb.Append("Nodes: \n\n");
 
-            for (int i = 0; i < this.nodes.Count; i++)
+            for (var i = 0; i < nodes.Count; i++)
             {
-                var node = this.nodes[i];
+                SerializationNode node = nodes[i];
 
                 sb.AppendLine("    - Name: " + node.Name);
                 sb.AppendLine("      Entry: " + (int)node.Entry);

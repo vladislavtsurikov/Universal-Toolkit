@@ -7,58 +7,58 @@ using UnityEngine;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.QuadTree.Runtime
-{  
+{
     /// <summary>
-    /// The QuadTreeNode
+    ///     The QuadTreeNode
     /// </summary>
     public class QuadTreeNode<T> where T : IHasRect
     {
         /// <summary>
-        /// Construct a quadtree node with the given rect 
+        ///     The contents of this node.
+        ///     Note that the contents have no limit: this is not the standard way to impement a QuadTree
         /// </summary>
-        /// <param name="rect"></param>
-        public QuadTreeNode(Rect rect)
-        {
-            _rect = rect;                       
-        }
+        private readonly List<T> _contentList = new();
+
         /// <summary>
-        /// The area of this node
+        ///     The child nodes of the QuadTree
+        /// </summary>
+        private readonly List<QuadTreeNode<T>> _nodes = new(4);
+
+        /// <summary>
+        ///     The area of this node
         /// </summary>
         private Rect _rect;
 
         /// <summary>
-        /// The contents of this node.
-        /// Note that the contents have no limit: this is not the standard way to impement a QuadTree
+        ///     Construct a quadtree node with the given rect
         /// </summary>
-        private List<T> _contentList = new List<T>();
+        /// <param name="rect"></param>
+        public QuadTreeNode(Rect rect) => _rect = rect;
 
         /// <summary>
-        /// The child nodes of the QuadTree
+        ///     Is the node empty
         /// </summary>
-        private List<QuadTreeNode<T>> _nodes = new List<QuadTreeNode<T>>(4);
+        public bool IsEmpty => _rect.width == 0 || _rect.height == 0 || _nodes.Count == 0;
 
         /// <summary>
-        /// Is the node empty
-        /// </summary>
-        public bool IsEmpty => _rect.width == 0  || _rect.height == 0 || _nodes.Count == 0;
-
-        /// <summary>
-        /// Area of the quadtree node
+        ///     Area of the quadtree node
         /// </summary>
         [OdinSerialize]
         public Rect Rect => _rect;
 
         /// <summary>
-        /// Total number of nodes in the this node and all SubNodes
+        ///     Total number of nodes in the this node and all SubNodes
         /// </summary>
         public int Count
         {
             get
             {
-                int count = 0;
+                var count = 0;
 
                 foreach (QuadTreeNode<T> node in _nodes)
+                {
                     count += node.Count;
+                }
 
                 count += _contentList.Count;
 
@@ -67,21 +67,21 @@ namespace VladislavTsurikov.QuadTree.Runtime
         }
 
         /// <summary>
-        /// Return the contents of this node and all subnodes in the true below this one.
+        ///     Return the contents of this node and all subnodes in the true below this one.
         /// </summary>
         public void SubTreeContents(List<T> results)
         {
-            for (int i = 0; i <= _nodes.Count - 1; i++)
+            for (var i = 0; i <= _nodes.Count - 1; i++)
             {
                 _nodes[i].SubTreeContents(results);
             }
 
-            for (int i = 0; i <= _contentList.Count - 1; i++)
+            for (var i = 0; i <= _contentList.Count - 1; i++)
             {
-                results.Add(_contentList[i]);                
-            }             
+                results.Add(_contentList[i]);
+            }
         }
-        
+
         public void Query(Rect queryArea, Func<T, bool> onItemFind)
         {
             //UnityEngine.Debug.Log("Query");
@@ -102,8 +102,10 @@ namespace VladislavTsurikov.QuadTree.Runtime
             foreach (QuadTreeNode<T> node in _nodes)
             {
                 if (node.IsEmpty)
+                {
                     continue;
-                
+                }
+
                 if (node.Rect.Overlaps(queryArea))
                 {
                     node.Query(queryArea, onItemFind);
@@ -112,7 +114,7 @@ namespace VladislavTsurikov.QuadTree.Runtime
         }
 
         /// <summary>
-        /// Query the QuadTree for items that are in the given area
+        ///     Query the QuadTree for items that are in the given area
         /// </summary>
         /// <param name="queryArea"></param>
         /// <param name="results"></param>
@@ -128,20 +130,24 @@ namespace VladislavTsurikov.QuadTree.Runtime
             foreach (T item in _contentList)
             {
                 if (queryArea.Overlaps(item.Rectangle))
+                {
                     results.Add(item);
+                }
             }
 
             foreach (QuadTreeNode<T> node in _nodes)
             {
                 if (node.IsEmpty)
+                {
                     continue;
+                }
 
                 // Case 1: search area completely contained by sub-quad
                 // if a node completely contains the query area, go down that branch
                 // and skip the remaining nodes (break this loop)
                 if (node.Rect.Contains(queryArea))
                 {
-                   node.Query(queryArea,results);
+                    node.Query(queryArea, results);
                     break;
                 }
 
@@ -161,13 +167,13 @@ namespace VladislavTsurikov.QuadTree.Runtime
                 // quads
                 if (node.Rect.Overlaps(queryArea))
                 {
-                    node.Query(queryArea,results);
+                    node.Query(queryArea, results);
                 }
             }
         }
 
         /// <summary>
-        /// Insert an item to this node
+        ///     Insert an item to this node
         /// </summary>
         /// <param name="item"></param>
         public void Insert(T item)
@@ -182,7 +188,9 @@ namespace VladislavTsurikov.QuadTree.Runtime
             // if the subnodes are null create them. may not be sucessfull: see below
             // we may be at the smallest allowed size in which case the subnodes will not be created
             if (_nodes.Count == 0)
+            {
                 CreateSubNodes();
+            }
 
             // for each subnode:
             // if the node contains the item, add the item to that node and return
@@ -210,34 +218,42 @@ namespace VladislavTsurikov.QuadTree.Runtime
             {
                 node.Move(offset);
             }
+
             _rect = new Rect(_rect.xMin + offset.x, _rect.yMin + offset.y, _rect.width, _rect.height);
         }
-      
+
         /// <summary>
-        /// Internal method to create the subnodes (partitions space)
+        ///     Internal method to create the subnodes (partitions space)
         /// </summary>
         private void CreateSubNodes()
         {
             // the smallest subnode has an area 
             if (_rect.height * _rect.width <= 10)
+            {
                 return;
+            }
 
-            float halfWidth = (_rect.width / 2f);
-            float halfHeight = (_rect.height / 2f);
+            var halfWidth = _rect.width / 2f;
+            var halfHeight = _rect.height / 2f;
 
-            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin, _rect.yMin), new Vector2(halfWidth, halfHeight))));
-            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin, _rect.yMin + halfHeight), new Vector2(halfWidth, halfHeight))));
-            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin + halfWidth, _rect.yMin), new Vector2(halfWidth, halfHeight))));
-            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin + halfWidth, _rect.yMin + halfHeight), new Vector2(halfWidth, halfHeight))));
+            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin, _rect.yMin),
+                new Vector2(halfWidth, halfHeight))));
+            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin, _rect.yMin + halfHeight),
+                new Vector2(halfWidth, halfHeight))));
+            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin + halfWidth, _rect.yMin),
+                new Vector2(halfWidth, halfHeight))));
+            _nodes.Add(new QuadTreeNode<T>(new Rect(new Vector2(_rect.xMin + halfWidth, _rect.yMin + halfHeight),
+                new Vector2(halfWidth, halfHeight))));
         }
-        
+
 #if UNITY_EDITOR
         public void DrawCellRecurse()
         {
             foreach (QuadTreeNode<T> node in _nodes)
             {
-                Handles.DrawWireCube(new Vector3(node.Rect.center.x, 0, node.Rect.center.y) , new Vector3(node.Rect.size.x, 0, node.Rect.size.y));
-                
+                Handles.DrawWireCube(new Vector3(node.Rect.center.x, 0, node.Rect.center.y),
+                    new Vector3(node.Rect.size.x, 0, node.Rect.size.y));
+
                 node.DrawCellRecurse();
             }
         }

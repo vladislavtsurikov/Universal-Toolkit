@@ -46,7 +46,10 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
         public static AABB CalcMeshWorldAABB(GameObject gameObject)
         {
             AABB modelAABB = CalcMeshModelAABB(gameObject);
-            if (!modelAABB.IsValid) return modelAABB;
+            if (!modelAABB.IsValid)
+            {
+                return modelAABB;
+            }
 
             modelAABB.Transform(gameObject.transform.localToWorldMatrix);
             return modelAABB;
@@ -58,7 +61,7 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
             AABB finalAABB = CalcModelAABB(root);
 
             List<GameObject> allChildren = root.GetAllChildren();
-            foreach (var child in allChildren)
+            foreach (GameObject child in allChildren)
             {
                 AABB modelAABB = CalcModelAABB(child);
                 if (modelAABB.IsValid)
@@ -66,11 +69,18 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
                     // All children must have their AABBs calculated in the root local space, so we must
                     // first calculate a matrix that transforms the child object in the local space of the
                     // root. We will use this matrix to transform the child's AABB in root space.
-                    Matrix4x4 rootRelativeTransform = child.transform.localToWorldMatrix.GetRelativeTransform(rootTransform);
+                    Matrix4x4 rootRelativeTransform =
+                        child.transform.localToWorldMatrix.GetRelativeTransform(rootTransform);
                     modelAABB.Transform(rootRelativeTransform);
 
-                    if (finalAABB.IsValid) finalAABB.Encapsulate(modelAABB);
-                    else finalAABB = modelAABB;
+                    if (finalAABB.IsValid)
+                    {
+                        finalAABB.Encapsulate(modelAABB);
+                    }
+                    else
+                    {
+                        finalAABB = modelAABB;
+                    }
                 }
             }
 
@@ -97,20 +107,20 @@ namespace VladislavTsurikov.GameObjectCollider.Editor
             }
 
             Terrain terrain = gameObject.GetComponent<Terrain>();
-            if (terrain != null) 
+            if (terrain != null)
             {
                 TerrainData terrainData = terrain.terrainData;
 
                 if (terrainData == null)
                 {
-                    UnityEngine.Debug.LogWarning("Terrain (" + terrain.gameObject.name + ") not including Terrain Data");
+                    Debug.LogWarning("Terrain (" + terrain.gameObject.name + ") not including Terrain Data");
                     return new AABB(Vector3.zero, Vector3.one);
                 }
-                
-                Vector3 terrainSize = terrainData.bounds.size;        
+
+                Vector3 terrainSize = terrainData.bounds.size;
                 return new AABB(terrainData.bounds.center, terrainSize);
             }
-            
+
             return new AABB(Vector3.zero, Vector3.one);
         }
     }

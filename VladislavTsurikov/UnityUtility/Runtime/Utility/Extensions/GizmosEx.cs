@@ -6,8 +6,8 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 {
     public static class GizmosEx
     {
-        private static Stack<Color> _colorStack = new Stack<Color>();
-        private static Stack<Matrix4x4> _matrixStack = new Stack<Matrix4x4>();
+        private static readonly Stack<Color> _colorStack = new();
+        private static readonly Stack<Matrix4x4> _matrixStack = new();
 
         static GizmosEx()
         {
@@ -23,7 +23,11 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static void PopColor()
         {
-            if (_colorStack.Count > 1) _colorStack.Pop();
+            if (_colorStack.Count > 1)
+            {
+                _colorStack.Pop();
+            }
+
             Gizmos.color = _colorStack.Peek();
         }
 
@@ -35,7 +39,11 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static void PopMatrix()
         {
-            if (_matrixStack.Count > 1) _matrixStack.Pop();
+            if (_matrixStack.Count > 1)
+            {
+                _matrixStack.Pop();
+            }
+
             Gizmos.matrix = _matrixStack.Peek();
         }
     }

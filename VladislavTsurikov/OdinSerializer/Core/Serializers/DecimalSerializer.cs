@@ -19,42 +19,42 @@
 namespace OdinSerializer
 {
     /// <summary>
-    /// Serializer for the <see cref="decimal"/> type.
+    ///     Serializer for the <see cref="decimal" /> type.
     /// </summary>
-    /// <seealso cref="Serializer{System.Decimal}" />
+    /// <seealso cref="decimal" />
     public sealed class DecimalSerializer : Serializer<decimal>
     {
         /// <summary>
-        /// Reads a value of type <see cref="decimal" />.
+        ///     Reads a value of type <see cref="decimal" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The value which has been read.
+        ///     The value which has been read.
         /// </returns>
         public override decimal ReadValue(IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.FloatingPoint || entry == EntryType.Integer)
             {
                 decimal value;
                 if (reader.ReadDecimal(out value) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Failed to read entry of type " + entry.ToString());
+                    reader.Context.Config.DebugContext.LogWarning("Failed to read entry of type " + entry);
                 }
+
                 return value;
             }
-            else
-            {
-                reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.FloatingPoint.ToString() + " or " + EntryType.Integer.ToString() + ", but got entry of type " + entry.ToString());
-                reader.SkipEntry();
-                return default(decimal);
-            }
+
+            reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.FloatingPoint + " or " +
+                                                          EntryType.Integer + ", but got entry of type " + entry);
+            reader.SkipEntry();
+            return default;
         }
 
         /// <summary>
-        /// Writes a value of type <see cref="decimal" />.
+        ///     Writes a value of type <see cref="decimal" />.
         /// </summary>
         /// <param name="name">The name of the value to write.</param>
         /// <param name="value">The value to write.</param>

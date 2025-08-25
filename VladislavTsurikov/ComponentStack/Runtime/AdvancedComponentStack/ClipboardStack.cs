@@ -7,10 +7,10 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {
     public class ClipboardStack<T> where T : Component
     {
-        private readonly List<T> _copiedComponentList = new List<T>();
-        
+        private readonly List<T> _copiedComponentList = new();
+
         public IReadOnlyList<T> CopiedComponentList => _copiedComponentList;
-        
+
         public void Copy(List<AdvancedComponentStack<T>> stacks)
         {
             _copiedComponentList.Clear();
@@ -20,20 +20,20 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
         public void ClipboardAction(List<AdvancedComponentStack<T>> stacks, bool paste)
         {
-            foreach(AdvancedComponentStack<T> stack in stacks) 
+            foreach (AdvancedComponentStack<T> stack in stacks)
             {
-                for (int i = 0; i < stack.ElementList.Count; i++)
+                for (var i = 0; i < stack.ElementList.Count; i++)
                 {
                     ClipboardAction(stack, stack.ElementList[i].GetType(), paste);
                 }
             }
         }
-        
+
         public void ClipboardAction(List<AdvancedComponentStack<T>> stacks, Type settingsType, bool paste)
         {
-            foreach(AdvancedComponentStack<T> stack in stacks) 
+            foreach (AdvancedComponentStack<T> stack in stacks)
             {
-                for (int i = 0; i < stack.ElementList.Count; i++)
+                for (var i = 0; i < stack.ElementList.Count; i++)
                 {
                     ClipboardAction(stack, settingsType, paste);
                 }
@@ -42,15 +42,15 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
         private void ClipboardAction(AdvancedComponentStack<T> stack, Type settingsType, bool paste)
         {
-            if(paste)
+            if (paste)
             {
-                var copiedComponent = _copiedComponentList.Find(obj => obj.GetType() == settingsType);
+                T copiedComponent = _copiedComponentList.Find(obj => obj.GetType() == settingsType);
 
                 if (copiedComponent == null)
                 {
                     return;
                 }
-                
+
                 T component = DeepCopier.Copy(copiedComponent);
 
                 ReplaceElement(stack, component);
@@ -60,13 +60,13 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
                 _copiedComponentList.Add(DeepCopier.Copy(stack.GetElement(settingsType)));
             }
         }
-        
+
         private void ReplaceElement(AdvancedComponentStack<T> stack, T replaceComponent)
         {
-            for (int i = 0; i < stack.ElementList.Count; i++)
+            for (var i = 0; i < stack.ElementList.Count; i++)
             {
                 Component component = stack.ElementList[i];
-                
+
                 if (component.GetType() == replaceComponent.GetType())
                 {
                     stack.ReplaceElement(replaceComponent, i);

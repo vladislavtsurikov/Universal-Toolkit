@@ -7,10 +7,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
 {
     public class MaskFilterStackEditor : ReorderableListStackEditor<MaskFilter, MaskFilterEditor>
     {
-        public MaskFilterStackEditor(GUIContent label, MaskFilterStack filterStack) : base(label, filterStack, true)
-        {
+        public MaskFilterStackEditor(GUIContent label, MaskFilterStack filterStack) : base(label, filterStack, true) =>
             DisplayHeaderText = false;
-        }
     }
 }
 #endif

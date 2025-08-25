@@ -7,9 +7,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
     {
         public readonly Type[] Types;
 
-        public AddSceneDataAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddSceneDataAttribute(Type[] types) => Types = types;
     }
 }

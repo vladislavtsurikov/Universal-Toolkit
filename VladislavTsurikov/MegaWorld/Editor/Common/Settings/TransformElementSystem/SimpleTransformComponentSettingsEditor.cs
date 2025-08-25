@@ -11,17 +11,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     {
         private SimpleTransformComponentSettings _simpleTransformComponentSettings;
         private TransformStackEditor _transformEditor;
-        
+
         public override void OnEnable()
         {
             _simpleTransformComponentSettings = (SimpleTransformComponentSettings)Target;
-            _transformEditor = new TransformStackEditor(new GUIContent("Transform Component Stack"), _simpleTransformComponentSettings.TransformComponentStack, true);
+            _transformEditor = new TransformStackEditor(new GUIContent("Transform Component Stack"),
+                _simpleTransformComponentSettings.TransformComponentStack, true);
         }
 
-        public override void OnGUI() 
-        {
-            _transformEditor.OnGUI();
-        }
+        public override void OnGUI() => _transformEditor.OnGUI();
     }
 }
 #endif

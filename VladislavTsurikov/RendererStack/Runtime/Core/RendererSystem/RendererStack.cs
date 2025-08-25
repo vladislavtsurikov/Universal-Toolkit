@@ -13,14 +13,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
             {
                 foreach (Renderer setting in _elementList)
                 {
-                    setting?.CheckChanges(); 
+                    setting?.CheckChanges();
                 }
             }
         }
-        
+
         public void ForceUpdateRendererData()
         {
-            foreach (var customRenderer in _elementList)
+            foreach (Renderer customRenderer in _elementList)
             {
                 customRenderer.ForceUpdateRendererData = true;
             }
@@ -28,12 +28,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
 
         public void Render()
         {
-            if(!RendererStackManager.Instance.IsSetup)
+            if (!RendererStackManager.Instance.IsSetup)
             {
                 return;
             }
 
-            foreach (var setting in _elementList)
+            foreach (Renderer setting in _elementList)
             {
                 if (!setting.IsSetup)
                 {

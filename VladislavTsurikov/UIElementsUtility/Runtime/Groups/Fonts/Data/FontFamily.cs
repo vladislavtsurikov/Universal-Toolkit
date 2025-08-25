@@ -16,15 +16,9 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Fonts
     ]
     public class FontFamily : FilesDataGroup<FontFamily, FontInfo>
     {
-        public void SortFontsByWeight()
-        {
-            _items = _items.OrderBy(fi => (int)fi.Weight).ToList();
-        }
+        public void SortFontsByWeight() => _items = _items.OrderBy(fi => (int)fi.Weight).ToList();
 
-        public Font GetFont(int weightValue)
-        {
-            return GetFont((GenericFontWeight)weightValue);
-        }
+        public Font GetFont(int weightValue) => GetFont((GenericFontWeight)weightValue);
 
         private Font GetFont(GenericFontWeight weight)
         {
@@ -34,31 +28,29 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Fonts
             {
                 return fontInfo.Font;
             }
-            
+
             Debug.LogWarning($"Font '{AssetDefaultName}-{weight}' not found! Returned default Unity font");
-            
+
             return ConstantVisualElements.UnityDefaultFont;
         }
 
 #if UNITY_EDITOR
-        public override string GetFileFormat()
-        {
-            return "ttf";
-        }
+        public override string GetFileFormat() => "ttf";
 
         protected override void AddItems(string[] files)
         {
-            foreach (string filePath in files)
+            foreach (var filePath in files)
             {
                 Font reference = AssetDatabase.LoadAssetAtPath<Font>(filePath);
                 if (reference == null)
                 {
                     continue;
                 }
+
                 _items.Add(new FontInfo { Font = reference });
             }
         }
-        
+
         internal override void ValidateItems()
         {
             _items = _items.Where(fi => fi != null && fi.Font != null).ToList();
@@ -71,9 +63,11 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Fonts
                     {
                         continue;
                     }
+
                     weight = style;
                     break;
                 }
+
                 fontInfo.Weight = weight;
             }
 

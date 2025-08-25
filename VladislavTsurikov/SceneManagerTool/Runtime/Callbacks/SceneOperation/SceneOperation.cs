@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation

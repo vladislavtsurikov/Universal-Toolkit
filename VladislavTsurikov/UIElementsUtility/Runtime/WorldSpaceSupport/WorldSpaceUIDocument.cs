@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport;
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport
@@ -15,20 +14,20 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport
     public class WorldSpaceUIDocument : MonoBehaviour
     {
         [HideInInspector]
-        [SerializeField] 
+        [SerializeField]
         private UIDocument _uiDocument;
-        
-        [SerializeField] 
+
+        [SerializeField]
         public Camera MainCamera;
-        
+
         [HideInInspector]
-        [SerializeField] 
+        [SerializeField]
         private MeshCollider _meshCollider;
 
 #if UNITY_EDITOR
         [HideInInspector]
         [SerializeField]
-        public EditorWorldSpaceUIDocumentSupport EditorWorldSpaceUIDocumentSupport = new EditorWorldSpaceUIDocumentSupport();
+        public EditorWorldSpaceUIDocumentSupport EditorWorldSpaceUIDocumentSupport = new();
 #endif
 
         private void OnEnable()
@@ -41,13 +40,13 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport
 #if UNITY_EDITOR
             InitializeCamera();
             _meshCollider = GetComponent<MeshCollider>();
-            
+
             EditorWorldSpaceUIDocumentSupport.Setup(this, _uiDocument);
 #endif
-            
+
             _uiDocument.panelSettings.SetScreenToPanelSpaceFunction(ConvertScreenSpacePositionToPanelSpacePosition);
         }
-        
+
         public void InitializeCamera()
         {
             if (MainCamera == null)
@@ -59,16 +58,16 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport
         private Vector2 ConvertScreenSpacePositionToPanelSpacePosition(Vector2 screenPosition)
         {
             screenPosition.y = Screen.height - screenPosition.y;
-            var ray = MainCamera.ScreenPointToRay(screenPosition);
+            Ray ray = MainCamera.ScreenPointToRay(screenPosition);
 
-            if (!_meshCollider.Raycast(ray, out var hit, Mathf.Infinity))
+            if (!_meshCollider.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
             {
                 return new Vector2(float.NaN, float.NaN);
             }
 
-            var targetTexture = _uiDocument.panelSettings.targetTexture;
-            var textureCoord = hit.textureCoord;
-        
+            RenderTexture targetTexture = _uiDocument.panelSettings.targetTexture;
+            Vector2 textureCoord = hit.textureCoord;
+
             textureCoord.y = 1 - textureCoord.y;
             textureCoord *= new Vector2(targetTexture.width, targetTexture.height);
 

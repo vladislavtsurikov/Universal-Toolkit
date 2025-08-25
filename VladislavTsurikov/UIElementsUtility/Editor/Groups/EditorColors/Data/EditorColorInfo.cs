@@ -10,29 +10,23 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors
     {
         public string ColorName;
         public EditorThemeColor ThemeColor;
-        public Color Color => ThemeColor.Color;
 
         public EditorColorInfo(string colorName, Color colorOnDark, Color colorOnLight)
         {
             ColorName = colorName;
             ValidateName();
-            ThemeColor = new EditorThemeColor
-            {
-                ColorOnDark = colorOnDark,
-                ColorOnLight = colorOnLight
-            };
+            ThemeColor = new EditorThemeColor { ColorOnDark = colorOnDark, ColorOnLight = colorOnLight };
         }
-        
+
         public EditorColorInfo()
         {
             ColorName = string.Empty;
             ThemeColor = new EditorThemeColor();
         }
 
-        public void ValidateName()
-        {
-            ColorName = ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
-        }
+        public Color Color => ThemeColor.Color;
+
+        public void ValidateName() => ColorName = ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
     }
 }
 #endif

@@ -2,58 +2,59 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
-    public static class SimulatedBodyStack 
+    public static class SimulatedBodyStack
     {
-        internal static readonly HashSet<SimulatedBody> SimulatedBodyHashSet = new HashSet<SimulatedBody>(2000);
-        
         public delegate void OnDisableAllSimulatedBodyDelegate();
+
+        internal static readonly HashSet<SimulatedBody> SimulatedBodyHashSet = new(2000);
         public static OnDisableAllSimulatedBodyDelegate OnDisableAllSimulatedBody;
 
         public static int Count => SimulatedBodyHashSet.Count;
-        
-        public static T InstantiateSimulatedBody<T>(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
-        where T: SimulatedBody
+
+        public static T InstantiateSimulatedBody<T>(GameObject prefab, Vector3 position, Vector3 scaleFactor,
+            Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
+            where T : SimulatedBody
         {
 #if UNITY_EDITOR
             var gameObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
 #else
             var gameObject = Object.Instantiate(prefab);
 #endif
-            
+
             gameObject.transform.position = position;
             gameObject.transform.localScale = scaleFactor;
             gameObject.transform.rotation = rotation;
 
-            T simulatedBody = (T)Activator.CreateInstance(typeof(T), gameObject, onDisablePhysicsActions);
-            
+            var simulatedBody = (T)Activator.CreateInstance(typeof(T), gameObject, onDisablePhysicsActions);
+
             RegisterSimulatedBody(simulatedBody, false);
 
             return simulatedBody;
         }
-        
-        public static SimulatedBody InstantiateSimulatedBody(GameObject prefab, Vector3 position, Vector3 scaleFactor, Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
+
+        public static SimulatedBody InstantiateSimulatedBody(GameObject prefab, Vector3 position, Vector3 scaleFactor,
+            Quaternion rotation, List<OnDisableSimulatedBodyEvent> onDisablePhysicsActions = null)
         {
 #if UNITY_EDITOR
             var gameObject = PrefabUtility.InstantiatePrefab(prefab) as GameObject;
 #else
             var gameObject = Object.Instantiate(prefab);
 #endif
-            
+
             gameObject.transform.position = position;
             gameObject.transform.localScale = scaleFactor;
             gameObject.transform.rotation = rotation;
-            
-            SimulatedBody simulatedBody = new SimulatedBody(gameObject, onDisablePhysicsActions);
+
+            var simulatedBody = new SimulatedBody(gameObject, onDisablePhysicsActions);
 
             RegisterSimulatedBody(simulatedBody, false);
 
             return simulatedBody;
         }
-        
+
         public static void RegisterSimulatedBody(SimulatedBody simulatedBody, bool checkForSameGameObject = true)
         {
             if (checkForSameGameObject)
@@ -63,25 +64,25 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
                     return;
                 }
             }
-            
+
             simulatedBody.OnAddToSimulatedBodyStack?.Invoke();
             SimulatedBodyHashSet.Add(simulatedBody);
-            
+
             PhysicsSimulator.ActiveDisablePhysicsMode.OnRegisterSimulatedBody(simulatedBody);
         }
-        
-        public static void DisablePhysicsSupportIfObjectStopped() 
-        {            
-            if(!PhysicsSimulatorSettings.Instance.SimulatePhysics)
+
+        public static void DisablePhysicsSupportIfObjectStopped()
+        {
+            if (!PhysicsSimulatorSettings.Instance.SimulatePhysics)
             {
                 return;
             }
 
-            List<SimulatedBody> removeSimulatedBodyList = new List<SimulatedBody>();
+            var removeSimulatedBodyList = new List<SimulatedBody>();
 
             foreach (SimulatedBody simulatedBody in SimulatedBodyHashSet)
             {
-                if(simulatedBody.IsRigidbodyStopping())
+                if (simulatedBody.IsRigidbodyStopping())
                 {
                     removeSimulatedBodyList.Add(simulatedBody);
                 }
@@ -97,12 +98,12 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
         {
             foreach (SimulatedBody simulatedBody in SimulatedBodyHashSet)
             {
-                if(simulatedBody.GameObject == null)
+                if (simulatedBody.GameObject == null)
                 {
                     continue;
                 }
 
-                if(simulatedBody.GameObject == gameObject)
+                if (simulatedBody.GameObject == gameObject)
                 {
                     return simulatedBody;
                 }
@@ -111,9 +112,9 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             return null;
         }
 
-        public static void DisableAllPhysicsSupport() 
+        public static void DisableAllPhysicsSupport()
         {
-            List<SimulatedBody> removeSimulatedBodyList = new List<SimulatedBody>();
+            var removeSimulatedBodyList = new List<SimulatedBody>();
             removeSimulatedBodyList.AddRange(SimulatedBodyHashSet);
 
             foreach (SimulatedBody simulatedBody in removeSimulatedBodyList)
@@ -122,9 +123,9 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             }
         }
 
-        public static void DisablePhysicsSupport(SimulatedBody simulatedBody) 
+        public static void DisablePhysicsSupport(SimulatedBody simulatedBody)
         {
-            if(simulatedBody.GameObject == null || !simulatedBody.HasRigidbody())
+            if (simulatedBody.GameObject == null || !simulatedBody.HasRigidbody())
             {
                 SimulatedBodyHashSet.Remove(simulatedBody);
                 return;

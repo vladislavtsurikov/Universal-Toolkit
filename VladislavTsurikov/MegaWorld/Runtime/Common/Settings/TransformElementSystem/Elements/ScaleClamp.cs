@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 
@@ -15,29 +14,29 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
 
         public override void SetInstanceData(ref Instance instance, float fitness, Vector3 normal)
         {
-            if(instance.Scale.x > MaxScale)
+            if (instance.Scale.x > MaxScale)
             {
                 instance.Scale.x = MaxScale;
             }
-            else if(instance.Scale.x < MinScale)
+            else if (instance.Scale.x < MinScale)
             {
                 instance.Scale.x = MinScale;
             }
 
-            if(instance.Scale.y > MaxScale)
+            if (instance.Scale.y > MaxScale)
             {
                 instance.Scale.y = MaxScale;
             }
-            else if(instance.Scale.y < MinScale)
+            else if (instance.Scale.y < MinScale)
             {
                 instance.Scale.y = MinScale;
             }
 
-            if(instance.Scale.z > MaxScale)
+            if (instance.Scale.z > MaxScale)
             {
                 instance.Scale.z = MaxScale;
             }
-            else if(instance.Scale.z < MinScale)
+            else if (instance.Scale.z < MinScale)
             {
                 instance.Scale.z = MinScale;
             }

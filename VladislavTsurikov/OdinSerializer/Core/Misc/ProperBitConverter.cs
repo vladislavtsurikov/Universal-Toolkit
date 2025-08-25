@@ -17,19 +17,20 @@
 //-----------------------------------------------------------------------
 
 // Tested and verified to work
+
 #pragma warning disable 0675
 
+using System;
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Runtime.InteropServices;
-
     /// <summary>
-    /// Corresponds to the .NET <see cref="BitConverter"/> class, but works only with buffers and so never allocates garbage.
-    /// <para />
-    /// This class always writes and reads bytes in a little endian format, regardless of system architecture.
+    ///     Corresponds to the .NET <see cref="BitConverter" /> class, but works only with buffers and so never allocates
+    ///     garbage.
+    ///     <para />
+    ///     This class always writes and reads bytes in a little endian format, regardless of system architecture.
     /// </summary>
     public static class ProperBitConverter
     {
@@ -37,23 +38,24 @@ namespace OdinSerializer
         private static readonly uint[] ByteToHexCharLookupUpperCase = CreateByteToHexLookup(true);
 
         // 16x16 table, set up for direct visual correlation to Unicode table with hex coords
-        private static readonly byte[] HexToByteLookup = new byte[] {
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+        private static readonly byte[] HexToByteLookup =
+        {
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x01, 0x02,
+            0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0a, 0x0b, 0x0c,
+            0x0d, 0x0e, 0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e,
+            0x0f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+            0xff
         };
 
         private static uint[] CreateByteToHexLookup(bool upperCase)
@@ -62,18 +64,18 @@ namespace OdinSerializer
 
             if (upperCase)
             {
-                for (int i = 0; i < 256; i++)
+                for (var i = 0; i < 256; i++)
                 {
-                    string s = i.ToString("X2", CultureInfo.InvariantCulture);
-                    result[i] = ((uint)s[0]) + ((uint)s[1] << 16);
+                    var s = i.ToString("X2", CultureInfo.InvariantCulture);
+                    result[i] = s[0] + ((uint)s[1] << 16);
                 }
             }
             else
             {
-                for (int i = 0; i < 256; i++)
+                for (var i = 0; i < 256; i++)
                 {
-                    string s = i.ToString("x2", CultureInfo.InvariantCulture);
-                    result[i] = ((uint)s[0]) + ((uint)s[1] << 16);
+                    var s = i.ToString("x2", CultureInfo.InvariantCulture);
+                    result[i] = s[0] + ((uint)s[1] << 16);
                 }
             }
 
@@ -81,16 +83,16 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Converts a byte array into a hexadecimal string.
+        ///     Converts a byte array into a hexadecimal string.
         /// </summary>
         public static string BytesToHexString(byte[] bytes, bool lowerCaseHexChars = true)
         {
             var lookup = lowerCaseHexChars ? ByteToHexCharLookupLowerCase : ByteToHexCharLookupUpperCase;
             var result = new char[bytes.Length * 2];
 
-            for (int i = 0; i < bytes.Length; i++)
+            for (var i = 0; i < bytes.Length; i++)
             {
-                int offset = i * 2;
+                var offset = i * 2;
                 var val = lookup[bytes[i]];
                 result[offset] = (char)val;
                 result[offset + 1] = (char)(val >> 16);
@@ -100,23 +102,23 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Converts a hexadecimal string into a byte array.
+        ///     Converts a hexadecimal string into a byte array.
         /// </summary>
         public static byte[] HexStringToBytes(string hex)
         {
-            int length = hex.Length;
-            int rLength = length / 2;
+            var length = hex.Length;
+            var rLength = length / 2;
 
             if (length % 2 != 0)
             {
                 throw new ArgumentException("Hex string must have an even length.");
             }
 
-            byte[] result = new byte[rLength];
+            var result = new byte[rLength];
 
-            for (int i = 0; i < rLength; i++)
+            for (var i = 0; i < rLength; i++)
             {
-                int offset = i * 2;
+                var offset = i * 2;
 
                 byte b1;
                 byte b2;
@@ -127,12 +129,14 @@ namespace OdinSerializer
 
                     if (b1 == 0xff)
                     {
-                        throw new ArgumentException("Expected a hex character, got '" + hex[offset] + "' at string index '" + offset + "'.");
+                        throw new ArgumentException("Expected a hex character, got '" + hex[offset] +
+                                                    "' at string index '" + offset + "'.");
                     }
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    throw new ArgumentException("Expected a hex character, got '" + hex[offset] + "' at string index '" + offset + "'.");
+                    throw new ArgumentException("Expected a hex character, got '" + hex[offset] +
+                                                "' at string index '" + offset + "'.");
                 }
 
                 try
@@ -141,29 +145,31 @@ namespace OdinSerializer
 
                     if (b2 == 0xff)
                     {
-                        throw new ArgumentException("Expected a hex character, got '" + hex[offset + 1] + "' at string index '" + (offset + 1) + "'.");
+                        throw new ArgumentException("Expected a hex character, got '" + hex[offset + 1] +
+                                                    "' at string index '" + (offset + 1) + "'.");
                     }
                 }
                 catch (IndexOutOfRangeException)
                 {
-                    throw new ArgumentException("Expected a hex character, got '" + hex[offset + 1] + "' at string index '" + (offset + 1) + "'.");
+                    throw new ArgumentException("Expected a hex character, got '" + hex[offset + 1] +
+                                                "' at string index '" + (offset + 1) + "'.");
                 }
 
-                result[i] = (byte)(b1 << 4 | b2);
+                result[i] = (byte)((b1 << 4) | b2);
             }
 
             return result;
         }
 
         /// <summary>
-        /// Reads two bytes from a buffer and converts them into a <see cref="short"/> value.
+        ///     Reads two bytes from a buffer and converts them into a <see cref="short" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static short ToInt16(byte[] buffer, int index)
         {
-            short value = default(short);
+            var value = default(short);
 
             value |= buffer[index + 1];
             value <<= 8;
@@ -173,14 +179,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads two bytes from a buffer and converts them into a <see cref="ushort"/> value.
+        ///     Reads two bytes from a buffer and converts them into a <see cref="ushort" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static ushort ToUInt16(byte[] buffer, int index)
         {
-            ushort value = default(ushort);
+            var value = default(ushort);
 
             value |= buffer[index + 1];
             value <<= 8;
@@ -190,14 +196,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads four bytes from a buffer and converts them into an <see cref="int"/> value.
+        ///     Reads four bytes from a buffer and converts them into an <see cref="int" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static int ToInt32(byte[] buffer, int index)
         {
-            int value = default(int);
+            var value = default(int);
 
             value |= buffer[index + 3];
             value <<= 8;
@@ -211,14 +217,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads four bytes from a buffer and converts them into an <see cref="uint"/> value.
+        ///     Reads four bytes from a buffer and converts them into an <see cref="uint" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static uint ToUInt32(byte[] buffer, int index)
         {
-            uint value = default(uint);
+            var value = default(uint);
 
             value |= buffer[index + 3];
             value <<= 8;
@@ -232,14 +238,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads eight bytes from a buffer and converts them into a <see cref="long"/> value.
+        ///     Reads eight bytes from a buffer and converts them into a <see cref="long" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static long ToInt64(byte[] buffer, int index)
         {
-            long value = default(long);
+            var value = default(long);
 
             value |= buffer[index + 7];
             value <<= 8;
@@ -261,14 +267,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads eight bytes from a buffer and converts them into an <see cref="ulong"/> value.
+        ///     Reads eight bytes from a buffer and converts them into an <see cref="ulong" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
         /// <returns>The converted value.</returns>
         public static ulong ToUInt64(byte[] buffer, int index)
         {
-            ulong value = default(ulong);
+            var value = default(ulong);
 
             value |= buffer[index + 7];
             value <<= 8;
@@ -290,7 +296,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads four bytes from a buffer and converts them into an <see cref="float"/> value.
+        ///     Reads four bytes from a buffer and converts them into an <see cref="float" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
@@ -318,7 +324,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads eight bytes from a buffer and converts them into an <see cref="double"/> value.
+        ///     Reads eight bytes from a buffer and converts them into an <see cref="double" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
@@ -354,7 +360,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads sixteen bytes from a buffer and converts them into a <see cref="decimal"/> value.
+        ///     Reads sixteen bytes from a buffer and converts them into a <see cref="decimal" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
@@ -406,7 +412,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads sixteen bytes from a buffer and converts them into a <see cref="Guid"/> value.
+        ///     Reads sixteen bytes from a buffer and converts them into a <see cref="Guid" /> value.
         /// </summary>
         /// <param name="buffer">The buffer to read from.</param>
         /// <param name="index">The index to start reading at.</param>
@@ -452,7 +458,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="short"/> value into two bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="short" /> value into two bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -472,7 +478,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns an <see cref="ushort"/> value into two bytes and writes those bytes to a given buffer.
+        ///     Turns an <see cref="ushort" /> value into two bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -492,7 +498,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns an <see cref="int"/> value into four bytes and writes those bytes to a given buffer.
+        ///     Turns an <see cref="int" /> value into four bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -516,7 +522,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns an <see cref="uint"/> value into four bytes and writes those bytes to a given buffer.
+        ///     Turns an <see cref="uint" /> value into four bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -540,7 +546,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="long"/> value into eight bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="long" /> value into eight bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -572,7 +578,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns an <see cref="ulong"/> value into eight bytes and writes those bytes to a given buffer.
+        ///     Turns an <see cref="ulong" /> value into eight bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -604,7 +610,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="float"/> value into four bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="float" /> value into four bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -631,7 +637,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="double"/> value into eight bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="double" /> value into eight bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -666,7 +672,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="decimal"/> value into sixteen bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="decimal" /> value into sixteen bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>
@@ -717,7 +723,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Turns a <see cref="Guid"/> value into sixteen bytes and writes those bytes to a given buffer.
+        ///     Turns a <see cref="Guid" /> value into sixteen bytes and writes those bytes to a given buffer.
         /// </summary>
         /// <param name="buffer">The buffer to write to.</param>
         /// <param name="index">The index to start writing at.</param>

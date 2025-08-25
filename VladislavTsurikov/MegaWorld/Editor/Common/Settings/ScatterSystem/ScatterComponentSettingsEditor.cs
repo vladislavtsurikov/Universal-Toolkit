@@ -14,17 +14,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
 
         public override void OnEnable()
         {
-            ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)Target;
-            _stackEditor = new ReorderableListStackEditor<Scatter, ReorderableListComponentEditor>(new GUIContent("Scatter Operations"), scatterComponentSettings.ScatterStack, true)
-            {
-                DisplayHeaderText = false
-            };
+            var scatterComponentSettings = (ScatterComponentSettings)Target;
+            _stackEditor =
+                new ReorderableListStackEditor<Scatter, ReorderableListComponentEditor>(
+                    new GUIContent("Scatter Operations"), scatterComponentSettings.ScatterStack, true)
+                {
+                    DisplayHeaderText = false
+                };
         }
 
-        public override void OnGUI()
-        {
-            _stackEditor.OnGUI();
-        }
+        public override void OnGUI() => _stackEditor.OnGUI();
     }
 }
 #endif

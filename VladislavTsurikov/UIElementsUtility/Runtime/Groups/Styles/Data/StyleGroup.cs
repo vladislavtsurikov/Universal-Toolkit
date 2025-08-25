@@ -2,8 +2,8 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Runtime.Core;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Styles
 {
@@ -16,19 +16,13 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Styles
     ]
     public class StyleGroup : FilesDataGroup<StyleGroup, StyleInfo>
     {
-        internal void AddNewItem()
-        {
-            _items.Insert(0, new StyleInfo());
-        }
+        internal void AddNewItem() => _items.Insert(0, new StyleInfo());
 
-        internal void SortByFileName()
-        {
-            _items = _items.OrderBy(item => item.UssReference.name).ToList();
-        }
-        
+        internal void SortByFileName() => _items = _items.OrderBy(item => item.UssReference.name).ToList();
+
         internal StyleSheet GetStyleSheet(string styleName)
         {
-            string cleanName = styleName.RemoveWhitespaces().RemoveAllSpecialCharacters();
+            var cleanName = styleName.RemoveWhitespaces().RemoveAllSpecialCharacters();
 
             _items = _items.Where(item => item != null && item.UssReference != null).ToList();
 
@@ -43,20 +37,18 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Styles
         }
 
 #if UNITY_EDITOR
-        public override string GetFileFormat()
-        {
-            return "uss";
-        }
+        public override string GetFileFormat() => "uss";
 
         protected override void AddItems(string[] files)
         {
-            foreach (string filePath in files)
+            foreach (var filePath in files)
             {
                 StyleSheet reference = AssetDatabase.LoadAssetAtPath<StyleSheet>(filePath);
                 if (reference == null)
                 {
                     continue;
                 }
+
                 _items.Add(new StyleInfo { UssReference = reference });
             }
         }

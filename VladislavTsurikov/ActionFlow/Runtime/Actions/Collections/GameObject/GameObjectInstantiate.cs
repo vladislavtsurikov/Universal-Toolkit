@@ -1,8 +1,8 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
 using VladislavTsurikov.ActionFlow.Runtime.Variables;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 {
@@ -10,19 +10,19 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
     public class GameObjectInstantiate : GameObjectAction
     {
         [SerializeField]
-        private UnityEngine.GameObject _prefab;
-
-        [SerializeField]
         private UnityEngine.GameObject _parent;
 
         [SerializeField]
         private Transform _point;
 
-        [SerializeField] 
+        [SerializeField]
+        private UnityEngine.GameObject _prefab;
+
+        [SerializeField]
         private GameObjectVariable _storage;
-        
+
         public override string Name => $"Instantiate {_prefab}";
-        
+
         protected override UniTask<bool> Run(CancellationToken token)
         {
             if (_prefab == null)

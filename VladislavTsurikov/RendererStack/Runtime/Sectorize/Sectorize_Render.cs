@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.Math.Runtime;
+using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
@@ -22,22 +23,24 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                 }
             }
 #endif
-            
-            foreach (var cam in CameraManager.VirtualCameraList)
+
+            foreach (VirtualCamera cam in CameraManager.VirtualCameraList)
             {
-                if (cam.Ignored) 
+                if (cam.Ignored)
                 {
                     continue;
                 }
 
-                List<Sector> loadSectors = FindSector.OverlapSphere(cam.Camera.transform.position, GetMaxLoadingDistance(), GetSectorLayerTag(), false);
+                List<Sector> loadSectors = FindSector.OverlapSphere(cam.Camera.transform.position,
+                    GetMaxLoadingDistance(),
+                    GetSectorLayerTag(), false);
 
                 if (loadSectors == null)
                 {
                     continue;
                 }
-                    
-                foreach (var sector in loadSectors)
+
+                foreach (Sector sector in loadSectors)
                 {
                     sector.SceneReference.UnloadSceneCancellationTokenSource?.Cancel();
 
@@ -45,24 +48,27 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
                     {
                         continue;
                     }
-                    
-                    Sphere loadImmediatelySphere = new Sphere(cam.Camera.transform.position, ImmediatelyLoading.MaxDistance);
-                                    
+
+                    var loadImmediatelySphere =
+                        new Sphere(cam.Camera.transform.position, ImmediatelyLoading.MaxDistance);
+
                     if (loadImmediatelySphere.Intersects(new AABB(sector.Bounds.center, sector.Bounds.size)))
                     {
                         sector.LoadScene();
                         continue;
                     }
-                    
+
                     if (!_lastLoadedScene.IsValid() || _lastLoadedScene.isLoaded)
                     {
-                        sector.LoadScene(CalculateMaximumPauseBeforeLoadingScene(sector, cam.Camera.transform.position));
+                        sector.LoadScene(
+                            CalculateMaximumPauseBeforeLoadingScene(sector, cam.Camera.transform.position));
                         _lastLoadedScene = sector.SceneReference.Scene;
                     }
                 }
-                        
-                Sphere preventingUnloadSceneSphere = new Sphere(cam.Camera.transform.position, PreventingUnloading.IsValid() ? PreventingUnloading.MaxDistance : 0);
-                        
+
+                var preventingUnloadSceneSphere = new Sphere(cam.Camera.transform.position,
+                    PreventingUnloading.IsValid() ? PreventingUnloading.MaxDistance : 0);
+
                 UnloadUnnecessaryScenes(loadSectors, preventingUnloadSceneSphere);
             }
         }
@@ -75,11 +81,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             {
                 return;
             }
-            
-            List<Sector> unloadSectors = new List<Sector>(allLoadedScenes);
+
+            var unloadSectors = new List<Sector>(allLoadedScenes);
             unloadSectors.RemoveAll(loadSectors.Contains);
 
-            foreach (var sector in unloadSectors)
+            foreach (Sector sector in unloadSectors)
             {
                 if (!preventingUnloadSceneSphere.Intersects(new AABB(sector.Bounds.center, sector.Bounds.size)))
                 {
@@ -95,16 +101,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             }
         }
 
-        public float GetMaxLoadingDistance()
-        {
-            return Mathf.Max(ImmediatelyLoading.MaxDistance, AsynchronousLoading.IsValid() ? AsynchronousLoading.MaxDistance : 0);
-        }
+        public float GetMaxLoadingDistance() =>
+            Mathf.Max(ImmediatelyLoading.MaxDistance,
+                AsynchronousLoading.IsValid() ? AsynchronousLoading.MaxDistance : 0);
 
         private float CalculateMaximumPauseBeforeLoadingScene(Sector sector, Vector3 center)
         {
-            float distance = Vector3.Distance(sector.Bounds.center, center);
-            float t = Mathf.InverseLerp(GetMaxLoadingDistance(), ImmediatelyLoading.MaxDistance, distance); 
-                                        
+            var distance = Vector3.Distance(sector.Bounds.center, center);
+            var t = Mathf.InverseLerp(GetMaxLoadingDistance(), ImmediatelyLoading.MaxDistance, distance);
+
             return Mathf.Lerp(GetMaxPauseBeforeLoadingScene(sector), 0, t);
         }
 
@@ -114,14 +119,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
             {
                 return Caching.MaxLoadingCachedScenePause;
             }
-            else if (AsynchronousLoading.IsValid())
+
+            if (AsynchronousLoading.IsValid())
             {
                 return AsynchronousLoading.MaxLoadingScenePause;
             }
-            else
-            {
-                return 0;
-            }
+
+            return 0;
         }
     }
 }

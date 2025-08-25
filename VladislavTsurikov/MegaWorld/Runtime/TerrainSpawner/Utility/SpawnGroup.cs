@@ -13,76 +13,83 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
 {
-    public static class SpawnGroup 
+    public static class SpawnGroup
     {
-        public static async UniTask SpawnGameObject(CancellationToken token, Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
+        public static async UniTask SpawnGameObject(CancellationToken token, Group group,
+            TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {
-            ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            
+            var scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
+
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(displayProgressBar
                 ? new DefaultWaitingNextFrame(0.2f)
                 : null);
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
-            
+
             await scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
-                if(rayHit != null)
+                RayHit rayHit =
+                    RaycastUtility.Raycast(
+                        RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)),
+                        layerSettings.GetCurrentPaintLayers(group.PrototypeType));
+                if (rayHit != null)
                 {
-                    PrototypeGameObject proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.PrototypeList);;
+                    var proto = (PrototypeGameObject)GetRandomPrototype.GetMaxSuccessProto(group.PrototypeList);
+                    ;
 
-                    if(proto == null || proto.Active == false)
+                    if (proto == null || proto.Active == false)
                     {
                         return;
                     }
 
-                    float fitness = GetFitness.Get(group, terrainsMaskManager, rayHit);
+                    var fitness = GetFitness.Get(group, terrainsMaskManager, rayHit);
 
-                    if(fitness != 0)
+                    if (fitness != 0)
                     {
                         if (Random.Range(0f, 1f) < 1 - fitness)
                         {
                             return;
                         }
 
-                        Common.Utility.Spawn.SpawnPrototype.SpawnGameObject(group, proto, rayHit, fitness);
+                        SpawnPrototype.SpawnGameObject(group, proto, rayHit, fitness);
                     }
                 }
             }, token);
         }
-        
+
 #if RENDERER_STACK
         public static async UniTask SpawnTerrainObject(CancellationToken token, Group group, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea, bool displayProgressBar)
         {
-            ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
-            
+            ScatterComponentSettings scatterComponentSettings =
+ (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
+
             scatterComponentSettings.ScatterStack.SetWaitingNextFrame(displayProgressBar
                 ? new DefaultWaitingNextFrame(0.2f)
                 : null);
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
-            
+
             await UniTask.Delay(1000);
-            
+
             await scatterComponentSettings.ScatterStack.Samples(boxArea, sample =>
             {
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
+                RayHit rayHit =
+ RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(sample.x, boxArea.RayHit.Point.y, sample.y)), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
                 if(rayHit != null)
                 {
-                    PrototypeTerrainObject proto = (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.PrototypeList);
+                    PrototypeTerrainObject proto =
+ (PrototypeTerrainObject)GetRandomPrototype.GetMaxSuccessProto(group.PrototypeList);
 
                     if(proto == null || proto.Active == false)
                     {
                         return;
                     }
-                    
+
                     float fitness = GetFitness.Get(group, terrainsMaskManager, rayHit);
 
                     if(fitness != 0)
@@ -99,37 +106,39 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner.Utility
         }
 #endif
 
-        public static async UniTask SpawnTerrainDetails(CancellationToken token, Group group, IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
+        public static async UniTask SpawnTerrainDetails(CancellationToken token, Group group,
+            IReadOnlyList<Prototype> protoTerrainDetailList, TerrainsMaskManager terrainsMaskManager, BoxArea boxArea)
         {
             if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
                 return;
             }
-            
+
             foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                Bounds terrainBounds = new Bounds(terrain.terrainData.bounds.center + terrain.transform.position, terrain.terrainData.bounds.size);
+                var terrainBounds = new Bounds(terrain.terrainData.bounds.center + terrain.transform.position,
+                    terrain.terrainData.bounds.size);
 
-                if(terrainBounds.Intersects(boxArea.Bounds))
+                if (terrainBounds.Intersects(boxArea.Bounds))
                 {
-                    if(terrain.terrainData.detailPrototypes.Length == 0)
+                    if (terrain.terrainData.detailPrototypes.Length == 0)
                     {
                         Debug.LogWarning("Add Terrain Details");
                         continue;
                     }
-        
+
                     foreach (PrototypeTerrainDetail proto in protoTerrainDetailList)
                     {
-                        if(proto.Active == false)
+                        if (proto.Active == false)
                         {
                             continue;
                         }
-                        
+
                         SpawnPrototype.SpawnTerrainDetails(group, proto, terrainsMaskManager, boxArea, terrain);
 
                         await UniTask.Yield();
                     }
-                    
+
                     await UniTask.Yield();
                 }
             }

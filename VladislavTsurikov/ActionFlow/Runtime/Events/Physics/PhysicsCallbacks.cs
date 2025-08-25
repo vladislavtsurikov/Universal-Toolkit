@@ -7,34 +7,16 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events.Physics
     {
         private PhysicsEvent _physicsEvent => (PhysicsEvent)TriggerEvent;
 
-        private void OnTriggerEnter(Collider other)
-        {
-            _physicsEvent?.OnTriggerEnter(other);
-        }
+        private void OnCollisionEnter(Collision collision) => _physicsEvent?.OnCollisionEnter(collision);
 
-        private void OnTriggerExit(Collider other)
-        {
-            _physicsEvent?.OnTriggerExit(other);
-        }
+        private void OnCollisionExit(Collision collision) => _physicsEvent?.OnCollisionExit(collision);
 
-        private void OnTriggerStay(Collider other)
-        {
-            _physicsEvent?.OnTriggerStay(other);
-        }
+        private void OnCollisionStay(Collision collision) => _physicsEvent?.OnCollisionStay(collision);
 
-        private void OnCollisionEnter(Collision collision)
-        {
-            _physicsEvent?.OnCollisionEnter(collision);
-        }
+        private void OnTriggerEnter(Collider other) => _physicsEvent?.OnTriggerEnter(other);
 
-        private void OnCollisionExit(Collision collision)
-        {
-            _physicsEvent?.OnCollisionExit(collision);
-        }
+        private void OnTriggerExit(Collider other) => _physicsEvent?.OnTriggerExit(other);
 
-        private void OnCollisionStay(Collision collision)
-        {
-            _physicsEvent?.OnCollisionStay(collision);
-        }
+        private void OnTriggerStay(Collider other) => _physicsEvent?.OnTriggerStay(other);
     }
 }

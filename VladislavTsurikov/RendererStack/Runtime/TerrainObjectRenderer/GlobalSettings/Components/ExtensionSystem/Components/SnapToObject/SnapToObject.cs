@@ -1,5 +1,5 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.SnapToObject
 {
@@ -7,8 +7,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
     public class SnapToObject : Extension
     {
         public LayerMask Layers;
-        public float RaycastPositionOffset = 0;
         public float MaxRayDistance = 6500f;
+        public float RaycastPositionOffset = 0;
         public float SpawnCheckOffset = 3000;
 
         public void Snap()
@@ -25,7 +25,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
                     for (int itemIndex = 0; itemIndex < persistentCell.ItemInfoList[persistentInfoIndex].InstanceDataList.Count; itemIndex++)
                     {
                         InstanceData persistentItem = persistentCell.ItemInfoList[persistentInfoIndex].InstanceDataList[itemIndex];
-                        
+
                         InstantPrototype proto = InstantRenderer.InstantPrototypesPackage.GetInstantItem(persistentCell.ItemInfoList[persistentInfoIndex].ID);
 
                         if(proto == null)
@@ -39,11 +39,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
                         }
 
                         RaycastHit hitInfo;
-                        Ray ray = new Ray(new Vector3(persistentItem.Position.x, persistentItem.Position.y + SpawnCheckOffset, persistentItem.Position.z), 
+                        Ray ray = new Ray(new Vector3(persistentItem.Position.x, persistentItem.Position.y + SpawnCheckOffset, persistentItem.Position.z),
                             Vector3.down);
 
                         if (Physics.Raycast(ray, out hitInfo, MaxRayDistance, Layers))
-		                {
+                        {
                             Vector3 finalPosition = new Vector3(hitInfo.point.x, hitInfo.point.y + RaycastPositionOffset, hitInfo.point.z);
                             persistentItem.Position = finalPosition;
                         }

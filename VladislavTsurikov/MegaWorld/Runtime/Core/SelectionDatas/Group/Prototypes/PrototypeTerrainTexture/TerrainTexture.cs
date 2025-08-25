@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture
 {
-    [System.Serializable]
+    [Serializable]
     public sealed class TerrainTexture
     {
         public Texture2D Texture;

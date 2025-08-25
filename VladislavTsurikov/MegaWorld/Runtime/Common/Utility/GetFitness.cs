@@ -11,26 +11,23 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
     {
         public static float Get(Group group, Bounds bounds, RayHit rayHit)
         {
-            FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
-            
-            if(filterSettings.FilterType == FilterType.MaskFilter)
+            var filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
+
+            if (filterSettings.FilterType == FilterType.MaskFilter)
             {
-                return GetFromMaskFilter(bounds, filterSettings.MaskFilterComponentSettings.MaskFilterStack, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D, rayHit.Point);
+                return GetFromMaskFilter(bounds, filterSettings.MaskFilterComponentSettings.MaskFilterStack,
+                    filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D, rayHit.Point);
             }
-            else
-            {
-                return GetFromSimpleFilter(filterSettings.SimpleFilter, rayHit);
-            }
+
+            return GetFromSimpleFilter(filterSettings.SimpleFilter, rayHit);
         }
 
-        public static float GetFromSimpleFilter(SimpleFilter simpleFilter, RayHit rayHit)
-        {
-            return simpleFilter.GetFitness(rayHit.Point, rayHit.Normal);
-        }
+        public static float GetFromSimpleFilter(SimpleFilter simpleFilter, RayHit rayHit) =>
+            simpleFilter.GetFitness(rayHit.Point, rayHit.Normal);
 
         public static float GetFromMaskFilter(Bounds bounds, MaskFilterStack stack, Texture2D filterMask, Vector3 point)
         {
-            if(stack.ElementList.Count != 0)
+            if (stack.ElementList.Count != 0)
             {
                 return TextureUtility.GetFromWorldPosition(bounds, point, filterMask);
             }

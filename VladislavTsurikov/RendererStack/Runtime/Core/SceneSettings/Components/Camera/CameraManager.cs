@@ -1,24 +1,23 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 {
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Cameras")]
+    [Name("Cameras")]
     public partial class CameraManager : SceneComponent
     {
-        public List<VirtualCamera> VirtualCameraList = new List<VirtualCamera>();
+        public List<VirtualCamera> VirtualCameraList = new();
 
         [OnDeserializing]
-        private void OnDeserializing()
-        {
-            VirtualCameraList ??= new List<VirtualCamera>();
-        }
+        private void OnDeserializing() => VirtualCameraList ??= new List<VirtualCamera>();
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
-            for (int i = VirtualCameraList.Count - 1; i >= 0; i--)
+            for (var i = VirtualCameraList.Count - 1; i >= 0; i--)
             {
                 if (VirtualCameraList[i].CameraType == CameraType.SceneView || VirtualCameraList[i].Camera == null)
                 {
@@ -31,7 +30,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                 cam.Setup();
             }
 
-#if UNITY_EDITOR 
+#if UNITY_EDITOR
             StartFindSceneViewCamera();
 
             if (!Application.isPlaying)
@@ -39,63 +38,28 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                 StartEditorSimulation();
             }
 #endif
+
+            return UniTask.CompletedTask;
         }
 
-        protected override void OnCreate()
-        {
-            FindMainCamera();
-        }
+        protected override void OnCreate() => FindMainCamera();
 
         protected override void OnDisableElement()
         {
 #if UNITY_EDITOR
             EditorApplication.update -= FindSceneViewCamera;
-            
+
             if (!Application.isPlaying)
             {
                 StopEditorSimulation();
             }
 #endif
 
-            for (int i = 0; i < VirtualCameraList.Count; i++)
+            for (var i = 0; i < VirtualCameraList.Count; i++)
             {
                 VirtualCameraList[i].OnDisable();
             }
         }
-
-#if UNITY_EDITOR
-        private void StartFindSceneViewCamera() 
-        {
-            EditorApplication.update -= FindSceneViewCamera;
-            EditorApplication.update += FindSceneViewCamera;
-        }
-
-        private void FindSceneViewCamera()
-        {
-            UnityEngine.Camera currentCam = UnityEngine.Camera.current;
-            if (currentCam != null && currentCam.name == "SceneCamera")
-            {
-                VirtualCamera sceneViewCameraData = GetSceneCamera();
-
-                if(sceneViewCameraData == null)
-                {
-                    VirtualCamera sceneviewCamera =
-                        new VirtualCamera(null)
-                        {
-                            CameraType = CameraType.SceneView,
-                        };
-
-                    AddCamera(sceneviewCamera);
-                    sceneViewCameraData = sceneviewCamera;
-                }
-
-                if (sceneViewCameraData.Camera == null)
-                {
-                    sceneViewCameraData.Camera = currentCam;
-                }
-            }
-        }
-#endif
 
         public void FindMainCamera()
         {
@@ -104,7 +68,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
             if (selectedCamera == null)
             {
                 UnityEngine.Camera[] cameras = Object.FindObjectsOfType<UnityEngine.Camera>();
-                for (int i = 0; i <= cameras.Length - 1; i++)
+                for (var i = 0; i <= cameras.Length - 1; i++)
                 {
                     if (cameras[i].gameObject.name.Contains("Main Camera") ||
                         cameras[i].gameObject.name.Contains("MainCamera"))
@@ -113,16 +77,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                         break;
                     }
                 }
-                
             }
-            
+
             AddCamera(selectedCamera);
         }
 
         public void FindAllCamera()
         {
             UnityEngine.Camera[] cameras = Object.FindObjectsOfType<UnityEngine.Camera>();
-            for (int i = 0; i <= cameras.Length - 1; i++)
+            for (var i = 0; i <= cameras.Length - 1; i++)
             {
                 AddCamera(cameras[i]);
             }
@@ -141,7 +104,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         private void AddCamera(VirtualCamera virtualCamera)
         {
-            if(GetVirtualCamera(virtualCamera.Camera) == null) 
+            if (GetVirtualCamera(virtualCamera.Camera) == null)
             {
                 VirtualCameraList.Add(virtualCamera);
             }
@@ -166,7 +129,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                 virtualCamera.CameraTemporaryComponentStack?.OnDisable();
             }
         }
-        
+
         public VirtualCamera GetVirtualCamera(UnityEngine.Camera unityCamera)
         {
             foreach (VirtualCamera cam in VirtualCameraList)
@@ -176,12 +139,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                     return cam;
                 }
             }
+
             return null;
         }
 
         public VirtualCamera GetSceneCamera()
         {
-            foreach (VirtualCamera cam in VirtualCameraList) 
+            foreach (VirtualCamera cam in VirtualCameraList)
             {
                 if (cam.CameraType == CameraType.SceneView)
                 {
@@ -191,17 +155,46 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
             return null;
         }
-        
+
         public bool IsMultipleCameras()
         {
             if (Application.isPlaying)
             {
                 return VirtualCameraList.Count > 1;
             }
-            else
+
+            return VirtualCameraList.Count > 2;
+        }
+
+#if UNITY_EDITOR
+        private void StartFindSceneViewCamera()
+        {
+            EditorApplication.update -= FindSceneViewCamera;
+            EditorApplication.update += FindSceneViewCamera;
+        }
+
+        private void FindSceneViewCamera()
+        {
+            UnityEngine.Camera currentCam = UnityEngine.Camera.current;
+            if (currentCam != null && currentCam.name == "SceneCamera")
             {
-                return VirtualCameraList.Count > 2;
+                VirtualCamera sceneViewCameraData = GetSceneCamera();
+
+                if (sceneViewCameraData == null)
+                {
+                    var sceneviewCamera =
+                        new VirtualCamera(null) { CameraType = CameraType.SceneView };
+
+                    AddCamera(sceneviewCamera);
+                    sceneViewCameraData = sceneviewCamera;
+                }
+
+                if (sceneViewCameraData.Camera == null)
+                {
+                    sceneViewCameraData.Camera = currentCam;
+                }
             }
         }
+#endif
     }
 }

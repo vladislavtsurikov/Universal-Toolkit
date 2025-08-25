@@ -1,7 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.RenderModelData.Utility;
 using VladislavTsurikov.UnityUtility.Runtime;
@@ -12,7 +12,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
     [Serializable]
     [MissingIconsWarning("Drag & Drop Prefabs Here")]
-    [DropObjects(new[]{typeof(GameObject)})]
+    [DropObjects(new[] { typeof(GameObject) })]
     public class PrototypeTerrainObject : Prototype
     {
         public GameObject Prefab;
@@ -26,11 +26,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
                 {
                     return Prefab.name;
                 }
-            
+
                 return "Missing Prefab";
             }
         }
-        
+
         public override Object PrototypeObject => Prefab;
         public override LayerMask Layer => Prefab.layer;
 
@@ -52,18 +52,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
         protected override void InitPrototype(Object obj)
         {
             Prefab = (GameObject)obj;
-            Bounds = GameObjectUtility.CalculateBoundsInstantiate(Prefab);      
+            Bounds = GameObjectUtility.CalculateBoundsInstantiate(Prefab);
         }
 
-        public override MeshRenderer[] GetMeshRenderers()
-        {
-            return Prefab.GetComponentsInChildren<MeshRenderer>();
-        }
+        public override MeshRenderer[] GetMeshRenderers() => Prefab.GetComponentsInChildren<MeshRenderer>();
 
-        public override void RefreshRenderModelInfo()
-        {
-            RenderModel = RenderModelUtility.GetRenderModel(this, Prefab);
-        }
+        public override void RefreshRenderModelInfo() => RenderModel = RenderModelUtility.GetRenderModel(this, Prefab);
 
         public override bool IsSamePrototypeObject(Object obj)
         {
@@ -71,16 +65,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             {
                 return false;
             }
-            
-            GameObject go = (GameObject)obj;
-            
+
+            var go = (GameObject)obj;
+
 #if UNITY_EDITOR
-            if(PrefabUtility.GetPrefabAssetType(obj) == PrefabAssetType.NotAPrefab)
+            if (PrefabUtility.GetPrefabAssetType(obj) == PrefabAssetType.NotAPrefab)
             {
                 return false;
             }
 #endif
-            
+
             return GameObjectUtility.IsSameGameObject(go, Prefab);
         }
     }

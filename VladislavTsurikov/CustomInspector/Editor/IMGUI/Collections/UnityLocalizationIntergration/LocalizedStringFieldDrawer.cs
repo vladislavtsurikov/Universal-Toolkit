@@ -8,10 +8,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
 {
     public class LocalizedStringFieldDrawer : IMGUIFieldDrawer
     {
-        public override bool CanDraw(Type type)
-        {
-            return type == typeof(LocalizedString);
-        }
+        public override bool CanDraw(Type type) => type == typeof(LocalizedString);
 
         public override object Draw(Rect rect, GUIContent label, Type fieldType, object value)
         {
@@ -20,13 +17,14 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
                 return null;
             }
 
-            Rect labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
-            Rect buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y, rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
+            var labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+            var buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y,
+                rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
 
             EditorGUI.LabelField(labelRect, label);
 
-            LocalizedString localizedString = (LocalizedString)value;
-            string buttonText = "Edit LocalizedString";
+            var localizedString = (LocalizedString)value;
+            var buttonText = "Edit LocalizedString";
 
             if (GUI.Button(buttonRect, buttonText))
             {
@@ -40,16 +38,10 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
     public class LocalizedStringEditorWindow : EditorWindow
     {
         private static LocalizedString _localizedString;
-        private SerializedObject _serializedObject;
         private SerializedProperty _property;
-        private LocalizeStringEvent _tempComponent;
         private Vector2 _scrollPosition;
-
-        public static void ShowWindow(LocalizedString localizedString)
-        {
-            _localizedString = localizedString;
-            GetWindow<LocalizedStringEditorWindow>("Edit LocalizedString").Show();
-        }
+        private SerializedObject _serializedObject;
+        private LocalizeStringEvent _tempComponent;
 
         private void OnEnable()
         {
@@ -64,6 +56,14 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
             }
         }
 
+        private void OnDisable()
+        {
+            if (_tempComponent != null)
+            {
+                DestroyImmediate(_tempComponent.gameObject);
+            }
+        }
+
         private void OnGUI()
         {
             if (_localizedString == null || _property == null)
@@ -72,7 +72,8 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
                 return;
             }
 
-            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(position.width), GUILayout.Height(position.height));
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Width(position.width),
+                GUILayout.Height(position.height));
 
             _serializedObject.Update();
             EditorGUILayout.PropertyField(_property, true);
@@ -87,12 +88,10 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
             EditorGUILayout.EndScrollView();
         }
 
-        private void OnDisable()
+        public static void ShowWindow(LocalizedString localizedString)
         {
-            if (_tempComponent != null)
-            {
-                DestroyImmediate(_tempComponent.gameObject);
-            }
+            _localizedString = localizedString;
+            GetWindow<LocalizedStringEditorWindow>("Edit LocalizedString").Show();
         }
     }
 

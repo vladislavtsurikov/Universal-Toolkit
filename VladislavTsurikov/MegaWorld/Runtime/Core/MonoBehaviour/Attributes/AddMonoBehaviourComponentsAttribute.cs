@@ -7,9 +7,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
     {
         public readonly Type[] Types;
 
-        public AddMonoBehaviourComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddMonoBehaviourComponentsAttribute(Type[] types) => Types = types;
     }
 }

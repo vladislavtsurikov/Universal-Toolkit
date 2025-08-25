@@ -6,19 +6,6 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
     {
         private static T s_instance;
 
-        public static T Instance
-        {
-            get
-            {
-                if (s_instance == null)
-                {
-                    CreateAndLoad();
-                }
-
-                return s_instance;
-            }
-        }
-
         protected ScriptableSingleton()
         {
             if (s_instance != null)
@@ -29,6 +16,19 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
             {
                 s_instance = this as T;
                 System.Diagnostics.Debug.Assert(s_instance != null);
+            }
+        }
+
+        public static T Instance
+        {
+            get
+            {
+                if (s_instance == null)
+                {
+                    CreateAndLoad();
+                }
+
+                return s_instance;
             }
         }
 

@@ -15,32 +15,30 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
-	[Serializable]
-    public class DoubleLookupDictionary<TFirstKey, TSecondKey, TValue> : Dictionary<TFirstKey, Dictionary<TSecondKey, TValue>>
+    [Serializable]
+    public class
+        DoubleLookupDictionary<TFirstKey, TSecondKey, TValue> : Dictionary<TFirstKey, Dictionary<TSecondKey, TValue>>
     {
         private readonly IEqualityComparer<TSecondKey> secondKeyComparer;
 
-        public DoubleLookupDictionary()
-        {
-            this.secondKeyComparer = EqualityComparer<TSecondKey>.Default;
-        }
+        public DoubleLookupDictionary() => secondKeyComparer = EqualityComparer<TSecondKey>.Default;
 
-        public DoubleLookupDictionary(IEqualityComparer<TFirstKey> firstKeyComparer, IEqualityComparer<TSecondKey> secondKeyComparer)
-            : base(firstKeyComparer)
-        {
+        public DoubleLookupDictionary(IEqualityComparer<TFirstKey> firstKeyComparer,
+            IEqualityComparer<TSecondKey> secondKeyComparer)
+            : base(firstKeyComparer) =>
             this.secondKeyComparer = secondKeyComparer;
-        }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public new Dictionary<TSecondKey, TValue> this[TFirstKey firstKey]
         {
@@ -48,10 +46,10 @@ namespace OdinSerializer.Utilities
             {
                 Dictionary<TSecondKey, TValue> innerDict;
 
-                if (!this.TryGetValue(firstKey, out innerDict))
+                if (!TryGetValue(firstKey, out innerDict))
                 {
-                    innerDict = new Dictionary<TSecondKey, TValue>(this.secondKeyComparer);
-                    this.Add(firstKey, innerDict);
+                    innerDict = new Dictionary<TSecondKey, TValue>(secondKeyComparer);
+                    Add(firstKey, innerDict);
                 }
 
                 return innerDict;
@@ -59,13 +57,13 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public int InnerCount(TFirstKey firstKey)
         {
             Dictionary<TSecondKey, TValue> innerDict;
 
-            if (this.TryGetValue(firstKey, out innerDict))
+            if (TryGetValue(firstKey, out innerDict))
             {
                 return innerDict.Count;
             }
@@ -74,15 +72,15 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public int TotalInnerCount()
         {
-            int count = 0;
+            var count = 0;
 
-            if (this.Count > 0)
+            if (Count > 0)
             {
-                foreach (var innerDict in this.Values)
+                foreach (Dictionary<TSecondKey, TValue> innerDict in Values)
                 {
                     count += innerDict.Count;
                 }
@@ -92,58 +90,59 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public bool ContainsKeys(TFirstKey firstKey, TSecondKey secondKey)
         {
             Dictionary<TSecondKey, TValue> innerDict;
 
-            return this.TryGetValue(firstKey, out innerDict) && innerDict.ContainsKey(secondKey);
+            return TryGetValue(firstKey, out innerDict) && innerDict.ContainsKey(secondKey);
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public bool TryGetInnerValue(TFirstKey firstKey, TSecondKey secondKey, out TValue value)
         {
             Dictionary<TSecondKey, TValue> innerDict;
 
-            if (this.TryGetValue(firstKey, out innerDict) && innerDict.TryGetValue(secondKey, out value))
+            if (TryGetValue(firstKey, out innerDict) && innerDict.TryGetValue(secondKey, out value))
             {
                 return true;
             }
 
-            value = default(TValue);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public TValue AddInner(TFirstKey firstKey, TSecondKey secondKey, TValue value)
         {
-            if (this.ContainsKeys(firstKey, secondKey))
+            if (ContainsKeys(firstKey, secondKey))
             {
-                throw new ArgumentException("An element with the same keys already exists in the " + this.GetType().GetNiceName() + ".");
+                throw new ArgumentException("An element with the same keys already exists in the " +
+                                            GetType().GetNiceName() + ".");
             }
 
             return this[firstKey][secondKey] = value;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public bool RemoveInner(TFirstKey firstKey, TSecondKey secondKey)
         {
             Dictionary<TSecondKey, TValue> innerDict;
 
-            if (this.TryGetValue(firstKey, out innerDict))
+            if (TryGetValue(firstKey, out innerDict))
             {
-                bool removed = innerDict.Remove(secondKey);
+                var removed = innerDict.Remove(secondKey);
 
                 if (innerDict.Count == 0)
                 {
-                    this.Remove(firstKey);
+                    Remove(firstKey);
                 }
 
                 return removed;
@@ -153,28 +152,26 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public void RemoveWhere(Func<TValue, bool> predicate)
         {
-            List<TFirstKey> toRemoveBufferFirstKey = new List<TFirstKey>();
-            List<TSecondKey> toRemoveBufferSecondKey = new List<TSecondKey>();
+            var toRemoveBufferFirstKey = new List<TFirstKey>();
+            var toRemoveBufferSecondKey = new List<TSecondKey>();
 
-            foreach (var outerDictionary in this.GFIterator())
+            foreach (KeyValuePair<TFirstKey, Dictionary<TSecondKey, TValue>> outerDictionary in this.GFIterator())
+            foreach (KeyValuePair<TSecondKey, TValue> innerKeyPair in outerDictionary.Value.GFIterator())
             {
-                foreach (var innerKeyPair in outerDictionary.Value.GFIterator())
+                if (predicate(innerKeyPair.Value))
                 {
-                    if (predicate(innerKeyPair.Value))
-                    {
-                        toRemoveBufferFirstKey.Add(outerDictionary.Key);
-                        toRemoveBufferSecondKey.Add(innerKeyPair.Key);
-                    }
+                    toRemoveBufferFirstKey.Add(outerDictionary.Key);
+                    toRemoveBufferSecondKey.Add(innerKeyPair.Key);
                 }
             }
 
-            for (int i = 0; i < toRemoveBufferFirstKey.Count; i++)
+            for (var i = 0; i < toRemoveBufferFirstKey.Count; i++)
             {
-                this.RemoveInner(toRemoveBufferFirstKey[i], toRemoveBufferSecondKey[i]);
+                RemoveInner(toRemoveBufferFirstKey[i], toRemoveBufferSecondKey[i]);
             }
         }
     }

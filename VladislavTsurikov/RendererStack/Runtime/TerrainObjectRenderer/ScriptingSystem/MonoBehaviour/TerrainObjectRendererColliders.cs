@@ -8,16 +8,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
     {
         public float MaxDistance = 100;
 
-        private void OnDisable()
-        {
-            ScriptingSystem.RemoveColliders(this);
-        }
-        
         private void Update()
         {
-            Sphere sphere = new Sphere(gameObject.transform.position, MaxDistance);
-            
+            var sphere = new Sphere(gameObject.transform.position, MaxDistance);
+
             ScriptingSystem.SetColliders(sphere, this);
         }
+
+        private void OnDisable() => ScriptingSystem.RemoveColliders(this);
     }
 }

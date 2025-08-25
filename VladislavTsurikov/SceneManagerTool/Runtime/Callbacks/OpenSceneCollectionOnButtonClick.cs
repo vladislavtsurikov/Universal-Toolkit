@@ -7,7 +7,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks
     [RequireComponent(typeof(Button))]
     public class OpenSceneCollectionOnButtonClick : MonoBehaviour
     {
-        public SceneCollectionReference SceneCollectionReference = new SceneCollectionReference();
+        public SceneCollectionReference SceneCollectionReference = new();
 
         private void Start()
         {
@@ -16,9 +16,6 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks
             button.onClick.AddListener(Load);
         }
 
-        public void Load()
-        {
-            SceneManagerAPI.LoadSceneCollection(SceneCollectionReference.SceneCollection);
-        }
+        public void Load() => SceneManagerAPI.LoadSceneCollection(SceneCollectionReference.SceneCollection);
     }
 }

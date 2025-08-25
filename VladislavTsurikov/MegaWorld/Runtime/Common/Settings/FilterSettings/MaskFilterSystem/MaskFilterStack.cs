@@ -15,14 +15,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     {
         public void Eval(MaskFilterContext maskFilterContext)
         {
-            int count = _elementList.Count;
+            var count = _elementList.Count;
 
             RenderTexture prev = RenderTexture.active;
 
-            RenderTexture[] rts = new RenderTexture[2];
+            var rts = new RenderTexture[2];
 
-            int srcIndex = 0;
-            int destIndex = 1;
+            var srcIndex = 0;
+            var destIndex = 1;
 
             rts[0] = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
             rts[1] = RenderTexture.GetTemporary(maskFilterContext.DestinationRenderTexture.descriptor);
@@ -31,16 +31,17 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             rts[1].enableRandomWrite = true;
 
             Graphics.Blit(Texture2D.whiteTexture, rts[0]);
-            Graphics.Blit(Texture2D.blackTexture, rts[1]); //don't remove this! needed for compute shaders to work correctly.
+            Graphics.Blit(Texture2D.blackTexture,
+                rts[1]); //don't remove this! needed for compute shaders to work correctly.
 
-            for( int i = 0; i < count; ++i )
+            for (var i = 0; i < count; ++i)
             {
-                if(_elementList[i].Active)
+                if (_elementList[i].Active)
                 {
                     maskFilterContext.SourceRenderTexture = rts[srcIndex];
                     maskFilterContext.DestinationRenderTexture = rts[destIndex];
 
-                    _elementList[ i ].Eval(maskFilterContext, i);
+                    _elementList[i].Eval(maskFilterContext, i);
 
                     destIndex += srcIndex;
                     srcIndex = destIndex - srcIndex;

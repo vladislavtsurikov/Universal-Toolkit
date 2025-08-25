@@ -10,31 +10,32 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 {
-    public static class SprayBrushToolVisualisation 
+    public static class SprayBrushToolVisualisation
     {
         public static void Draw(BoxArea boxArea)
         {
-            if(boxArea == null)
+            if (boxArea == null)
             {
                 return;
             }
 
-            if(boxArea.RayHit == null)
+            if (boxArea.RayHit == null)
             {
                 return;
             }
-            
-            if(WindowData.Instance.SelectedData.HasOneSelectedGroup())
+
+            if (WindowData.Instance.SelectedData.HasOneSelectedGroup())
             {
                 Group group = WindowData.Instance.SelectedData.SelectedGroup;
 
-                SimpleFilter simpleFilter = (SimpleFilter)group.GetElement(typeof(SprayBrushTool), typeof(SimpleFilter));
+                var simpleFilter = (SimpleFilter)group.GetElement(typeof(SprayBrushTool), typeof(SimpleFilter));
 
-                if(simpleFilter.HasOneActiveFilter())
+                if (simpleFilter.HasOneActiveFilter())
                 {
-                    SimpleFilterVisualisation.DrawSimpleFilter(group, boxArea, simpleFilter, GlobalCommonComponentSingleton<LayerSettings>.Instance, true);
+                    SimpleFilterVisualisation.DrawSimpleFilter(group, boxArea, simpleFilter,
+                        GlobalCommonComponentSingleton<LayerSettings>.Instance, true);
                 }
-                
+
                 VisualisationUtility.DrawCircleHandles(boxArea.BoxSize, boxArea.RayHit);
             }
             else

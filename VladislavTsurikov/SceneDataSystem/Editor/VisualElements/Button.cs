@@ -6,110 +6,39 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.UIElementsUtility;
-using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors;
 using VladislavTsurikov.UIElementsUtility.Runtime;
-using VisualElementExtensions = VladislavTsurikov.UIElementsUtility.Runtime.Utility.VisualElementExtensions;
+using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 
 namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 {
     public class Button : VisualElement
     {
-        // public new class UxmlFactory : UxmlFactory<Button, UxmlTraits> { }
-        // public new class UxmlTraits : VisualElement.UxmlTraits { }
-        
-        public TemplateContainer TemplateContainer { get; }
-        public VisualElement LayoutContainer { get; }
-        public VisualElement ButtonContainer { get; }
-        public Image ButtonIcon { get; }
-        public Label ButtonLabel { get; }
-        
         public UnityAction OnClick;
-        public Element Element { get; }
-        private static Font Font => GetFont.Ubuntu.Light;
-        
-        public SelectionState SelectionState
-        {
-            get => Element.SelectionState;
-            set => Element.SelectionState = value;
-        }
-        
-        #region IconType
 
-        private IconType IconType { get; set; } = IconType.None;
-        private List<VisualElement> IconDependentComponents { get; }
-        internal void UpdateIconType(IconType value)
-        {
-            if (IconType != IconType.None)
-            {
-                UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(IconType.ToString(), IconDependentComponents);
-            }
-
-            if (value != IconType.None)
-            {
-                UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), IconDependentComponents);
-            }
-
-            IconType = value;
-        }
-
-        #endregion
-        
-        #region ElementSize
-
-        private ElementSize ElementSize { get; set; }
-        private List<VisualElement> ElementSizeDependentElements { get; }
-        public Button SetElementSize(ElementSize value)
-        {
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(ElementSize.ToString(), ElementSizeDependentElements);
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), ElementSizeDependentElements);
-            ElementSize = value;
-            return this;
-        }
-        public Button ResetElementSize() =>
-            SetElementSize(ElementSize.Normal);
-
-        #endregion
-        
-        #region LayoutOrientation
-
-        private LayoutOrientation LayoutOrientation { get; set; }
-        private List<VisualElement> LayoutOrientationDependentElements { get; }
-        public Button SetLayoutOrientation(LayoutOrientation value)
-        {
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(LayoutOrientation.ToString(), LayoutOrientationDependentElements);
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), LayoutOrientationDependentElements);
-            LayoutOrientation = value;
-            return this;
-        }
-        public Button ResetLayoutOrientation() =>
-            SetLayoutOrientation(LayoutOrientation.Horizontal);
-
-        #endregion
-        
         public Button()
         {
             Add(TemplateContainer = GetLayout.VisualElements.Button.CloneTree());
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.AddStyle(TemplateContainer, GetStyle.VisualElements.Button);
-            
+            TemplateContainer.AddStyle(GetStyle.VisualElements.Button);
+
             LayoutContainer = TemplateContainer.Q<VisualElement>(nameof(LayoutContainer));
             ButtonContainer = LayoutContainer.Q<VisualElement>(nameof(ButtonContainer));
             ButtonIcon = LayoutContainer.Q<Image>(nameof(ButtonIcon));
             ButtonLabel = LayoutContainer.Q<Label>(nameof(ButtonLabel));
 
-            ElementSizeDependentElements = new List<VisualElement> { LayoutContainer, ButtonContainer, ButtonIcon, ButtonLabel };
+            ElementSizeDependentElements = new List<VisualElement>
+            {
+                LayoutContainer, ButtonContainer, ButtonIcon, ButtonLabel
+            };
             LayoutOrientationDependentElements = new List<VisualElement>(ElementSizeDependentElements);
             ButtonStyleDependentElements = new List<VisualElement>(ElementSizeDependentElements);
             IconDependentComponents = new List<VisualElement>(ElementSizeDependentElements);
 
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleUnityFont(ButtonLabel, Font);
+            ButtonLabel.SetStyleUnityFont(Font);
 
             Element = new Element(this)
             {
-                OnStateChanged = StateChanged,
-                OnClick = ExecuteOnClick,
-                OnPointerEnter = ExecuteOnPointerEnter
+                OnStateChanged = StateChanged, OnClick = ExecuteOnClick, OnPointerEnter = ExecuteOnPointerEnter
             };
 
             //RESET
@@ -117,33 +46,31 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                 ResetElementSize();
                 ResetLayoutOrientation();
                 ResetButtonStyle();
-                UIElementsUtility.Runtime.Utility.VisualElementExtensions.ResetLayout(this);
+                this.ResetLayout();
                 this.ResetAccentColor();
                 this.ClearIcon();
                 this.ClearLabelText();
                 this.ClearOnClick();
-                UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(this, string.Empty);
+                this.SetTooltip(string.Empty);
                 SelectionState = SelectionState.Normal;
             }
         }
+        // public new class UxmlFactory : UxmlFactory<Button, UxmlTraits> { }
+        // public new class UxmlTraits : VisualElement.UxmlTraits { }
 
-        #region ButtonStyle
+        public TemplateContainer TemplateContainer { get; }
+        public VisualElement LayoutContainer { get; }
+        public VisualElement ButtonContainer { get; }
+        public Image ButtonIcon { get; }
+        public Label ButtonLabel { get; }
+        public Element Element { get; }
+        private static Font Font => GetFont.Ubuntu.Light;
 
-        private ButtonStyle ButtonStyle { get; set; }
-        private List<VisualElement> ButtonStyleDependentElements { get; }
-        public Button SetButtonStyle(ButtonStyle value)
+        public SelectionState SelectionState
         {
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(ButtonStyle.ToString(), ButtonStyleDependentElements);
-            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), ButtonStyleDependentElements);
-            ButtonStyle = value;
-            Element.StateChanged();
-            return this;
+            get => Element.SelectionState;
+            set => Element.SelectionState = value;
         }
-        
-        public Button ResetButtonStyle() =>
-            SetButtonStyle(ButtonStyle.Clear);
-
-        #endregion
 
         public void Reset()
         {
@@ -151,21 +78,21 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             ResetLayoutOrientation();
             ResetButtonStyle();
 
-            this.SetEnabled(true);
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.ResetLayout(this);
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(this, string.Empty);
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetName(this, string.Empty);
+            SetEnabled(true);
+            this.ResetLayout();
+            this.SetTooltip(string.Empty);
+            this.SetName(string.Empty);
             this.ResetAccentColor();
             this.ClearIcon();
             this.ClearLabelText();
             //this.ClearInfoContainer();
             this.ClearOnClick();
             this.SetSelectionState(SelectionState.Normal);
-            
-            
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleTextAlign(ButtonLabel, TextAnchor.MiddleCenter);
+
+
+            ButtonLabel.SetStyleTextAlign(TextAnchor.MiddleCenter);
         }
-        
+
         private void StateChanged()
         {
             switch (ButtonStyle)
@@ -190,10 +117,10 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                     throw new ArgumentOutOfRangeException();
             }
 
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImageTintColor(ButtonIcon, Element.IconColor); //Icon
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleColor(ButtonLabel, Element.TextColor); //Label
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundColor(ButtonContainer, Element.ContainerColor); //Background
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBorderColor(LayoutContainer, Element.ContainerBorderColor); //Border
+            ButtonIcon.SetStyleBackgroundImageTintColor(Element.IconColor); //Icon
+            ButtonLabel.SetStyleColor(Element.TextColor); //Label
+            ButtonContainer.SetStyleBackgroundColor(Element.ContainerColor); //Background
+            LayoutContainer.SetStyleBorderColor(Element.ContainerBorderColor); //Border
         }
 
         public void ExecuteOnClick(EventBase clickEvent = null)
@@ -205,18 +132,98 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
             OnClick?.Invoke();
             //if (animationTrigger == ButtonAnimationTrigger.OnClick)
-                //iconReaction?.Play();
+            //iconReaction?.Play();
         }
 
         public void ExecuteOnPointerEnter(PointerEnterEvent enterEvent = null)
         {
             if (SelectionState == SelectionState.Disabled)
             {
-                return;
             }
             //if (animationTrigger == ButtonAnimationTrigger.OnPointerEnter)
-                //iconReaction?.Play();
+            //iconReaction?.Play();
         }
+
+        #region IconType
+
+        private IconType IconType { get; set; } = IconType.None;
+        private List<VisualElement> IconDependentComponents { get; }
+
+        internal void UpdateIconType(IconType value)
+        {
+            if (IconType != IconType.None)
+            {
+                UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(IconType.ToString(),
+                    IconDependentComponents);
+            }
+
+            if (value != IconType.None)
+            {
+                UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(), IconDependentComponents);
+            }
+
+            IconType = value;
+        }
+
+        #endregion
+
+        #region ElementSize
+
+        private ElementSize ElementSize { get; set; }
+        private List<VisualElement> ElementSizeDependentElements { get; }
+
+        public Button SetElementSize(ElementSize value)
+        {
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(ElementSize.ToString(),
+                ElementSizeDependentElements);
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(),
+                ElementSizeDependentElements);
+            ElementSize = value;
+            return this;
+        }
+
+        public Button ResetElementSize() => SetElementSize(ElementSize.Normal);
+
+        #endregion
+
+        #region LayoutOrientation
+
+        private LayoutOrientation LayoutOrientation { get; set; }
+        private List<VisualElement> LayoutOrientationDependentElements { get; }
+
+        public Button SetLayoutOrientation(LayoutOrientation value)
+        {
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(LayoutOrientation.ToString(),
+                LayoutOrientationDependentElements);
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(),
+                LayoutOrientationDependentElements);
+            LayoutOrientation = value;
+            return this;
+        }
+
+        public Button ResetLayoutOrientation() => SetLayoutOrientation(LayoutOrientation.Horizontal);
+
+        #endregion
+
+        #region ButtonStyle
+
+        private ButtonStyle ButtonStyle { get; set; }
+        private List<VisualElement> ButtonStyleDependentElements { get; }
+
+        public Button SetButtonStyle(ButtonStyle value)
+        {
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.RemoveClass(ButtonStyle.ToString(),
+                ButtonStyleDependentElements);
+            UIElementsUtility.Runtime.Utility.UIElementsUtility.AddClass(value.ToString(),
+                ButtonStyleDependentElements);
+            ButtonStyle = value;
+            Element.StateChanged();
+            return this;
+        }
+
+        public Button ResetButtonStyle() => SetButtonStyle(ButtonStyle.Clear);
+
+        #endregion
     }
 
     public static class ButtonExtensions
@@ -229,7 +236,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.SelectionState = state;
             return target;
         }
-        
+
         /// <summary> Enable button and update its visual state </summary>
         /// <param name="target"> Target button </param>
         public static T EnableElement<T>(this T target) where T : Button
@@ -245,7 +252,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.Element.Disable();
             return target;
         }
-        
+
         #region Label
 
         /// <summary> Set label text </summary>
@@ -253,14 +260,15 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         /// <param name="labelText"> Label text </param>
         public static T SetLabelText<T>(this T target, string labelText) where T : Button
         {
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonLabel
-                    .SetText(labelText), String.IsNullOrEmpty(labelText) ? DisplayStyle.None : DisplayStyle.Flex);
+            target.ButtonLabel
+                .SetText(labelText)
+                .SetStyleDisplay(string.IsNullOrEmpty(labelText) ? DisplayStyle.None : DisplayStyle.Flex);
             return target;
         }
 
         /// <summary> Clear the text and tooltip values from the button's label </summary>
         public static T ClearLabelText<T>(this T target) where T : Button =>
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(target.SetLabelText(string.Empty), string.Empty);
+            target.SetLabelText(string.Empty).SetTooltip(string.Empty);
 
         #endregion
 
@@ -303,7 +311,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         }
 
         #endregion
-        
+
         #region Icon
 
         /// <summary> Set Static Icon </summary>
@@ -314,8 +322,8 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.UpdateIconType(IconType.Static);
             //target.iconReaction?.Recycle();
             //target.iconReaction = null;
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, iconTexture2D);
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.Flex);
+            target.ButtonIcon.SetStyleBackgroundImage(iconTexture2D);
+            target.ButtonIcon.SetStyleDisplay(DisplayStyle.Flex);
             //target.SetAnimationTrigger(ButtonAnimationTrigger.None);
             return target;
         }
@@ -327,13 +335,13 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.UpdateIconType(IconType.None);
             //target.iconReaction?.Recycle();
             //target.iconReaction = null;
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, (Texture2D)null);
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.None);
+            target.ButtonIcon.SetStyleBackgroundImage((Texture2D)null);
+            target.ButtonIcon.SetStyleDisplay(DisplayStyle.None);
             return target;
         }
 
         #endregion
-        
+
         #region Accent Color
 
         /// <summary> Set button's accent color </summary>

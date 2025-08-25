@@ -19,42 +19,44 @@
 namespace OdinSerializer
 {
     /// <summary>
-    /// Serializer for the <see cref="float"/> type.
+    ///     Serializer for the <see cref="float" /> type.
     /// </summary>
-    /// <seealso cref="Serializer{System.Single}" />
+    /// <seealso cref="float" />
     public sealed class SingleSerializer : Serializer<float>
     {
         /// <summary>
-        /// Reads a value of type <see cref="float" />.
+        ///     Reads a value of type <see cref="float" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The value which has been read.
+        ///     The value which has been read.
         /// </returns>
         public override float ReadValue(IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.FloatingPoint || entry == EntryType.Integer)
             {
                 float value;
                 if (reader.ReadSingle(out value) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Failed to read entry '" + name + "' of type " + entry.ToString());
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Failed to read entry '" + name + "' of type " + entry);
                 }
+
                 return value;
             }
-            else
-            {
-                reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.FloatingPoint.ToString() + " or " + EntryType.Integer.ToString() + ", but got entry '" + name + "' of type " + entry.ToString());
-                reader.SkipEntry();
-                return default(float);
-            }
+
+            reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.FloatingPoint + " or " +
+                                                          EntryType.Integer + ", but got entry '" + name +
+                                                          "' of type " + entry);
+            reader.SkipEntry();
+            return default;
         }
 
         /// <summary>
-        /// Writes a value of type <see cref="float" />.
+        ///     Writes a value of type <see cref="float" />.
         /// </summary>
         /// <param name="name">The name of the value to write.</param>
         /// <param name="value">The value to write.</param>

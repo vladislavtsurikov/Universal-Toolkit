@@ -14,42 +14,47 @@ using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem
 {
-    public class TerrainObjectRendererCollider 
+    public class TerrainObjectRendererCollider
     {
-        private QuadTree<ColliderCell> _cellQuadTree;
-        private BvhCellTree<ColliderCell> _bvhCellTree;
-        
-        [NonSerialized]
-        public List<ColliderCell> CellList = new List<ColliderCell>();
-        
         public const int ConstCellSize = 50;
+        private BvhCellTree<ColliderCell> _bvhCellTree;
+        private QuadTree<ColliderCell> _cellQuadTree;
+
+        [NonSerialized]
+        public List<ColliderCell> CellList = new();
 
         public TerrainObjectRendererCollider()
         {
         }
 
-        public TerrainObjectRendererCollider(SceneDataManager sceneDataManager, Cell cell, PrototypeRenderDataStack prototypeRenderDataStack)
+        public TerrainObjectRendererCollider(SceneDataManager sceneDataManager, Cell cell,
+            PrototypeRenderDataStack prototypeRenderDataStack)
         {
             RefreshCells(cell.Bounds);
 
-            foreach (var prototypeRenderData in prototypeRenderDataStack.PrototypeRenderDataList)
+            foreach (PrototypeRendererData prototypeRenderData in prototypeRenderDataStack.PrototypeRenderDataList)
             {
-                PrototypeTerrainObject prototypeTerrainObject = (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(prototypeRenderData.PrototypeID);
-                
-                foreach (var instance in prototypeRenderData.InstanceList)
+                var prototypeTerrainObject =
+                    (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(prototypeRenderData
+                        .PrototypeID);
+
+                foreach (RendererData.Instance instance in prototypeRenderData.InstanceList)
                 {
-                    TerrainObjectInstance instantObject = new TerrainObjectInstance(instance.ID, instance.Position, instance.Scale, instance.Rotation, prototypeTerrainObject);  
-                    
+                    var instantObject = new TerrainObjectInstance(instance.ID, instance.Position, instance.Scale,
+                        instance.Rotation, prototypeTerrainObject);
+
                     RegisterObject(instantObject, cell, prototypeRenderData, sceneDataManager);
                 }
             }
         }
 
         public void Setup()
-        { 
-            TerrainObjectRenderer terrainObject = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
+        {
+            var terrainObject =
+                (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(
+                    typeof(TerrainObjectRenderer));
 
-            if(terrainObject != null)
+            if (terrainObject != null)
             {
                 foreach (ColliderCell cell in CellList)
                 {
@@ -66,7 +71,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
                 _bvhCellTree.ChangeNodeSize(cell, cell.GetObjectsAABB());
             }
         }
-        
+
         public void RemoveInstances()
         {
             foreach (ColliderCell cell in CellList)
@@ -82,21 +87,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             {
                 _bvhCellTree = new BvhCellTree<ColliderCell>();
             }
-            
+
             return _bvhCellTree.GetAABB();
         }
 
         public List<TerrainObjectCollider> GetAllInstances()
         {
-            List<TerrainObjectCollider> largeObjectColliders = new List<TerrainObjectCollider>();
+            var largeObjectColliders = new List<TerrainObjectCollider>();
             foreach (ColliderCell cell in CellList)
+            foreach (PrototypeBVHObjectTree proto in cell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
             {
-                foreach (var proto in cell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
-                {
-                    largeObjectColliders.AddRange(proto.BVHObjectTree.FindAllInstance());
-                }
+                largeObjectColliders.AddRange(proto.BVHObjectTree.FindAllInstance());
             }
-            
+
             return largeObjectColliders;
         }
 
@@ -105,19 +108,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             CellList.Clear();
             _bvhCellTree?.Clear();
 
-            float cellSize = bounds.size.x;
+            var cellSize = bounds.size.x;
 
-            while(cellSize > ConstCellSize)
+            while (cellSize > ConstCellSize)
             {
                 cellSize /= 2;
             }
 
-            if(cellSize <= 0)
+            if (cellSize <= 0)
             {
                 return;
             }
 
-            Bounds expandedBounds = new Bounds(bounds.center, bounds.size);
+            var expandedBounds = new Bounds(bounds.center, bounds.size);
             expandedBounds.Expand(new Vector3(cellSize * 2f, 0, cellSize * 2f));
 
             Rect expandedRect = RectExtension.CreateRectFromBounds(expandedBounds);
@@ -125,97 +128,111 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             _cellQuadTree = new QuadTree<ColliderCell>(expandedRect);
             _bvhCellTree = new BvhCellTree<ColliderCell>();
 
-            int cellXCount = Mathf.CeilToInt(bounds.size.x / cellSize);
-            int cellZCount = Mathf.CeilToInt(bounds.size.z / cellSize);
+            var cellXCount = Mathf.CeilToInt(bounds.size.x / cellSize);
+            var cellZCount = Mathf.CeilToInt(bounds.size.z / cellSize);
 
-            Vector2 corner = new Vector2(bounds.center.x - bounds.size.x / 2f,
+            var corner = new Vector2(bounds.center.x - bounds.size.x / 2f,
                 bounds.center.z - bounds.size.z / 2f);
 
-            for (int x = 0; x <= cellXCount - 1; x++)
+            for (var x = 0; x <= cellXCount - 1; x++)
+            for (var z = 0; z <= cellZCount - 1; z++)
             {
-                for (int z = 0; z <= cellZCount - 1; z++)
-                {
-                    Rect rect = new Rect(
-                        new Vector2(cellSize * x + corner.x, cellSize * z + corner.y),
-                        new Vector2(cellSize, cellSize));
+                var rect = new Rect(
+                    new Vector2(cellSize * x + corner.x, cellSize * z + corner.y),
+                    new Vector2(cellSize, cellSize));
 
-                    var localBounds = RectExtension.CreateBoundsFromRect(rect, bounds.center.y, bounds.size.y);
+                Bounds localBounds = RectExtension.CreateBoundsFromRect(rect, bounds.center.y, bounds.size.y);
 
-                    ColliderCell cell = new ColliderCell(localBounds);
+                var cell = new ColliderCell(localBounds);
 
-                    CellList.Add(cell);
-                    _cellQuadTree.Insert(cell);
-                    _bvhCellTree.RegisterObject(cell, new AABB(cell.Bounds));
-                }
+                CellList.Add(cell);
+                _cellQuadTree.Insert(cell);
+                _bvhCellTree.RegisterObject(cell, new AABB(cell.Bounds));
             }
 
             Setup();
         }
-        
-        public List<TerrainObjectCollider> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, SceneData sceneData, Cell renderCell, bool quadTree, bool checkObbIntersection)
+
+        public List<TerrainObjectCollider> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            ObjectFilter objectFilter, SceneData sceneData, Cell renderCell, bool quadTree, bool checkObbIntersection)
         {
             var overlappedObjects = new List<TerrainObjectCollider>();
 
-            foreach (ColliderCell colliderCell in OverlapCellBox( boxCenter,  boxSize, boxRotation, quadTree))
+            foreach (ColliderCell colliderCell in OverlapCellBox(boxCenter, boxSize, boxRotation, quadTree))
+            foreach (PrototypeBVHObjectTree proto in
+                     colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
             {
-                foreach (var proto in colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
+                if (!proto.Filter(objectFilter))
                 {
-                    if(!proto.Filter(objectFilter))
-                    {
-                        continue;
-                    }
-
-                    List<object> pathDatas = new List<object> {sceneData.SceneDataManager, colliderCell, renderCell, renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)};
-                    
-                    overlappedObjects.AddRange(proto.BVHObjectTree.OverlapBox(boxCenter, boxSize, boxRotation, null, checkObbIntersection, pathDatas));
+                    continue;
                 }
+
+                var pathDatas = new List<object>
+                {
+                    sceneData.SceneDataManager,
+                    colliderCell,
+                    renderCell,
+                    renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)
+                };
+
+                overlappedObjects.AddRange(proto.BVHObjectTree.OverlapBox(boxCenter, boxSize, boxRotation, null,
+                    checkObbIntersection, pathDatas));
             }
 
             return overlappedObjects;
         }
-        
-        public List<TerrainObjectCollider> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, SceneData sceneData, Cell renderCell, bool quadTree, bool checkOBBIntersection)
+
+        public List<TerrainObjectCollider> OverlapSphere(Vector3 sphereCenter, float sphereRadius,
+            ObjectFilter objectFilter, SceneData sceneData, Cell renderCell, bool quadTree, bool checkOBBIntersection)
         {
             var overlappedObjects = new List<TerrainObjectCollider>();
 
             foreach (ColliderCell colliderCell in OverlapCellSphere(sphereCenter, sphereRadius, quadTree))
+            foreach (PrototypeBVHObjectTree proto in
+                     colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
             {
-                foreach (var proto in colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
+                if (!proto.Filter(objectFilter))
                 {
-                    if(!proto.Filter(objectFilter))
-                    {
-                        continue;
-                    }
-                    
-                    List<object> pathDatas = new List<object> {sceneData.SceneDataManager, colliderCell, renderCell, renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)};
-
-                    overlappedObjects.AddRange(proto.BVHObjectTree.OverlapSphere(sphereCenter, sphereRadius, null, checkOBBIntersection, pathDatas));
+                    continue;
                 }
+
+                var pathDatas = new List<object>
+                {
+                    sceneData.SceneDataManager,
+                    colliderCell,
+                    renderCell,
+                    renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)
+                };
+
+                overlappedObjects.AddRange(proto.BVHObjectTree.OverlapSphere(sphereCenter, sphereRadius, null,
+                    checkOBBIntersection, pathDatas));
             }
 
             return overlappedObjects;
         }
 
-        public TerrainObjectCollider RegisterObject(TerrainObjectInstance instance, Cell cell, PrototypeRendererData prototypeStorageRendererData, SceneDataManager sceneDataManager)
+        public TerrainObjectCollider RegisterObject(TerrainObjectInstance instance, Cell cell,
+            PrototypeRendererData prototypeStorageRendererData, SceneDataManager sceneDataManager)
         {
-            Rect positionRect = new Rect(new Vector2(instance.Position.x, instance.Position.z), Vector2.zero);
+            var positionRect = new Rect(new Vector2(instance.Position.x, instance.Position.z), Vector2.zero);
 
-            List<ColliderCell> overlapCellList = new List<ColliderCell>();                 
+            var overlapCellList = new List<ColliderCell>();
             _cellQuadTree.Query(positionRect, overlapCellList);
 
-            if(overlapCellList.Count == 0) 
+            if (overlapCellList.Count == 0)
             {
                 return null;
             }
 
-            TerrainObjectCollider terrainObjectCollider = new TerrainObjectCollider(instance);
+            var terrainObjectCollider = new TerrainObjectCollider(instance);
 
             ColliderCell colliderCell = overlapCellList[0];
 
-            if(colliderCell.PrototypeBVHObjectTreeStack.RegisterObject(terrainObjectCollider, cell, colliderCell, prototypeStorageRendererData, sceneDataManager))
-            {                
+            if (colliderCell.PrototypeBVHObjectTreeStack.RegisterObject(terrainObjectCollider, cell, colliderCell,
+                    prototypeStorageRendererData, sceneDataManager))
+            {
                 ChangeNodeSizeIfNecessary(terrainObjectCollider, colliderCell);
-                
+
                 SceneObjectsBounds.ChangeSceneObjectsBounds(sceneDataManager.Sector);
             }
 
@@ -223,28 +240,29 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
         }
 
         public void ChangeNodeSizeIfNecessary(TerrainObjectCollider terrainObjectCollider, ColliderCell cell)
-        {      
-            AABB cellAABB = new AABB(cell.Bounds);
+        {
+            var cellAABB = new AABB(cell.Bounds);
 
-            AABB newObjectsAABB = terrainObjectCollider.GetAABB(); 
+            AABB newObjectsAABB = terrainObjectCollider.GetAABB();
 
             newObjectsAABB.Encapsulate(cellAABB);
 
-            if(newObjectsAABB.Size.IsBigger(cellAABB.Size))
+            if (newObjectsAABB.Size.IsBigger(cellAABB.Size))
             {
                 _bvhCellTree.ChangeNodeSize(cell, cell.GetObjectsAABB());
             }
         }
-        
-        public List<ColliderCell> OverlapCellBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, bool quadTree)
+
+        public List<ColliderCell> OverlapCellBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            bool quadTree)
         {
-            List<ColliderCell> overlapCellList = new List<ColliderCell>();    
+            var overlapCellList = new List<ColliderCell>();
 
             if (quadTree)
             {
-                Vector2 position = new Vector2(boxCenter.x - boxSize.x / 2, boxCenter.z - boxSize.z / 2);
-                Rect selectedAreaRect = new Rect(position, new Vector2(boxSize.x, boxSize.z));   
-                
+                var position = new Vector2(boxCenter.x - boxSize.x / 2, boxCenter.z - boxSize.z / 2);
+                var selectedAreaRect = new Rect(position, new Vector2(boxSize.x, boxSize.z));
+
                 _cellQuadTree.Query(selectedAreaRect, overlapCellList);
             }
             else
@@ -257,13 +275,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 
         public List<ColliderCell> OverlapCellSphere(Vector3 sphereCenter, float sphereRadius, bool quadTree)
         {
-            List<ColliderCell> overlapCellList = new List<ColliderCell>();    
-            
+            var overlapCellList = new List<ColliderCell>();
+
             if (quadTree)
             {
-                Vector2 position = new Vector2(sphereCenter.x - sphereRadius, sphereCenter.z - sphereRadius);
-                Rect selectedAreaRect = new Rect(position, new Vector2(sphereRadius * 2, sphereRadius * 2));   
-                
+                var position = new Vector2(sphereCenter.x - sphereRadius, sphereCenter.z - sphereRadius);
+                var selectedAreaRect = new Rect(position, new Vector2(sphereRadius * 2, sphereRadius * 2));
+
                 _cellQuadTree.Query(selectedAreaRect, overlapCellList);
             }
             else
@@ -273,7 +291,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 
             return overlapCellList;
         }
-        
+
         public RayHit Raycast(Ray ray, ObjectFilter objectFilter, SceneData sceneData, Cell renderCell)
         {
             List<RayHit> allObjectHits = RaycastAll(ray, objectFilter, sceneData, renderCell);
@@ -283,29 +301,34 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 
         public List<RayHit> RaycastAll(Ray ray, ObjectFilter objectFilter, SceneData sceneData, Cell renderCell)
         {
-            var nodeHits = _bvhCellTree.RaycastAll(ray);
+            List<ColliderCell> nodeHits = _bvhCellTree.RaycastAll(ray);
 
-            List<ColliderCell> overlappedCells = new List<ColliderCell>();
-            
+            var overlappedCells = new List<ColliderCell>();
+
             overlappedCells.AddRange(nodeHits);
 
             var rayHits = new List<RayHit>();
 
             foreach (ColliderCell colliderCell in overlappedCells)
+            foreach (PrototypeBVHObjectTree proto in
+                     colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
             {
-                foreach (var proto in colliderCell.PrototypeBVHObjectTreeStack.PrototypeBVHObjectTreeList)
+                if (!proto.Filter(objectFilter))
                 {
-                    if(!proto.Filter(objectFilter))
-                    {
-                        continue;
-                    }
-                    
-                    List<object> pathDatas = new List<object> {sceneData.SceneDataManager, colliderCell, renderCell, renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)};
+                    continue;
+                }
 
-                    foreach (RayHit rayHit in proto.BVHObjectTree.RaycastAll(ray, objectFilter, pathDatas))
-                    {
-                        rayHits.Add(rayHit);
-                    }
+                var pathDatas = new List<object>
+                {
+                    sceneData.SceneDataManager,
+                    colliderCell,
+                    renderCell,
+                    renderCell.PrototypeRenderDataStack.GetPrototypeRenderData(proto.PrototypeID)
+                };
+
+                foreach (RayHit rayHit in proto.BVHObjectTree.RaycastAll(ray, objectFilter, pathDatas))
+                {
+                    rayHits.Add(rayHit);
                 }
             }
 
@@ -313,15 +336,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
         }
 
 #if UNITY_EDITOR
-        public void DrawAllCells(Color nodeColor)
-        {
-            _bvhCellTree.DrawAllCells(nodeColor);
-        }
+        public void DrawAllCells(Color nodeColor) => _bvhCellTree.DrawAllCells(nodeColor);
 
-        public List<BVHNodeRayHit<ColliderCell>> DrawRaycast(Ray ray, Color nodeColor)
-        {
-            return _bvhCellTree.DrawRaycast(ray, nodeColor);
-        }
+        public List<BVHNodeRayHit<ColliderCell>> DrawRaycast(Ray ray, Color nodeColor) =>
+            _bvhCellTree.DrawRaycast(ray, nodeColor);
 #endif
     }
 }

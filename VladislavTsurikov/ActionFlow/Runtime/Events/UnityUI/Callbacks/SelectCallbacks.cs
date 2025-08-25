@@ -9,14 +9,8 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events.UnityUI
     {
         private UISelectEvent UISelectEvent => (UISelectEvent)TriggerEvent;
 
-        public void OnSelect(BaseEventData eventData)
-        {
-            UISelectEvent?.OnSelect(eventData);
-        }
+        public void OnDeselect(BaseEventData eventData) => UISelectEvent?.OnDeselect(eventData);
 
-        public void OnDeselect(BaseEventData eventData)
-        {
-            UISelectEvent?.OnDeselect(eventData);
-        }
+        public void OnSelect(BaseEventData eventData) => UISelectEvent?.OnSelect(eventData);
     }
 }

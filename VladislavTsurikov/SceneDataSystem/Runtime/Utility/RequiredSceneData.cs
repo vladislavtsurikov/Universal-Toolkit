@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
@@ -12,12 +11,12 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 #endif
     public static class RequiredSceneData
     {
-        private static List<Type> _requiredTypeList = new List<Type>();
+        private static readonly List<Type> _requiredTypeList = new();
 
         static RequiredSceneData()
         {
-            var types = AllTypesDerivedFrom<SceneData>.Types
-                                .Where(t => t.IsDefined(typeof(RequiredSceneDataAttribute), false)); 
+            IEnumerable<Type> types = AllTypesDerivedFrom<SceneData>.Types
+                .Where(t => t.IsDefined(typeof(RequiredSceneDataAttribute), false));
 
             foreach (Type type in types)
             {
@@ -31,7 +30,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             {
                 _requiredTypeList.Add(type);
             }
-            
+
             CreateAllRequiredTypes();
         }
 
@@ -43,15 +42,15 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 {
                     sceneDataManager.Setup();
                 }
-                    
+
                 foreach (Type type in _requiredTypeList)
                 {
                     sceneDataManager.SceneDataStack.CreateIfMissingType(type);
                 }
             }
         }
-        
-        public static void Create<T>() where T: SceneData
+
+        public static void Create<T>() where T : SceneData
         {
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
@@ -59,7 +58,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 {
                     sceneDataManager.Setup();
                 }
-                    
+
                 sceneDataManager.SceneDataStack.CreateIfMissingType(typeof(T));
             }
         }

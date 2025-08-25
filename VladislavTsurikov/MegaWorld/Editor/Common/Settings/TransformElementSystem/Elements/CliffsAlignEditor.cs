@@ -9,9 +9,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     [ElementEditor(typeof(CliffsAlign))]
     public class CliffsAlignEditor : ReorderableListComponentEditor
     {
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             return height;
         }

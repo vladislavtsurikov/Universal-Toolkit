@@ -19,17 +19,17 @@
 namespace OdinSerializer.Utilities
 {
     /// <summary>
-    /// Provides notification callbacks for values that are cached using the <see cref="Cache{T}"/> class.
+    ///     Provides notification callbacks for values that are cached using the <see cref="Cache{T}" /> class.
     /// </summary>
     public interface ICacheNotificationReceiver
     {
         /// <summary>
-        /// Called when the cached value is freed.
+        ///     Called when the cached value is freed.
         /// </summary>
         void OnFreed();
 
         /// <summary>
-        /// Called when the cached value is claimed.
+        ///     Called when the cached value is claimed.
         /// </summary>
         void OnClaimed();
     }

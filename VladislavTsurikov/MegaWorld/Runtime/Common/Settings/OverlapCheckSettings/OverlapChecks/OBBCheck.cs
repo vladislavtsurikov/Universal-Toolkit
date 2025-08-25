@@ -5,26 +5,26 @@ using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks
 {
-    public enum BoundsCheckType 
-    { 
+    public enum BoundsCheckType
+    {
         Custom,
         BoundsPrefab
     }
-    
+
     public class OBBCheck : OverlapShape
     {
-        public BoundsCheckType BoundsType = BoundsCheckType.BoundsPrefab;
-        public bool UniformBoundsSize;
         public Vector3 BoundsSize = Vector3.one;
+        public BoundsCheckType BoundsType = BoundsCheckType.BoundsPrefab;
         public float MultiplyBoundsSize = 1;
+        public bool UniformBoundsSize;
 
         public override OBB GetOBB(Vector3 center, Vector3 scale, Quaternion rotation, Vector3 extents)
         {
             Vector3 boundsSize = Vector3.zero;
 
-            if(BoundsType == BoundsCheckType.Custom)
+            if (BoundsType == BoundsCheckType.Custom)
             {
-                if(UniformBoundsSize)
+                if (UniformBoundsSize)
                 {
                     boundsSize.x = BoundsSize.x;
                     boundsSize.y = BoundsSize.x;
@@ -35,7 +35,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
                     boundsSize = BoundsSize;
                 }
             }
-            else if(BoundsType == BoundsCheckType.BoundsPrefab)
+            else if (BoundsType == BoundsCheckType.BoundsPrefab)
             {
                 boundsSize.x = scale.x * (extents.x * 2);
                 boundsSize.y = scale.y * (extents.y * 2);
@@ -45,13 +45,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
             boundsSize.x *= MultiplyBoundsSize;
             boundsSize.y *= MultiplyBoundsSize;
             boundsSize.z *= MultiplyBoundsSize;
-            
-            Bounds bounds = new Bounds
-            {
-                center = center,
-                size = boundsSize
-            };
-            
+
+            var bounds = new Bounds { center = center, size = boundsSize };
+
             return new OBB(bounds, rotation);
         }
 
@@ -64,12 +60,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
         }
 
 #if UNITY_EDITOR
-        public override void DrawOverlapVisualisation(Vector3 position, Vector3 scale, Quaternion rotation, Vector3 extents)
+        public override void DrawOverlapVisualisation(Vector3 position, Vector3 scale, Quaternion rotation,
+            Vector3 extents)
         {
             Color color = Color.green.WithAlpha(0.5f);
 
             OBB obb = GetOBB(position, scale, rotation, extents);
-            
+
             GizmosEx.PushColor(color);
             GizmosEx.PushMatrix(Matrix4x4.TRS(obb.Center, obb.Rotation, obb.Size));
             Gizmos.DrawCube(Vector3.zero, Vector3.one);

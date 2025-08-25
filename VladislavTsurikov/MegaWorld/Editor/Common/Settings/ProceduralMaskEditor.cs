@@ -4,116 +4,130 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.CPUNoise.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
 {
     [Serializable]
     public class ProceduralMaskEditor
     {
-	    private ProceduralMask _target;
-	    
         public bool ProceduralMaskFoldout = true;
         public bool AdditionalNoiseSettingsFoldout = true;
         public bool ProceduralBrushPreviewTextureFoldout = true;
 
-        public ProceduralMaskEditor(ProceduralMask target)
-        {
-	        _target = target;
-        }
+        [NonSerialized]
+        private GUIContent _brushFalloff = new("Brush Falloff (%)",
+            "Allows you to control the brush fall by creating a gradient.");
+
+        [NonSerialized]
+        private GUIContent _brushStrength = new("Brush Strength (%)",
+            "Allows you to change the maximum strength of the brush the lower this parameter, the closer the value.");
+
+        [NonSerialized]
+        private GUIContent _fractalNoise = new("Fractal Noise",
+            "Mathematical algorithm for generating a procedural texture by a pseudo-random method.");
+
+        [NonSerialized]
+        private GUIContent _shape = new("Shape", "Allows you to select the geometric shape of the mask.");
+
+        private ProceduralMask _target;
+
+        public ProceduralMaskEditor(ProceduralMask target) => _target = target;
 
         public void OnGUI()
         {
-	        ProceduralMaskFoldout = CustomEditorGUILayout.Foldout(ProceduralMaskFoldout, "Procedural Mask");
+            ProceduralMaskFoldout = CustomEditorGUILayout.Foldout(ProceduralMaskFoldout, "Procedural Mask");
 
-	        if(ProceduralMaskFoldout)
-	        {
-		        EditorGUI.indentLevel++;
+            if (ProceduralMaskFoldout)
+            {
+                EditorGUI.indentLevel++;
 
-		        EditorGUI.BeginChangeCheck();
+                EditorGUI.BeginChangeCheck();
 
-		        ProceduralBrushPreviewTextureFoldout = CustomEditorGUILayout.Foldout(ProceduralBrushPreviewTextureFoldout, "Preview Texture");
+                ProceduralBrushPreviewTextureFoldout =
+                    CustomEditorGUILayout.Foldout(ProceduralBrushPreviewTextureFoldout, "Preview Texture");
 
-		        if(ProceduralBrushPreviewTextureFoldout)
-		        {
-			        EditorGUI.indentLevel++;
+                if (ProceduralBrushPreviewTextureFoldout)
+                {
+                    EditorGUI.indentLevel++;
 
-			        Rect textureRect = EditorGUILayout.GetControlRect(GUILayout.Height(200), GUILayout.Width(200), GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false));
-			        Rect indentedRect = EditorGUI.IndentedRect(textureRect);
-			        Rect finalRect = new Rect(new Vector2(indentedRect.x, indentedRect.y), new Vector2(200, 200));
+                    Rect textureRect = EditorGUILayout.GetControlRect(GUILayout.Height(200), GUILayout.Width(200),
+                        GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(false));
+                    Rect indentedRect = EditorGUI.IndentedRect(textureRect);
+                    var finalRect = new Rect(new Vector2(indentedRect.x, indentedRect.y), new Vector2(200, 200));
 
-			        GUI.DrawTexture(finalRect, _target.Mask);
+                    GUI.DrawTexture(finalRect, _target.Mask);
 
-			        EditorGUI.indentLevel--;
-		        }
+                    EditorGUI.indentLevel--;
+                }
 
-		        _target.Shape = (Shape)CustomEditorGUILayout.EnumPopup(_shape, _target.Shape);
-		        _target.Falloff = CustomEditorGUILayout.Slider(_brushFalloff, _target.Falloff, 0f, 100f);
-		        _target.Strength = CustomEditorGUILayout.Slider(_brushStrength, _target.Strength, 0f, 100f);
+                _target.Shape = (Shape)CustomEditorGUILayout.EnumPopup(_shape, _target.Shape);
+                _target.Falloff = CustomEditorGUILayout.Slider(_brushFalloff, _target.Falloff, 0f, 100f);
+                _target.Strength = CustomEditorGUILayout.Slider(_brushStrength, _target.Strength, 0f, 100f);
 
-		        DrawNoiseForProceduralBrush();
+                DrawNoiseForProceduralBrush();
 
-		        if (EditorGUI.EndChangeCheck())
-		        {
-			        _target.CreateProceduralTexture();
-		        }
+                if (EditorGUI.EndChangeCheck())
+                {
+                    _target.CreateProceduralTexture();
+                }
 
-		        EditorGUI.indentLevel--;
-	        }
+                EditorGUI.indentLevel--;
+            }
         }
 
         public void DrawNoiseForProceduralBrush()
-		{
-			EditorGUI.BeginChangeCheck();
+        {
+            EditorGUI.BeginChangeCheck();
 
-			_target.FractalNoise = CustomEditorGUILayout.Toggle(_fractalNoise, _target.FractalNoise);
+            _target.FractalNoise = CustomEditorGUILayout.Toggle(_fractalNoise, _target.FractalNoise);
 
-			if(_target.FractalNoise)
-			{
-				EditorGUI.indentLevel++;
-
-				_target.NoiseType = (NoiseType)CustomEditorGUILayout.EnumPopup(new GUIContent("Check Fractal Noise"), _target.NoiseType);
-
-				_target.Seed = CustomEditorGUILayout.IntSlider(new GUIContent("Seed"), _target.Seed, 0, 65000);
-				_target.Octaves = CustomEditorGUILayout.IntSlider(new GUIContent("Octaves"), _target.Octaves, 1, 12);
-				_target.Frequency = CustomEditorGUILayout.Slider(new GUIContent("Frequency"), _target.Frequency, 0f, 0.1f);
-
-				_target.Persistence = CustomEditorGUILayout.Slider(new GUIContent("Persistence"), _target.Persistence, 0f, 1f);
-				_target.Lacunarity = CustomEditorGUILayout.Slider(new GUIContent("Lacunarity"), _target.Lacunarity, 1f, 3.5f);
-
-				AdditionalNoiseSettingsFoldout = CustomEditorGUILayout.Foldout(AdditionalNoiseSettingsFoldout, "Additional Settings");
-
-				if(AdditionalNoiseSettingsFoldout)
-				{
-					EditorGUI.indentLevel++;
-
-					_target.RemapMin = CustomEditorGUILayout.Slider(new GUIContent("Remap Min"), _target.RemapMin, 0f, 1f);
-					_target.RemapMax = CustomEditorGUILayout.Slider(new GUIContent("Remap Max"), _target.RemapMax, 0f, 1f);
-					
-					_target.Invert = CustomEditorGUILayout.Toggle(new GUIContent("Invert"), _target.Invert);
-
-					EditorGUI.indentLevel--;
-				}
-
-				EditorGUI.indentLevel--;
-			}
-
-			if (EditorGUI.EndChangeCheck())
+            if (_target.FractalNoise)
             {
-                _target.Fractal = new FractalNoiseCPU(_target.GetNoiseForProceduralBrush(), _target.Octaves, _target.Frequency / 7, _target.Lacunarity, _target.Persistence);
+                EditorGUI.indentLevel++;
 
-				_target.FindNoiseRangeMinMaxForProceduralNoise(150, 150);
-			}
-		}
+                _target.NoiseType =
+                    (NoiseType<>)CustomEditorGUILayout.EnumPopup(new GUIContent("Check Fractal Noise"),
+                        _target.NoiseType);
 
-		[NonSerialized]
-		private GUIContent _shape = new GUIContent("Shape", "Allows you to select the geometric shape of the mask.");
-		[NonSerialized]
-		private GUIContent _brushFalloff = new GUIContent("Brush Falloff (%)", "Allows you to control the brush fall by creating a gradient.");
-		[NonSerialized]
-		private GUIContent _brushStrength = new GUIContent("Brush Strength (%)", "Allows you to change the maximum strength of the brush the lower this parameter, the closer the value.");
-		[NonSerialized]
-		private GUIContent _fractalNoise = new GUIContent("Fractal Noise", "Mathematical algorithm for generating a procedural texture by a pseudo-random method.");
+                _target.Seed = CustomEditorGUILayout.IntSlider(new GUIContent("Seed"), _target.Seed, 0, 65000);
+                _target.Octaves = CustomEditorGUILayout.IntSlider(new GUIContent("Octaves"), _target.Octaves, 1, 12);
+                _target.Frequency =
+                    CustomEditorGUILayout.Slider(new GUIContent("Frequency"), _target.Frequency, 0f, 0.1f);
+
+                _target.Persistence =
+                    CustomEditorGUILayout.Slider(new GUIContent("Persistence"), _target.Persistence, 0f, 1f);
+                _target.Lacunarity =
+                    CustomEditorGUILayout.Slider(new GUIContent("Lacunarity"), _target.Lacunarity, 1f, 3.5f);
+
+                AdditionalNoiseSettingsFoldout =
+                    CustomEditorGUILayout.Foldout(AdditionalNoiseSettingsFoldout, "Additional Settings");
+
+                if (AdditionalNoiseSettingsFoldout)
+                {
+                    EditorGUI.indentLevel++;
+
+                    _target.RemapMin =
+                        CustomEditorGUILayout.Slider(new GUIContent("Remap Min"), _target.RemapMin, 0f, 1f);
+                    _target.RemapMax =
+                        CustomEditorGUILayout.Slider(new GUIContent("Remap Max"), _target.RemapMax, 0f, 1f);
+
+                    _target.Invert = CustomEditorGUILayout.Toggle(new GUIContent("Invert"), _target.Invert);
+
+                    EditorGUI.indentLevel--;
+                }
+
+                EditorGUI.indentLevel--;
+            }
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                _target.Fractal = new FractalNoiseCPU(_target.GetNoiseForProceduralBrush(), _target.Octaves,
+                    _target.Frequency / 7, _target.Lacunarity, _target.Persistence);
+
+                _target.FindNoiseRangeMinMaxForProceduralNoise(150, 150);
+            }
+        }
     }
 }
 #endif

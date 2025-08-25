@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation;
 using VladislavTsurikov.SceneUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
@@ -15,8 +16,8 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
     [SceneCollectionComponent]
     public class ProgressBar : SettingsComponent
     {
-        public SceneReference SceneReference = new SceneReference();
         public bool DisableFade = false;
+        public SceneReference SceneReference = new();
 
 #if UNITY_EDITOR
         protected override void OnCreate()
@@ -29,20 +30,22 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
             }
         }
 #endif
-        
-        internal static async UniTask LoadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+
+        internal static async UniTask LoadProgressBarIfNecessary(
+            ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
-            ProgressBar progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
-            
+            var progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
+
             if (progressBar != null)
             {
                 await progressBar.LoadFade();
             }
         }
-        
-        internal static async UniTask UnloadProgressBarIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+
+        internal static async UniTask UnloadProgressBarIfNecessary(
+            ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
-            ProgressBar progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
+            var progressBar = (ProgressBar)settingsList.GetElement(typeof(ProgressBar));
 
             if (progressBar != null)
             {
@@ -53,24 +56,23 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
         private async UniTask LoadFade()
         {
             await SceneReference.LoadScene();
-            
-            SceneOperation sceneOperation = (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
-            
+
+            var sceneOperation =
+                (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
+
             await sceneOperation.OnLoad();
         }
 
         private async UniTask UnloadFade()
         {
-            SceneOperation sceneOperation = (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
-            
+            var sceneOperation =
+                (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
+
             await sceneOperation.OnUnload();
-            
+
             await SceneReference.UnloadScene();
         }
 
-        public override List<SceneReference> GetSceneReferences()
-        {
-            return new List<SceneReference>{SceneReference};
-        }
+        public override List<SceneReference> GetSceneReferences() => new() { SceneReference };
     }
 }

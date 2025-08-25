@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.IO;
+using OdinSerializer.Utilities;
+
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using System.IO;
-
     internal sealed class CachedMemoryStream : ICacheNotificationReceiver
     {
         public static int InitialCapacity = 1024 * 1; // Initial capacity of 1 kb
@@ -28,39 +28,36 @@ namespace OdinSerializer
 
         private MemoryStream memoryStream;
 
+        public CachedMemoryStream() => memoryStream = new MemoryStream(InitialCapacity);
+
         public MemoryStream MemoryStream
         {
             get
             {
-                if (!this.memoryStream.CanRead)
+                if (!memoryStream.CanRead)
                 {
-                    this.memoryStream = new MemoryStream(InitialCapacity);
+                    memoryStream = new MemoryStream(InitialCapacity);
                 }
 
-                return this.memoryStream;
+                return memoryStream;
             }
-        }
-
-        public CachedMemoryStream()
-        {
-            this.memoryStream = new MemoryStream(InitialCapacity);
         }
 
         public void OnFreed()
         {
-            this.memoryStream.SetLength(0);
-            this.memoryStream.Position = 0;
+            memoryStream.SetLength(0);
+            memoryStream.Position = 0;
 
-            if (this.memoryStream.Capacity > MaxCapacity)
+            if (memoryStream.Capacity > MaxCapacity)
             {
-                this.memoryStream.Capacity = MaxCapacity;
+                memoryStream.Capacity = MaxCapacity;
             }
         }
 
         public void OnClaimed()
         {
-            this.memoryStream.SetLength(0);
-            this.memoryStream.Position = 0;
+            memoryStream.SetLength(0);
+            memoryStream.Position = 0;
         }
 
         public static Cache<CachedMemoryStream> Claim(int minCapacity)

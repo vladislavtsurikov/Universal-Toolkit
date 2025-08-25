@@ -6,22 +6,16 @@ namespace VladislavTsurikov.ObjectPool.Runtime
     public class HashSetPoolCollection<T> : PoolCollection<T> where T : class
     {
         private readonly HashSet<T> _hashSet;
-        
+
         public HashSetPoolCollection() : this(10)
         {
         }
 
-        public HashSetPoolCollection(int initialCapacity)
-        {
-            _hashSet = new HashSet<T>(initialCapacity);
-        }
+        public HashSetPoolCollection(int initialCapacity) => _hashSet = new HashSet<T>(initialCapacity);
 
         public override int Count => _hashSet.Count;
 
-        public override void Add(T item)
-        {
-            _hashSet.Add(item);
-        }
+        public override void Add(T item) => _hashSet.Add(item);
 
         public override T Remove()
         {
@@ -30,14 +24,8 @@ namespace VladislavTsurikov.ObjectPool.Runtime
             return item;
         }
 
-        public override bool Contains(T item)
-        {
-            return _hashSet.Contains(item);
-        }
-        
-        public override void Clear()
-        {
-            _hashSet.Clear();
-        }
+        public override bool Contains(T item) => _hashSet.Contains(item);
+
+        public override void Clear() => _hashSet.Clear();
     }
 }

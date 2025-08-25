@@ -34,10 +34,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             {
                 return new AABB(mesh.bounds);
             }
-            else
-            {
-                return new AABB(Vector3.zero, Vector3.one);
-            }
+
+            return new AABB(Vector3.zero, Vector3.one);
         }
     }
 }

@@ -44,10 +44,10 @@ AppendStructuredBuffer<InstanceShaderData> MergeBuffer;
 
 void Add(uint id, StructuredBuffer<InstanceShaderData> buffer, uint count)
 {
-	if (id < count)
-	{
-	    MergeBuffer.Append(buffer[id]);
-	}
+    if (id < count)
+    {
+        MergeBuffer.Append(buffer[id]);
+    }
 }
 
 [numthreads(THREADS, 1, 1)]

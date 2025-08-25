@@ -1,4 +1,5 @@
 ﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.StreamingRules.StreamingRulesSystem
 {
@@ -7,10 +8,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.Strea
     public class ImmediatelyLoading : StreamingRule
     {
         public float MaxDistance = 2000;
-        
-        public override bool ShowActiveToggle()
-        {
-            return false;
-        }
+
+        public override bool ShowActiveToggle() => false;
     }
 }

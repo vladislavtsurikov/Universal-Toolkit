@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,6 +23,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 {
                     return false;
                 }
+
                 return true;
             }
 
@@ -32,16 +34,16 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
             return true;
         }
-        
+
         public static GameObject GetPrefabRoot(GameObject gameObject)
         {
             if (gameObject == null)
             {
                 return null;
             }
-            
+
 #if UNITY_EDITOR
-            if(PrefabUtility.GetPrefabAssetType(gameObject) == PrefabAssetType.NotAPrefab)
+            if (PrefabUtility.GetPrefabAssetType(gameObject) == PrefabAssetType.NotAPrefab)
             {
                 return gameObject;
             }
@@ -59,24 +61,24 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 gameObject.transform.SetParent(parent.transform, true);
             }
         }
-        
+
         public static GameObject FindParentGameObject(string gameObjectName, Scene scene)
         {
             GameObject container = null;
-            
+
             GameObject[] sceneRoots = scene.GetRootGameObjects();
-			foreach(GameObject root in sceneRoots)
-			{
-				if(root.name == gameObjectName) 
+            foreach (GameObject root in sceneRoots)
+            {
+                if (root.name == gameObjectName)
                 {
-					container = root.transform.gameObject;
+                    container = root.transform.gameObject;
                     break;
-				}
-			} 
+                }
+            }
 
             if (container == null)
             {
-                GameObject childObject = new GameObject(gameObjectName);
+                var childObject = new GameObject(gameObjectName);
                 SceneManager.MoveGameObjectToScene(childObject, scene);
                 container = childObject.transform.gameObject;
             }
@@ -88,7 +90,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         {
             List<Object> components = FindObjectsOfType(type, scene, getActiveGameObject);
 
-            if(components.Count == 0)
+            if (components.Count == 0)
             {
                 return null;
             }
@@ -98,9 +100,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static List<Object> FindObjectsOfType(Type type, bool getActiveGameObject = false)
         {
-            List<Object> objects = new List<Object>();
-            
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            var objects = new List<Object>();
+
+            for (var i = 0; i < SceneManager.sceneCount; i++)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
 
@@ -112,18 +114,18 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static List<Object> FindObjectsOfType(Type type, Scene scene, bool getActiveGameObject = false)
         {
-            if(!scene.isLoaded)
+            if (!scene.isLoaded)
             {
                 return new List<Object>();
             }
-            
-            List<Object> componentList = new List<Object>();
 
-            foreach (var gameObject in GetSceneObjects(scene))
+            var componentList = new List<Object>();
+
+            foreach (GameObject gameObject in GetSceneObjects(scene))
             {
                 if (getActiveGameObject)
                 {
-                    if(!gameObject.activeInHierarchy)
+                    if (!gameObject.activeInHierarchy)
                     {
                         continue;
                     }
@@ -134,22 +136,22 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
             return componentList;
         }
-        
+
         public static GameObject[] GetSceneObjects(Scene scene)
         {
             var roots = new List<GameObject>(Mathf.Max(1, scene.rootCount));
             scene.GetRootGameObjects(roots);
-            List<GameObject> sceneObjects = new List<GameObject>(Mathf.Max(1, scene.rootCount * 5));
+            var sceneObjects = new List<GameObject>(Mathf.Max(1, scene.rootCount * 5));
 
-            foreach (var root in roots)
+            foreach (GameObject root in roots)
             {
-                var allChildrenAndSelf = root.GetAllChildrenAndSelf();
+                List<GameObject> allChildrenAndSelf = root.GetAllChildrenAndSelf();
                 sceneObjects.AddRange(allChildrenAndSelf);
             }
 
             return sceneObjects.ToArray();
-        }    
-        
+        }
+
         public static T CopyComponent<T>(T original, GameObject destination) where T : Component
         {
             Type type = original.GetType();
@@ -159,8 +161,8 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 dst = destination.AddComponent(type) as T;
             }
 
-            var fields = type.GetFields();
-            foreach (var field in fields)
+            FieldInfo[] fields = type.GetFields();
+            foreach (FieldInfo field in fields)
             {
                 if (field.IsStatic)
                 {
@@ -169,9 +171,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
                 field.SetValue(dst, field.GetValue(original));
             }
-			
-            var props = type.GetProperties();
-            foreach (var prop in props)
+
+            PropertyInfo[] props = type.GetProperties();
+            foreach (PropertyInfo prop in props)
             {
                 if (!prop.CanWrite || prop.Name == "name")
                 {
@@ -180,16 +182,17 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
                 prop.SetValue(dst, prop.GetValue(original, null), null);
             }
+
             return dst;
         }
-        
+
         public static void Unspawn(List<GameObject> unspawnPrefabs)
         {
             GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
 
-            for (int index = 0; index < allGameObjects.Length; index++)
+            for (var index = 0; index < allGameObjects.Length; index++)
             {
-                foreach (var prefab in unspawnPrefabs)
+                foreach (GameObject prefab in unspawnPrefabs)
                 {
                     if (IsSameGameObject(prefab, allGameObjects[index]))
                     {
@@ -199,7 +202,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 }
             }
         }
-        
+
         public static Bounds CalculateBoundsInstantiate(GameObject go)
         {
             if (!go)
@@ -226,21 +229,22 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static Bounds CalculateBounds(GameObject go)
         {
-            Bounds combinedbounds = new Bounds(go.transform.position, Vector3.zero);
+            var combinedbounds = new Bounds(go.transform.position, Vector3.zero);
             Renderer[] renderers = go.GetComponentsInChildren<Renderer>();
             foreach (Renderer renderer in renderers)
             {
                 if (renderer is SkinnedMeshRenderer)
                 {
-                    SkinnedMeshRenderer skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
-                    Mesh mesh = new Mesh();
+                    var skinnedMeshRenderer = renderer as SkinnedMeshRenderer;
+                    var mesh = new Mesh();
                     skinnedMeshRenderer.BakeMesh(mesh);
                     Vector3[] vertices = mesh.vertices;
 
-                    for (int i = 0; i <= vertices.Length - 1; i++)
+                    for (var i = 0; i <= vertices.Length - 1; i++)
                     {
                         vertices[i] = skinnedMeshRenderer.transform.TransformPoint(vertices[i]);
                     }
+
                     mesh.vertices = vertices;
                     mesh.RecalculateBounds();
                     Bounds meshBounds = mesh.bounds;
@@ -251,9 +255,10 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                     combinedbounds.Encapsulate(renderer.bounds);
                 }
             }
+
             return combinedbounds;
         }
-        
+
         public static int GetLODCount(GameObject go)
         {
             LODGroup lodGroup = go.GetComponentInChildren<LODGroup>();
@@ -287,22 +292,20 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
                 return lod.renderers.Length > 0 ? lod.renderers[0].gameObject : null;
             }
-            else
+
+            MeshRenderer meshRenderer = go.GetComponent<MeshRenderer>();
+            if (meshRenderer)
             {
-                var meshRenderer = go.GetComponent<MeshRenderer>();
-                if (meshRenderer)
-                {
-                    return meshRenderer.gameObject;
-                }
-
-                meshRenderer = go.GetComponentInChildren<MeshRenderer>();
-                if (meshRenderer)
-                {
-                    return meshRenderer.gameObject;
-                }
-
-                return null;
+                return meshRenderer.gameObject;
             }
+
+            meshRenderer = go.GetComponentInChildren<MeshRenderer>();
+            if (meshRenderer)
+            {
+                return meshRenderer.gameObject;
+            }
+
+            return null;
         }
     }
 }

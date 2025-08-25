@@ -16,22 +16,25 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// <para>
-    /// Applying this attribute to a type indicates that in the case where, when expecting to deserialize an instance of the type
-    /// or any of its derived types, but encountering an incompatible, uncastable type in the data being read, the serializer
-    /// should attempt to deserialize an instance of the expected type using the stored, possibly invalid data.
-    /// </para>
-    /// <para>
-    /// This is equivalent to the <see cref="SerializationConfig.AllowDeserializeInvalidData"/> option, expect type-specific instead
-    /// of global.
-    /// </para>
+    ///     <para>
+    ///         Applying this attribute to a type indicates that in the case where, when expecting to deserialize an instance
+    ///         of the type
+    ///         or any of its derived types, but encountering an incompatible, uncastable type in the data being read, the
+    ///         serializer
+    ///         should attempt to deserialize an instance of the expected type using the stored, possibly invalid data.
+    ///     </para>
+    ///     <para>
+    ///         This is equivalent to the <see cref="SerializationConfig.AllowDeserializeInvalidData" /> option, expect
+    ///         type-specific instead
+    ///         of global.
+    ///     </para>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public class AllowDeserializeInvalidDataAttribute : Attribute
     {
     }

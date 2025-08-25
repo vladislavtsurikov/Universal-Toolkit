@@ -1,7 +1,5 @@
-﻿using Unity.Burst;
-using Unity.Collections;
+﻿using Unity.Collections;
 using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
 using VladislavTsurikov.Utility.Runtime;
 
@@ -10,7 +8,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
     [BurstCompile(CompileSynchronously = true)]
     public struct UnityTerranCellSampleJob : IJobParallelFor
     {
-        [ReadOnly] public NativeArray<float> InputHeights;
+        [ReadOnly]
+        public NativeArray<float> InputHeights;
+
         public NativeArray<Bounds> CellBoundsList;
         public int HeightmapWidth;
         public int HeightmapHeight;
@@ -23,7 +23,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         {
             Bounds cellBounds = CellBoundsList[index];
             Rect cellRect = RectExtension.CreateRectFromBounds(cellBounds);
-            if (!TerrainRect.Overlaps(cellRect)) return;
+            if (!TerrainRect.Overlaps(cellRect))
+            {
+                return;
+            }
 
             float2 worldspaceCellCorner = new float2(cellBounds.center.x - cellBounds.extents.x,
                 cellBounds.center.z - cellBounds.extents.z);
@@ -32,31 +35,39 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
             float2 heightmapPosition = new float2(terrainspaceCellCorner.x / HeightMapScale.x,
                 terrainspaceCellCorner.y / HeightMapScale.z);
 
-            int xCount = Mathf.CeilToInt(cellRect.width / HeightMapScale.x);
-            int zCount = Mathf.CeilToInt(cellRect.height / HeightMapScale.z);
+            var xCount = Mathf.CeilToInt(cellRect.width / HeightMapScale.x);
+            var zCount = Mathf.CeilToInt(cellRect.height / HeightMapScale.z);
 
-            int xStart = Mathf.FloorToInt(heightmapPosition.x);
-            int zStart = Mathf.FloorToInt(heightmapPosition.y);
+            var xStart = Mathf.FloorToInt(heightmapPosition.x);
+            var zStart = Mathf.FloorToInt(heightmapPosition.y);
 
-            float minHeight = float.MaxValue;
-            float maxHeight = float.MinValue;
-            for (int x = xStart; x <= xStart + xCount; x++)
+            var minHeight = float.MaxValue;
+            var maxHeight = float.MinValue;
+            for (var x = xStart; x <= xStart + xCount; x++)
+            for (var z = zStart; z <= zStart + zCount; z++)
             {
-                for (int z = zStart; z <= zStart + zCount; z++)
+                var heightSample = GetHeight(x, z);
+                if (heightSample < minHeight)
                 {
-                    float heightSample = GetHeight(x, z);
-                    if (heightSample < minHeight) minHeight = heightSample;
-                    if (heightSample > maxHeight) maxHeight = heightSample;
+                    minHeight = heightSample;
+                }
+
+                if (heightSample > maxHeight)
+                {
+                    maxHeight = heightSample;
                 }
             }
 
-            if (maxHeight + TerrainPosition.y < MinHeightCells) return;
+            if (maxHeight + TerrainPosition.y < MinHeightCells)
+            {
+                return;
+            }
 
-            float centerY = (maxHeight + minHeight) / 2f;
-            float height = maxHeight - minHeight;
+            var centerY = (maxHeight + minHeight) / 2f;
+            var height = maxHeight - minHeight;
             cellBounds = new Bounds(
-                    new Vector3(cellBounds.center.x, centerY + TerrainPosition.y, cellBounds.center.z),
-                    new Vector3(cellBounds.size.x, height, cellBounds.size.z));
+                new Vector3(cellBounds.center.x, centerY + TerrainPosition.y, cellBounds.center.z),
+                new Vector3(cellBounds.size.x, height, cellBounds.size.z));
             CellBoundsList[index] = cellBounds;
         }
 

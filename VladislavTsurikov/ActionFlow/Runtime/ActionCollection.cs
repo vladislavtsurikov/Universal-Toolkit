@@ -1,7 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ActionFlow.Runtime.Actions;
+using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 
 namespace VladislavTsurikov.ActionFlow.Runtime
 {
@@ -9,10 +9,10 @@ namespace VladislavTsurikov.ActionFlow.Runtime
     {
         public async UniTask<bool> Run(CancellationToken token = default)
         {
-            foreach (var action in ElementList)
+            foreach (Action action in ElementList)
             {
                 token.ThrowIfCancellationRequested();
-                bool isActionCompleted =  await action.RunAction(token);
+                var isActionCompleted = await action.RunAction(token);
 
                 if (!isActionCompleted)
                 {

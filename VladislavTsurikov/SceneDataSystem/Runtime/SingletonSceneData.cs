@@ -4,11 +4,12 @@ using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
 {
-    public class SingletonSceneData<T> : SceneData where T: SceneData
+    public class SingletonSceneData<T> : SceneData where T : SceneData
     {
         private static bool _setup;
         private static T _instance;
-        public static T Instance 
+
+        public static T Instance
         {
             get
             {
@@ -16,17 +17,16 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                 {
                     return _instance;
                 }
-                else
+
+                if (SceneDataStackUtility.HasMultipleSceneData<T>())
                 {
-                    if (SceneDataStackUtility.HasMultipleSceneData<T>())
-                    {
-                        Debug.LogError("There are several types of " + typeof(T) + " at the level, but there should be only one");
-                        return null;
-                    }
-                    
-                    RequiredSceneData.Create<T>(); 
-                    return Get();
+                    Debug.LogError("There are several types of " + typeof(T) +
+                                   " at the level, but there should be only one");
+                    return null;
                 }
+
+                RequiredSceneData.Create<T>();
+                return Get();
             }
         }
 
@@ -36,30 +36,31 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
             {
                 Setup();
             }
-            
-            if(!_setup || _instance == null || _instance.SceneDataManager == null || !_instance.SceneDataManager.Scene.isLoaded)
+
+            if (!_setup || _instance == null || _instance.SceneDataManager == null ||
+                !_instance.SceneDataManager.Scene.isLoaded)
             {
                 _setup = true;
                 List<T> sceneDatas = SceneDataStackUtility.GetAllSceneData<T>();
 
                 if (sceneDatas.Count > 1)
                 {
-                    Debug.LogError("There are several types of " + typeof(T) + " at the level, but there should be only one");
+                    Debug.LogError("There are several types of " + typeof(T) +
+                                   " at the level, but there should be only one");
                     _instance = null;
                     return null;
                 }
-                else if (sceneDatas.Count == 1)
+
+                if (sceneDatas.Count == 1)
                 {
                     _instance = sceneDatas[0];
                     return _instance;
                 }
-                else
-                {
-                    _instance = null;
-                    return _instance;
-                }
+
+                _instance = null;
+                return _instance;
             }
-            
+
             return _instance;
         }
 
@@ -69,9 +70,6 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
             OnSetupEvent += CheckValid;
         }
 
-        private static void CheckValid()
-        {
-            _setup = false;
-        }
+        private static void CheckValid() => _setup = false;
     }
 }

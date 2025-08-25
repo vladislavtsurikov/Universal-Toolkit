@@ -7,12 +7,12 @@ namespace VladislavTsurikov.Undo.Editor.GameObject
 {
     public class GameObjectTransform : UndoRecord
     {
-        private readonly List<TransformData> _transformList = new List<TransformData>();
+        private readonly List<TransformData> _transformList = new();
 
-        public GameObjectTransform(UnityEngine.GameObject gameObject) 
+        public GameObjectTransform(UnityEngine.GameObject gameObject)
         {
             UnityEngine.GameObject prefabRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
-            
+
             _transformList.Add(new TransformData(prefabRoot));
         }
 
@@ -49,9 +49,9 @@ namespace VladislavTsurikov.Undo.Editor.GameObject
                 {
                     return;
                 }
-            
+
                 _gameObject.transform.position = _instance.Position;
-                _gameObject.transform.localScale = _instance.Scale; 
+                _gameObject.transform.localScale = _instance.Scale;
                 _gameObject.transform.rotation = _instance.Rotation;
             }
         }

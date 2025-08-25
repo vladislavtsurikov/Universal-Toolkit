@@ -5,6 +5,6 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
     public class Actions : SerializedMonoBehaviour
     {
         [OdinSerialize]
-        public ActionCollection ActionCollection = new ActionCollection();
+        public ActionCollection ActionCollection = new();
     }
 }

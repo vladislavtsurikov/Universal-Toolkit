@@ -15,15 +15,12 @@ namespace VladislavTsurikov.Math.Runtime
             Radius = radius;
             IsValid = true;
         }
-        
-        public bool Contains(Vector3 point)
-        {
-            return Vector3.Distance(point, Center) <= Radius;
-        }
-        
+
+        public bool Contains(Vector3 point) => Vector3.Distance(point, Center) <= Radius;
+
         public bool Intersects(Sphere otherSphere)
         {
-            float distance = Vector3.Distance(Center, otherSphere.Center);
+            var distance = Vector3.Distance(Center, otherSphere.Center);
 
             if (distance < Radius + otherSphere.Radius)
             {
@@ -32,15 +29,9 @@ namespace VladislavTsurikov.Math.Runtime
 
             return false;
         }
-        
-        public bool Intersects(OBB obb)
-        {
-            return obb.IntersectsSphere(Center, Radius);
-        }
-        
-        public bool Intersects(AABB aabb)
-        {
-            return aabb.IntersectsSphere(Center, Radius);
-        }
+
+        public bool Intersects(OBB obb) => obb.IntersectsSphere(Center, Radius);
+
+        public bool Intersects(AABB aabb) => aabb.IntersectsSphere(Center, Radius);
     }
 }

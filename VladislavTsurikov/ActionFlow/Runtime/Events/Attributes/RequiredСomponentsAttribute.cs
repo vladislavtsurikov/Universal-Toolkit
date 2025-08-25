@@ -2,14 +2,11 @@ using System;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Events
 {
-    [AttributeUsage(AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class RequiredComponentsAttribute : Attribute
     {
-        public Type[] RequiredTypes { get; }
+        public RequiredComponentsAttribute(params Type[] requiredTypes) => RequiredTypes = requiredTypes;
 
-        public RequiredComponentsAttribute(params Type[] requiredTypes)
-        {
-            RequiredTypes = requiredTypes;
-        }
+        public Type[] RequiredTypes { get; }
     }
 }

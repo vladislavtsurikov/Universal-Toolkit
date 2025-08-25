@@ -8,13 +8,9 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 
         public ComputeBufferProperty()
         {
-            
         }
 
-        public ComputeBufferProperty(ComputeBuffer computeBuffer)
-        {
-            ComputeBuffer = computeBuffer;
-        }
+        public ComputeBufferProperty(ComputeBuffer computeBuffer) => ComputeBuffer = computeBuffer;
 
         public void ChangeComputeBuffer(ComputeBuffer computeBuffer)
         {

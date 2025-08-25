@@ -12,23 +12,23 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
     [InitializeOnLoad]
     public class GameObjectColliderUtility
     {
-        static GameObjectColliderUtility()
-        {
-            GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene += RegisterGameObjectToCurrentScene;
-        }
-        
+        static GameObjectColliderUtility() =>
+            GameObjectCollider.Editor.GameObjectCollider.RegisterGameObjectToCurrentScene +=
+                RegisterGameObjectToCurrentScene;
+
         public static void RegisterGameObjectToCurrentScene(GameObject gameObject)
         {
             if (gameObject == null)
             {
                 return;
             }
-            
+
             ChangeGameObjectSceneIfNecessary(gameObject);
 
             List<SceneDataManager> sceneDataManagers =
-                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
-            
+                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position,
+                    Runtime.Sectorize.Sectorize.GetSectorLayerTag(), false);
+
             if (sceneDataManagers.Count == 0)
             {
                 return;
@@ -36,44 +36,51 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.GameObjectColliderInt
 
             SceneDataManager sceneDataManager = sceneDataManagers[0];
 
-            GameObjectCollider.Editor.GameObjectCollider gameObjectCollider = 
-                (GameObjectCollider.Editor.GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(typeof(GameObjectCollider.Editor.GameObjectCollider));
-            
-            if(gameObjectCollider == null)
+            var gameObjectCollider =
+                (GameObjectCollider.Editor.GameObjectCollider)sceneDataManager.SceneDataStack.GetElement(
+                    typeof(GameObjectCollider.Editor.GameObjectCollider));
+
+            if (gameObjectCollider == null)
             {
-                SceneDataStackUtility.InstanceSceneData<GameObjectCollider.Editor.GameObjectCollider>(sceneDataManager.Scene);
+                SceneDataStackUtility.InstanceSceneData<GameObjectCollider.Editor.GameObjectCollider>(sceneDataManager
+                    .Scene);
             }
             else
             {
                 gameObjectCollider.RegisterGameObjectWithChildren(gameObject);
             }
         }
-        
+
         private static void ChangeGameObjectSceneIfNecessary(GameObject gameObject)
         {
             List<SceneDataManager> sceneDataManagers =
-                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position, Runtime.Sectorize.Sectorize.GetSectorLayerTag(),
+                SceneDataManagerFinder.OverlapPosition(gameObject.transform.position,
+                    Runtime.Sectorize.Sectorize.GetSectorLayerTag(),
                     false);
 
-            if (sceneDataManagers.Count <= 1) return;
-            
+            if (sceneDataManagers.Count <= 1)
+            {
+                return;
+            }
+
             SceneDataManager sceneDataManager = sceneDataManagers[0];
 
-            if(gameObject.scene != sceneDataManager.Scene)
+            if (gameObject.scene != sceneDataManager.Scene)
             {
                 GameObject prefabRoot = GameObjectUtility.GetPrefabRoot(gameObject);
 
-                if(prefabRoot != null)
+                if (prefabRoot != null)
                 {
-                    if(prefabRoot.transform.parent != null)
+                    if (prefabRoot.transform.parent != null)
                     {
-                        string prefabParentName = prefabRoot.transform.parent.gameObject.name;
+                        var prefabParentName = prefabRoot.transform.parent.gameObject.name;
 
                         prefabRoot.transform.parent = null;
 
                         SceneManager.MoveGameObjectToScene(prefabRoot, sceneDataManager.Scene);
 
-                        GameObject parent = GameObjectUtility.FindParentGameObject(prefabParentName, sceneDataManager.Scene);
+                        GameObject parent =
+                            GameObjectUtility.FindParentGameObject(prefabParentName, sceneDataManager.Scene);
 
                         GameObjectUtility.ParentGameObject(prefabRoot, parent);
                     }

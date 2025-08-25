@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     public interface IAskIfCanFormatTypes
     {
         bool CanFormatType(Type type);

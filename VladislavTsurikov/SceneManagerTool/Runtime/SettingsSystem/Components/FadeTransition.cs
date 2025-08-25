@@ -1,7 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.Callbacks.SceneOperation;
 using VladislavTsurikov.SceneUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
@@ -16,21 +16,23 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
     [SceneCollectionComponent]
     public class FadeTransition : SettingsComponent
     {
-        public SceneReference SceneReference = new SceneReference();
-        
-        internal static async UniTask LoadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+        public SceneReference SceneReference = new();
+
+        internal static async UniTask LoadFadeIfNecessary(
+            ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
-            FadeTransition fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
+            var fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
 
             if (fadeTransition != null)
             {
                 await fadeTransition.LoadFadeIfNecessary();
             }
         }
-        
-        internal static async UniTask UnloadFadeIfNecessary(ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
+
+        internal static async UniTask UnloadFadeIfNecessary(
+            ComponentStackOnlyDifferentTypes<SettingsComponent> settingsList)
         {
-            FadeTransition fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
+            var fadeTransition = (FadeTransition)settingsList.GetElement(typeof(FadeTransition));
 
             if (fadeTransition != null)
             {
@@ -49,28 +51,27 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
             }
         }
 #endif
-        
+
         private async UniTask LoadFadeIfNecessary()
         {
             await SceneReference.LoadScene();
-            
-            SceneOperation sceneOperation = (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
-            
+
+            var sceneOperation =
+                (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
+
             await sceneOperation.OnLoad();
         }
 
         private async UniTask UnloadFadeIfNecessary()
         {
-            SceneOperation sceneOperation = (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
-            
+            var sceneOperation =
+                (SceneOperation)GameObjectUtility.FindObjectsOfType(typeof(SceneOperation), SceneReference.Scene)[0];
+
             await sceneOperation.OnUnload();
-            
+
             await SceneReference.UnloadScene();
         }
 
-        public override List<SceneReference> GetSceneReferences()
-        {
-            return new List<SceneReference>{SceneReference};
-        }
+        public override List<SceneReference> GetSceneReferences() => new() { SceneReference };
     }
 }

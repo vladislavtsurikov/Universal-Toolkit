@@ -7,41 +7,39 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
     public class TerrainsMaskManager
     {
-        private readonly List<TerrainsMaskItem> _itemList = new List<TerrainsMaskItem>();
+        private readonly List<TerrainsMaskItem> _itemList = new();
 
         public float GetFitness(Group group, MaskFilterComponentSettings maskFilterComponentSettings, Vector3 point)
         {
-            foreach (var item in _itemList)
+            foreach (TerrainsMaskItem item in _itemList)
             {
                 if (item.MaskFilterComponentSettings == maskFilterComponentSettings)
                 {
                     return item.GetFitness(group, point);
                 }
             }
-            
-            TerrainsMaskItem localTerrainsMaskItem = new TerrainsMaskItem(maskFilterComponentSettings);
+
+            var localTerrainsMaskItem = new TerrainsMaskItem(maskFilterComponentSettings);
             _itemList.Add(localTerrainsMaskItem);
             return localTerrainsMaskItem.GetFitness(group, point);
         }
-        
-        public float GetFitness(Group group, MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain, Vector3 point)
+
+        public float GetFitness(Group group, MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain,
+            Vector3 point)
         {
-            foreach (var item in _itemList)
+            foreach (TerrainsMaskItem item in _itemList)
             {
                 if (item.MaskFilterComponentSettings == maskFilterComponentSettings)
                 {
                     return item.GetFitness(group, terrain, point);
                 }
             }
-            
-            TerrainsMaskItem localTerrainsMaskItem = new TerrainsMaskItem(maskFilterComponentSettings);
+
+            var localTerrainsMaskItem = new TerrainsMaskItem(maskFilterComponentSettings);
             _itemList.Add(localTerrainsMaskItem);
             return localTerrainsMaskItem.GetFitness(group, terrain, point);
         }
-        
-        public void Dispose()
-        {
-            _itemList.Clear();
-        }
+
+        public void Dispose() => _itemList.Clear();
     }
 }

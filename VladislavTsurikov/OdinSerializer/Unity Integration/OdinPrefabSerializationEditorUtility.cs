@@ -17,22 +17,37 @@
 //-----------------------------------------------------------------------
 
 //#define PREFAB_DEBUG
+
+using System;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
 #if UNITY_EDITOR
 namespace OdinSerializer
 {
-    using System;
-    using System.Reflection;
-    using UnityEditor;
-    using UnityEngine;
-
     public static class OdinPrefabSerializationEditorUtility
     {
         private static bool? hasNewPrefabWorkflow;
-        private static MethodInfo PrefabUtility_GetPrefabAssetType_Method = typeof(PrefabUtility).GetMethod("GetPrefabAssetType", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(UnityEngine.Object) }, null);
-        private static MethodInfo PrefabUtility_GetPrefabParent_Method = typeof(PrefabUtility).GetMethod("GetPrefabParent", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(UnityEngine.Object) }, null);
-        private static MethodInfo PrefabUtility_GetCorrespondingObjectFromSource_Method = typeof(PrefabUtility).GetMethod("GetCorrespondingObjectFromSource", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(UnityEngine.Object) }, null);
-        private static MethodInfo PrefabUtility_GetPrefabType_Method = typeof(PrefabUtility).GetMethod("GetPrefabType", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(UnityEngine.Object) }, null);
-        private static MethodInfo PrefabUtility_ApplyPropertyOverride_Method;
+
+        private static readonly MethodInfo PrefabUtility_GetPrefabAssetType_Method =
+            typeof(PrefabUtility).GetMethod("GetPrefabAssetType", BindingFlags.Public | BindingFlags.Static, null,
+                new[] { typeof(Object) }, null);
+
+        private static readonly MethodInfo PrefabUtility_GetPrefabParent_Method =
+            typeof(PrefabUtility).GetMethod("GetPrefabParent", BindingFlags.Public | BindingFlags.Static, null,
+                new[] { typeof(Object) }, null);
+
+        private static readonly MethodInfo PrefabUtility_GetCorrespondingObjectFromSource_Method =
+            typeof(PrefabUtility).GetMethod("GetCorrespondingObjectFromSource",
+                BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(Object) }, null);
+
+        private static readonly MethodInfo PrefabUtility_GetPrefabType_Method =
+            typeof(PrefabUtility).GetMethod("GetPrefabType", BindingFlags.Public | BindingFlags.Static, null,
+                new[] { typeof(Object) }, null);
+
+        private static readonly MethodInfo PrefabUtility_ApplyPropertyOverride_Method;
 
         static OdinPrefabSerializationEditorUtility()
         {
@@ -40,7 +55,9 @@ namespace OdinSerializer
 
             if (interactionModeEnum != null)
             {
-                PrefabUtility_ApplyPropertyOverride_Method = typeof(PrefabUtility).GetMethod("ApplyPropertyOverride", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(SerializedProperty), typeof(string), interactionModeEnum }, null);
+                PrefabUtility_ApplyPropertyOverride_Method = typeof(PrefabUtility).GetMethod("ApplyPropertyOverride",
+                    BindingFlags.Public | BindingFlags.Static, null,
+                    new[] { typeof(SerializedProperty), typeof(string), interactionModeEnum }, null);
             }
         }
 
@@ -57,21 +74,20 @@ namespace OdinSerializer
             }
         }
 
-        public static bool HasApplyPropertyOverride
-        {
-            get
-            {
-                return PrefabUtility_ApplyPropertyOverride_Method != null;
-            }
-        }
+        public static bool HasApplyPropertyOverride => PrefabUtility_ApplyPropertyOverride_Method != null;
 
         private static bool DetectNewPrefabWorkflow()
         {
             try
             {
-                var method = typeof(PrefabUtility).GetMethod("GetPrefabType", BindingFlags.Public | BindingFlags.Static, null, new Type[] { typeof(UnityEngine.Object) }, null);
+                MethodInfo method = typeof(PrefabUtility).GetMethod("GetPrefabType",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null, new[] { typeof(Object) }, null);
 
-                if (method == null) return true;
+                if (method == null)
+                {
+                    return true;
+                }
 
                 if (method.IsDefined(typeof(ObsoleteAttribute), false))
                 {
@@ -89,26 +105,40 @@ namespace OdinSerializer
         public static void ApplyPropertyOverride(SerializedProperty instanceProperty, string assetPath)
         {
             //PrefabUtility.ApplyPropertyOverride(instanceProperty, assetPath, InteractionMode.AutomatedAction);
-            if (!HasApplyPropertyOverride) throw new NotSupportedException("PrefabUtility.ApplyPropertyOverride doesn't exist in this version of Unity");
+            if (!HasApplyPropertyOverride)
+            {
+                throw new NotSupportedException(
+                    "PrefabUtility.ApplyPropertyOverride doesn't exist in this version of Unity");
+            }
+
             PrefabUtility_ApplyPropertyOverride_Method.Invoke(null, new object[] { instanceProperty, assetPath, 0 });
         }
 
-        public static bool ObjectIsPrefabInstance(UnityEngine.Object unityObject)
+        public static bool ObjectIsPrefabInstance(Object unityObject)
         {
             if (PrefabUtility_GetPrefabType_Method != null)
             {
                 try
                 {
-                    int prefabType = Convert.ToInt32((Enum)PrefabUtility_GetPrefabType_Method.Invoke(null, new object[] { unityObject }));
+                    var prefabType =
+                        Convert.ToInt32(
+                            (Enum)PrefabUtility_GetPrefabType_Method.Invoke(null, new object[] { unityObject }));
                     // PrefabType.PrefabInstance == 3
-                    if (prefabType == 3) return true;
+                    if (prefabType == 3)
+                    {
+                        return true;
+                    }
                 }
-                catch (Exception) { }
+                catch (Exception)
+                {
+                }
             }
 
             if (PrefabUtility_GetPrefabAssetType_Method != null)
             {
-                int prefabAssetType = Convert.ToInt32((Enum)PrefabUtility_GetPrefabAssetType_Method.Invoke(null, new object[] { unityObject }));
+                var prefabAssetType =
+                    Convert.ToInt32(
+                        (Enum)PrefabUtility_GetPrefabAssetType_Method.Invoke(null, new object[] { unityObject }));
                 // 1 = PrefabAssetType.Regular
                 // 3 = PrefabAssetType.Variant
                 return prefabAssetType == 1 || prefabAssetType == 3;
@@ -116,39 +146,54 @@ namespace OdinSerializer
 
             if (PrefabUtility_GetPrefabType_Method == null && PrefabUtility_GetPrefabAssetType_Method == null)
             {
-                Debug.LogError("Neither PrefabUtility.GetPrefabType or PrefabUtility.GetPrefabAssetType methods could be located. Prefab functionality will likely be broken in this build of Odin.");
+                Debug.LogError(
+                    "Neither PrefabUtility.GetPrefabType or PrefabUtility.GetPrefabAssetType methods could be located. Prefab functionality will likely be broken in this build of Odin.");
             }
 
             return GetCorrespondingObjectFromSource(unityObject) != null;
         }
 
-        public static bool ObjectHasNestedOdinPrefabData(UnityEngine.Object unityObject)
+        public static bool ObjectHasNestedOdinPrefabData(Object unityObject)
         {
-            if (!HasNewPrefabWorkflow) return false;
-            if (!(unityObject is ISupportsPrefabSerialization)) return false;
-            var prefab = GetCorrespondingObjectFromSource(unityObject);
+            if (!HasNewPrefabWorkflow)
+            {
+                return false;
+            }
+
+            if (!(unityObject is ISupportsPrefabSerialization))
+            {
+                return false;
+            }
+
+            Object prefab = GetCorrespondingObjectFromSource(unityObject);
             return IsOdinSerializedPrefabInstance(prefab);
         }
 
-        private static bool IsOdinSerializedPrefabInstance(UnityEngine.Object unityObject)
+        private static bool IsOdinSerializedPrefabInstance(Object unityObject)
         {
-            if (!(unityObject is ISupportsPrefabSerialization)) return false;
+            if (!(unityObject is ISupportsPrefabSerialization))
+            {
+                return false;
+            }
+
             return GetCorrespondingObjectFromSource(unityObject) != null;
         }
 
-        public static UnityEngine.Object GetCorrespondingObjectFromSource(UnityEngine.Object unityObject)
+        public static Object GetCorrespondingObjectFromSource(Object unityObject)
         {
             if (PrefabUtility_GetCorrespondingObjectFromSource_Method != null)
             {
-                return (UnityEngine.Object)PrefabUtility_GetCorrespondingObjectFromSource_Method.Invoke(null, new object[] { unityObject });
+                return (Object)PrefabUtility_GetCorrespondingObjectFromSource_Method.Invoke(null,
+                    new object[] { unityObject });
             }
 
             if (PrefabUtility_GetPrefabParent_Method != null)
             {
-                return (UnityEngine.Object)PrefabUtility_GetPrefabParent_Method.Invoke(null, new object[] { unityObject });
+                return (Object)PrefabUtility_GetPrefabParent_Method.Invoke(null, new object[] { unityObject });
             }
 
-            Debug.LogError("Neither PrefabUtility.GetCorrespondingObjectFromSource or PrefabUtility.GetPrefabParent methods could be located. Prefab functionality will be broken in this build of Odin.");
+            Debug.LogError(
+                "Neither PrefabUtility.GetCorrespondingObjectFromSource or PrefabUtility.GetPrefabParent methods could be located. Prefab functionality will be broken in this build of Odin.");
             return null;
         }
     }

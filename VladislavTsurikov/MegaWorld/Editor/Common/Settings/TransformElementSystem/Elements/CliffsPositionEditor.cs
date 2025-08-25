@@ -11,21 +11,20 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     public class CliffsPositionEditor : ReorderableListComponentEditor
     {
         private CliffsPosition _cliffsPosition;
-        public override void OnEnable()
+
+        public override void OnEnable() => _cliffsPosition = (CliffsPosition)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _cliffsPosition = (CliffsPosition)Target;
-        }
-        
-        public override void OnGUI(Rect rect, int index) 
-        {
-            _cliffsPosition.OffsetPosition = EditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), 
+            _cliffsPosition.OffsetPosition = EditorGUI.FloatField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
                 new GUIContent("Additional Rotation"), _cliffsPosition.OffsetPosition);
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
 

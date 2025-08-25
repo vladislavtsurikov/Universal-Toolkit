@@ -10,24 +10,18 @@ namespace VladislavTsurikov.BVH.Runtime
         where TNodeData : class
     {
         private const int _numChildren = 2;
-        private TNode _root = new TNode();
+        private TNode _root = new();
 
-        public void Clear()
-        {
-            _root = new TNode();
-        }
+        public void Clear() => _root = new TNode();
 
-        public AABB GetAABB()
-        {
-            return new AABB(_root.Position, _root.Size);
-        }
+        public AABB GetAABB() => new(_root.Position, _root.Size);
 
         public void InsertLeafNode(TNode node)
         {
             InsertLeafNodeRecurse(_root, node);
             node.MakeLeaf();
         }
-        
+
         public void RemoveLeafNode(TNode node)
         {
             if (!node.IsLeaf)
@@ -44,8 +38,8 @@ namespace VladislavTsurikov.BVH.Runtime
                 currentParent.SetParent(null);
                 currentParent = newParent;
             }
-            
-            if(currentParent != null)
+
+            if (currentParent != null)
             {
                 currentParent.EncapsulateChildrenBottomUp();
             }
@@ -79,7 +73,7 @@ namespace VladislavTsurikov.BVH.Runtime
             }
             else
             {
-                for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
                 {
                     FindAllLeafNodeRecurse(node.GetChild(childIndex), outputNodes);
                 }
@@ -117,7 +111,7 @@ namespace VladislavTsurikov.BVH.Runtime
             }
             else
             {
-                TNode newParent = new TNode();
+                var newParent = new TNode();
                 BVHNode<TNodeData> oldParent = parent.Parent;
 
                 node.SetParent(newParent);
@@ -136,15 +130,16 @@ namespace VladislavTsurikov.BVH.Runtime
                 {
                     outputNodes.Add(new BVHNodeRayHit<TNodeData>(ray, node, t));
                 }
-                
-                for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+
+                for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
                 {
                     RaycastAllRecurse(ray, node.GetChild(childIndex), outputNodes);
                 }
             }
         }
 
-        private void OverlapBoxRecurse(BVHNode<TNodeData> node, Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, List<BVHNode<TNodeData>> outputNodes)
+        private void OverlapBoxRecurse(BVHNode<TNodeData> node, Vector3 boxCenter, Vector3 boxSize,
+            Quaternion boxRotation, List<BVHNode<TNodeData>> outputNodes)
         {
             if (node.IntersectsBox(boxCenter, boxSize, boxRotation))
             {
@@ -154,7 +149,7 @@ namespace VladislavTsurikov.BVH.Runtime
                 }
                 else
                 {
-                    for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                    for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
                     {
                         OverlapBoxRecurse(node.GetChild(childIndex), boxCenter, boxSize, boxRotation, outputNodes);
                     }
@@ -162,7 +157,8 @@ namespace VladislavTsurikov.BVH.Runtime
             }
         }
 
-        private void OverlapSphereRecurse(BVHNode<TNodeData> node, Vector3 sphereCenter, float sphereRadius, List<BVHNode<TNodeData>> outputNodes)
+        private void OverlapSphereRecurse(BVHNode<TNodeData> node, Vector3 sphereCenter, float sphereRadius,
+            List<BVHNode<TNodeData>> outputNodes)
         {
             if (node.IntersectsSphere(sphereCenter, sphereRadius))
             {
@@ -172,7 +168,7 @@ namespace VladislavTsurikov.BVH.Runtime
                 }
                 else
                 {
-                    for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                    for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
                     {
                         OverlapSphereRecurse(node.GetChild(childIndex), sphereCenter, sphereRadius, outputNodes);
                     }
@@ -181,29 +177,31 @@ namespace VladislavTsurikov.BVH.Runtime
         }
 
 #if UNITY_EDITOR
+
         #region Gizmos
+
         private void DrawRaycastRecurse(Ray ray, BVHNode<TNodeData> node, Matrix4x4 transformMtx, Color nodeColor)
         {
-            float t = 0.0f;
+            var t = 0.0f;
             if (node.Raycast(ray, out t))
             {
                 GizmosEx.PushColor(nodeColor);
-                Matrix4x4 nodeMatrix = Matrix4x4.TRS(node.Position, Quaternion.identity, node.Size);
+                var nodeMatrix = Matrix4x4.TRS(node.Position, Quaternion.identity, node.Size);
                 GizmosEx.PushMatrix(transformMtx * nodeMatrix);
                 Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
                 GizmosEx.PopMatrix();
                 GizmosEx.PopColor();
 
-                for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+                for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
                 {
                     DrawRaycastRecurse(ray, node.GetChild(childIndex), transformMtx, nodeColor);
                 }
             }
         }
 
-        public List<BVHNodeRayHit<TNodeData>> DrawRaycast(Ray ray, Matrix4x4 transformMtx, Color nodeColor) 
+        public List<BVHNodeRayHit<TNodeData>> DrawRaycast(Ray ray, Matrix4x4 transformMtx, Color nodeColor)
         {
-            var nodeHits = RaycastAll(ray, false);
+            List<BVHNodeRayHit<TNodeData>> nodeHits = RaycastAll(ray, false);
 
             DrawRaycastRecurse(ray, _root, transformMtx, nodeColor);
 
@@ -219,20 +217,22 @@ namespace VladislavTsurikov.BVH.Runtime
 
         private void DrawCellRecurse(BVHNode<TNodeData> node, Matrix4x4 transformMtx, Color lineColor)
         {
-            if(_root != node)
+            if (_root != node)
             {
-                Matrix4x4 nodeMatrix = Matrix4x4.TRS(node.Position, Quaternion.identity, node.Size);
+                var nodeMatrix = Matrix4x4.TRS(node.Position, Quaternion.identity, node.Size);
                 GizmosEx.PushMatrix(transformMtx * nodeMatrix);
                 Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
                 GizmosEx.PopMatrix();
             }
-       
-            for (int childIndex = 0; childIndex < node.NumChildren; ++childIndex)
+
+            for (var childIndex = 0; childIndex < node.NumChildren; ++childIndex)
             {
                 DrawCellRecurse(node.GetChild(childIndex), transformMtx, lineColor);
             }
         }
+
         #endregion
+
 #endif
     }
 }

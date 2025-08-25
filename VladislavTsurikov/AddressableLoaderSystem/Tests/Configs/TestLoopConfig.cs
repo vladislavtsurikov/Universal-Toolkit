@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Tests
 {
@@ -7,8 +8,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
     {
         public TestLoopData data;
     }
-    
-    [System.Serializable]
+
+    [Serializable]
     public class TestLoopData
     {
         public TestLoopConfig backReference;

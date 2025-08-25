@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
@@ -8,7 +7,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
     {
         public static void LoadScenes(List<Sector> sectors)
         {
-            foreach (var sector in sectors)
+            foreach (Sector sector in sectors)
             {
                 sector.LoadScene();
             }
@@ -16,7 +15,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public static void CacheScenes(List<Sector> sectors, float waitForSeconds = 0F, float keepScene = 0F)
         {
-            foreach (var sector in sectors)
+            foreach (Sector sector in sectors)
             {
                 sector.CacheScene(waitForSeconds, keepScene);
             }
@@ -24,7 +23,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public static void UnloadScenes(List<Sector> sectors, float waitForSeconds = 0F)
         {
-            foreach (var sector in sectors)
+            foreach (Sector sector in sectors)
             {
                 sector.UnloadScene(waitForSeconds);
             }
@@ -32,11 +31,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public static async UniTask UnloadAllScenes(string tag)
         {
-            foreach (var sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
+            foreach (SectorLayer sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
             {
                 if (sceneDataManager.Tag == tag)
                 {
-                    foreach (var sector in sceneDataManager.SectorList)
+                    foreach (Sector sector in sceneDataManager.SectorList)
                     {
                         await sector.SceneReference.UnloadScene();
                     }
@@ -46,11 +45,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public static async UniTask LoadAllScenes(string tag)
         {
-            foreach (var sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
+            foreach (SectorLayer sceneDataManager in SectorLayerManager.Instance.SectorLayerList)
             {
                 if (sceneDataManager.Tag == tag)
                 {
-                    foreach (var sector in sceneDataManager.SectorList)
+                    foreach (Sector sector in sceneDataManager.SectorList)
                     {
                         await sector.SceneReference.LoadScene();
                     }

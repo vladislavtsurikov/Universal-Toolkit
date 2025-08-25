@@ -5,7 +5,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core
 {
     public interface IToolEditor
     {
-	    SelectionData SelectionData { get; }
+        SelectionData SelectionData { get; }
         Type TargetType { get; }
     }
 }

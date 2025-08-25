@@ -13,31 +13,30 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI
 {
     [ElementEditor(typeof(PrecisePlaceTool))]
-	[DrawersSelectionDatas(typeof(PrecisePlacePrototypesDrawer))]
+    [DrawersSelectionDatas(typeof(PrecisePlacePrototypesDrawer))]
     public class PrecisePlaceToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-		{
-			UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-		}
+        public override void DrawButtons() => UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
 
-	    protected override void DrawPrototypeSettings(Prototype proto)
-		{
-			PrecisePlaceToolSettings settings = (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool), typeof(PrecisePlaceToolSettings));
-			
-			proto.ComponentStackManager.DrawElement(typeof(PrecisePlaceSettings), typeof(PrecisePlaceTool));
-			proto.ComponentStackManager.DrawElement(typeof(SuccessSettings));
+        protected override void DrawPrototypeSettings(Prototype proto)
+        {
+            var settings =
+                (PrecisePlaceToolSettings)ToolsComponentStack.GetElement(typeof(PrecisePlaceTool),
+                    typeof(PrecisePlaceToolSettings));
 
-			if(settings.OverlapCheck)
-			{
-				proto.ComponentStackManager.DrawElement(typeof(OverlapCheckSettings));
-			}
+            proto.ComponentStackManager.DrawElement(typeof(PrecisePlaceSettings), typeof(PrecisePlaceTool));
+            proto.ComponentStackManager.DrawElement(typeof(SuccessSettings));
 
-			if(settings.UseTransformComponents)
-			{
-				proto.ComponentStackManager.DrawElement(typeof(TransformComponentSettings));
-			}
-		}
+            if (settings.OverlapCheck)
+            {
+                proto.ComponentStackManager.DrawElement(typeof(OverlapCheckSettings));
+            }
+
+            if (settings.UseTransformComponents)
+            {
+                proto.ComponentStackManager.DrawElement(typeof(TransformComponentSettings));
+            }
+        }
     }
 }
 #endif

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -18,20 +19,34 @@ namespace VladislavTsurikov.SceneUtility.Runtime
     [Serializable]
     public class SceneReference
     {
-        [OdinSerialize] private bool _cachedScene;
-        private SceneOperations _sceneOperations;
-        
+        [OdinSerialize]
+        private bool _cachedScene;
+
+        private Scene _scene;
+
 #if UNITY_EDITOR
         [OdinSerialize]
         private Object _sceneAsset;
 #endif
-        
+        private SceneOperations _sceneOperations;
+
         [OdinSerialize]
         private string _scenePath = string.Empty;
-        private Scene _scene;
-        
-        public static event Action OnDeleteScene;
-        
+
+        public SceneReference()
+        {
+        }
+
+        public SceneReference(Scene scene)
+        {
+            _scene = scene;
+            _scenePath = scene.path;
+        }
+
+#if UNITY_EDITOR
+        public SceneReference(SceneAsset sceneAsset) => SceneAsset = sceneAsset;
+#endif
+
         public CancellationTokenSource UnloadSceneCancellationTokenSource { get; private set; }
         public CancellationTokenSource LoadSceneCancellationTokenSource { get; private set; }
         public CancellationTokenSource KeepCachedSceneCancellationTokenSource { get; private set; }
@@ -45,35 +60,36 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     return _sceneOperations;
                 }
 
-                var types = AllTypesDerivedFrom<SceneOperations>.Types
+                IEnumerable<Type> types = AllTypesDerivedFrom<SceneOperations>.Types
                     .Where(
                         t => !t.IsAbstract
                     );
-                
-                foreach (var type in types)
+
+                foreach (Type type in types)
                 {
                     if (type == typeof(SceneManagerSceneOperations))
                     {
                         continue;
                     }
-                    
-                    SceneOperations sceneOperations = (SceneOperations)Activator.CreateInstance(type, this);
+
+                    var sceneOperations = (SceneOperations)Activator.CreateInstance(type, this);
 
                     if (!sceneOperations.Enable)
                     {
                         continue;
                     }
-                    
+
                     _sceneOperations = sceneOperations;
                     return _sceneOperations;
                 }
-                
-                _sceneOperations = (SceneManagerSceneOperations)Activator.CreateInstance(typeof(SceneManagerSceneOperations), this);
+
+                _sceneOperations =
+                    (SceneManagerSceneOperations)Activator.CreateInstance(typeof(SceneManagerSceneOperations), this);
                 return _sceneOperations;
             }
             set => _sceneOperations = value;
         }
-        
+
         public bool CachedScene => _cachedScene;
 
 #if UNITY_EDITOR
@@ -83,7 +99,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 if (_sceneAsset == null)
                 {
-                    _sceneAsset = string.IsNullOrEmpty(ScenePath) ? null : AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
+                    _sceneAsset = string.IsNullOrEmpty(ScenePath)
+                        ? null
+                        : AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath);
                 }
 
                 return _sceneAsset;
@@ -97,14 +115,14 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     _scene = new Scene();
                     return;
                 }
-                
+
                 _sceneAsset = value;
                 _scenePath = AssetDatabase.GetAssetPath(_sceneAsset);
                 _scene = SceneManager.GetSceneByPath(_scenePath);
             }
         }
 #endif
-        
+
         public string ScenePath
         {
             get
@@ -147,18 +165,17 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                 return Scene.isLoaded ? 1 : 0;
             }
         }
-        
+
         public bool IsLoaded
         {
             get
             {
-                
                 if (Scene.isLoaded == false)
                 {
                     _cachedScene = false;
                     return false;
                 }
-                
+
                 if (_cachedScene)
                 {
                     return false;
@@ -168,23 +185,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             }
         }
 
-        public SceneReference()
-        {
-            
-        }
-
-        public SceneReference(Scene scene)
-        {
-            _scene = scene;
-            _scenePath = scene.path;
-        }
-        
-#if UNITY_EDITOR
-        public SceneReference(SceneAsset sceneAsset)
-        {
-            SceneAsset = sceneAsset;
-        }
-#endif
+        public static event Action OnDeleteScene;
 
         public async UniTask LoadScene(float waitForSeconds = 0)
         {
@@ -197,10 +198,10 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 return;
             }
-            
+
             UnloadSceneCancellationTokenSource?.Cancel();
             KeepCachedSceneCancellationTokenSource?.Cancel();
-            
+
             LoadSceneCancellationTokenSource = new CancellationTokenSource();
             await Load(LoadSceneCancellationTokenSource.Token);
 
@@ -216,7 +217,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     SetGameObjectsAsActive(true);
                     _cachedScene = false;
                 }
-            
+
 #if UNITY_EDITOR
                 if (Application.isPlaying)
                 {
@@ -231,7 +232,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 #endif
             }
         }
-        
+
         public async UniTask UnloadScene(float waitForSeconds = 0)
         {
             if (!IsValid())
@@ -243,10 +244,10 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 return;
             }
-            
+
             LoadSceneCancellationTokenSource?.Cancel();
             KeepCachedSceneCancellationTokenSource?.Cancel();
-            
+
             UnloadSceneCancellationTokenSource = new CancellationTokenSource();
             await Unload(UnloadSceneCancellationTokenSource.Token);
 
@@ -262,7 +263,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     SetGameObjectsAsActive(true);
                     _cachedScene = false;
                 }
-            
+
 #if UNITY_EDITOR
                 if (Application.isPlaying)
                 {
@@ -274,7 +275,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                     {
                         EditorSceneManager.SaveScene(Scene);
                     }
-                    
+
                     EditorSceneManager.CloseScene(Scene, true);
                 }
 #else
@@ -289,8 +290,9 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 return;
             }
-            
-            if (keepScene == 0 || Profiler.GetTotalReservedMemoryLong() > StreamingUtilitySettings.Instance.GetCacheMemoryThresholdInBytes())
+
+            if (keepScene == 0 || Profiler.GetTotalReservedMemoryLong() >
+                StreamingUtilitySettings.Instance.GetCacheMemoryThresholdInBytes())
             {
                 UnloadScene().Forget();
             }
@@ -298,16 +300,16 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 KeepCachedSceneCancellationTokenSource = new CancellationTokenSource();
                 Unload(KeepCachedSceneCancellationTokenSource.Token).Forget();
-                    
+
                 async UniTask Unload(CancellationToken token)
                 {
                     await UniTask.WaitForSeconds(waitForSeconds, cancellationToken: token);
-                        
+
                     SetGameObjectsAsActive(false);
                     _cachedScene = true;
-                        
+
                     await UniTask.WaitForSeconds(keepScene, cancellationToken: token);
-                        
+
                     await UnloadScene();
                 }
             }
@@ -317,12 +319,12 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         {
             GameObject[] gameObjects = Scene.GetRootGameObjects();
 
-            foreach (var go in gameObjects)
+            foreach (GameObject go in gameObjects)
             {
                 go.SetActive(setActive);
             }
         }
-        
+
         public bool IsValid()
         {
 #if UNITY_EDITOR
@@ -335,7 +337,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 #if UNITY_EDITOR
         public void MarkSceneDirty()
         {
-            if(!Application.isPlaying)
+            if (!Application.isPlaying)
             {
                 EditorSceneManager.MarkSceneDirty(Scene);
             }

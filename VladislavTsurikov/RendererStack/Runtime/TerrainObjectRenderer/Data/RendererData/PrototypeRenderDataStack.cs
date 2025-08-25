@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.RendererData
@@ -9,12 +9,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
     public class PrototypeRenderDataStack
     {
         [OdinSerialize]
-        public List<PrototypeRendererData> PrototypeRenderDataList = new List<PrototypeRendererData>();
+        public List<PrototypeRendererData> PrototypeRenderDataList = new();
 
         public void Setup(SelectionData selectionData)
         {
             PreparePrototypeRenderCount(selectionData);
-            
+
             foreach (PrototypeRendererData prototypeRenderData in PrototypeRenderDataList)
             {
                 prototypeRenderData.Setup();
@@ -23,7 +23,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
 
         public void PreparePrototypeRenderCount(SelectionData selectionData)
         {
-            for (int i = selectionData.PrototypeList.Count - 1; i >= 0; i--)
+            for (var i = selectionData.PrototypeList.Count - 1; i >= 0; i--)
             {
                 if (selectionData.PrototypeList[i] == null)
                 {
@@ -38,7 +38,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
                 }
             }
 
-            for (int i = PrototypeRenderDataList.Count - 1; i >= 0; i--)
+            for (var i = PrototypeRenderDataList.Count - 1; i >= 0; i--)
             {
                 if (selectionData.GetProto(PrototypeRenderDataList[i].PrototypeID) == null)
                 {
@@ -61,7 +61,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
         }
 
         public void ClearInstances()
-        {          
+        {
             foreach (PrototypeRendererData prototypeRenderData in PrototypeRenderDataList)
             {
                 prototypeRenderData.ClearPersistentData();
@@ -72,7 +72,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
         {
             foreach (PrototypeRendererData item in PrototypeRenderDataList)
             {
-                if (item.PrototypeID == id) 
+                if (item.PrototypeID == id)
                 {
                     return item;
                 }

@@ -13,12 +13,13 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings
         public SceneComponentStackEditor(AdvancedComponentStack<SceneComponent> stack) : base(stack)
         {
         }
-        
+
         protected override void OnIMGUIComponentStackGUI()
         {
-            AddSceneComponentsAttribute addSceneComponentsAttribute = 
-                (AddSceneComponentsAttribute)RendererStackManager.Instance.RendererStack.SelectedElement.GetType().GetAttribute(typeof(AddSceneComponentsAttribute));
-            
+            var addSceneComponentsAttribute =
+                (AddSceneComponentsAttribute)RendererStackManager.Instance.RendererStack.SelectedElement.GetType()
+                    .GetAttribute(typeof(AddSceneComponentsAttribute));
+
             DrawElements(addSceneComponentsAttribute.Types.ToList());
         }
     }

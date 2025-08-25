@@ -1,11 +1,8 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.ReflectionUtility;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
@@ -19,7 +16,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
         {
             if (prototypeType == typeof(PrototypeTerrainDetail) || prototypeType == typeof(PrototypeTerrainTexture))
             {
-                if(Terrain.activeTerrain == null)
+                if (Terrain.activeTerrain == null)
                 {
                     Debug.LogWarning("Not present in the scene with an active Unity Terrain.");
                     return PaintLayers;
@@ -27,10 +24,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings
 
                 return LayerMask.GetMask(LayerMask.LayerToName(Terrain.activeTerrain.gameObject.layer));
             }
-            else
-            {
-                return PaintLayers;
-            }
+
+            return PaintLayers;
         }
     }
 }

@@ -16,14 +16,12 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
         public override void OnEnable()
         {
             _afterLoadOperationsSettings = (AfterLoadOperationsSettings)Target;
-            _sceneOperationStackEditor = new SceneOperationStackEditor(SettingsTypes.AfterLoadScene, _afterLoadOperationsSettings.OperationStack);
+            _sceneOperationStackEditor = new SceneOperationStackEditor(SettingsTypes.AfterLoadScene,
+                _afterLoadOperationsSettings.OperationStack);
         }
 
-        public override void OnGUI(Rect rect, int index)
-        {
-            _sceneOperationStackEditor.OnGUI(rect);
-        }
-        
+        public override void OnGUI(Rect rect, int index) => _sceneOperationStackEditor.OnGUI(rect);
+
         public override float GetElementHeight(int index)
         {
             float height = 0;

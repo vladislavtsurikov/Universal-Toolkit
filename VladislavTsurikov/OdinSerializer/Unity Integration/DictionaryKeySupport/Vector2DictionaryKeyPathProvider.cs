@@ -16,31 +16,30 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using OdinSerializer;
+using UnityEngine;
 
 [assembly: RegisterDictionaryKeyPathProvider(typeof(Vector2DictionaryKeyPathProvider))]
 
 namespace OdinSerializer
 {
-    using System.Globalization;
-    using UnityEngine;
-
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public sealed class Vector2DictionaryKeyPathProvider : BaseDictionaryKeyPathProvider<Vector2>
     {
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public override string ProviderID { get { return "v2"; } }
+        public override string ProviderID => "v2";
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override int Compare(Vector2 x, Vector2 y)
         {
-            int result = x.x.CompareTo(y.x);
+            var result = x.x.CompareTo(y.x);
 
             if (result == 0)
             {
@@ -51,20 +50,20 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override Vector2 GetKeyFromPathString(string pathStr)
         {
-            int sep = pathStr.IndexOf('|');
+            var sep = pathStr.IndexOf('|');
 
-            string x = pathStr.Substring(1, sep - 1).Trim();
-            string y = pathStr.Substring(sep + 1, pathStr.Length - (sep + 2)).Trim();
+            var x = pathStr.Substring(1, sep - 1).Trim();
+            var y = pathStr.Substring(sep + 1, pathStr.Length - (sep + 2)).Trim();
 
             return new Vector2(float.Parse(x), float.Parse(y));
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override string GetPathStringFromKey(Vector2 key)
         {

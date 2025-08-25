@@ -12,84 +12,114 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransform
     {
         private Rotation _settings;
 
-        public override void OnEnable()
+        public override void OnEnable() => _settings = (Rotation)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _settings = (Rotation)Target;
+            _settings.ModifyStrengthRotation = EditorGUI.Slider(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Strength", "How fast the object will rotate."), _settings.ModifyStrengthRotation, 0f,
+                10f);
+            rect.y += EditorGUIUtility.singleLineHeight;
+
+            _settings.ModifyRandomRotationX = EditorGUI.Toggle(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Random Rotation X", "Apply random rotation to the axis"),
+                _settings.ModifyRandomRotationX);
+            rect.y += EditorGUIUtility.singleLineHeight;
+            {
+                ++EditorGUI.indentLevel;
+
+                if (_settings.ModifyRandomRotationX)
+                {
+                    _settings.ModifyRandomRotationValues.x = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Randomize X",
+                            "Allows you to set how strong the influence of the random will be"),
+                        _settings.ModifyRandomRotationValues.x, 0.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+                else
+                {
+                    _settings.ModifyRotationValues.x = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Rotation X", "Allows you to select positive or negative rotation."),
+                        _settings.ModifyRotationValues.x, -1.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+
+                --EditorGUI.indentLevel;
+            }
+
+            _settings.ModifyRandomRotationY = EditorGUI.Toggle(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Random Rotation Y", "Apply random rotation to the axis"),
+                _settings.ModifyRandomRotationY);
+            rect.y += EditorGUIUtility.singleLineHeight;
+            {
+                ++EditorGUI.indentLevel;
+
+                if (_settings.ModifyRandomRotationY)
+                {
+                    _settings.ModifyRandomRotationValues.y = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Randomize Y",
+                            "Allows you to set how strong the influence of the random will be"),
+                        _settings.ModifyRandomRotationValues.y, 0.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+                else
+                {
+                    _settings.ModifyRotationValues.y = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Rotation Y", "Allows you to select positive or negative rotation."),
+                        _settings.ModifyRotationValues.y, -1.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+
+                --EditorGUI.indentLevel;
+            }
+
+            _settings.ModifyRandomRotationZ = EditorGUI.Toggle(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Random Rotation Z", "Apply random rotation to the axis"),
+                _settings.ModifyRandomRotationZ);
+            rect.y += EditorGUIUtility.singleLineHeight;
+            {
+                ++EditorGUI.indentLevel;
+
+                if (_settings.ModifyRandomRotationZ)
+                {
+                    _settings.ModifyRandomRotationValues.z = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Randomize Z",
+                            "Allows you to set how strong the influence of the random will be"),
+                        _settings.ModifyRandomRotationValues.z, 0.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+                else
+                {
+                    _settings.ModifyRotationValues.z = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Rotation Z", "Allows you to select positive or negative rotation."),
+                        _settings.ModifyRotationValues.z, -1.0f, 1.0f);
+                    rect.y += EditorGUIUtility.singleLineHeight;
+                }
+
+                --EditorGUI.indentLevel;
+            }
         }
-        
-        public override void OnGUI(Rect rect, int index) 
+
+        public override float GetElementHeight(int index)
         {
-            _settings.ModifyStrengthRotation = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Strength", "How fast the object will rotate."), _settings.ModifyStrengthRotation, 0f, 10f);
-            rect.y += EditorGUIUtility.singleLineHeight;
-
-            _settings.ModifyRandomRotationX = EditorGUI.Toggle(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Random Rotation X", "Apply random rotation to the axis"), _settings.ModifyRandomRotationX);
-            rect.y += EditorGUIUtility.singleLineHeight;
-            {
-                ++EditorGUI.indentLevel;
-
-                if(_settings.ModifyRandomRotationX)
-                {
-                    _settings.ModifyRandomRotationValues.x = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Randomize X", "Allows you to set how strong the influence of the random will be"), _settings.ModifyRandomRotationValues.x, 0.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-                else
-                {
-                    _settings.ModifyRotationValues.x = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Rotation X", "Allows you to select positive or negative rotation."), _settings.ModifyRotationValues.x, -1.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-
-                --EditorGUI.indentLevel;
-            }
-            
-            _settings.ModifyRandomRotationY = EditorGUI.Toggle(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Random Rotation Y", "Apply random rotation to the axis"), _settings.ModifyRandomRotationY);
-            rect.y += EditorGUIUtility.singleLineHeight;
-            {
-                ++EditorGUI.indentLevel;
-
-                if(_settings.ModifyRandomRotationY)
-                {
-                    _settings.ModifyRandomRotationValues.y = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Randomize Y", "Allows you to set how strong the influence of the random will be"), _settings.ModifyRandomRotationValues.y, 0.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-                else
-                {
-                    _settings.ModifyRotationValues.y = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Rotation Y", "Allows you to select positive or negative rotation."), _settings.ModifyRotationValues.y, -1.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-
-                --EditorGUI.indentLevel;
-            }
-            
-            _settings.ModifyRandomRotationZ = EditorGUI.Toggle(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Random Rotation Z", "Apply random rotation to the axis"), _settings.ModifyRandomRotationZ);
-            rect.y += EditorGUIUtility.singleLineHeight;
-            {
-                ++EditorGUI.indentLevel;
-
-                if(_settings.ModifyRandomRotationZ)
-                {
-                    _settings.ModifyRandomRotationValues.z = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Randomize Z", "Allows you to set how strong the influence of the random will be"), _settings.ModifyRandomRotationValues.z, 0.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-                else
-                {
-                    _settings.ModifyRotationValues.z = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Rotation Z", "Allows you to select positive or negative rotation."), _settings.ModifyRotationValues.z, -1.0f, 1.0f);
-                    rect.y += EditorGUIUtility.singleLineHeight;
-                }
-
-                --EditorGUI.indentLevel;
-            }
-        }
-
-        public override float GetElementHeight(int index) 
-        {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
             height += EditorGUIUtility.singleLineHeight;
             {
                 ++EditorGUI.indentLevel;
 
-                if(_settings.ModifyRandomRotationX)
+                if (_settings.ModifyRandomRotationX)
                 {
                     height += EditorGUIUtility.singleLineHeight;
                 }
@@ -100,10 +130,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransform
 
                 --EditorGUI.indentLevel;
             }
-            
+
             height += EditorGUIUtility.singleLineHeight;
             {
-                if(_settings.ModifyRandomRotationY)
+                if (_settings.ModifyRandomRotationY)
                 {
                     height += EditorGUIUtility.singleLineHeight;
                 }
@@ -111,12 +141,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransform
                 {
                     height += EditorGUIUtility.singleLineHeight;
                 }
-
             }
 
             height += EditorGUIUtility.singleLineHeight;
             {
-                if(_settings.ModifyRandomRotationZ)
+                if (_settings.ModifyRandomRotationZ)
                 {
                     height += EditorGUIUtility.singleLineHeight;
                 }
@@ -124,7 +153,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransform
                 {
                     height += EditorGUIUtility.singleLineHeight;
                 }
-
             }
 
             return height;

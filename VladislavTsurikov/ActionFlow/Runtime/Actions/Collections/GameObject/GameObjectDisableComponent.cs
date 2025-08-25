@@ -1,8 +1,8 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 {
@@ -15,15 +15,16 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 
         protected override UniTask<bool> Run(CancellationToken token)
         {
-            Type componentType = Type.GetType(ComponentType);
+            var componentType = Type.GetType(ComponentType);
             if (componentType != null)
             {
-                MonoBehaviour component = (MonoBehaviour)GameObject.GetComponent(componentType);
+                var component = (MonoBehaviour)GameObject.GetComponent(componentType);
                 if (component != null)
                 {
                     component.enabled = false;
                 }
             }
+
             return UniTask.FromResult(true);
         }
     }

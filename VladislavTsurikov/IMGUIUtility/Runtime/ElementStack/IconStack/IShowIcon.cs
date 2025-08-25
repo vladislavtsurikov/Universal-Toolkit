@@ -8,7 +8,7 @@ namespace VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack
 #if UNITY_EDITOR
         string Name { get; }
         bool IsRedIcon { get; }
-        
+
         Texture2D PreviewTexture { get; }
 #endif
     }

@@ -11,21 +11,20 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     public class ScaleFitnessEditor : ReorderableListComponentEditor
     {
         private ScaleFitness _scaleFitness;
-        public override void OnEnable()
+
+        public override void OnEnable() => _scaleFitness = (ScaleFitness)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _scaleFitness = (ScaleFitness)Target;
-        }
-        
-        public override void OnGUI(Rect rect, int index) 
-        {
-            _scaleFitness.OffsetScale = EditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), 
+            _scaleFitness.OffsetScale = EditorGUI.FloatField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
                 new GUIContent("Offset Scale"), _scaleFitness.OffsetScale);
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
-        {   
-            float height = EditorGUIUtility.singleLineHeight;
+        public override float GetElementHeight(int index)
+        {
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
 

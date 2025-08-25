@@ -4,6 +4,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 {
     public abstract class MaskFilter : Component
     {
-        public virtual void Eval( MaskFilterContext maskFilterContext, int index) {}
+        public virtual void Eval(MaskFilterContext maskFilterContext, int index)
+        {
+        }
     }
 }

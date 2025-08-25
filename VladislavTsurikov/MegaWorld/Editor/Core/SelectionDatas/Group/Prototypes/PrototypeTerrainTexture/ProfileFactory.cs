@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
         {
             Directory.CreateDirectory(MegaWorldPath.TerrainLayerStoragePath);
 
-            string path = MegaWorldPath.TerrainLayerStoragePath + "/" + textureName + ".asset";
+            var path = MegaWorldPath.TerrainLayerStoragePath + "/" + textureName + ".asset";
 
             path = AssetDatabase.GenerateUniqueAssetPath(path);
 

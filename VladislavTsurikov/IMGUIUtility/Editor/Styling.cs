@@ -5,38 +5,28 @@ using UnityEngine;
 namespace VladislavTsurikov.IMGUIUtility.Editor
 {
     /// <summary>
-    /// Common styles used for Post-processing editor controls.
+    ///     Common styles used for Post-processing editor controls.
     /// </summary>
     public static class Styling
     {
         /// <summary>
-        /// Style for the override checkbox.
+        ///     Style for the override checkbox.
         /// </summary>
         public static readonly GUIStyle smallTickbox;
 
         /// <summary>
-        /// Style for the labels in the toolbar of each effect.
+        ///     Style for the labels in the toolbar of each effect.
         /// </summary>
         public static readonly GUIStyle miniLabelButton;
 
         private static readonly Color splitterDark;
         private static readonly Color splitterLight;
 
-        /// <summary>
-        /// Color of UI splitters.
-        /// </summary>
-        public static Color splitter { get { return EditorGUIUtility.isProSkin ? splitterDark : splitterLight; } }
-
         private static readonly Texture2D paneOptionsIconDark;
         private static readonly Texture2D paneOptionsIconLight;
 
         /// <summary>
-        /// Option icon used in effect headers.
-        /// </summary>
-        public static Texture2D paneOptionsIcon { get { return EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight; } }
-
-        /// <summary>
-        /// Style for effect header labels.
+        ///     Style for effect header labels.
         /// </summary>
         public static readonly GUIStyle headerLabel;
 
@@ -44,52 +34,26 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
         private static readonly Color headerBackgroundLight;
 
         /// <summary>
-        /// Color of effect header backgrounds.
-        /// </summary>
-        public static Color headerBackground { get { return EditorGUIUtility.isProSkin ? headerBackgroundDark : headerBackgroundLight; } }
-
-        /// <summary>
-        /// Style for the trackball labels.
+        ///     Style for the trackball labels.
         /// </summary>
         public static readonly GUIStyle wheelLabel;
 
         /// <summary>
-        /// Style for the trackball cursors.
+        ///     Style for the trackball cursors.
         /// </summary>
         public static readonly GUIStyle wheelThumb;
 
         /// <summary>
-        /// Size of the trackball cursors.
+        ///     Size of the trackball cursors.
         /// </summary>
         public static readonly Vector2 wheelThumbSize;
 
         /// <summary>
-        /// Style for the curve editor position info.
+        ///     Style for the curve editor position info.
         /// </summary>
         public static readonly GUIStyle preLabel;
 
         private static Texture2D m_TransparentTexture;
-
-        /// <summary>
-        /// A 1x1 transparent texture.
-        /// </summary>
-        /// <remarks>
-        /// This texture is only created once and recycled afterward. You shouldn't modify it.
-        /// </remarks>
-        public static Texture2D transparentTexture
-        {
-            get
-            {
-                if (m_TransparentTexture == null)
-                {
-                    m_TransparentTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false) { name = "Transparent Texture" };
-                    m_TransparentTexture.SetPixel(0, 0, Color.clear);
-                    m_TransparentTexture.Apply();
-                }
-
-                return m_TransparentTexture;
-            }
-        }
 
         static Styling()
         {
@@ -98,15 +62,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
             miniLabelButton = new GUIStyle(EditorStyles.miniLabel);
             miniLabelButton.normal = new GUIStyleState
             {
-                background = transparentTexture,
-                scaledBackgrounds = null,
-                textColor = Color.grey
+                background = transparentTexture, scaledBackgrounds = null, textColor = Color.grey
             };
             var activeState = new GUIStyleState
             {
-                background = transparentTexture,
-                scaledBackgrounds = null,
-                textColor = Color.white
+                background = transparentTexture, scaledBackgrounds = null, textColor = Color.white
             };
             miniLabelButton.active = activeState;
             miniLabelButton.onNormal = activeState;
@@ -114,7 +74,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
             splitterDark = new Color(0.12f, 0.12f, 0.12f, 1.333f);
             splitterLight = new Color(0.6f, 0.6f, 0.6f, 1.333f);
-            
+
             headerBackgroundDark = new Color(0.1f, 0.1f, 0.1f, 0.2f);
             headerBackgroundLight = new Color(1f, 1f, 1f, 0.2f);
 
@@ -134,6 +94,47 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
             preLabel = new GUIStyle("ShurikenLabel");
         }
+
+        /// <summary>
+        ///     Color of UI splitters.
+        /// </summary>
+        public static Color splitter => EditorGUIUtility.isProSkin ? splitterDark : splitterLight;
+
+        /// <summary>
+        ///     Option icon used in effect headers.
+        /// </summary>
+        public static Texture2D paneOptionsIcon =>
+            EditorGUIUtility.isProSkin ? paneOptionsIconDark : paneOptionsIconLight;
+
+        /// <summary>
+        ///     Color of effect header backgrounds.
+        /// </summary>
+        public static Color headerBackground =>
+            EditorGUIUtility.isProSkin ? headerBackgroundDark : headerBackgroundLight;
+
+        /// <summary>
+        ///     A 1x1 transparent texture.
+        /// </summary>
+        /// <remarks>
+        ///     This texture is only created once and recycled afterward. You shouldn't modify it.
+        /// </remarks>
+        public static Texture2D transparentTexture
+        {
+            get
+            {
+                if (m_TransparentTexture == null)
+                {
+                    m_TransparentTexture = new Texture2D(1, 1, TextureFormat.ARGB32, false)
+                    {
+                        name = "Transparent Texture"
+                    };
+                    m_TransparentTexture.SetPixel(0, 0, Color.clear);
+                    m_TransparentTexture.Apply();
+                }
+
+                return m_TransparentTexture;
+            }
+        }
     }
-} 
+}
 #endif

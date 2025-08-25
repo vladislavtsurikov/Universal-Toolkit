@@ -11,11 +11,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
     public class ScatterPreferenceSettingsEditor : IMGUIElementEditor
     {
         private ScatterPreferenceSettings PreferenceSettings => (ScatterPreferenceSettings)Target;
-        
-        public override void OnGUI()
-        {
-            PreferenceSettings.MaxChecks = Mathf.Max(1, CustomEditorGUILayout.IntField(new GUIContent("Max Checks"), PreferenceSettings.MaxChecks));
-        }
+
+        public override void OnGUI() =>
+            PreferenceSettings.MaxChecks = Mathf.Max(1,
+                CustomEditorGUILayout.IntField(new GUIContent("Max Checks"), PreferenceSettings.MaxChecks));
     }
 }
 #endif

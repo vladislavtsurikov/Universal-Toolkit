@@ -7,10 +7,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.TerrainSpawner
     {
         public Group Group;
         public Texture2D Mask;
-        
-        public bool IsFit()
-        {
-            return Group != null && Mask != null;
-        }
+
+        public bool IsFit() => Group != null && Mask != null;
     }
 }

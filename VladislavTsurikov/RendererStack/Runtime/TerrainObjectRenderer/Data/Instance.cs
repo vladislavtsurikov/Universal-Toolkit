@@ -1,12 +1,28 @@
 using UnityEngine;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
-{    
+{
     public class Instance
     {
         private Vector3 _position;
-        private Vector3 _scale;
         private Quaternion _rotation;
+        private Vector3 _scale;
+
+        protected Instance(Vector3 position, Vector3 scale, Quaternion rotation)
+        {
+            _position = position;
+            _scale = scale;
+            _rotation = rotation;
+            ID = GetHashCode();
+        }
+
+        protected Instance(int id, Vector3 position, Vector3 scale, Quaternion rotation)
+        {
+            _position = position;
+            _scale = scale;
+            _rotation = rotation;
+            ID = id;
+        }
 
         public int ID { get; }
 
@@ -17,7 +33,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             get => _position;
             set
             {
-                if(_position != value)
+                if (_position != value)
                 {
                     _position = value;
                     Reposition();
@@ -29,13 +45,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         {
             get
             {
-                var newScale = new Vector3(_scale.x * GetMultiplySize().x, _scale.y * GetMultiplySize().y, _scale.z * GetMultiplySize().z);
-                
+                var newScale = new Vector3(_scale.x * GetMultiplySize().x, _scale.y * GetMultiplySize().y,
+                    _scale.z * GetMultiplySize().z);
+
                 return newScale;
             }
             set
             {
-                if(_scale != value)
+                if (_scale != value)
                 {
                     _scale = value;
                     TransformChanged();
@@ -48,52 +65,33 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             get => _rotation;
             set
             {
-                if(_rotation != value)
+                if (_rotation != value)
                 {
                     _rotation = value;
                     TransformChanged();
                 }
             }
         }
-        
+
         public Vector3 Right
         {
             get => Rotation * Vector3.right;
             set => Rotation = Quaternion.FromToRotation(Vector3.right, value);
         }
-        
+
         public Vector3 Up
         {
             get => Rotation * Vector3.up;
             set => Rotation = Quaternion.FromToRotation(Vector3.up, value);
         }
-        
+
         public Vector3 Forward
         {
             get => Rotation * Vector3.forward;
             set => Rotation = Quaternion.LookRotation(value);
         }
 
-        protected Instance(Vector3 position, Vector3 scale, Quaternion rotation) 
-        {
-            _position = position;
-            _scale = scale;
-            _rotation = rotation;
-            ID = GetHashCode();
-        }
-
-        protected Instance(int id, Vector3 position, Vector3 scale, Quaternion rotation) 
-        {
-            _position = position;
-            _scale = scale;
-            _rotation = rotation;
-            ID = id;
-        }
-
-        public Matrix4x4 GetMatrix()
-        {
-            return Matrix4x4.TRS(Position, Rotation, Scale);
-        }
+        public Matrix4x4 GetMatrix() => Matrix4x4.TRS(Position, Rotation, Scale);
 
         public void Destroy()
         {
@@ -101,13 +99,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             DestroyInstance();
         }
 
-        protected virtual void DestroyInstance(){}
-        protected virtual void TransformChanged(){}
-        protected virtual void Reposition(){}
-
-        protected virtual Vector3 GetMultiplySize()
+        protected virtual void DestroyInstance()
         {
-            return Vector3.one;
         }
+
+        protected virtual void TransformChanged()
+        {
+        }
+
+        protected virtual void Reposition()
+        {
+        }
+
+        protected virtual Vector3 GetMultiplySize() => Vector3.one;
     }
 }

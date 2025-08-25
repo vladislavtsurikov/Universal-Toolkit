@@ -18,7 +18,7 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
                 return true;
             }
 
-            string normalizedPath = path.Replace('\\', '/');
+            var normalizedPath = path.Replace('\\', '/');
             foreach (var excluded in PathRulesUtility.ExcludedFolders)
             {
                 if (normalizedPath.Contains($"/{excluded}/"))
@@ -32,13 +32,13 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
 
         public static string GenerateAddress(string path)
         {
-            string contentRoot = ContentFolderUtility.GetContentRoot();
-            string address = path.Replace($"{contentRoot}/", "");
+            var contentRoot = ContentFolderUtility.GetContentRoot();
+            var address = path.Replace($"{contentRoot}/", "");
 
-            int addressableConfigIndex = address.IndexOf("AddressableConfigs", StringComparison.Ordinal);
+            var addressableConfigIndex = address.IndexOf("AddressableConfigs", StringComparison.Ordinal);
             if (addressableConfigIndex >= 0)
             {
-                int startIndex = addressableConfigIndex + "AddressableConfigs".Length;
+                var startIndex = addressableConfigIndex + "AddressableConfigs".Length;
 
                 if (startIndex < address.Length && address[startIndex] == '/')
                 {
@@ -55,7 +55,7 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
                 }
             }
 
-            string extension = Path.GetExtension(address);
+            var extension = Path.GetExtension(address);
             if (!string.IsNullOrEmpty(extension))
             {
                 address = address.Substring(0, address.Length - extension.Length);
@@ -64,14 +64,15 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
             return address;
         }
 
-        public static void AddAssetsToGroup(string folderPath, AddressableAssetGroup group, string label, bool filterByExtension, string extensionFilter)
+        public static void AddAssetsToGroup(string folderPath, AddressableAssetGroup group, string label,
+            bool filterByExtension, string extensionFilter)
         {
-            string[] guids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
+            var guids = AssetDatabase.FindAssets("t:Object", new[] { folderPath });
             var entryCreator = new FastAddressableEntryCreator(group);
 
-            foreach (string guid in guids)
+            foreach (var guid in guids)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
+                var path = AssetDatabase.GUIDToAssetPath(guid);
 
                 if (ShouldSkipAsset(path) || IsFolder(path))
                 {
@@ -83,15 +84,13 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
                     continue;
                 }
 
-                string address = GenerateAddress(path);
+                var address = GenerateAddress(path);
                 entryCreator.CreateAndAddEntry(guid, address, label);
             }
         }
-        
-        private static bool IsFolder(string path)
-        {
-            return string.IsNullOrEmpty(Path.GetExtension(path)) && Directory.Exists(path);
-        }
+
+        private static bool IsFolder(string path) =>
+            string.IsNullOrEmpty(Path.GetExtension(path)) && Directory.Exists(path);
     }
 }
 #endif

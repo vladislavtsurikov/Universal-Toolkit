@@ -7,7 +7,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
     {
         public bool HasScene(SceneReference sceneReference)
         {
-            foreach (var scene in ElementList)
+            foreach (SceneType scene in ElementList)
             {
                 if (scene.HasScene(sceneReference))
                 {

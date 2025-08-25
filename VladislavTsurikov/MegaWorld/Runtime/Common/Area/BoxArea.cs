@@ -8,14 +8,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
     {
         public readonly RayHit RayHit;
         public readonly Terrain TerrainUnder;
-        
-        public float BoxSize => Size.x;
-        public float Radius => BoxSize / 2;
-        
+
         public BoxArea(RayHit rayHit, float size) : base(rayHit.Point, size)
         {
             RayHit = rayHit;
             TerrainUnder = UnityTerrainUtility.GetTerrain(rayHit.Point);
         }
+
+        public float BoxSize => Size.x;
+        public float Radius => BoxSize / 2;
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
+using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
@@ -13,17 +13,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
     [ElementEditor(typeof(EditToolSettings))]
     public class EditToolSettingsEditor : IMGUIElementEditor
     {
-        private bool _hotkeysFoldout;
         private EditToolSettings _editToolSettings;
+        private bool _hotkeysFoldout;
 
         private static GUIStyle TitleStyle
         {
             get
             {
-                GUIStyle guiStyle = new GUIStyle
-                {
-                    richText = true,
-                };
+                var guiStyle = new GUIStyle { richText = true };
 
                 return guiStyle;
             }
@@ -37,7 +34,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             ActionStackEditor = new ActionStackEditor(_editToolSettings.ActionStack);
         }
 
-        public override void OnGUI() 
+        public override void OnGUI()
         {
             ActionStackEditor.DrawSettings();
 
@@ -48,21 +45,33 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
         {
             _hotkeysFoldout = CustomEditorGUILayout.Foldout(_hotkeysFoldout, "Hotkeys");
 
-            if(_hotkeysFoldout)
+            if (_hotkeysFoldout)
             {
-                EditorGUI.indentLevel++; 
-
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>Q</i></b> - Move Up/Down.</color></size>", TitleStyle);
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>W</i></b> - Raycast.</color></size>", TitleStyle);
-				
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>E</i></b> - Rotation.</color></size>", TitleStyle);
                 EditorGUI.indentLevel++;
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>Space</i></b> - Transform Space.</color></size>", TitleStyle);
+
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>Q</i></b> - Move Up/Down.</color></size>", TitleStyle);
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>W</i></b> - Raycast.</color></size>", TitleStyle);
+
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>E</i></b> - Rotation.</color></size>", TitleStyle);
+                EditorGUI.indentLevel++;
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>Space</i></b> - Transform Space.</color></size>", TitleStyle);
                 EditorGUI.indentLevel--;
 
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>R</i></b> - Scale.</color></size>", TitleStyle);
-                CustomEditorGUILayout.Label("<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) + ">" + "<b><i>T</i></b> - Remove.</color></size>", TitleStyle);
-			
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>R</i></b> - Scale.</color></size>", TitleStyle);
+                CustomEditorGUILayout.Label(
+                    "<size=14><color=#" + UnityEngine.ColorUtility.ToHtmlStringRGB(EditorColors.Instance.LabelColor) +
+                    ">" + "<b><i>T</i></b> - Remove.</color></size>", TitleStyle);
+
                 EditorGUI.indentLevel--;
             }
         }

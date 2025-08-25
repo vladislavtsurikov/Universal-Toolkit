@@ -7,11 +7,10 @@ using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.UnityUtility.Editor;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.SelectionData
 {
-    public class GroupsSelectedEditor 
+    public class GroupsSelectedEditor
     {
         private readonly Runtime.Core.PrototypeRendererSystem.SelectionData _selectionData;
         private readonly TabStackEditor _tabStackEditor;
@@ -31,19 +30,13 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
             };
         }
 
-        public void OnGUI()
-        {
-            _tabStackEditor.OnGUI();
-        }
+        public void OnGUI() => _tabStackEditor.OnGUI();
 
-        private void AddGroup()
-        {
-            SelectGroup(AddGroup("New Group"));
-        }
+        private void AddGroup() => SelectGroup(AddGroup("New Group"));
 
         private void SelectGroup(int index)
         {
-            if(index < 0 && index >= _selectionData.GroupList.Count)
+            if (index < 0 && index >= _selectionData.GroupList.Count)
             {
                 return;
             }
@@ -58,14 +51,11 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
             _selectionData.GroupList[index].Selected = true;
         }
 
-        private void DisableAllPrototypes()
-        {
-            _selectionData.PrototypeList.ForEach(proto => proto.Selected = false);
-        }
+        private void DisableAllPrototypes() => _selectionData.PrototypeList.ForEach(proto => proto.Selected = false);
 
         private int AddGroup(string name)
         {
-            _selectionData.GroupList.Add(new Group(name));            
+            _selectionData.GroupList.Add(new Group(name));
             return _selectionData.GroupList.Count - 1;
         }
 
@@ -73,7 +63,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
         {
             foreach (Group group in _selectionData.GroupList)
             {
-                if(group.Selected)
+                if (group.Selected)
                 {
                     _selectionData.RemovePrototypes(group.PrototypeList);
                 }
@@ -83,32 +73,31 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Se
 
             Group lastGroup = _selectionData.GroupList.Last();
 
-            if(lastGroup != null)
+            if (lastGroup != null)
             {
                 lastGroup.Selected = true;
             }
         }
 
-        private void HappenedMoveCallback()
-        {
-            RendererStackManager.Instance.Setup(true);
-        }
+        private void HappenedMoveCallback() => RendererStackManager.Instance.Setup(true);
 
         private GenericMenu TabMenu(int currentTabIndex)
         {
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
-            menu.AddItem(new GUIContent("Add Tab"), false, ContextMenuUtility.ContextMenuCallback, new Action(AddGroup));
+            menu.AddItem(new GUIContent("Add Tab"), false, ContextMenuUtility.ContextMenuCallback,
+                new Action(AddGroup));
 
-            menu.AddSeparator ("");
+            menu.AddSeparator("");
             if (_selectionData.GroupList.Count > 1)
             {
-                menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback, new Action(DeleteSelectedGroups));
+                menu.AddItem(new GUIContent("Delete"), false, ContextMenuUtility.ContextMenuCallback,
+                    new Action(DeleteSelectedGroups));
             }
             else
             {
                 menu.AddDisabledItem(new GUIContent("Delete"));
-            }    
+            }
 
             return menu;
         }

@@ -1,39 +1,36 @@
 namespace VladislavTsurikov.CPUNoise.Runtime
 {
     public static class NoiseUtility
-    {        
+    {
         public static void NormalizeArray(float[,] arr, int width, int height, ref float rangeMin, ref float rangeMax)
         {
-            float min = float.PositiveInfinity;
-            float max = float.NegativeInfinity;
+            var min = float.PositiveInfinity;
+            var max = float.NegativeInfinity;
 
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
+            for (var x = 0; x < width; x++)
             {
-                for (int x = 0; x < width; x++)
+                var v = arr[x, y];
+                if (v < min)
                 {
-                    float v = arr[x, y];
-                    if (v < min)
-                    {
-                        min = v;
-                    }
-                    if (v > max) 
-                    {
-                        max = v;
-                    }
+                    min = v;
+                }
+
+                if (v > max)
+                {
+                    max = v;
                 }
             }
 
             rangeMin = min;
             rangeMax = max;
 
-            for (int y = 0; y < height; y++)
+            for (var y = 0; y < height; y++)
+            for (var x = 0; x < width; x++)
             {
-                for (int x = 0; x < width; x++)
-                {
-                    float v = arr[x, y];
-                    arr[x, y] = (v - min) / (max - min);
-                }
+                var v = arr[x, y];
+                arr[x, y] = (v - min) / (max - min);
             }
         }
-    } 
+    }
 }

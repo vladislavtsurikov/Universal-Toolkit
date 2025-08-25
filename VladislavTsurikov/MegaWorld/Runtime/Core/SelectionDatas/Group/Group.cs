@@ -6,7 +6,6 @@ using OdinSerializer.Utilities;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
@@ -14,53 +13,39 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultCompo
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
 using VladislavTsurikov.ReflectionUtility;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Object = UnityEngine.Object;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 {
     public class Group : SerializedScriptableObject, IHasElementStack, IShowIcon
     {
-        [OdinSerialize] 
-        private bool _selected;
-        [OdinSerialize] 
-        private Type _prototypeType;
-        
+        public string RenamingName = "Group";
+        public bool Renaming;
+
         [OdinSerialize]
         private ComponentStackManager _componentStackManager;
 
-        [OdinSerialize] 
+        [OdinSerialize]
         private DefaultGroupComponentStack _defaultGroupComponentStack;
+
+        [OdinSerialize]
+        private Type _prototypeType;
+
+        [OdinSerialize]
+        private bool _selected;
+
+        [OdinSerialize]
+        public AdvancedElementList<Prototype> PrototypeList = new();
 
         public DefaultGroupComponentStack DefaultGroupComponentStack => _defaultGroupComponentStack;
 
         public Type PrototypeType => _prototypeType;
-        
-        [OdinSerialize] 
-        public AdvancedElementList<Prototype> PrototypeList = new AdvancedElementList<Prototype>();
 
-        public string RenamingName = "Group";
-        public bool Renaming;
-        public string Name => name;
-
-        public bool Selected
-        {
-            get => _selected;
-            set => _selected = value;
-        }
-        
-        public ComponentStackManager ComponentStackManager => _componentStackManager;
-
-#if UNITY_EDITOR
-        public bool IsRedIcon => false;
-        public Texture2D PreviewTexture => null;
-#endif
-
-        public void OnEnable() 
+        public void OnEnable()
         {
             AllAvailableGroups.AddGroup(this);
-            
+
             PrototypeList.OnRemoved -= OnRemove;
             PrototypeList.OnRemoved += OnRemove;
 
@@ -70,35 +55,24 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
                 SetupPrototypesElementStack();
             }
 
-            foreach (var prototype in PrototypeList)
+            foreach (Prototype prototype in PrototypeList)
             {
                 prototype.Setup();
             }
         }
 
-        private void OnRemove(int index)
-        {
-            PrototypeList[index].OnDisable();
-        }
-
         private void OnDestroy()
         {
             AllAvailableGroups.RemoveGroup(this);
-            
-            foreach (var prototype in PrototypeList)
+
+            foreach (Prototype prototype in PrototypeList)
             {
                 prototype.OnDisable();
             }
         }
 
-        internal void Init(Type prototypeType)
-        {
-            _prototypeType = prototypeType;
-            
-            SetupComponentStack();
-            SetupPrototypesElementStack();
-        }
-        
+        public ComponentStackManager ComponentStackManager => _componentStackManager;
+
         public void SetupComponentStack()
         {
             _componentStackManager ??= new ComponentStackManager();
@@ -106,36 +80,45 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             _componentStackManager.SetupElementStack(typeof(AddGeneralGroupComponentsAttribute),
                 typeof(AddGroupComponentsAttribute), PrototypeType);
-            _defaultGroupComponentStack.Setup(true, new object[]{this});
+            _defaultGroupComponentStack.Setup(true, new object[] { this });
+        }
+
+        public Runtime_Core_Component GetElement(Type elementType) =>
+            _componentStackManager.GeneralComponentStack.GetElement(elementType);
+
+        public Runtime_Core_Component GetElement(Type toolType, Type elementType) =>
+            _componentStackManager.ToolsComponentStack.GetElement(toolType, elementType);
+
+        public string Name => name;
+
+        public bool Selected
+        {
+            get => _selected;
+            set => _selected = value;
+        }
+
+        private void OnRemove(int index) => PrototypeList[index].OnDisable();
+
+        internal void Init(Type prototypeType)
+        {
+            _prototypeType = prototypeType;
+
+            SetupComponentStack();
+            SetupPrototypesElementStack();
         }
 
         public void SetupPrototypesElementStack()
         {
-            foreach (var prototype in PrototypeList)
+            foreach (Prototype prototype in PrototypeList)
             {
                 prototype.SetupComponentStack();
             }
         }
 
-        public Runtime_Core_Component GetElement(Type elementType)
-        {
-            return _componentStackManager.GeneralComponentStack.GetElement(elementType);
-        }
+        public T GetDefaultElement<T>() where T : DefaultGroupComponent =>
+            (T)_defaultGroupComponentStack.GetElement(typeof(T));
 
-        public Runtime_Core_Component GetElement(Type toolType, Type elementType)
-        {
-            return _componentStackManager.ToolsComponentStack.GetElement(toolType, elementType);
-        }
-        
-        public T GetDefaultElement<T>() where T: DefaultGroupComponent
-        {
-            return (T)_defaultGroupComponentStack.GetElement(typeof(T));
-        }
-        
-        public Prototype AddMissingPrototype(UnityEngine.Object obj)
-        {
-            return AddMissingPrototype(GeneratePrototypeIfNecessary(obj));
-        }
+        public Prototype AddMissingPrototype(Object obj) => AddMissingPrototype(GeneratePrototypeIfNecessary(obj));
 
         private Prototype AddMissingPrototype(Prototype proto)
         {
@@ -148,23 +131,23 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
             {
                 return proto;
             }
-            
+
             PrototypeList.Add(proto);
 
             return proto;
         }
 
-        private Prototype GeneratePrototypeIfNecessary(UnityEngine.Object obj)
+        private Prototype GeneratePrototypeIfNecessary(Object obj)
         {
             if (obj == null)
             {
                 Debug.LogWarning("You are adding a null object " + "(" + PrototypeType + ")");
                 return null;
             }
-            
+
             Prototype prototype = GetPrototype(obj);
-            
-            int id = obj.GetInstanceID();
+
+            var id = obj.GetInstanceID();
 
             if (prototype == null)
             {
@@ -180,11 +163,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
             return prototype;
         }
 
-        public Prototype GetPrototype(UnityEngine.Object obj)
+        public Prototype GetPrototype(Object obj)
         {
             foreach (Prototype proto in PrototypeList)
             {
-                if(proto.PrototypeObject == obj)
+                if (proto.PrototypeObject == obj)
                 {
                     return proto;
                 }
@@ -192,10 +175,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             return null;
         }
-        
+
         public Prototype GetPrototype(int id)
         {
-            foreach (var proto in PrototypeList)
+            foreach (Prototype proto in PrototypeList)
             {
                 if (proto.ID == id)
                 {
@@ -205,14 +188,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             return null;
         }
-        
+
         public List<Prototype> GetAllSelectedPrototypes()
         {
-            List<Prototype> protoList = new List<Prototype>();
+            var protoList = new List<Prototype>();
 
-            foreach (var proto in PrototypeList)
+            foreach (Prototype proto in PrototypeList)
             {
-                if(proto.Selected)
+                if (proto.Selected)
                 {
                     protoList.Add(proto);
                 }
@@ -220,12 +203,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             return protoList;
         }
-        
+
         public bool HasAllActivePrototypes()
         {
             foreach (Prototype proto in PrototypeList)
             {
-                if(proto.Active)
+                if (proto.Active)
                 {
                     return true;
                 }
@@ -233,49 +216,42 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             return false;
         }
-        
-        public void DeleteSelectedPrototype()
-        {
-            PrototypeList.RemoveAll(proto => proto.Selected);
-        }
 
-        public void SelectAllPrototypes(bool select)
-        {
-            PrototypeList.ForEach(proto => proto.Selected = select);
-        }
+        public void DeleteSelectedPrototype() => PrototypeList.RemoveAll(proto => proto.Selected);
+
+        public void SelectAllPrototypes(bool select) => PrototypeList.ForEach(proto => proto.Selected = select);
 
 #if UNITY_EDITOR
-        public string GetPrototypeTypeName()
-        {
-            return PrototypeType.GetAttribute<NameAttribute>().Name.Split('/').Last();
-        }
-        
-        public void Save() 
-        {
-            EditorUtility.SetDirty(this);
-        }
-        
+        public bool IsRedIcon => false;
+        public Texture2D PreviewTexture => null;
+#endif
+
+#if UNITY_EDITOR
+        public string GetPrototypeTypeName() => PrototypeType.GetAttribute<NameAttribute>().Name.Split('/').Last();
+
+        public void Save() => EditorUtility.SetDirty(this);
+
         // Sadly OnDestroy is not being called reliably by the editor. So we need this.
-        private class OnDestroyProcessor: AssetModificationProcessor
+        private class OnDestroyProcessor : AssetModificationProcessor
         {
-            static Type _type = typeof(Group);
-     
-            static string _fileEnding = ".asset";
- 
+            private static readonly Type _type = typeof(Group);
+
+            private static readonly string _fileEnding = ".asset";
+
             public static AssetDeleteResult OnWillDeleteAsset(string path, RemoveAssetOptions _)
             {
                 if (!path.EndsWith(_fileEnding))
                 {
                     return AssetDeleteResult.DidNotDelete;
                 }
- 
-                var assetType = AssetDatabase.GetMainAssetTypeAtPath(path);
+
+                Type assetType = AssetDatabase.GetMainAssetTypeAtPath(path);
                 if (assetType != null && (assetType == _type || assetType.IsSubclassOf(_type)))
                 {
-                    var asset = AssetDatabase.LoadAssetAtPath<Group>(path);
+                    Group asset = AssetDatabase.LoadAssetAtPath<Group>(path);
                     asset.OnDestroy();
                 }
- 
+
                 return AssetDeleteResult.DidNotDelete;
             }
         }

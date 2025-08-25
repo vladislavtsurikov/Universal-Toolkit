@@ -8,152 +8,162 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.U
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail
 {
-	[ResourceController(typeof(Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail.PrototypeTerrainDetail))]
+    [ResourceController(
+        typeof(Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail.PrototypeTerrainDetail))]
     public class DetailTerrainControllerEditor : ResourceControllerEditor
     {
-	    public override void OnGUI(Runtime.Core.SelectionDatas.Group.Group group)
-		{
-			if(Terrain.activeTerrains.Length != 0)
-			{	
-				DetailTerrainResourcesController.DetectSyncError(group, Terrain.activeTerrain);
+        public override void OnGUI(Runtime.Core.SelectionDatas.Group.Group group)
+        {
+            if (Terrain.activeTerrains.Length != 0)
+            {
+                DetailTerrainResourcesController.DetectSyncError(group, Terrain.activeTerrain);
 
-				switch (DetailTerrainResourcesController.SyncError)
-				{
-					case DetailTerrainResourcesController.TerrainResourcesSyncError.None:
-					{
-						string getResourcesFromTerrain = "Get/Update Resources From Terrain";
-		
-						GUILayout.BeginHorizontal();
-						{
-							GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-							GUILayout.BeginVertical();
-							{
-								if(CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick, ButtonSize.ClickButton))
-								{
-									DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain, group);
-								}
-	
-								GUILayout.Space(3);
-	
-								GUILayout.BeginHorizontal();
-								{
-									if(CustomEditorGUILayout.ClickButton("Add Missing Resources", ButtonStyle.Add))
-									{
-										TerrainResourcesController.AddMissingPrototypesToTerrains(group);
-									}
-	
-									GUILayout.Space(2);
-	
-									if(CustomEditorGUILayout.ClickButton("Remove All Resources", ButtonStyle.Remove))
-									{
-										if (EditorUtility.DisplayDialog("WARNING!",
-											"Are you sure you want to remove all Terrain Resources from the scene?",
-											"OK", "Cancel"))
-										{
-											TerrainResourcesController.RemoveAllPrototypesFromTerrains(group);
-										}
-									}
-								}
-								GUILayout.EndHorizontal();
-							}
-							GUILayout.EndVertical();
-							GUILayout.Space(5);
-						}
-						GUILayout.EndHorizontal();
+                switch (DetailTerrainResourcesController.SyncError)
+                {
+                    case DetailTerrainResourcesController.TerrainResourcesSyncError.None:
+                    {
+                        var getResourcesFromTerrain = "Get/Update Resources From Terrain";
 
-						break;
-					}
-					case DetailTerrainResourcesController.TerrainResourcesSyncError.NotAllProtoAvailable:
-					{
-						CustomEditorGUILayout.WarningBox("You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");   
-	
-						string getResourcesFromTerrain = "Get/Update Resources From Terrain";
-		
-						GUILayout.BeginHorizontal();
-						{
-							GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-							GUILayout.BeginVertical();
-							{
-								if(CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick, ButtonSize.ClickButton))
-								{
-									DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain, group);
-								}
-	
-								GUILayout.Space(3);
-	
-								GUILayout.BeginHorizontal();
-								{
-									if(CustomEditorGUILayout.ClickButton("Add Missing Resources", ButtonStyle.Add))
-									{
-										TerrainResourcesController.AddMissingPrototypesToTerrains(group);
-									}
-	
-									GUILayout.Space(2);
-	
-									if(CustomEditorGUILayout.ClickButton("Remove All Resources", ButtonStyle.Remove))
-									{
-										if (EditorUtility.DisplayDialog("WARNING!",
-											"Are you sure you want to remove all Terrain Resources from the scene?",
-											"OK", "Cancel"))
-										{
-											TerrainResourcesController.RemoveAllPrototypesFromTerrains(group);
-										}
-									}
-								}
-								GUILayout.EndHorizontal();
-							}
-							GUILayout.EndVertical();
-							GUILayout.Space(5);
-						}
-						GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
+                            GUILayout.BeginVertical();
+                            {
+                                if (CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick,
+                                        ButtonSize.ClickButton))
+                                {
+                                    DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain,
+                                        group);
+                                }
 
-						break;
-					}
-					case DetailTerrainResourcesController.TerrainResourcesSyncError.MissingPrototypes:
-					{
-						string getResourcesFromTerrain = "Get/Update Resources From Terrain";
-	
-						GUILayout.BeginHorizontal();
-						{
-							GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-							GUILayout.BeginVertical();
-							{
-								if(CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick, ButtonSize.ClickButton))
-								{
-									DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain, group);
-								}
-							}
-							GUILayout.EndVertical();
-							GUILayout.Space(5);
-						}
-						GUILayout.EndHorizontal();
+                                GUILayout.Space(3);
 
-						break;
-					}
-				}
+                                GUILayout.BeginHorizontal();
+                                {
+                                    if (CustomEditorGUILayout.ClickButton("Add Missing Resources", ButtonStyle.Add))
+                                    {
+                                        TerrainResourcesController.AddMissingPrototypesToTerrains(group);
+                                    }
 
-				GUILayout.Space(3);
-			}
-			else
-			{
-				CustomEditorGUILayout.WarningBox("There is no active terrain in the scene.");
-			}
-		}
+                                    GUILayout.Space(2);
 
-	    public override bool HasSyncError(Runtime.Core.SelectionDatas.Group.Group group)
-	    {
-		    if (group.PrototypeType == typeof(Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail.PrototypeTerrainDetail))
-		    {
-			    TerrainResourcesController.DetectSyncError(group, Terrain.activeTerrain);
+                                    if (CustomEditorGUILayout.ClickButton("Remove All Resources", ButtonStyle.Remove))
+                                    {
+                                        if (EditorUtility.DisplayDialog("WARNING!",
+                                                "Are you sure you want to remove all Terrain Resources from the scene?",
+                                                "OK", "Cancel"))
+                                        {
+                                            TerrainResourcesController.RemoveAllPrototypesFromTerrains(group);
+                                        }
+                                    }
+                                }
+                                GUILayout.EndHorizontal();
+                            }
+                            GUILayout.EndVertical();
+                            GUILayout.Space(5);
+                        }
+                        GUILayout.EndHorizontal();
 
-			    if(DetailTerrainResourcesController.SyncError != DetailTerrainResourcesController.TerrainResourcesSyncError.None)
-			    {
-				    return true;
-			    }
-		    }
+                        break;
+                    }
+                    case DetailTerrainResourcesController.TerrainResourcesSyncError.NotAllProtoAvailable:
+                    {
+                        CustomEditorGUILayout.WarningBox(
+                            "You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");
 
-		    return false;
-	    }
+                        var getResourcesFromTerrain = "Get/Update Resources From Terrain";
+
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
+                            GUILayout.BeginVertical();
+                            {
+                                if (CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick,
+                                        ButtonSize.ClickButton))
+                                {
+                                    DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain,
+                                        group);
+                                }
+
+                                GUILayout.Space(3);
+
+                                GUILayout.BeginHorizontal();
+                                {
+                                    if (CustomEditorGUILayout.ClickButton("Add Missing Resources", ButtonStyle.Add))
+                                    {
+                                        TerrainResourcesController.AddMissingPrototypesToTerrains(group);
+                                    }
+
+                                    GUILayout.Space(2);
+
+                                    if (CustomEditorGUILayout.ClickButton("Remove All Resources", ButtonStyle.Remove))
+                                    {
+                                        if (EditorUtility.DisplayDialog("WARNING!",
+                                                "Are you sure you want to remove all Terrain Resources from the scene?",
+                                                "OK", "Cancel"))
+                                        {
+                                            TerrainResourcesController.RemoveAllPrototypesFromTerrains(group);
+                                        }
+                                    }
+                                }
+                                GUILayout.EndHorizontal();
+                            }
+                            GUILayout.EndVertical();
+                            GUILayout.Space(5);
+                        }
+                        GUILayout.EndHorizontal();
+
+                        break;
+                    }
+                    case DetailTerrainResourcesController.TerrainResourcesSyncError.MissingPrototypes:
+                    {
+                        var getResourcesFromTerrain = "Get/Update Resources From Terrain";
+
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
+                            GUILayout.BeginVertical();
+                            {
+                                if (CustomEditorGUILayout.ClickButton(getResourcesFromTerrain, ButtonStyle.ButtonClick,
+                                        ButtonSize.ClickButton))
+                                {
+                                    DetailTerrainResourcesController.UpdatePrototypesFromTerrain(Terrain.activeTerrain,
+                                        group);
+                                }
+                            }
+                            GUILayout.EndVertical();
+                            GUILayout.Space(5);
+                        }
+                        GUILayout.EndHorizontal();
+
+                        break;
+                    }
+                }
+
+                GUILayout.Space(3);
+            }
+            else
+            {
+                CustomEditorGUILayout.WarningBox("There is no active terrain in the scene.");
+            }
+        }
+
+        public override bool HasSyncError(Runtime.Core.SelectionDatas.Group.Group group)
+        {
+            if (group.PrototypeType ==
+                typeof(Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainDetail.PrototypeTerrainDetail))
+            {
+                TerrainResourcesController.DetectSyncError(group, Terrain.activeTerrain);
+
+                if (DetailTerrainResourcesController.SyncError !=
+                    DetailTerrainResourcesController.TerrainResourcesSyncError.None)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
 #endif

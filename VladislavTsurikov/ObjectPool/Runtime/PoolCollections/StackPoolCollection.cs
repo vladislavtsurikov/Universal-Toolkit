@@ -10,31 +10,16 @@ namespace VladislavTsurikov.ObjectPool.Runtime
         {
         }
 
-        public StackPoolCollection(int initialCapacity)
-        {
-            _stack = new Stack<T>(initialCapacity);
-        }
+        public StackPoolCollection(int initialCapacity) => _stack = new Stack<T>(initialCapacity);
 
         public override int Count => _stack.Count;
 
-        public override void Add(T item)
-        {
-            _stack.Push(item);
-        }
+        public override void Add(T item) => _stack.Push(item);
 
-        public override T Remove()
-        {
-            return _stack.Pop();
-        }
+        public override T Remove() => _stack.Pop();
 
-        public override bool Contains(T item)
-        {
-            return _stack.Contains(item);
-        }
-        
-        public override void Clear()
-        {
-            _stack.Clear();
-        }
+        public override bool Contains(T item) => _stack.Contains(item);
+
+        public override void Clear() => _stack.Clear();
     }
 }

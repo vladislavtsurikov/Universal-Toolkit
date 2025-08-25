@@ -7,36 +7,36 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
 {
-    public static class GetRandomPrototype 
+    public static class GetRandomPrototype
     {
         public static Prototype GetMaxSuccessProto(IReadOnlyList<Prototype> protoList)
         {
-            if(protoList.Count == 0)
+            if (protoList.Count == 0)
             {
                 Debug.Log("You have not selected more than one prototype.");
                 return null;
             }
 
-            if(protoList.Count == 1)
+            if (protoList.Count == 1)
             {
                 return protoList[0];
             }
 
-            List<float> successProto = new List<float>();
+            var successProto = new List<float>();
 
             foreach (Prototype proto in protoList)
             {
-                SuccessSettings successSettings = (SuccessSettings)proto.GetElement(typeof(SuccessSettings));
+                var successSettings = (SuccessSettings)proto.GetElement(typeof(SuccessSettings));
 
-                if(proto.Active == false)
+                if (proto.Active == false)
                 {
                     successProto.Add(-1);
                     continue;
                 }
 
-                float randomSuccess = Random.Range(0.0f, 1.0f);
+                var randomSuccess = Random.Range(0.0f, 1.0f);
 
-                if(randomSuccess > successSettings.SuccessValue / 100)
+                if (randomSuccess > successSettings.SuccessValue / 100)
                 {
                     randomSuccess = successSettings.SuccessValue / 100;
                 }
@@ -44,7 +44,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
                 successProto.Add(randomSuccess);
             }
 
-            float maxSuccessProto = successProto.Max();
+            var maxSuccessProto = successProto.Max();
 
             var maxIndexProto = successProto.IndexOf(maxSuccessProto);
             return protoList[maxIndexProto];
@@ -53,7 +53,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility
         public static PlacedObjectPrototype GetRandomSelectedPrototype(Group group)
         {
             List<Prototype> protoList = group.GetAllSelectedPrototypes();
-            
+
             return (PlacedObjectPrototype)protoList[Random.Range(0, protoList.Count)];
         }
     }

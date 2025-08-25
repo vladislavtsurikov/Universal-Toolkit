@@ -16,82 +16,132 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using OdinSerializer.Utilities;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEditorInternal;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Debug = UnityEngine.Debug;
+using Object = UnityEngine.Object;
+
 #if UNITY_EDITOR
 
 namespace OdinSerializer.Editor
 {
-    using Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using UnityEditor;
-    using UnityEditor.SceneManagement;
-    using UnityEngine;
-    using System.Reflection;
-    using UnityEngine.SceneManagement;
-    using System.Collections;
-    using UnityEditorInternal;
-
     public sealed class AOTSupportScanner : IDisposable
     {
-        private bool scanning;
+        private static readonly Stopwatch smartProgressBarWatch = Stopwatch.StartNew();
+        private static int smartProgressBarDisplaysSinceLastUpdate;
+
+        private static readonly MethodInfo PlayerSettings_GetPreloadedAssets_Method =
+            typeof(PlayerSettings).GetMethod("GetPreloadedAssets", BindingFlags.Public | BindingFlags.Static, null,
+                Type.EmptyTypes, null);
+
+        private static readonly PropertyInfo Debug_Logger_Property =
+            typeof(Debug).GetProperty("unityLogger") ?? typeof(Debug).GetProperty("logger");
+
+        private static readonly Dictionary<Assembly, bool> IsEditorOnlyAssembly_Cache = new();
+
+        private static readonly HashSet<string> EditorAssemblyNames = new()
+        {
+            "Assembly-CSharp-Editor",
+            "Assembly-UnityScript-Editor",
+            "Assembly-Boo-Editor",
+            "Assembly-CSharp-Editor-firstpass",
+            "Assembly-UnityScript-Editor-firstpass",
+            "Assembly-Boo-Editor-firstpass",
+            "Sirenix.OdinInspector.Editor",
+            "Sirenix.Utilities.Editor",
+            "Sirenix.Reflection.Editor",
+            typeof(UnityEditor.Editor).Assembly.GetName().Name
+        };
+
+        private readonly HashSet<string> scannedPathsNoDependencies = new();
+        private readonly HashSet<string> scannedPathsWithDependencies = new();
+        private readonly HashSet<Type> seenSerializedTypes = new();
+
         private bool allowRegisteringScannedTypes;
-        private HashSet<Type> seenSerializedTypes = new HashSet<Type>();
-        private HashSet<string> scannedPathsNoDependencies = new HashSet<string>();
-        private HashSet<string> scannedPathsWithDependencies = new HashSet<string>();
+        private bool scanning;
 
-        private static System.Diagnostics.Stopwatch smartProgressBarWatch = System.Diagnostics.Stopwatch.StartNew();
-        private static int smartProgressBarDisplaysSinceLastUpdate = 0;
+        public void Dispose()
+        {
+            if (scanning)
+            {
+                FormatterLocator.OnLocatedEmittableFormatterForType -= OnLocatedEmitType;
+                FormatterLocator.OnLocatedFormatter -= OnLocatedFormatter;
+                Serializer.OnSerializedType -= OnSerializedType;
 
-        private static readonly MethodInfo PlayerSettings_GetPreloadedAssets_Method = typeof(PlayerSettings).GetMethod("GetPreloadedAssets", BindingFlags.Public | BindingFlags.Static, null, Type.EmptyTypes, null);
-        private static readonly PropertyInfo Debug_Logger_Property = typeof(Debug).GetProperty("unityLogger") ?? typeof(Debug).GetProperty("logger");
+                scanning = false;
+                seenSerializedTypes.Clear();
+                allowRegisteringScannedTypes = false;
+            }
+        }
 
         public void BeginScan()
         {
-            this.scanning = true;
+            scanning = true;
             allowRegisteringScannedTypes = false;
 
-            this.seenSerializedTypes.Clear();
-            this.scannedPathsNoDependencies.Clear();
-            this.scannedPathsWithDependencies.Clear();
+            seenSerializedTypes.Clear();
+            scannedPathsNoDependencies.Clear();
+            scannedPathsWithDependencies.Clear();
 
-            FormatterLocator.OnLocatedEmittableFormatterForType += this.OnLocatedEmitType;
-            FormatterLocator.OnLocatedFormatter += this.OnLocatedFormatter;
-            Serializer.OnSerializedType += this.OnSerializedType;
+            FormatterLocator.OnLocatedEmittableFormatterForType += OnLocatedEmitType;
+            FormatterLocator.OnLocatedFormatter += OnLocatedFormatter;
+            Serializer.OnSerializedType += OnSerializedType;
         }
 
         public bool ScanPreloadedAssets(bool showProgressBar)
         {
             // The API does not exist in this version of Unity
-            if (PlayerSettings_GetPreloadedAssets_Method == null) return true;
+            if (PlayerSettings_GetPreloadedAssets_Method == null)
+            {
+                return true;
+            }
 
-            UnityEngine.Object[] assets = (UnityEngine.Object[])PlayerSettings_GetPreloadedAssets_Method.Invoke(null, null);
+            var assets = (Object[])PlayerSettings_GetPreloadedAssets_Method.Invoke(null, null);
 
-            if (assets == null) return true;
+            if (assets == null)
+            {
+                return true;
+            }
 
             try
             {
-                for (int i = 0; i < assets.Length; i++)
+                for (var i = 0; i < assets.Length; i++)
                 {
-                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning preloaded assets for AOT support", (i + 1) + " / " + assets.Length, (float)i / assets.Length))
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar(
+                            "Scanning preloaded assets for AOT support", i + 1 + " / " + assets.Length,
+                            (float)i / assets.Length))
                     {
                         return false;
                     }
 
-                    var asset = assets[i];
+                    Object asset = assets[i];
 
-                    if (asset == null) continue;
+                    if (asset == null)
+                    {
+                        continue;
+                    }
 
                     if (AssetDatabase.Contains(asset))
                     {
                         // Scan the asset and all its dependencies
                         var path = AssetDatabase.GetAssetPath(asset);
-                        this.ScanAsset(path, true);
+                        ScanAsset(path, true);
                     }
                     else
                     {
                         // Just scan the asset
-                        this.ScanObject(asset);
+                        ScanObject(asset);
                     }
                 }
             }
@@ -108,11 +158,11 @@ namespace OdinSerializer.Editor
 
         public bool ScanAssetBundle(string bundle)
         {
-            string[] assets = AssetDatabase.GetAssetPathsFromAssetBundle(bundle);
-            
+            var assets = AssetDatabase.GetAssetPathsFromAssetBundle(bundle);
+
             foreach (var asset in assets)
             {
-                this.ScanAsset(asset, true);
+                ScanAsset(asset, true);
             }
 
             return true;
@@ -122,18 +172,20 @@ namespace OdinSerializer.Editor
         {
             try
             {
-                string[] bundles = AssetDatabase.GetAllAssetBundleNames();
+                var bundles = AssetDatabase.GetAllAssetBundleNames();
 
-                for (int i = 0; i < bundles.Length; i++)
+                for (var i = 0; i < bundles.Length; i++)
                 {
                     var bundle = bundles[i];
 
-                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning asset bundles for AOT support", bundle, (float)i / bundles.Length))
+                    if (showProgressBar &&
+                        DisplaySmartUpdatingCancellableProgressBar("Scanning asset bundles for AOT support", bundle,
+                            (float)i / bundles.Length))
                     {
                         return false;
                     }
 
-                    this.ScanAssetBundle(bundle);
+                    ScanAssetBundle(bundle);
                 }
             }
             finally
@@ -181,86 +233,149 @@ namespace OdinSerializer.Editor
 
             */
 
-            bool progressBarWasDisplayed = false;
+            var progressBarWasDisplayed = false;
 
             try
             {
-                Type AddressableAssetSettingsDefaultObject_Type = TwoWaySerializationBinder.Default.BindToType("UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject");
-                if (AddressableAssetSettingsDefaultObject_Type == null) return true;
-                PropertyInfo AddressableAssetSettingsDefaultObject_Settings = AddressableAssetSettingsDefaultObject_Type.GetProperty("Settings");
-                if (AddressableAssetSettingsDefaultObject_Settings == null) throw new NotSupportedException("AddressableAssetSettingsDefaultObject.Settings property not found");
-                ScriptableObject settings = (ScriptableObject)AddressableAssetSettingsDefaultObject_Settings.GetValue(null, null);
+                Type AddressableAssetSettingsDefaultObject_Type =
+                    TwoWaySerializationBinder.Default.BindToType(
+                        "UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject");
+                if (AddressableAssetSettingsDefaultObject_Type == null)
+                {
+                    return true;
+                }
 
-                if (settings == null) return true;
+                PropertyInfo AddressableAssetSettingsDefaultObject_Settings =
+                    AddressableAssetSettingsDefaultObject_Type.GetProperty("Settings");
+                if (AddressableAssetSettingsDefaultObject_Settings == null)
+                {
+                    throw new NotSupportedException(
+                        "AddressableAssetSettingsDefaultObject.Settings property not found");
+                }
+
+                var settings = (ScriptableObject)AddressableAssetSettingsDefaultObject_Settings.GetValue(null, null);
+
+                if (settings == null)
+                {
+                    return true;
+                }
 
                 Type AddressableAssetSettings_Type = settings.GetType();
                 PropertyInfo AddressableAssetSettings_groups = AddressableAssetSettings_Type.GetProperty("groups");
-                if (AddressableAssetSettings_groups == null) throw new NotSupportedException("AddressableAssetSettings.groups property not found");
+                if (AddressableAssetSettings_groups == null)
+                {
+                    throw new NotSupportedException("AddressableAssetSettings.groups property not found");
+                }
 
-                IList groups = (IList)AddressableAssetSettings_groups.GetValue(settings, null);
+                var groups = (IList)AddressableAssetSettings_groups.GetValue(settings, null);
 
-                if (groups == null) return true;
+                if (groups == null)
+                {
+                    return true;
+                }
 
-                Type PlayerDataGroupSchema_Type = TwoWaySerializationBinder.Default.BindToType("UnityEditor.AddressableAssets.Settings.GroupSchemas.PlayerDataGroupSchema");
+                Type PlayerDataGroupSchema_Type =
+                    TwoWaySerializationBinder.Default.BindToType(
+                        "UnityEditor.AddressableAssets.Settings.GroupSchemas.PlayerDataGroupSchema");
 
                 Type AddressableAssetGroup_Type = null;
                 MethodInfo AddressableAssetGroup_HasSchema = null;
                 MethodInfo AddressableAssetGroup_GatherAllAssets = null;
 
-                Type AddressableAssetEntry_Type = TwoWaySerializationBinder.Default.BindToType("UnityEditor.AddressableAssets.Settings.AddressableAssetEntry");
-                if (AddressableAssetEntry_Type == null) throw new NotSupportedException("AddressableAssetEntry type not found");
-                Type List_AddressableAssetEntry_Type = typeof(List<>).MakeGenericType(AddressableAssetEntry_Type);
-                Type Func_AddressableAssetEntry_bool_Type = typeof(Func<,>).MakeGenericType(AddressableAssetEntry_Type, typeof(bool));
-                PropertyInfo AddressableAssetEntry_AssetPath = AddressableAssetEntry_Type.GetProperty("AssetPath");
-                if (AddressableAssetEntry_AssetPath == null) throw new NotSupportedException("AddressableAssetEntry.AssetPath property not found");
-
-                foreach (object groupObj in groups)
+                Type AddressableAssetEntry_Type =
+                    TwoWaySerializationBinder.Default.BindToType(
+                        "UnityEditor.AddressableAssets.Settings.AddressableAssetEntry");
+                if (AddressableAssetEntry_Type == null)
                 {
-                    ScriptableObject group = (ScriptableObject)groupObj;
-                    if (group == null) continue;
+                    throw new NotSupportedException("AddressableAssetEntry type not found");
+                }
 
-                    string groupName = group.name;
+                Type List_AddressableAssetEntry_Type = typeof(List<>).MakeGenericType(AddressableAssetEntry_Type);
+                Type Func_AddressableAssetEntry_bool_Type =
+                    typeof(Func<,>).MakeGenericType(AddressableAssetEntry_Type, typeof(bool));
+                PropertyInfo AddressableAssetEntry_AssetPath = AddressableAssetEntry_Type.GetProperty("AssetPath");
+                if (AddressableAssetEntry_AssetPath == null)
+                {
+                    throw new NotSupportedException("AddressableAssetEntry.AssetPath property not found");
+                }
+
+                foreach (var groupObj in groups)
+                {
+                    var group = (ScriptableObject)groupObj;
+                    if (group == null)
+                    {
+                        continue;
+                    }
+
+                    var groupName = group.name;
 
                     if (AddressableAssetGroup_Type == null)
                     {
                         AddressableAssetGroup_Type = group.GetType();
-                        AddressableAssetGroup_HasSchema = AddressableAssetGroup_Type.GetMethod("HasSchema", Flags.InstancePublic, null, new Type[] { typeof(Type) }, null);
-                        if (AddressableAssetGroup_HasSchema == null) throw new NotSupportedException("AddressableAssetGroup.HasSchema(Type type) method not found");
-                        AddressableAssetGroup_GatherAllAssets = AddressableAssetGroup_Type.GetMethod("GatherAllAssets", Flags.InstancePublic, null, new Type[] { List_AddressableAssetEntry_Type, typeof(bool), typeof(bool), typeof(bool), Func_AddressableAssetEntry_bool_Type }, null);
-                        if (AddressableAssetGroup_GatherAllAssets == null) throw new NotSupportedException("AddressableAssetGroup.GatherAllAssets(List<AddressableAssetEntry> results, bool includeSelf, bool recurseAll, bool includeSubObjects, Func<AddressableAssetEntry, bool> entryFilter) method not found");
+                        AddressableAssetGroup_HasSchema = AddressableAssetGroup_Type.GetMethod("HasSchema",
+                            Flags.InstancePublic, null, new[] { typeof(Type) }, null);
+                        if (AddressableAssetGroup_HasSchema == null)
+                        {
+                            throw new NotSupportedException(
+                                "AddressableAssetGroup.HasSchema(Type type) method not found");
+                        }
+
+                        AddressableAssetGroup_GatherAllAssets = AddressableAssetGroup_Type.GetMethod("GatherAllAssets",
+                            Flags.InstancePublic, null,
+                            new[]
+                            {
+                                List_AddressableAssetEntry_Type, typeof(bool), typeof(bool), typeof(bool),
+                                Func_AddressableAssetEntry_bool_Type
+                            }, null);
+                        if (AddressableAssetGroup_GatherAllAssets == null)
+                        {
+                            throw new NotSupportedException(
+                                "AddressableAssetGroup.GatherAllAssets(List<AddressableAssetEntry> results, bool includeSelf, bool recurseAll, bool includeSubObjects, Func<AddressableAssetEntry, bool> entryFilter) method not found");
+                        }
                     }
 
-                    bool hasPlayerDataGroupSchema = false;
-                    
+                    var hasPlayerDataGroupSchema = false;
+
                     if (PlayerDataGroupSchema_Type != null)
                     {
-                        hasPlayerDataGroupSchema = (bool)AddressableAssetGroup_HasSchema.Invoke(group, new object[] { PlayerDataGroupSchema_Type });
+                        hasPlayerDataGroupSchema =
+                            (bool)AddressableAssetGroup_HasSchema.Invoke(group,
+                                new object[] { PlayerDataGroupSchema_Type });
                     }
 
-                    if (hasPlayerDataGroupSchema) continue; // Skip this group, since it contains all the player data such as resources and build scenes, and we're scanning that separately
-
-                    IList results = (IList)Activator.CreateInstance(List_AddressableAssetEntry_Type);
-
-                    AddressableAssetGroup_GatherAllAssets.Invoke(group, new object[] { results, true, true, true, null });
-
-                    for (int i = 0; i < results.Count; i++)
+                    if (hasPlayerDataGroupSchema)
                     {
-                        object entry = (object)results[i];
-                        if (entry == null) continue;
-                        string assetPath = (string)AddressableAssetEntry_AssetPath.GetValue(entry, null);
+                        continue; // Skip this group, since it contains all the player data such as resources and build scenes, and we're scanning that separately
+                    }
+
+                    var results = (IList)Activator.CreateInstance(List_AddressableAssetEntry_Type);
+
+                    AddressableAssetGroup_GatherAllAssets.Invoke(group,
+                        new object[] { results, true, true, true, null });
+
+                    for (var i = 0; i < results.Count; i++)
+                    {
+                        var entry = results[i];
+                        if (entry == null)
+                        {
+                            continue;
+                        }
+
+                        var assetPath = (string)AddressableAssetEntry_AssetPath.GetValue(entry, null);
 
                         if (showProgressBar)
                         {
                             progressBarWasDisplayed = true;
 
-                            if (DisplaySmartUpdatingCancellableProgressBar("Scanning addressables for AOT support", groupName + ": " + assetPath, (float)i / results.Count))
+                            if (DisplaySmartUpdatingCancellableProgressBar("Scanning addressables for AOT support",
+                                    groupName + ": " + assetPath, (float)i / results.Count))
                             {
                                 return false;
                             }
                         }
 
                         // Finally!
-                        this.ScanAsset(assetPath, includeAssetDependencies);
+                        ScanAsset(assetPath, includeAssetDependencies);
                     }
                 }
             }
@@ -284,34 +399,38 @@ namespace OdinSerializer.Editor
             return true;
         }
 
-        public bool ScanAllResources(bool includeResourceDependencies, bool showProgressBar, List<string> resourcesPaths = null)
+        public bool ScanAllResources(bool includeResourceDependencies, bool showProgressBar,
+            List<string> resourcesPaths = null)
         {
             if (resourcesPaths == null)
             {
-                resourcesPaths = new List<string>() {""};
+                resourcesPaths = new List<string> { "" };
             }
 
             try
             {
-                if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning resources for AOT support", "Loading resource assets", 0f))
+                if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning resources for AOT support",
+                        "Loading resource assets", 0f))
                 {
                     return false;
                 }
 
                 var resourcesPathsSet = new HashSet<string>();
 
-                for (int i = 0; i < resourcesPaths.Count; i++)
+                for (var i = 0; i < resourcesPaths.Count; i++)
                 {
                     var resourcesPath = resourcesPaths[i];
 
-                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Listing resources for AOT support", resourcesPath, (float)i / resourcesPaths.Count))
+                    if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar(
+                            "Listing resources for AOT support", resourcesPath,
+                            (float)i / resourcesPaths.Count))
                     {
                         return false;
                     }
 
-                    var resources = Resources.LoadAll(resourcesPath);
+                    Object[] resources = Resources.LoadAll(resourcesPath);
 
-                    foreach (var resource in resources)
+                    foreach (Object resource in resources)
                     {
                         try
                         {
@@ -324,22 +443,28 @@ namespace OdinSerializer.Editor
                         }
                         catch (MissingReferenceException ex)
                         {
-                            Debug.LogError("A resource threw a missing reference exception when scanning. Skipping resource and continuing scan.", resource);
+                            Debug.LogError(
+                                "A resource threw a missing reference exception when scanning. Skipping resource and continuing scan.",
+                                resource);
                             Debug.LogException(ex, resource);
-                            continue;
                         }
                     }
                 }
 
-                string[] resourcePaths = resourcesPathsSet.ToArray();
+                var resourcePaths = resourcesPathsSet.ToArray();
 
-                for (int i = 0; i < resourcePaths.Length; i++)
+                for (var i = 0; i < resourcePaths.Length; i++)
                 {
-                    if (resourcePaths[i] == null) continue;
+                    if (resourcePaths[i] == null)
+                    {
+                        continue;
+                    }
 
                     try
                     {
-                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning resource " + i + " for AOT support", resourcePaths[i], (float)i / resourcePaths.Length))
+                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar(
+                                "Scanning resource " + i + " for AOT support", resourcePaths[i],
+                                (float)i / resourcePaths.Length))
                         {
                             return false;
                         }
@@ -347,15 +472,18 @@ namespace OdinSerializer.Editor
                         var assetPath = resourcePaths[i];
 
                         // Exclude editor-only resources
-                        if (assetPath.ToLower().Contains("/editor/")) continue;
+                        if (assetPath.ToLower().Contains("/editor/"))
+                        {
+                            continue;
+                        }
 
-                        this.ScanAsset(assetPath, includeAssetDependencies: includeResourceDependencies);
+                        ScanAsset(assetPath, includeResourceDependencies);
                     }
                     catch (MissingReferenceException ex)
                     {
-                        Debug.LogError("A resource '" + resourcePaths[i] + "' threw a missing reference exception when scanning. Skipping resource and continuing scan.");
+                        Debug.LogError("A resource '" + resourcePaths[i] +
+                                       "' threw a missing reference exception when scanning. Skipping resource and continuing scan.");
                         Debug.LogException(ex);
-                        continue;
                     }
                 }
 
@@ -377,22 +505,25 @@ namespace OdinSerializer.Editor
                 .Select(n => n.path)
                 .ToArray();
 
-            return this.ScanScenes(scenePaths, includeSceneDependencies, showProgressBar);
+            return ScanScenes(scenePaths, includeSceneDependencies, showProgressBar);
         }
 
         public bool ScanScenes(string[] scenePaths, bool includeSceneDependencies, bool showProgressBar)
         {
-            if (scenePaths.Length == 0) return true;
+            if (scenePaths.Length == 0)
+            {
+                return true;
+            }
 
-            bool formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
+            var formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
 
             try
             {
                 UnitySerializationUtility.ForceEditorModeSerialization = true;
 
-                bool hasDirtyScenes = false;
+                var hasDirtyScenes = false;
 
-                for (int i = 0; i < EditorSceneManager.sceneCount; i++)
+                for (var i = 0; i < EditorSceneManager.sceneCount; i++)
                 {
                     if (EditorSceneManager.GetSceneAt(i).isDirty)
                     {
@@ -406,26 +537,30 @@ namespace OdinSerializer.Editor
                     return false;
                 }
 
-                var oldSceneSetup = EditorSceneManager.GetSceneManagerSetup();
+                SceneSetup[] oldSceneSetup = EditorSceneManager.GetSceneManagerSetup();
 
                 try
                 {
-                    for (int i = 0; i < scenePaths.Length; i++)
+                    for (var i = 0; i < scenePaths.Length; i++)
                     {
                         var scenePath = scenePaths[i];
 
-                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning scenes for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
+                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar(
+                                "Scanning scenes for AOT support",
+                                "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath,
+                                (float)i / scenePaths.Length))
                         {
                             return false;
                         }
 
-                        if (!System.IO.File.Exists(scenePath))
+                        if (!File.Exists(scenePath))
                         {
-                            Debug.LogWarning("Skipped AOT scanning scene '" + scenePath + "' for a file not existing at the scene path.");
+                            Debug.LogWarning("Skipped AOT scanning scene '" + scenePath +
+                                             "' for a file not existing at the scene path.");
                             continue;
                         }
 
-                        Scene openScene = default(Scene);
+                        var openScene = default(Scene);
 
                         try
                         {
@@ -433,23 +568,28 @@ namespace OdinSerializer.Editor
                         }
                         catch
                         {
-                            Debug.LogWarning("Skipped AOT scanning scene '" + scenePath + "' for throwing exceptions when trying to load it.");
+                            Debug.LogWarning("Skipped AOT scanning scene '" + scenePath +
+                                             "' for throwing exceptions when trying to load it.");
                             continue;
                         }
 
-                        var sceneGOs = Resources.FindObjectsOfTypeAll<GameObject>();
+                        GameObject[] sceneGOs = Resources.FindObjectsOfTypeAll<GameObject>();
 
-                        foreach (var go in sceneGOs)
+                        foreach (GameObject go in sceneGOs)
                         {
-                            if (go.scene != openScene) continue;
-                            
+                            if (go.scene != openScene)
+                            {
+                                continue;
+                            }
+
                             if ((go.hideFlags & HideFlags.DontSaveInBuild) == 0)
                             {
-                                foreach (var component in go.GetComponents<ISerializationCallbackReceiver>())
+                                foreach (ISerializationCallbackReceiver component in go
+                                             .GetComponents<ISerializationCallbackReceiver>())
                                 {
                                     try
                                     {
-                                        this.allowRegisteringScannedTypes = true;
+                                        allowRegisteringScannedTypes = true;
                                         component.OnBeforeSerialize();
 
                                         var prefabSupporter = component as ISupportsPrefabSerialization;
@@ -457,15 +597,18 @@ namespace OdinSerializer.Editor
                                         if (prefabSupporter != null)
                                         {
                                             // Also force a serialization of the object's prefab modifications, in case there are unknown types in there
-
-                                            List<UnityEngine.Object> objs = null;
-                                            var mods = UnitySerializationUtility.DeserializePrefabModifications(prefabSupporter.SerializationData.PrefabModifications, prefabSupporter.SerializationData.PrefabModificationsReferencedUnityObjects);
+                                            List<Object> objs = null;
+                                            List<PrefabModification> mods =
+                                                UnitySerializationUtility.DeserializePrefabModifications(
+                                                    prefabSupporter.SerializationData.PrefabModifications,
+                                                    prefabSupporter.SerializationData
+                                                        .PrefabModificationsReferencedUnityObjects);
                                             UnitySerializationUtility.SerializePrefabModifications(mods, ref objs);
                                         }
                                     }
                                     finally
                                     {
-                                        this.allowRegisteringScannedTypes = false;
+                                        allowRegisteringScannedTypes = false;
                                     }
                                 }
                             }
@@ -484,8 +627,8 @@ namespace OdinSerializer.Editor
                         logger = (UnityEngine.ILogger)Debug_Logger_Property.GetValue(null, null);
                     }
 
-                    bool previous = true;
-                    
+                    var previous = true;
+
                     try
                     {
                         if (logger != null)
@@ -496,7 +639,9 @@ namespace OdinSerializer.Editor
 
                         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
                     }
-                    catch { }
+                    catch
+                    {
+                    }
                     finally
                     {
                         if (logger != null)
@@ -504,7 +649,6 @@ namespace OdinSerializer.Editor
                             logger.logEnabled = previous;
                         }
                     }
-
                 }
                 finally
                 {
@@ -514,25 +658,31 @@ namespace OdinSerializer.Editor
                         {
                             EditorUtility.DisplayProgressBar("Restoring scene setup", "", 1.0f);
                         }
+
                         EditorSceneManager.RestoreSceneManagerSetup(oldSceneSetup);
                     }
                 }
 
                 if (includeSceneDependencies)
                 {
-                    for (int i = 0; i < scenePaths.Length; i++)
+                    for (var i = 0; i < scenePaths.Length; i++)
                     {
                         var scenePath = scenePaths[i];
-                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar("Scanning scene dependencies for AOT support", "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath, (float)i / scenePaths.Length))
+                        if (showProgressBar && DisplaySmartUpdatingCancellableProgressBar(
+                                "Scanning scene dependencies for AOT support",
+                                "Scene " + (i + 1) + "/" + scenePaths.Length + " - " + scenePath,
+                                (float)i / scenePaths.Length))
                         {
                             return false;
                         }
 
-                        string[] dependencies = AssetDatabase.GetDependencies(scenePath, recursive: true);
+                        var dependencies = AssetDatabase.GetDependencies(scenePath, true);
 
-                        foreach (var dependency in dependencies)
+                        foreach (var dependency in
+                                 dependencies)
                         {
-                            this.ScanAsset(dependency, includeAssetDependencies: false); // All dependencies of this asset were already included recursively by Unity
+                            ScanAsset(dependency,
+                                false); // All dependencies of this asset were already included recursively by Unity
                         }
                     }
                 }
@@ -554,56 +704,66 @@ namespace OdinSerializer.Editor
         {
             if (includeAssetDependencies)
             {
-                if (this.scannedPathsWithDependencies.Contains(assetPath)) return true; // Already scanned this asset
+                if (scannedPathsWithDependencies.Contains(assetPath))
+                {
+                    return true; // Already scanned this asset
+                }
 
-                this.scannedPathsWithDependencies.Add(assetPath);
-                this.scannedPathsNoDependencies.Add(assetPath);
+                scannedPathsWithDependencies.Add(assetPath);
+                scannedPathsNoDependencies.Add(assetPath);
             }
             else
             {
-                if (this.scannedPathsNoDependencies.Contains(assetPath)) return true; // Already scanned this asset
+                if (scannedPathsNoDependencies.Contains(assetPath))
+                {
+                    return true; // Already scanned this asset
+                }
 
-                this.scannedPathsNoDependencies.Add(assetPath);
+                scannedPathsNoDependencies.Add(assetPath);
             }
 
             if (assetPath.EndsWith(".unity"))
             {
-                return this.ScanScenes(new string[] { assetPath }, includeAssetDependencies, false);
+                return ScanScenes(new[] { assetPath }, includeAssetDependencies, false);
             }
 
             if (!(assetPath.EndsWith(".asset") || assetPath.EndsWith(".prefab")))
-            {
                 // ScanAsset can only scan .unity, .asset and .prefab assets.
+            {
                 return false;
             }
 
-            bool formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
+            var formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
 
             try
             {
                 UnitySerializationUtility.ForceEditorModeSerialization = true;
 
-                var assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
+                Object[] assets = AssetDatabase.LoadAllAssetsAtPath(assetPath);
 
                 if (assets == null || assets.Length == 0)
                 {
                     return false;
                 }
 
-                foreach (var asset in assets)
+                foreach (Object asset in assets)
                 {
-                    if (asset == null) continue;
+                    if (asset == null)
+                    {
+                        continue;
+                    }
 
-                    this.ScanObject(asset);
+                    ScanObject(asset);
                 }
 
                 if (includeAssetDependencies)
                 {
-                    string[] dependencies = AssetDatabase.GetDependencies(assetPath, recursive: true);
+                    var dependencies = AssetDatabase.GetDependencies(assetPath, true);
 
-                    foreach (var dependency in dependencies)
+                    foreach (var dependency in
+                             dependencies)
                     {
-                        this.ScanAsset(dependency, includeAssetDependencies: false); // All dependencies were already included recursively by Unity
+                        ScanAsset(dependency, false); // All dependencies were already included recursively by Unity
                     }
                 }
 
@@ -615,21 +775,21 @@ namespace OdinSerializer.Editor
             }
         }
 
-        public void ScanObject(UnityEngine.Object obj)
+        public void ScanObject(Object obj)
         {
             if (obj is ISerializationCallbackReceiver)
             {
-                bool formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
+                var formerForceEditorModeSerialization = UnitySerializationUtility.ForceEditorModeSerialization;
 
                 try
                 {
                     UnitySerializationUtility.ForceEditorModeSerialization = true;
-                    this.allowRegisteringScannedTypes = true;
+                    allowRegisteringScannedTypes = true;
                     (obj as ISerializationCallbackReceiver).OnBeforeSerialize();
                 }
                 finally
                 {
-                    this.allowRegisteringScannedTypes = false;
+                    allowRegisteringScannedTypes = false;
                     UnitySerializationUtility.ForceEditorModeSerialization = formerForceEditorModeSerialization;
                 }
             }
@@ -637,62 +797,68 @@ namespace OdinSerializer.Editor
 
         public List<Type> EndScan()
         {
-            if (!this.scanning) throw new InvalidOperationException("Cannot end a scan when scanning has not begun.");
+            if (!scanning)
+            {
+                throw new InvalidOperationException("Cannot end a scan when scanning has not begun.");
+            }
 
             var results = new HashSet<Type>();
 
-            foreach (var type in this.seenSerializedTypes)
+            foreach (Type type in seenSerializedTypes)
             {
                 GatherValidAOTSupportTypes(type, results);
             }
 
-            this.Dispose();
+            Dispose();
             return results.ToList();
-        }
-
-        public void Dispose()
-        {
-            if (this.scanning)
-            {
-                FormatterLocator.OnLocatedEmittableFormatterForType -= this.OnLocatedEmitType;
-                FormatterLocator.OnLocatedFormatter -= this.OnLocatedFormatter;
-                Serializer.OnSerializedType -= this.OnSerializedType;
-
-                this.scanning = false;
-                this.seenSerializedTypes.Clear();
-                this.allowRegisteringScannedTypes = false;
-            }
         }
 
         private void OnLocatedEmitType(Type type)
         {
-			if (!this.allowRegisteringScannedTypes) return;
-            this.seenSerializedTypes.Add(type);
+            if (!allowRegisteringScannedTypes)
+            {
+                return;
+            }
+
+            seenSerializedTypes.Add(type);
         }
 
         private void OnSerializedType(Type type)
-		{
-			if (!this.allowRegisteringScannedTypes) return;
-			this.seenSerializedTypes.Add(type);
-		}
+        {
+            if (!allowRegisteringScannedTypes)
+            {
+                return;
+            }
+
+            seenSerializedTypes.Add(type);
+        }
 
         private void OnLocatedFormatter(IFormatter formatter)
         {
-            var type = formatter.SerializedType;
-            if (type == null || !this.allowRegisteringScannedTypes) return;
-			this.seenSerializedTypes.Add(type);
-		}
+            Type type = formatter.SerializedType;
+            if (type == null || !allowRegisteringScannedTypes)
+            {
+                return;
+            }
+
+            seenSerializedTypes.Add(type);
+        }
 
         public static bool AllowRegisterType(Type type)
         {
             if (IsEditorOnlyAssembly(type.Assembly))
+            {
                 return false;
+            }
 
             if (type.IsGenericType)
             {
-                foreach (var parameter in type.GetGenericArguments())
+                foreach (Type parameter in type.GetGenericArguments())
                 {
-                    if (!AllowRegisterType(parameter)) return false;
+                    if (!AllowRegisterType(parameter))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -712,16 +878,17 @@ namespace OdinSerializer.Editor
                 try
                 {
                     var name = assembly.GetName().Name;
-                    string[] guids = AssetDatabase.FindAssets(name);
-                    string[] paths = new string[guids.Length];
+                    var guids = AssetDatabase.FindAssets(name);
+                    var paths = new string[guids.Length];
 
-                    int dllCount = 0;
-                    int dllIndex = 0;
+                    var dllCount = 0;
+                    var dllIndex = 0;
 
-                    for (int i = 0; i < guids.Length; i++)
+                    for (var i = 0; i < guids.Length; i++)
                     {
                         paths[i] = AssetDatabase.GUIDToAssetPath(guids[i]);
-                        if (paths[i].EndsWith(".dll", StringComparison.OrdinalIgnoreCase) || paths[i].EndsWith(".asmdef", StringComparison.OrdinalIgnoreCase))
+                        if (paths[i].EndsWith(".dll", StringComparison.OrdinalIgnoreCase) ||
+                            paths[i].EndsWith(".asmdef", StringComparison.OrdinalIgnoreCase))
                         {
                             dllCount++;
                             dllIndex = i;
@@ -747,16 +914,19 @@ namespace OdinSerializer.Editor
                             }
                             else
                             {
-                                bool isCompatibleWithAnyNonEditorPlatform = false;
+                                var isCompatibleWithAnyNonEditorPlatform = false;
 
-                                foreach (var member in typeof(BuildTarget).GetFields(BindingFlags.Public | BindingFlags.Static))
+                                foreach (FieldInfo member in typeof(BuildTarget).GetFields(BindingFlags.Public |
+                                             BindingFlags.Static))
                                 {
-                                    BuildTarget platform = (BuildTarget)member.GetValue(null);
+                                    var platform = (BuildTarget)member.GetValue(null);
 
-                                    int asInt = Convert.ToInt32(platform);
+                                    var asInt = Convert.ToInt32(platform);
 
                                     if (member.IsDefined(typeof(ObsoleteAttribute)) || asInt < 0)
+                                    {
                                         continue;
+                                    }
 
                                     if (pluginImporter.GetCompatibleWithPlatform(platform))
                                     {
@@ -771,7 +941,8 @@ namespace OdinSerializer.Editor
                         else if (assetImporter is AssemblyDefinitionImporter)
                         {
                             var asmDefImporter = assetImporter as AssemblyDefinitionImporter;
-                            var asset = AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(path);
+                            AssemblyDefinitionAsset asset =
+                                AssetDatabase.LoadAssetAtPath<AssemblyDefinitionAsset>(path);
 
                             if (asset == null)
                             {
@@ -779,13 +950,13 @@ namespace OdinSerializer.Editor
                                 goto HasResult;
                             }
 
-                            var data = JsonUtility.FromJson<AssemblyDefinitionData>(asset.text);
+                            AssemblyDefinitionData data = JsonUtility.FromJson<AssemblyDefinitionData>(asset.text);
 
                             if (data != null)
                             {
                                 if (data.defineConstraints != null)
                                 {
-                                    for (int i = 0; i < data.defineConstraints.Length; i++)
+                                    for (var i = 0; i < data.defineConstraints.Length; i++)
                                     {
                                         if (data.defineConstraints[i].Trim() == "UNITY_EDITOR")
                                         {
@@ -825,57 +996,23 @@ namespace OdinSerializer.Editor
             return result;
         }
 
-        [Serializable]
-        class VersionDefine
-        {
-            public string name;
-            public string expression;
-            public string define;
-        }
-
-        [Serializable]
-        class AssemblyDefinitionData
-        {
-            public string name;
-            public string rootNamespace;
-            public string[] references;
-            public string[] includePlatforms;
-            public string[] excludePlatforms;
-            public bool allowUnsafeCode;
-            public bool overrideReferences;
-            public string[] precompiledReferences;
-            public bool autoReferenced;
-            public string[] defineConstraints;
-            public VersionDefine[] versionDefines;
-            public bool noEngineReferences;
-        }
-
-        private static Dictionary<Assembly, bool> IsEditorOnlyAssembly_Cache = new Dictionary<Assembly, bool>();
-
-        private static HashSet<string> EditorAssemblyNames = new HashSet<string>()
-        {
-            "Assembly-CSharp-Editor",
-            "Assembly-UnityScript-Editor",
-            "Assembly-Boo-Editor",
-            "Assembly-CSharp-Editor-firstpass",
-            "Assembly-UnityScript-Editor-firstpass",
-            "Assembly-Boo-Editor-firstpass",
-            "Sirenix.OdinInspector.Editor",
-            "Sirenix.Utilities.Editor",
-            "Sirenix.Reflection.Editor",
-            typeof(Editor).Assembly.GetName().Name
-        };
-
         private static void GatherValidAOTSupportTypes(Type type, HashSet<Type> results)
         {
-            if (type.IsGenericType && (type.IsGenericTypeDefinition || !type.IsFullyConstructedGenericType())) return;
-            if (!AllowRegisterType(type)) return;
+            if (type.IsGenericType && (type.IsGenericTypeDefinition || !type.IsFullyConstructedGenericType()))
+            {
+                return;
+            }
 
-			if (results.Add(type))
+            if (!AllowRegisterType(type))
+            {
+                return;
+            }
+
+            if (results.Add(type))
             {
                 if (type.IsGenericType)
                 {
-                    foreach (var arg in type.GetGenericArguments())
+                    foreach (Type arg in type.GetGenericArguments())
                     {
                         GatherValidAOTSupportTypes(arg, results);
                     }
@@ -883,10 +1020,11 @@ namespace OdinSerializer.Editor
             }
         }
 
-        private static bool DisplaySmartUpdatingCancellableProgressBar(string title, string details, float progress, int updateIntervalByMS = 200, int updateIntervalByCall = 50)
+        private static bool DisplaySmartUpdatingCancellableProgressBar(string title, string details, float progress,
+            int updateIntervalByMS = 200, int updateIntervalByCall = 50)
         {
-            bool updateProgressBar =
-                    smartProgressBarWatch.ElapsedMilliseconds >= updateIntervalByMS
+            var updateProgressBar =
+                smartProgressBarWatch.ElapsedMilliseconds >= updateIntervalByMS
                 || ++smartProgressBarDisplaysSinceLastUpdate >= updateIntervalByCall;
 
             if (updateProgressBar)
@@ -904,6 +1042,31 @@ namespace OdinSerializer.Editor
             }
 
             return false;
+        }
+
+        [Serializable]
+        private class VersionDefine
+        {
+            public string name;
+            public string expression;
+            public string define;
+        }
+
+        [Serializable]
+        private class AssemblyDefinitionData
+        {
+            public string name;
+            public string rootNamespace;
+            public string[] references;
+            public string[] includePlatforms;
+            public string[] excludePlatforms;
+            public bool allowUnsafeCode;
+            public bool overrideReferences;
+            public string[] precompiledReferences;
+            public bool autoReferenced;
+            public string[] defineConstraints;
+            public VersionDefine[] versionDefines;
+            public bool noEngineReferences;
         }
     }
 }

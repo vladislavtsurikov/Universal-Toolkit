@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using OdinSerializer;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.QuadTree.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Common;
 using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
@@ -20,25 +20,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
     [AllowCreateComponentWithTerrains]
     public partial class TerrainObjectRendererData : RendererSceneData, IRaycast
     {
-        [OdinSerialize]
-        private float _cellSize;
-        [OdinSerialize]
-        private Bounds _bounds;
-        
-        [NonSerialized] 
-        private QuadTree<Cell> _cellQuadTree;
-
         private const int ConstCellSize = 500;
 
         [OdinSerialize]
-        public List<Cell> CellList = new List<Cell>();
+        private Bounds _bounds;
 
         [NonSerialized]
-        public BvhCellTree<Cell> BVHCellTree = new BvhCellTree<Cell>();
+        private QuadTree<Cell> _cellQuadTree;
+
+        [OdinSerialize]
+        private float _cellSize;
+
+        [NonSerialized]
+        public BvhCellTree<Cell> BVHCellTree = new();
+
+        [OdinSerialize]
+        public List<Cell> CellList = new();
 
         protected override void SetupSceneData()
         {
-            if(CellList.Count == 0)
+            if (CellList.Count == 0)
             {
                 RefreshCells();
                 return;
@@ -49,7 +50,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 return;
             }
 
-            TerrainObjectRenderer terrainObject = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
+            var terrainObject =
+                (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(
+                    typeof(TerrainObjectRenderer));
             terrainObject.ForceUpdateRendererData = true;
 
             SetupNonSerializedData();
@@ -59,7 +62,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 cell.Setup(this, terrainObject.SelectionData);
             }
         }
-        
+
         public override AABB GetAABB()
         {
             SetupNonSerializedData();
@@ -69,7 +72,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
 
         protected override void OnDisableElement()
         {
-            for (int i = 0; i <= CellList.Count - 1; i++)
+            for (var i = 0; i <= CellList.Count - 1; i++)
             {
                 CellList[i].PrototypeRenderDataStack.OnDisable();
             }
@@ -87,7 +90,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 _cellQuadTree = new QuadTree<Cell>(expandedRect);
                 BVHCellTree = new BvhCellTree<Cell>();
 
-                foreach (var cell in CellList)
+                foreach (Cell cell in CellList)
                 {
                     _cellQuadTree.Insert(cell);
                     BVHCellTree.RegisterObject(cell, new AABB(cell.Bounds));
@@ -98,18 +101,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         public void RemoveInstances(int prototypeID)
         {
             ScriptingSystem.ScriptingSystem.RemoveCollider(prototypeID);
-            
-            foreach (var cell in CellList)
+
+            foreach (Cell cell in CellList)
             {
-                PrototypeRendererData prototypeRendererData = cell.PrototypeRenderDataStack.GetPrototypeRenderData(prototypeID);
-                
+                PrototypeRendererData prototypeRendererData =
+                    cell.PrototypeRenderDataStack.GetPrototypeRenderData(prototypeID);
+
                 if (prototypeRendererData == null || prototypeRendererData.InstanceList.Count == 0)
                 {
                     continue;
                 }
-                
+
                 prototypeRendererData.ClearPersistentData();
-                
+
                 cell.PrototypeRenderDataStack.RemoveInstances(prototypeID);
                 cell.TerrainObjectRendererCollider.RemoveInstances(prototypeID);
 
@@ -119,9 +123,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
 
         public List<TerrainObjectCollider> GetAllInstances()
         {
-            List<TerrainObjectCollider> largeObjectColliders = new List<TerrainObjectCollider>();
+            var largeObjectColliders = new List<TerrainObjectCollider>();
 
-            foreach (var cell in CellList)
+            foreach (Cell cell in CellList)
             {
                 largeObjectColliders.AddRange(cell.TerrainObjectRendererCollider.GetAllInstances());
             }
@@ -136,13 +140,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 return;
             }
 
-            AABB cellAABB = new AABB(cell.Bounds);
+            var cellAABB = new AABB(cell.Bounds);
 
             AABB newObjectsAABB = terrainObjectCollider.GetAABB();
 
             newObjectsAABB.Encapsulate(cellAABB);
 
-            if(!cell.InitialObjectsAABB.IsValid || newObjectsAABB.Size.IsBigger(cell.InitialObjectsAABB.Size))
+            if (!cell.InitialObjectsAABB.IsValid || newObjectsAABB.Size.IsBigger(cell.InitialObjectsAABB.Size))
             {
                 BVHCellTree.ChangeNodeSize(cell, cell.GetObjectsAABB());
                 cell.InitialObjectsAABB = cell.GetObjectsAABB();
@@ -156,8 +160,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             {
                 return;
             }
-            
-            CameraManager cameraManager = (CameraManager)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(CameraManager));
+
+            var cameraManager =
+                (CameraManager)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(CameraManager));
 
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
 
@@ -177,14 +182,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             {
                 foreach (VirtualCamera cam in cameraManager.VirtualCameraList)
                 {
-                    if(cam.Ignored)
+                    if (cam.Ignored)
                     {
                         continue;
                     }
 
                     List<Cell> visibleCellList = GetVisibleCellList(cam);
 
-                    for (int i = 0; i < visibleCellList.Count; i++)
+                    for (var i = 0; i < visibleCellList.Count; i++)
                     {
                         Bounds bounds = visibleCellList[i].GetObjectBounds();
 

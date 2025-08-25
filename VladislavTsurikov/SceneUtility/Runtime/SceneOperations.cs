@@ -1,19 +1,13 @@
-﻿using System.Collections;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
 
 namespace VladislavTsurikov.SceneUtility.Runtime
 {
     public abstract class SceneOperations
     {
-        public bool Enable = true;
-        
         protected readonly SceneReference SceneReference;
-        
-        public SceneOperations(SceneReference sceneReference)
-        {
-            SceneReference = sceneReference;
-        }
+        public bool Enable = true;
+
+        public SceneOperations(SceneReference sceneReference) => SceneReference = sceneReference;
 
         internal async UniTask LoadSceneInternal()
         {
@@ -31,10 +25,10 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             {
                 return;
             }
-            
+
             await UnloadScene();
         }
-        
+
         protected abstract UniTask LoadScene();
         protected abstract UniTask UnloadScene();
         public abstract float LoadingProgress();

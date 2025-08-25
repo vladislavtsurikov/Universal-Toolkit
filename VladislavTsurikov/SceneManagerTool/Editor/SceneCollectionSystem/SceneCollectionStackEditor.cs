@@ -10,7 +10,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
 {
     public class SceneCollectionStackEditor : ReorderableListStackEditor<SceneCollection, SceneCollectionEditor>
     {
-	    public SceneCollectionStackEditor(GUIContent reorderableListName, ComponentStackSupportSameType<SceneCollection> list) : base(reorderableListName, list, true)
+        public SceneCollectionStackEditor(GUIContent reorderableListName,
+            ComponentStackSupportSameType<SceneCollection> list) : base(reorderableListName, list, true)
         {
             RenameSupport = true;
             CopySettings = true;
@@ -18,15 +19,14 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
 
         protected override void AddCB(ReorderableList list)
         {
-            ComponentStackSupportSameType<SceneCollection> componentStackSupportSameType = (ComponentStackSupportSameType<SceneCollection>)Stack;
+            var componentStackSupportSameType = (ComponentStackSupportSameType<SceneCollection>)Stack;
             componentStackSupportSameType.CreateComponent(typeof(SceneCollection));
         }
 
-        protected override void DrawHeaderElement(Rect headerRect, int index, SceneCollectionEditor componentEditor)
-        {
-            componentEditor.Target.SelectSettingsFoldout = 
-                CustomEditorGUI.HeaderWithMenu(headerRect, componentEditor.Target.Name, componentEditor.Target.SelectSettingsFoldout, () => Menu(Stack.ElementList[index], index));
-        }
+        protected override void DrawHeaderElement(Rect headerRect, int index, SceneCollectionEditor componentEditor) =>
+            componentEditor.Target.SelectSettingsFoldout =
+                CustomEditorGUI.HeaderWithMenu(headerRect, componentEditor.Target.Name,
+                    componentEditor.Target.SelectSettingsFoldout, () => Menu(Stack.ElementList[index], index));
     }
 }
 #endif

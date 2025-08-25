@@ -11,13 +11,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     {
         public static void Unspawn(IReadOnlyList<Prototype> unspawnPrototypes, bool unspawnSelected)
         {
-            List<GameObject> unspawnPrefabs = new List<GameObject>();
-            
-            foreach (var proto in unspawnPrototypes)
+            var unspawnPrefabs = new List<GameObject>();
+
+            foreach (Prototype proto in unspawnPrototypes)
             {
-                if(unspawnSelected)
+                if (unspawnSelected)
                 {
-                    if(proto.Selected == false)
+                    if (proto.Selected == false)
                     {
                         continue;
                     }

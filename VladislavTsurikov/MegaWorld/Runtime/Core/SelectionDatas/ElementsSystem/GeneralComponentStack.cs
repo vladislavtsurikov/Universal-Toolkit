@@ -11,6 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
     {
         [OdinSerialize]
         private Type _addElementsAttributeType;
+
         [OdinSerialize]
         private Type _prototypeType;
 
@@ -22,29 +23,27 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 
         protected override void OnCreateElements()
         {
-            foreach (var type in AllToolTypes.TypeList)
+            foreach (Type type in AllToolTypes.TypeList)
+            foreach (Attribute attribute in type.GetAttributes(_addElementsAttributeType))
             {
-                foreach (var attribute in type.GetAttributes(_addElementsAttributeType))
+                var addComponentsAttribute = (AddComponentsAttribute)attribute;
+
+                if (!addComponentsAttribute.PrototypeTypes.Contains(_prototypeType))
                 {
-                    AddComponentsAttribute addComponentsAttribute = (AddComponentsAttribute)attribute;
-
-                    if (!addComponentsAttribute.PrototypeTypes.Contains(_prototypeType))
-                    {
-                        continue;
-                    }
-
-                    CreateIfMissingType(addComponentsAttribute.Types);
+                    continue;
                 }
+
+                CreateIfMissingType(addComponentsAttribute.Types);
             }
         }
 
         public override void OnRemoveInvalidElements()
         {
-            for (int i = ElementList.Count - 1; i >= 0; i--)
+            for (var i = ElementList.Count - 1; i >= 0; i--)
             {
-                bool found = false;
-                
-                foreach (var toolType in AllToolTypes.TypeList)
+                var found = false;
+
+                foreach (Type toolType in AllToolTypes.TypeList)
                 {
                     if (IsElementBelongsToTool(ElementList[i], toolType))
                     {
@@ -62,10 +61,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 
         private bool IsElementBelongsToTool(Element element, Type toolType)
         {
-            foreach (var attribute in toolType.GetAttributes(_addElementsAttributeType))
+            foreach (Attribute attribute in toolType.GetAttributes(_addElementsAttributeType))
             {
-                AddComponentsAttribute addComponentsAttribute = (AddComponentsAttribute)attribute;
-                
+                var addComponentsAttribute = (AddComponentsAttribute)attribute;
+
                 if (!addComponentsAttribute.PrototypeTypes.Contains(_prototypeType))
                 {
                     continue;

@@ -16,82 +16,88 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Provides a way of claiming and releasing cached array buffers.
+    ///     Provides a way of claiming and releasing cached array buffers.
     /// </summary>
     /// <typeparam name="T">The element type of the array to buffer.</typeparam>
     /// <seealso cref="System.IDisposable" />
     public sealed class Buffer<T> : IDisposable
     {
-        private static readonly object LOCK = new object();
-        private static readonly List<Buffer<T>> FreeBuffers = new List<Buffer<T>>();
+        private static readonly object LOCK = new();
+        private static readonly List<Buffer<T>> FreeBuffers = new();
+        private readonly T[] array;
 
-        private int count;
-        private T[] array;
+        private readonly int count;
         private volatile bool isFree;
 
         private Buffer(int count)
         {
-            this.array = new T[count];
+            array = new T[count];
             this.count = count;
-            this.isFree = false; // Always start as non-free
+            isFree = false; // Always start as non-free
         }
 
         /// <summary>
-        /// Gets the total element count of the buffered array. This will always be a power of two.
+        ///     Gets the total element count of the buffered array. This will always be a power of two.
         /// </summary>
         /// <value>
-        /// The total element count of the buffered array.
+        ///     The total element count of the buffered array.
         /// </value>
         /// <exception cref="System.InvalidOperationException">Cannot access a buffer while it is freed.</exception>
         public int Count
         {
             get
             {
-                if (this.isFree)
+                if (isFree)
                 {
                     throw new InvalidOperationException("Cannot access a buffer while it is freed.");
                 }
 
-                return this.count;
+                return count;
             }
         }
 
         /// <summary>
-        /// Gets the buffered array.
+        ///     Gets the buffered array.
         /// </summary>
         /// <value>
-        /// The buffered array.
+        ///     The buffered array.
         /// </value>
         /// <exception cref="System.InvalidOperationException">Cannot access a buffer while it is freed.</exception>
         public T[] Array
         {
             get
             {
-                if (this.isFree)
+                if (isFree)
                 {
                     throw new InvalidOperationException("Cannot access a buffer while it is freed.");
                 }
 
-                return this.array;
+                return array;
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this buffer is free.
+        ///     Gets a value indicating whether this buffer is free.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this buffer is free; otherwise, <c>false</c>.
+        ///     <c>true</c> if this buffer is free; otherwise, <c>false</c>.
         /// </value>
-        public bool IsFree { get { return this.isFree; } }
+        public bool IsFree => isFree;
 
         /// <summary>
-        /// Claims a buffer with the specified minimum capacity. Note: buffers always have a capacity equal to or larger than 256.
+        ///     Frees this buffer.
+        /// </summary>
+        public void Dispose() => Free(this);
+
+        /// <summary>
+        ///     Claims a buffer with the specified minimum capacity. Note: buffers always have a capacity equal to or larger than
+        ///     256.
         /// </summary>
         /// <param name="minimumCapacity">The minimum capacity.</param>
         /// <returns>A buffer which has a capacity equal to or larger than the specified minimum capacity.</returns>
@@ -113,31 +119,31 @@ namespace OdinSerializer
             lock (LOCK)
             {
                 // Search for a free buffer of sufficient size
-                for (int i = 0; i < Buffer<T>.FreeBuffers.Count; i++)
+                for (var i = 0; i < FreeBuffers.Count; i++)
                 {
-                    var buffer = Buffer<T>.FreeBuffers[i];
+                    Buffer<T> buffer = FreeBuffers[i];
 
                     if (buffer != null && buffer.count >= minimumCapacity)
                     {
                         result = buffer;
                         result.isFree = false;
-                        Buffer<T>.FreeBuffers[i] = null;
+                        FreeBuffers[i] = null;
                         break;
                     }
                 }
             }
 
             if (result == null)
-            {
                 // Allocate new buffer
-                result = new Buffer<T>(Buffer<T>.NextPowerOfTwo(minimumCapacity));
+            {
+                result = new Buffer<T>(NextPowerOfTwo(minimumCapacity));
             }
 
             return result;
         }
 
         /// <summary>
-        /// Frees the specified buffer.
+        ///     Frees the specified buffer.
         /// </summary>
         /// <param name="buffer">The buffer to free.</param>
         /// <exception cref="System.ArgumentNullException">The buffer argument is null.</exception>
@@ -156,13 +162,13 @@ namespace OdinSerializer
                     {
                         buffer.isFree = true;
 
-                        bool added = false;
+                        var added = false;
 
-                        for (int i = 0; i < Buffer<T>.FreeBuffers.Count; i++)
+                        for (var i = 0; i < FreeBuffers.Count; i++)
                         {
-                            if (Buffer<T>.FreeBuffers[i] == null)
+                            if (FreeBuffers[i] == null)
                             {
-                                Buffer<T>.FreeBuffers[i] = buffer;
+                                FreeBuffers[i] = buffer;
                                 added = true;
                                 break;
                             }
@@ -170,7 +176,7 @@ namespace OdinSerializer
 
                         if (!added)
                         {
-                            Buffer<T>.FreeBuffers.Add(buffer);
+                            FreeBuffers.Add(buffer);
                         }
                     }
                 }
@@ -178,20 +184,9 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Frees this buffer.
+        ///     Frees this buffer.
         /// </summary>
-        public void Free()
-        {
-            Buffer<T>.Free(this);
-        }
-
-        /// <summary>
-        /// Frees this buffer.
-        /// </summary>
-        public void Dispose()
-        {
-            Buffer<T>.Free(this);
-        }
+        public void Free() => Free(this);
 
         private static int NextPowerOfTwo(int v)
         {

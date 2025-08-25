@@ -3,12 +3,12 @@ using System;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.TemplatesSystem
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class)]
     public class TemplateAttribute : Attribute
     {
         public readonly string Name;
-        public readonly Type[] ToolTypes;
         public readonly Type[] SupportedResourceTypes;
+        public readonly Type[] ToolTypes;
 
         internal TemplateAttribute(string name, Type[] toolTypes, Type[] supportedResourceTypes)
         {

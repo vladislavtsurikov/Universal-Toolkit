@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
+using OdinSerializer;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 {

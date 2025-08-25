@@ -16,21 +16,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Globalization;
-
     /// <summary>
-    /// MemberInfo method extensions.
+    ///     MemberInfo method extensions.
     /// </summary>
     public static class MemberInfoExtensions
     {
         /// <summary>
-        /// Returns true if the attribute whose type is specified by the generic argument is defined on this member
+        ///     Returns true if the attribute whose type is specified by the generic argument is defined on this member
         /// </summary>
         public static bool IsDefined<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
         {
@@ -45,47 +45,42 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Returns true if the attribute whose type is specified by the generic argument is defined on this member
+        ///     Returns true if the attribute whose type is specified by the generic argument is defined on this member
         /// </summary>
-        public static bool IsDefined<T>(this ICustomAttributeProvider member) where T : Attribute
-        {
-            return IsDefined<T>(member, false);
-        }
+        public static bool IsDefined<T>(this ICustomAttributeProvider member) where T : Attribute =>
+            IsDefined<T>(member, false);
 
         /// <summary>
-        /// Returns the first found custom attribute of type T on this member
-        /// Returns null if none was found
+        ///     Returns the first found custom attribute of type T on this member
+        ///     Returns null if none was found
         /// </summary>
         public static T GetAttribute<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
         {
-            var all = GetAttributes<T>(member, inherit).ToArray();
-            return (all == null || all.Length == 0) ? null : all[0];
+            T[] all = GetAttributes<T>(member, inherit).ToArray();
+            return all == null || all.Length == 0 ? null : all[0];
         }
 
         /// <summary>
-        /// Returns the first found non-inherited custom attribute of type T on this member
-        /// Returns null if none was found
+        ///     Returns the first found non-inherited custom attribute of type T on this member
+        ///     Returns null if none was found
         /// </summary>
-        public static T GetAttribute<T>(this ICustomAttributeProvider member) where T : Attribute
-        {
-            return GetAttribute<T>(member, false);
-        }
+        public static T GetAttribute<T>(this ICustomAttributeProvider member) where T : Attribute =>
+            GetAttribute<T>(member, false);
 
         /// <summary>
-        /// Gets all attributes of the specified generic type.
+        ///     Gets all attributes of the specified generic type.
         /// </summary>
         /// <param name="member">The member.</param>
-        public static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider member) where T : Attribute
-        {
-            return GetAttributes<T>(member, false);
-        }
+        public static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider member) where T : Attribute =>
+            GetAttributes<T>(member, false);
 
         /// <summary>
-        /// Gets all attributes of the specified generic type.
+        ///     Gets all attributes of the specified generic type.
         /// </summary>
         /// <param name="member">The member.</param>
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
-        public static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider member, bool inherit) where T : Attribute
+        public static IEnumerable<T> GetAttributes<T>(this ICustomAttributeProvider member, bool inherit)
+            where T : Attribute
         {
             try
             {
@@ -98,7 +93,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets all attribute instances defined on a MemeberInfo.
+        ///     Gets all attribute instances defined on a MemeberInfo.
         /// </summary>
         /// <param name="member">The member.</param>
         public static Attribute[] GetAttributes(this ICustomAttributeProvider member)
@@ -114,7 +109,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets all attribute instances on a MemberInfo.
+        ///     Gets all attribute instances on a MemberInfo.
         /// </summary>
         /// <param name="member">The member.</param>
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
@@ -131,7 +126,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// If this member is a method, returns the full method name (name + params) otherwise the member name paskal splitted
+        ///     If this member is a method, returns the full method name (name + params) otherwise the member name paskal splitted
         /// </summary>
         public static string GetNiceName(this MemberInfo member)
         {
@@ -150,11 +145,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Determines whether a FieldInfo, PropertyInfo or MethodInfo is static.
+        ///     Determines whether a FieldInfo, PropertyInfo or MethodInfo is static.
         /// </summary>
         /// <param name="member">The member.</param>
         /// <returns>
-        ///   <c>true</c> if the specified member is static; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified member is static; otherwise, <c>false</c>.
         /// </returns>
         /// <exception cref="System.NotSupportedException"></exception>
         public static bool IsStatic(this MemberInfo member)
@@ -189,7 +184,7 @@ namespace OdinSerializer.Utilities
                 return type.IsSealed && type.IsAbstract;
             }
 
-            string message = string.Format(
+            var message = string.Format(
                 CultureInfo.InvariantCulture,
                 "Unable to determine IsStatic for member {0}.{1}" +
                 "MemberType was {2} but only fields, properties, methods, events and types are supported.",
@@ -201,43 +196,42 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Determines whether the specified member is an alias.
+        ///     Determines whether the specified member is an alias.
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
         /// <returns>
-        ///   <c>true</c> if the specified member is an alias; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified member is an alias; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsAlias(this MemberInfo memberInfo)
-        {
-            return memberInfo is MemberAliasFieldInfo
-                || memberInfo is MemberAliasPropertyInfo
-                || memberInfo is MemberAliasMethodInfo;
-        }
+        public static bool IsAlias(this MemberInfo memberInfo) =>
+            memberInfo is MemberAliasFieldInfo
+            || memberInfo is MemberAliasPropertyInfo
+            || memberInfo is MemberAliasMethodInfo;
 
         /// <summary>
-        /// Returns the original, backing member of an alias member if the member is an alias.
+        ///     Returns the original, backing member of an alias member if the member is an alias.
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
-        /// /// <param name="throwOnNotAliased">if set to <c>true</c> an exception will be thrown if the member is not aliased.</param>
+        /// ///
+        /// <param name="throwOnNotAliased">if set to <c>true</c> an exception will be thrown if the member is not aliased.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentException">The member was not aliased; this only occurs if throwOnNotAliased is true.</exception>
         public static MemberInfo DeAlias(this MemberInfo memberInfo, bool throwOnNotAliased = false)
         {
-            MemberAliasFieldInfo aliasFieldInfo = memberInfo as MemberAliasFieldInfo;
+            var aliasFieldInfo = memberInfo as MemberAliasFieldInfo;
 
             if (aliasFieldInfo != null)
             {
                 return aliasFieldInfo.AliasedField;
             }
 
-            MemberAliasPropertyInfo aliasPropertyInfo = memberInfo as MemberAliasPropertyInfo;
+            var aliasPropertyInfo = memberInfo as MemberAliasPropertyInfo;
 
             if (aliasPropertyInfo != null)
             {
                 return aliasPropertyInfo.AliasedProperty;
             }
 
-            MemberAliasMethodInfo aliasMethodInfo = memberInfo as MemberAliasMethodInfo;
+            var aliasMethodInfo = memberInfo as MemberAliasMethodInfo;
 
             if (aliasMethodInfo != null)
             {

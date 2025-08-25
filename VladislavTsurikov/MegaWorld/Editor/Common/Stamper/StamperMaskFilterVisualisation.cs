@@ -13,15 +13,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
             {
                 return NeedUpdateMask;
             }
-                
-            if(_filterContext == null)
+
+            if (_filterContext == null)
             {
                 NeedUpdateMask = true;
 
                 return NeedUpdateMask;
             }
-            
-            if(PastMaskFilterStack != maskFilterStack || NeedUpdateMask)   
+
+            if (PastMaskFilterStack != maskFilterStack || NeedUpdateMask)
             {
                 NeedUpdateMask = true;
 

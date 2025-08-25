@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
@@ -11,14 +9,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
     {
         private UnityEngine.MonoBehaviour _tool;
 
-        protected override void OnSetup()
-        {
-            _tool = (UnityEngine.MonoBehaviour)SetupData[0]; 
-        }
+        protected override void OnSetup() => _tool = (UnityEngine.MonoBehaviour)SetupData[0];
 
         protected override void OnCreateElements()
         {
-            AddMonoBehaviourComponentsAttribute addMonoBehaviourComponentsAttribute = (AddMonoBehaviourComponentsAttribute)_tool.GetType().GetAttribute(typeof(AddMonoBehaviourComponentsAttribute));
+            var addMonoBehaviourComponentsAttribute =
+                (AddMonoBehaviourComponentsAttribute)_tool.GetType()
+                    .GetAttribute(typeof(AddMonoBehaviourComponentsAttribute));
 
             if (addMonoBehaviourComponentsAttribute == null)
             {
@@ -27,12 +24,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 
             CreateIfMissingType(addMonoBehaviourComponentsAttribute.Types);
         }
-        
+
         public override void OnRemoveInvalidElements()
         {
-            for (int i = ElementList.Count - 1; i >= 0; i--)
+            for (var i = ElementList.Count - 1; i >= 0; i--)
             {
-                AddMonoBehaviourComponentsAttribute addMonoBehaviourComponentsAttribute = (AddMonoBehaviourComponentsAttribute)_tool.GetType().GetAttribute(typeof(AddMonoBehaviourComponentsAttribute));
+                var addMonoBehaviourComponentsAttribute =
+                    (AddMonoBehaviourComponentsAttribute)_tool.GetType()
+                        .GetAttribute(typeof(AddMonoBehaviourComponentsAttribute));
 
                 if (addMonoBehaviourComponentsAttribute == null)
                 {

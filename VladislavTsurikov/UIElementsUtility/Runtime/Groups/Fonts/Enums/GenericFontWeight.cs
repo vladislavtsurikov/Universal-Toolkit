@@ -10,6 +10,6 @@
         SemiBold,
         Bold,
         ExtraBold,
-        Black,
+        Black
     }
 }

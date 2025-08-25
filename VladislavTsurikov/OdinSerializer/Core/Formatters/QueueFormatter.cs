@@ -16,20 +16,19 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using OdinSerializer;
+using OdinSerializer.Utilities;
 
-[assembly: RegisterFormatter(typeof(QueueFormatter<,>), weakFallback: typeof(WeakQueueFormatter))]
+[assembly: RegisterFormatter(typeof(QueueFormatter<,>), typeof(WeakQueueFormatter))]
 
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     /// <summary>
-    /// Custom generic formatter for the generic type definition <see cref="Queue{T}"/>.
+    ///     Custom generic formatter for the generic type definition <see cref="Queue{T}" />.
     /// </summary>
     /// <typeparam name="T">The element type of the formatted queue.</typeparam>
     /// <seealso cref="BaseFormatter{System.Collections.Generic.Queue{T}}" />
@@ -39,38 +38,31 @@ namespace OdinSerializer
         private static readonly Serializer<TValue> TSerializer = Serializer.Get<TValue>();
         private static readonly bool IsPlainQueue = typeof(TQueue) == typeof(Queue<TValue>);
 
-        static QueueFormatter()
-        {
+        static QueueFormatter() =>
             // This exists solely to prevent IL2CPP code stripping from removing the generic type's instance constructor
             // which it otherwise seems prone to do, regardless of what might be defined in any link.xml file.
-
             new QueueFormatter<Queue<int>, int>();
-        }
-
-        public QueueFormatter()
-        {
-        }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override TQueue GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override TQueue GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref TQueue value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -89,15 +81,17 @@ namespace OdinSerializer
                     }
 
                     // We must remember to register the queue reference ourselves, since we return null in GetUninitializedObject
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
                     // There aren't any OnDeserializing callbacks on queues.
                     // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
@@ -106,7 +100,8 @@ namespace OdinSerializer
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -123,7 +118,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -133,7 +128,7 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(value.Count);
 
-                foreach (var element in value)
+                foreach (TValue element in value)
                 {
                     try
                     {
@@ -155,31 +150,30 @@ namespace OdinSerializer
     public class WeakQueueFormatter : WeakBaseFormatter
     {
         private readonly Serializer ElementSerializer;
+        private readonly MethodInfo EnqueueMethod;
         private readonly bool IsPlainQueue;
-        private MethodInfo EnqueueMethod;
 
         public WeakQueueFormatter(Type serializedType) : base(serializedType)
         {
-            var args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Queue<>));
-            this.ElementSerializer = Serializer.Get(args[0]);
-            this.IsPlainQueue = serializedType.IsGenericType && serializedType.GetGenericTypeDefinition() == typeof(Queue<>);
-            this.EnqueueMethod = serializedType.GetMethod("Enqueue", BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic, null, new Type[] { args[0] }, null);
+            Type[] args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Queue<>));
+            ElementSerializer = Serializer.Get(args[0]);
+            IsPlainQueue = serializedType.IsGenericType && serializedType.GetGenericTypeDefinition() == typeof(Queue<>);
+            EnqueueMethod = serializedType.GetMethod("Enqueue",
+                BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic, null, new[] { args[0] }, null);
 
-            if (this.EnqueueMethod == null)
+            if (EnqueueMethod == null)
             {
-                throw new SerializationAbortException("Can't serialize type '" + serializedType.GetNiceFullName() + "' because no proper Enqueue method was found.");
+                throw new SerializationAbortException("Can't serialize type '" + serializedType.GetNiceFullName() +
+                                                      "' because no proper Enqueue method was found.");
             }
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -190,37 +184,40 @@ namespace OdinSerializer
 
                     if (IsPlainQueue)
                     {
-                        value = Activator.CreateInstance(this.SerializedType, (int)length);
+                        value = Activator.CreateInstance(SerializedType, (int)length);
                     }
                     else
                     {
-                        value = Activator.CreateInstance(this.SerializedType);
+                        value = Activator.CreateInstance(SerializedType);
                     }
 
                     var collection = (ICollection)value;
 
                     // We must remember to register the queue reference ourselves, since we return null in GetUninitializedObject
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
                     var enqueueParams = new object[1];
 
                     // There aren't any OnDeserializing callbacks on queues.
                     // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
-                        enqueueParams[0] = this.ElementSerializer.ReadValueWeak(reader);
+                        enqueueParams[0] = ElementSerializer.ReadValueWeak(reader);
                         EnqueueMethod.Invoke(value, enqueueParams);
 
                         if (reader.IsInArrayNode == false)
                         {
                             // Something has gone wrong
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -248,7 +245,7 @@ namespace OdinSerializer
                 {
                     try
                     {
-                        this.ElementSerializer.WriteValueWeak(element, writer);
+                        ElementSerializer.WriteValueWeak(element, writer);
                     }
                     catch (Exception ex)
                     {

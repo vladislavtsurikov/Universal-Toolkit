@@ -4,32 +4,26 @@ using VladislavTsurikov.SceneDataSystem.Runtime;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.ColliderSystem.Runtime
-{    
+{
     public static class ColliderUtility
     {
         public static RayHit Raycast(Ray ray, LayerMask layerMask)
         {
-            ObjectFilter raycastFilter = new ObjectFilter
-            {
-                LayerMask = layerMask
-            };
+            var raycastFilter = new ObjectFilter { LayerMask = layerMask };
 
             return Raycast(ray, raycastFilter);
         }
-        
+
         public static RayHit Raycast<T>(Ray ray, LayerMask layerMask)
-            where T: RendererSceneData, IRaycast
+            where T : RendererSceneData, IRaycast
         {
-            ObjectFilter raycastFilter = new ObjectFilter
-            {
-                LayerMask = layerMask
-            };
+            var raycastFilter = new ObjectFilter { LayerMask = layerMask };
 
             return Raycast<T>(ray, raycastFilter);
         }
 
         public static RayHit Raycast(Ray ray, ObjectFilter raycastFilter)
-        {            
+        {
             List<RayHit> allObjectHits = RaycastAll(ray, raycastFilter);
 
             RayHit.SortByHitDistance(allObjectHits);
@@ -37,10 +31,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
             return closestObjectHit;
         }
-        
+
         public static RayHit Raycast<T>(Ray ray, ObjectFilter raycastFilter)
-            where T: RendererSceneData, IRaycast
-        {            
+            where T : RendererSceneData, IRaycast
+        {
             List<RayHit> allObjectHits = RaycastAll<T>(ray, raycastFilter);
 
             RayHit.SortByHitDistance(allObjectHits);
@@ -50,17 +44,17 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
         }
 
         public static List<RayHit> RaycastAll<T>(Ray ray, ObjectFilter raycastFilter)
-            where T: RendererSceneData, IRaycast
+            where T : RendererSceneData, IRaycast
         {
             List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.RaycastAll(ray);
 
-            List<RayHit> allObjectHits = new List<RayHit>();
+            var allObjectHits = new List<RayHit>();
 
             foreach (SceneDataManager sceneDataManager in sceneDataManagers)
             {
                 T rendererSceneData = SceneDataStackUtility.InstanceSceneData<T>(sceneDataManager.Scene);
 
-                if(rendererSceneData != null)
+                if (rendererSceneData != null)
                 {
                     allObjectHits.AddRange(rendererSceneData.RaycastAll(ray, raycastFilter));
                 }
@@ -73,20 +67,18 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
         {
             List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.RaycastAll(ray);
 
-            List<RayHit> allObjectHits = new List<RayHit>();
+            var allObjectHits = new List<RayHit>();
 
             foreach (SceneDataManager sceneDataManager in sceneDataManagers)
+            foreach (SceneData sceneData in sceneDataManager.SceneDataStack.ElementList)
             {
-                foreach (var sceneData in sceneDataManager.SceneDataStack.ElementList)
+                if (sceneData is IRaycast rendererSceneData)
                 {
-                    if (sceneData is IRaycast rendererSceneData)
-                    {
-                        List<RayHit> rayHits = rendererSceneData.RaycastAll(ray, raycastFilter);
+                    List<RayHit> rayHits = rendererSceneData.RaycastAll(ray, raycastFilter);
 
-                        if (rayHits != null)
-                        {
-                            allObjectHits.AddRange(rendererSceneData.RaycastAll(ray, raycastFilter));
-                        }
+                    if (rayHits != null)
+                    {
+                        allObjectHits.AddRange(rendererSceneData.RaycastAll(ray, raycastFilter));
                     }
                 }
             }

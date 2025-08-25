@@ -8,36 +8,34 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using GUIUtility = UnityEngine.GUIUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
 {
 #if UNITY_EDITOR
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Happy Artist/Edit")]
+    [Name("Happy Artist/Edit")]
     [SupportMultipleSelectedGroups]
-    [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
-    [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
-    [AddToolComponents(new []{typeof(EditToolSettings)})]
+    [SupportedPrototypeTypes(new[] { typeof(PrototypeTerrainObject), typeof(PrototypeGameObject) })]
+    [AddGlobalCommonComponents(new[] { typeof(TransformSpaceSettings), typeof(LayerSettings) })]
+    [AddToolComponents(new[] { typeof(EditToolSettings) })]
     public class EditTool : ToolWindow
     {
+        internal static CommonInstance FindObject;
         private bool _mouseUp = true;
 
-        internal static CommonInstance FindObject;
-
-        protected override void  OnEnable()
-        {
-            _mouseUp = true;
-        }
+        protected override void OnEnable() => _mouseUp = true;
 
         protected override void DoTool()
         {
-            EditToolSettings editToolSettings = (EditToolSettings)ToolsComponentStack.GetElement(typeof(EditTool), typeof(EditToolSettings));
-            
-            int controlID = GUIUtility.GetControlID(EditorHash, FocusType.Passive);
+            var editToolSettings =
+                (EditToolSettings)ToolsComponentStack.GetElement(typeof(EditTool), typeof(EditToolSettings));
+
+            var controlID = GUIUtility.GetControlID(EditorHash, FocusType.Passive);
 
             RemoveFindObjectsIfNecessary();
 
-            if(FindObject == null)
+            if (FindObject == null)
             {
                 editToolSettings.ActionStack.SelectedElement?.HandleButtons();
             }
@@ -46,16 +44,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                 editToolSettings.ActionStack.SelectedElement?.OnMouseMove();
             }
 
-            if(Event.current.type == EventType.Layout)
+            if (Event.current.type == EventType.Layout)
             {
                 HandleUtility.AddDefaultControl(controlID);
             }
         }
-        
+
         protected override void HandleKeyboardEvents()
         {
-            EditToolSettings editToolSettings = (EditToolSettings)ToolsComponentStack.GetElement(typeof(EditTool), typeof(EditToolSettings));
-            
+            var editToolSettings =
+                (EditToolSettings)ToolsComponentStack.GetElement(typeof(EditTool), typeof(EditToolSettings));
+
             Tools.current = Tool.None;
 
             Event e = Event.current;
@@ -75,7 +74,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
                 }
             }
 
-            if(!_mouseUp)
+            if (!_mouseUp)
             {
                 return;
             }
@@ -84,22 +83,23 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             {
                 case KeyCode.Space:
                 {
-                    if(EventType.KeyUp == e.type)
+                    if (EventType.KeyUp == e.type)
                     {
-                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace = GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace == TransformSpace.Global ? TransformSpace.Local : TransformSpace.Global;
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace =
+                            GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace ==
+                            TransformSpace.Global
+                                ? TransformSpace.Local
+                                : TransformSpace.Global;
                     }
-    
+
                     break;
                 }
             }
 
             editToolSettings.ActionStack.CheckShortcutCombos();
         }
-        
-        public override bool DisableToolIfUnityToolActive()
-        {
-            return false;
-        }
+
+        public override bool DisableToolIfUnityToolActive() => false;
 
         private static void RemoveFindObjectsIfNecessary()
         {
@@ -107,8 +107,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             {
                 return;
             }
-            
-            if(FindObject.IsValid() == false)
+
+            if (FindObject.IsValid() == false)
             {
                 FindObject = null;
             }

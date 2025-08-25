@@ -2,8 +2,8 @@
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Runtime.Core;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Layouts
 {
@@ -14,13 +14,9 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Layouts
             menuName = "VladislavTsurikov/UIElementsUtility/Layout Group (UXML)"
         )
     ]
-    
     public class LayoutGroup : FilesDataGroup<LayoutGroup, LayoutInfo>
     {
-        internal void AddNewItem()
-        {
-            _items.Insert(0, new LayoutInfo());
-        }
+        internal void AddNewItem() => _items.Insert(0, new LayoutInfo());
 
         internal void SortByFileName()
         {
@@ -30,7 +26,7 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Layouts
 
         internal VisualTreeAsset GetVisualTreeAsset(string layoutName)
         {
-            string cleanName = layoutName.RemoveWhitespaces().RemoveAllSpecialCharacters();
+            var cleanName = layoutName.RemoveWhitespaces().RemoveAllSpecialCharacters();
 
             _items = _items.Where(item => item != null && item.UxmlReference != null).ToList();
 
@@ -45,20 +41,18 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Layouts
         }
 
 #if UNITY_EDITOR
-        public override string GetFileFormat()
-        {
-            return "uxml";
-        }
+        public override string GetFileFormat() => "uxml";
 
         protected override void AddItems(string[] files)
         {
-            foreach (string filePath in files)
+            foreach (var filePath in files)
             {
                 VisualTreeAsset reference = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(filePath);
                 if (reference == null)
                 {
                     continue;
                 }
+
                 _items.Add(new LayoutInfo { UxmlReference = reference });
             }
         }

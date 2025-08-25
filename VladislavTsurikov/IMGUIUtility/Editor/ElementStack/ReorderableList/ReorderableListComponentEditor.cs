@@ -6,8 +6,6 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.CustomInspector.Editor.IMGUI;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
@@ -15,7 +13,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
     public class ReorderableListComponentEditor : ElementEditor
     {
         private readonly IMGUIInspectorFieldsDrawer _fieldsRenderer = new(
-            excludedDeclaringTypes: new List<Type> { typeof(Runtime_Core_Component), typeof(Element) }
+            new List<Type> { typeof(Runtime_Core_Component), typeof(Element) }
         );
 
         public virtual void OnGUI(Rect rect, int index)

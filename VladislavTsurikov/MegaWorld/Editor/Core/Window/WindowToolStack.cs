@@ -1,9 +1,9 @@
 #if UNITY_EDITOR
 using System;
-using Object = UnityEngine.Object;
 using UnityEditor;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core;
+using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
@@ -17,7 +17,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 
         protected override void OnCreateElements()
         {
-            if(_elementList.Count == 0)
+            if (_elementList.Count == 0)
             {
                 CreateAllElementTypes();
             }
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
         protected override void OnDisableStack()
         {
             EditorApplication.update -= DisableToolsIfNecessary;
-            
+
             Selection.objects = Array.Empty<Object>();
             Tools.current = Tool.None;
         }
@@ -39,7 +39,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 
                 if (toolWindow != null)
                 {
-                    if(toolWindow.DisableToolIfUnityToolActive())
+                    if (toolWindow.DisableToolIfUnityToolActive())
                     {
                         toolWindow.Selected = false;
                     }
@@ -53,12 +53,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             {
                 return;
             }
-            
-            foreach (var item in _elementList)
+
+            foreach (ToolWindow item in _elementList)
             {
-                if(item.Selected)
+                if (item.Selected)
                 {
-                    if(ToolUtility.IsToolSupportSelectedData(item.GetType(), WindowData.Instance.SelectionData))
+                    if (ToolUtility.IsToolSupportSelectedData(item.GetType(), WindowData.Instance.SelectionData))
                     {
                         item.HandleKeyboardEventsInternal();
                         item.DoToolInternal();

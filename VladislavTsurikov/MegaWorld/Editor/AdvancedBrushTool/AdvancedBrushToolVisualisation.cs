@@ -17,38 +17,42 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
     public static class AdvancedBrushToolVisualisation
     {
-        private static MaskFilterVisualisation _maskFilterVisualisation = new MaskFilterVisualisation();
-        
+        private static readonly MaskFilterVisualisation _maskFilterVisualisation = new();
+
         public static void Draw(BoxArea area, SelectionData data, LayerSettings layerSettings)
         {
-            if(area == null || area.RayHit == null)
+            if (area == null || area.RayHit == null)
             {
                 return;
             }
-            
-            if(data.SelectedData.HasOneSelectedGroup())
+
+            if (data.SelectedData.HasOneSelectedGroup())
             {
                 Group group = data.SelectedData.SelectedGroup;
 
-                if (group.PrototypeType == typeof(PrototypeGameObject) || group.PrototypeType == typeof(PrototypeTerrainObject))
+                if (group.PrototypeType == typeof(PrototypeGameObject) ||
+                    group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
-                                            
-                    if(filterSettings.FilterType != FilterType.MaskFilter)
+                    var filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
+
+                    if (filterSettings.FilterType != FilterType.MaskFilter)
                     {
-                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter, layerSettings);
+                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter,
+                            layerSettings);
                         VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                     }
                     else
                     {
-                        _maskFilterVisualisation.DrawMaskFilterVisualization(filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
+                        _maskFilterVisualisation.DrawMaskFilterVisualization(
+                            filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
                     }
                 }
                 else
                 {
-                    if(data.SelectedData.HasOneSelectedPrototype())
+                    if (data.SelectedData.HasOneSelectedPrototype())
                     {
-                        _maskFilterVisualisation.DrawMaskFilterVisualization(MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area);
+                        _maskFilterVisualisation.DrawMaskFilterVisualization(
+                            MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area);
                     }
                     else
                     {
@@ -58,7 +62,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
             }
             else
             {
-                if(SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(AdvancedBrushTool), WindowData.Instance.SelectedData))
+                if (SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(AdvancedBrushTool),
+                        WindowData.Instance.SelectedData))
                 {
                     VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                 }

@@ -16,67 +16,64 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using OdinSerializer.Utilities.Unsafe;
+
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities.Unsafe;
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     /// <summary>
-    /// Reads data from a stream that has been written by a <see cref="BinaryDataWriter"/>.
+    ///     Reads data from a stream that has been written by a <see cref="BinaryDataWriter" />.
     /// </summary>
     /// <seealso cref="BaseDataReader" />
     public unsafe class BinaryDataReader : BaseDataReader
     {
-        private static readonly Dictionary<Type, Delegate> PrimitiveFromByteMethods = new Dictionary<Type, Delegate>()
+        private static readonly Dictionary<Type, Delegate> PrimitiveFromByteMethods = new()
         {
-            { typeof(char),     (Func<byte[], int, char>)      ((b, i) => (char)ProperBitConverter.ToUInt16(b, i)) },
-            { typeof(byte),     (Func<byte[], int, byte>)      ((b, i) => b[i]) },
-            { typeof(sbyte),    (Func<byte[], int, sbyte>)     ((b, i) => (sbyte)b[i]) },
-            { typeof(bool),     (Func<byte[], int, bool>)      ((b, i) => (b[i] == 0) ? false : true) },
-            { typeof(short),    (Func<byte[], int, short>)     ProperBitConverter.ToInt16 },
-            { typeof(int),      (Func<byte[], int, int>)       ProperBitConverter.ToInt32 },
-            { typeof(long),     (Func<byte[], int, long>)      ProperBitConverter.ToInt64 },
-            { typeof(ushort),   (Func<byte[], int, ushort>)    ProperBitConverter.ToUInt16 },
-            { typeof(uint),     (Func<byte[], int, uint>)      ProperBitConverter.ToUInt32 },
-            { typeof(ulong),    (Func<byte[], int, ulong>)     ProperBitConverter.ToUInt64 },
-            { typeof(decimal),  (Func<byte[], int, decimal>)   ProperBitConverter.ToDecimal },
-            { typeof(float),    (Func<byte[], int, float>)     ProperBitConverter.ToSingle },
-            { typeof(double),   (Func<byte[], int, double>)    ProperBitConverter.ToDouble },
-            { typeof(Guid),     (Func<byte[], int, Guid>)      ProperBitConverter.ToGuid }
+            { typeof(char), (Func<byte[], int, char>)((b, i) => (char)ProperBitConverter.ToUInt16(b, i)) },
+            { typeof(byte), (Func<byte[], int, byte>)((b, i) => b[i]) },
+            { typeof(sbyte), (Func<byte[], int, sbyte>)((b, i) => (sbyte)b[i]) },
+            { typeof(bool), (Func<byte[], int, bool>)((b, i) => b[i] == 0 ? false : true) },
+            { typeof(short), (Func<byte[], int, short>)ProperBitConverter.ToInt16 },
+            { typeof(int), (Func<byte[], int, int>)ProperBitConverter.ToInt32 },
+            { typeof(long), (Func<byte[], int, long>)ProperBitConverter.ToInt64 },
+            { typeof(ushort), (Func<byte[], int, ushort>)ProperBitConverter.ToUInt16 },
+            { typeof(uint), (Func<byte[], int, uint>)ProperBitConverter.ToUInt32 },
+            { typeof(ulong), (Func<byte[], int, ulong>)ProperBitConverter.ToUInt64 },
+            { typeof(decimal), (Func<byte[], int, decimal>)ProperBitConverter.ToDecimal },
+            { typeof(float), (Func<byte[], int, float>)ProperBitConverter.ToSingle },
+            { typeof(double), (Func<byte[], int, double>)ProperBitConverter.ToDouble },
+            { typeof(Guid), (Func<byte[], int, Guid>)ProperBitConverter.ToGuid }
         };
 
-        private byte[] internalBufferBackup;
-        private byte[] buffer = new byte[1024 * 100];
+        private readonly Dictionary<int, Type> types = new(16);
 
-        private int bufferIndex;
+        private byte[] buffer = new byte[1024 * 100];
         private int bufferEnd;
 
-        private EntryType? peekedEntryType;
+        private int bufferIndex;
+
+        private byte[] internalBufferBackup;
         private BinaryEntryType peekedBinaryEntryType;
         private string peekedEntryName;
-        private Dictionary<int, Type> types = new Dictionary<int, Type>(16);
 
-        public BinaryDataReader() : base(null, null)
-        {
-            this.internalBufferBackup = this.buffer;
-        }
+        private EntryType? peekedEntryType;
+
+        public BinaryDataReader() : base(null, null) => internalBufferBackup = buffer;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryDataReader" /> class.
+        ///     Initializes a new instance of the <see cref="BinaryDataReader" /> class.
         /// </summary>
         /// <param name="stream">The base stream of the reader.</param>
         /// <param name="context">The deserialization context to use.</param>
-        public BinaryDataReader(Stream stream, DeserializationContext context) : base(stream, context)
-        {
-            this.internalBufferBackup = this.buffer;
-        }
+        public BinaryDataReader(Stream stream, DeserializationContext context) : base(stream, context) =>
+            internalBufferBackup = buffer;
 
         /// <summary>
-        /// Disposes all resources kept by the data reader, except the stream, which can be reused later.
+        ///     Disposes all resources kept by the data reader, except the stream, which can be reused later.
         /// </summary>
         public override void Dispose()
         {
@@ -84,405 +81,425 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Peeks ahead and returns the type of the next entry in the stream.
+        ///     Peeks ahead and returns the type of the next entry in the stream.
         /// </summary>
         /// <param name="name">The name of the next entry, if it has one.</param>
         /// <returns>
-        /// The type of the next entry.
+        ///     The type of the next entry.
         /// </returns>
         public override EntryType PeekEntry(out string name)
         {
-            if (this.peekedEntryType != null)
+            if (peekedEntryType != null)
             {
-                name = this.peekedEntryName;
-                return (EntryType)this.peekedEntryType;
+                name = peekedEntryName;
+                return (EntryType)peekedEntryType;
             }
 
-            this.peekedBinaryEntryType = this.HasBufferData(1) ? (BinaryEntryType)this.buffer[this.bufferIndex++] : BinaryEntryType.EndOfStream;
+            peekedBinaryEntryType =
+                HasBufferData(1) ? (BinaryEntryType)buffer[bufferIndex++] : BinaryEntryType.EndOfStream;
 
             // Switch on entry type
-            switch (this.peekedBinaryEntryType)
+            switch (peekedBinaryEntryType)
             {
                 case BinaryEntryType.EndOfStream:
                     name = null;
-                    this.peekedEntryName = null;
-                    this.peekedEntryType = EntryType.EndOfStream;
+                    peekedEntryName = null;
+                    peekedEntryType = EntryType.EndOfStream;
                     break;
 
                 case BinaryEntryType.NamedStartOfReferenceNode:
                 case BinaryEntryType.NamedStartOfStructNode:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.StartOfNode;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.StartOfNode;
                     break;
 
                 case BinaryEntryType.UnnamedStartOfReferenceNode:
                 case BinaryEntryType.UnnamedStartOfStructNode:
                     name = null;
-                    this.peekedEntryType = EntryType.StartOfNode;
+                    peekedEntryType = EntryType.StartOfNode;
                     break;
 
                 case BinaryEntryType.EndOfNode:
                     name = null;
-                    this.peekedEntryType = EntryType.EndOfNode;
+                    peekedEntryType = EntryType.EndOfNode;
                     break;
 
                 case BinaryEntryType.StartOfArray:
                     name = null;
-                    this.peekedEntryType = EntryType.StartOfArray;
+                    peekedEntryType = EntryType.StartOfArray;
                     break;
 
                 case BinaryEntryType.EndOfArray:
                     name = null;
-                    this.peekedEntryType = EntryType.EndOfArray;
+                    peekedEntryType = EntryType.EndOfArray;
                     break;
 
                 case BinaryEntryType.PrimitiveArray:
                     name = null;
-                    this.peekedEntryType = EntryType.PrimitiveArray;
+                    peekedEntryType = EntryType.PrimitiveArray;
                     break;
 
                 case BinaryEntryType.NamedInternalReference:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.InternalReference;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.InternalReference;
                     break;
 
                 case BinaryEntryType.UnnamedInternalReference:
                     name = null;
-                    this.peekedEntryType = EntryType.InternalReference;
+                    peekedEntryType = EntryType.InternalReference;
                     break;
 
                 case BinaryEntryType.NamedExternalReferenceByIndex:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.ExternalReferenceByIndex;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.ExternalReferenceByIndex;
                     break;
 
                 case BinaryEntryType.UnnamedExternalReferenceByIndex:
                     name = null;
-                    this.peekedEntryType = EntryType.ExternalReferenceByIndex;
+                    peekedEntryType = EntryType.ExternalReferenceByIndex;
                     break;
 
                 case BinaryEntryType.NamedExternalReferenceByGuid:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.ExternalReferenceByGuid;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.ExternalReferenceByGuid;
                     break;
 
                 case BinaryEntryType.UnnamedExternalReferenceByGuid:
                     name = null;
-                    this.peekedEntryType = EntryType.ExternalReferenceByGuid;
+                    peekedEntryType = EntryType.ExternalReferenceByGuid;
                     break;
 
                 case BinaryEntryType.NamedExternalReferenceByString:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.ExternalReferenceByString;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.ExternalReferenceByString;
                     break;
 
                 case BinaryEntryType.UnnamedExternalReferenceByString:
                     name = null;
-                    this.peekedEntryType = EntryType.ExternalReferenceByString;
+                    peekedEntryType = EntryType.ExternalReferenceByString;
                     break;
 
                 case BinaryEntryType.NamedSByte:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedSByte:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedByte:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedByte:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedShort:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedShort:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedUShort:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedUShort:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedInt:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedInt:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedUInt:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedUInt:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedLong:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedLong:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedULong:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Integer;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.UnnamedULong:
                     name = null;
-                    this.peekedEntryType = EntryType.Integer;
+                    peekedEntryType = EntryType.Integer;
                     break;
 
                 case BinaryEntryType.NamedFloat:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.UnnamedFloat:
                     name = null;
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.NamedDouble:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.UnnamedDouble:
                     name = null;
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.NamedDecimal:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.UnnamedDecimal:
                     name = null;
-                    this.peekedEntryType = EntryType.FloatingPoint;
+                    peekedEntryType = EntryType.FloatingPoint;
                     break;
 
                 case BinaryEntryType.NamedChar:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.String;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.String;
                     break;
 
                 case BinaryEntryType.UnnamedChar:
                     name = null;
-                    this.peekedEntryType = EntryType.String;
+                    peekedEntryType = EntryType.String;
                     break;
 
                 case BinaryEntryType.NamedString:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.String;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.String;
                     break;
 
                 case BinaryEntryType.UnnamedString:
                     name = null;
-                    this.peekedEntryType = EntryType.String;
+                    peekedEntryType = EntryType.String;
                     break;
 
                 case BinaryEntryType.NamedGuid:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Guid;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Guid;
                     break;
 
                 case BinaryEntryType.UnnamedGuid:
                     name = null;
-                    this.peekedEntryType = EntryType.Guid;
+                    peekedEntryType = EntryType.Guid;
                     break;
 
                 case BinaryEntryType.NamedBoolean:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Boolean;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Boolean;
                     break;
 
                 case BinaryEntryType.UnnamedBoolean:
                     name = null;
-                    this.peekedEntryType = EntryType.Boolean;
+                    peekedEntryType = EntryType.Boolean;
                     break;
 
                 case BinaryEntryType.NamedNull:
-                    name = this.ReadStringValue();
-                    this.peekedEntryType = EntryType.Null;
+                    name = ReadStringValue();
+                    peekedEntryType = EntryType.Null;
                     break;
 
                 case BinaryEntryType.UnnamedNull:
                     name = null;
-                    this.peekedEntryType = EntryType.Null;
+                    peekedEntryType = EntryType.Null;
                     break;
 
                 case BinaryEntryType.TypeName:
                 case BinaryEntryType.TypeID:
-                    this.peekedBinaryEntryType = BinaryEntryType.Invalid;
-                    this.peekedEntryType = EntryType.Invalid;
-                    throw new InvalidOperationException("Invalid binary data stream: BinaryEntryType.TypeName and BinaryEntryType.TypeID must never be peeked by the binary reader.");
+                    peekedBinaryEntryType = BinaryEntryType.Invalid;
+                    peekedEntryType = EntryType.Invalid;
+                    throw new InvalidOperationException(
+                        "Invalid binary data stream: BinaryEntryType.TypeName and BinaryEntryType.TypeID must never be peeked by the binary reader.");
 
                 case BinaryEntryType.Invalid:
                 default:
                     name = null;
-                    this.peekedBinaryEntryType = BinaryEntryType.Invalid;
-                    this.peekedEntryType = EntryType.Invalid;
-                    throw new InvalidOperationException("Invalid binary data stream: could not parse peeked BinaryEntryType byte '" + (byte)this.peekedBinaryEntryType + "' into a known entry type.");
+                    peekedBinaryEntryType = BinaryEntryType.Invalid;
+                    peekedEntryType = EntryType.Invalid;
+                    throw new InvalidOperationException(
+                        "Invalid binary data stream: could not parse peeked BinaryEntryType byte '" +
+                        (byte)peekedBinaryEntryType + "' into a known entry type.");
             }
 
-            this.peekedEntryName = name;
-            return this.peekedEntryType.Value;
+            peekedEntryName = name;
+            return peekedEntryType.Value;
         }
 
         /// <summary>
-        /// Tries to enters an array node. This will succeed if the next entry is an <see cref="EntryType.StartOfArray" />.
-        /// <para />
-        /// This call MUST (eventually) be followed by a corresponding call to <see cref="IDataReader.ExitArray()" /><para />
-        /// This call will change the values of the <see cref="IDataReader.IsInArrayNode" />, <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current array node.
+        ///     Tries to enters an array node. This will succeed if the next entry is an <see cref="EntryType.StartOfArray" />.
+        ///     <para />
+        ///     This call MUST (eventually) be followed by a corresponding call to <see cref="IDataReader.ExitArray()" />
+        ///     <para />
+        ///     This call will change the values of the <see cref="IDataReader.IsInArrayNode" />,
+        ///     <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and
+        ///     <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current array node.
         /// </summary>
         /// <param name="length">The length of the array that was entered.</param>
         /// <returns>
-        ///   <c>true</c> if an array was entered, otherwise <c>false</c>
+        ///     <c>true</c> if an array was entered, otherwise <c>false</c>
         /// </returns>
         public override bool EnterArray(out long length)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedEntryType == EntryType.StartOfArray)
+            if (peekedEntryType == EntryType.StartOfArray)
             {
-                this.PushArray();
-                this.MarkEntryContentConsumed();
+                PushArray();
+                MarkEntryContentConsumed();
 
-                if (this.UNSAFE_Read_8_Int64(out length))
+                if (UNSAFE_Read_8_Int64(out length))
                 {
                     if (length < 0)
                     {
                         length = 0;
-                        this.Context.Config.DebugContext.LogError("Invalid array length: " + length + ".");
+                        Context.Config.DebugContext.LogError("Invalid array length: " + length + ".");
                         return false;
                     }
-                    else return true;
+
+                    return true;
                 }
-                else return false;
-            }
-            else
-            {
-                this.SkipEntry();
-                length = 0;
+
                 return false;
             }
+
+            SkipEntry();
+            length = 0;
+            return false;
         }
 
         /// <summary>
-        /// Tries to enter a node. This will succeed if the next entry is an <see cref="EntryType.StartOfNode" />.
-        /// <para />
-        /// This call MUST (eventually) be followed by a corresponding call to <see cref="IDataReader.ExitNode()" /><para />
-        /// This call will change the values of the <see cref="IDataReader.IsInArrayNode" />, <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current node.
+        ///     Tries to enter a node. This will succeed if the next entry is an <see cref="EntryType.StartOfNode" />.
+        ///     <para />
+        ///     This call MUST (eventually) be followed by a corresponding call to <see cref="IDataReader.ExitNode()" />
+        ///     <para />
+        ///     This call will change the values of the <see cref="IDataReader.IsInArrayNode" />,
+        ///     <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and
+        ///     <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current node.
         /// </summary>
-        /// <param name="type">The type of the node. This value will be null if there was no metadata, or if the reader's serialization binder failed to resolve the type name.</param>
+        /// <param name="type">
+        ///     The type of the node. This value will be null if there was no metadata, or if the reader's
+        ///     serialization binder failed to resolve the type name.
+        /// </param>
         /// <returns>
-        ///   <c>true</c> if entering a node succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if entering a node succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool EnterNode(out Type type)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedStartOfReferenceNode || this.peekedBinaryEntryType == BinaryEntryType.UnnamedStartOfReferenceNode)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedStartOfReferenceNode ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedStartOfReferenceNode)
             {
-                this.MarkEntryContentConsumed();
-                type = this.ReadTypeEntry();
+                MarkEntryContentConsumed();
+                type = ReadTypeEntry();
                 int id;
 
-                if (!this.UNSAFE_Read_4_Int32(out id))
+                if (!UNSAFE_Read_4_Int32(out id))
                 {
                     type = null;
                     return false;
                 }
 
-                this.PushNode(this.peekedEntryName, id, type);
+                PushNode(peekedEntryName, id, type);
                 return true;
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedStartOfStructNode || this.peekedBinaryEntryType == BinaryEntryType.UnnamedStartOfStructNode)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedStartOfStructNode ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedStartOfStructNode)
             {
-                type = this.ReadTypeEntry();
-                this.PushNode(this.peekedEntryName, -1, type);
-                this.MarkEntryContentConsumed();
+                type = ReadTypeEntry();
+                PushNode(peekedEntryName, -1, type);
+                MarkEntryContentConsumed();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                type = null;
-                return false;
-            }
+
+            SkipEntry();
+            type = null;
+            return false;
         }
 
         /// <summary>
-        /// Exits the closest array. This method will keep skipping entries using <see cref="IDataReader.SkipEntry()" /> until an <see cref="EntryType.EndOfArray" /> is reached, or the end of the stream is reached.
-        /// <para />
-        /// This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterArray(out long)" />.
-        /// <para />
-        /// This call will change the values of the <see cref="IDataReader.IsInArrayNode" />, <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and <see cref="IDataReader.CurrentNodeDepth" /> to the correct values for the node that was prior to the exited array node.
+        ///     Exits the closest array. This method will keep skipping entries using <see cref="IDataReader.SkipEntry()" /> until
+        ///     an <see cref="EntryType.EndOfArray" /> is reached, or the end of the stream is reached.
+        ///     <para />
+        ///     This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterArray(out long)" />.
+        ///     <para />
+        ///     This call will change the values of the <see cref="IDataReader.IsInArrayNode" />,
+        ///     <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and
+        ///     <see cref="IDataReader.CurrentNodeDepth" /> to the correct values for the node that was prior to the exited array
+        ///     node.
         /// </summary>
         /// <returns>
-        ///   <c>true</c> if the method exited an array, <c>false</c> if it reached the end of the stream.
+        ///     <c>true</c> if the method exited an array, <c>false</c> if it reached the end of the stream.
         /// </returns>
         public override bool ExitArray()
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            while (this.peekedBinaryEntryType != BinaryEntryType.EndOfArray && this.peekedBinaryEntryType != BinaryEntryType.EndOfStream)
+            while (peekedBinaryEntryType != BinaryEntryType.EndOfArray &&
+                   peekedBinaryEntryType != BinaryEntryType.EndOfStream)
             {
-                if (this.peekedEntryType == EntryType.EndOfNode)
+                if (peekedEntryType == EntryType.EndOfNode)
                 {
-                    this.Context.Config.DebugContext.LogError("Data layout mismatch; skipping past node boundary when exiting array.");
-                    this.MarkEntryContentConsumed();
+                    Context.Config.DebugContext.LogError(
+                        "Data layout mismatch; skipping past node boundary when exiting array.");
+                    MarkEntryContentConsumed();
                 }
 
-                this.SkipEntry();
+                SkipEntry();
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.EndOfArray)
+            if (peekedBinaryEntryType == BinaryEntryType.EndOfArray)
             {
-                this.MarkEntryContentConsumed();
-                this.PopArray();
+                MarkEntryContentConsumed();
+                PopArray();
                 return true;
             }
 
@@ -490,38 +507,43 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Exits the current node. This method will keep skipping entries using <see cref="IDataReader.SkipEntry()" /> until an <see cref="EntryType.EndOfNode" /> is reached, or the end of the stream is reached.
-        /// <para />
-        /// This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterNode(out Type)" />.
-        /// <para />
-        /// This call will change the values of the <see cref="IDataReader.IsInArrayNode" />, <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and <see cref="IDataReader.CurrentNodeDepth" /> to the correct values for the node that was prior to the current node.
+        ///     Exits the current node. This method will keep skipping entries using <see cref="IDataReader.SkipEntry()" /> until
+        ///     an <see cref="EntryType.EndOfNode" /> is reached, or the end of the stream is reached.
+        ///     <para />
+        ///     This call MUST have been preceded by a corresponding call to <see cref="IDataReader.EnterNode(out Type)" />.
+        ///     <para />
+        ///     This call will change the values of the <see cref="IDataReader.IsInArrayNode" />,
+        ///     <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and
+        ///     <see cref="IDataReader.CurrentNodeDepth" /> to the correct values for the node that was prior to the current node.
         /// </summary>
         /// <returns>
-        ///   <c>true</c> if the method exited a node, <c>false</c> if it reached the end of the stream.
+        ///     <c>true</c> if the method exited a node, <c>false</c> if it reached the end of the stream.
         /// </returns>
         public override bool ExitNode()
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            while (this.peekedBinaryEntryType != BinaryEntryType.EndOfNode && this.peekedBinaryEntryType != BinaryEntryType.EndOfStream)
+            while (peekedBinaryEntryType != BinaryEntryType.EndOfNode &&
+                   peekedBinaryEntryType != BinaryEntryType.EndOfStream)
             {
-                if (this.peekedEntryType == EntryType.EndOfArray)
+                if (peekedEntryType == EntryType.EndOfArray)
                 {
-                    this.Context.Config.DebugContext.LogError("Data layout mismatch; skipping past array boundary when exiting node.");
-                    this.MarkEntryContentConsumed();
+                    Context.Config.DebugContext.LogError(
+                        "Data layout mismatch; skipping past array boundary when exiting node.");
+                    MarkEntryContentConsumed();
                 }
 
-                this.SkipEntry();
+                SkipEntry();
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.EndOfNode)
+            if (peekedBinaryEntryType == BinaryEntryType.EndOfNode)
             {
-                this.MarkEntryContentConsumed();
-                this.PopNode(this.CurrentNodeName);
+                MarkEntryContentConsumed();
+                PopNode(CurrentNodeName);
                 return true;
             }
 
@@ -529,14 +551,19 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads a primitive array value. This call will succeed if the next entry is an <see cref="EntryType.PrimitiveArray" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a primitive array value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.PrimitiveArray" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
-        /// <typeparam name="T">The element type of the primitive array. Valid element types can be determined using <see cref="FormatterUtilities.IsPrimitiveArrayType(Type)" />.</typeparam>
+        /// <typeparam name="T">
+        ///     The element type of the primitive array. Valid element types can be determined using
+        ///     <see cref="FormatterUtilities.IsPrimitiveArrayType(Type)" />.
+        /// </typeparam>
         /// <param name="array">The resulting primitive array.</param>
         /// <returns>
-        ///   <c>true</c> if reading a primitive array succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading a primitive array succeeded, otherwise <c>false</c>
         /// </returns>
         /// <exception cref="System.ArgumentException">Type  + typeof(T).Name +  is not a valid primitive array type.</exception>
         public override bool ReadPrimitiveArray<T>(out T[] array)
@@ -546,30 +573,30 @@ namespace OdinSerializer
                 throw new ArgumentException("Type " + typeof(T).Name + " is not a valid primitive array type.");
             }
 
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedEntryType == EntryType.PrimitiveArray)
+            if (peekedEntryType == EntryType.PrimitiveArray)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 int elementCount;
                 int bytesPerElement;
 
-                if (!this.UNSAFE_Read_4_Int32(out elementCount) || !this.UNSAFE_Read_4_Int32(out bytesPerElement))
+                if (!UNSAFE_Read_4_Int32(out elementCount) || !UNSAFE_Read_4_Int32(out bytesPerElement))
                 {
                     array = null;
                     return false;
                 }
 
-                int byteCount = elementCount * bytesPerElement;
+                var byteCount = elementCount * bytesPerElement;
 
-                if (!this.HasBufferData(byteCount))
+                if (!HasBufferData(byteCount))
                 {
-                    this.bufferIndex = this.bufferEnd; // We're done!
+                    bufferIndex = bufferEnd; // We're done!
                     array = null;
                     return false;
                 }
@@ -580,113 +607,111 @@ namespace OdinSerializer
                     // We can include a special case for byte arrays, as there's no need to copy that to a buffer
                     var byteArray = new byte[byteCount];
 
-                    Buffer.BlockCopy(this.buffer, this.bufferIndex, byteArray, 0, byteCount);
+                    Buffer.BlockCopy(buffer, bufferIndex, byteArray, 0, byteCount);
 
                     array = (T[])(object)byteArray;
 
-                    this.bufferIndex += byteCount;
+                    bufferIndex += byteCount;
 
                     return true;
+                }
+
+                array = new T[elementCount];
+
+                // We always store in little endian, so we can do a direct memory mapping, which is a lot faster
+                if (BitConverter.IsLittleEndian)
+                {
+                    var toHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
+
+                    try
+                    {
+                        fixed (byte* fromBase = buffer)
+                        {
+                            void* from = fromBase + bufferIndex;
+                            void* to = toHandle.AddrOfPinnedObject().ToPointer();
+                            UnsafeUtilities.MemoryCopy(from, to, byteCount);
+                        }
+                    }
+                    finally
+                    {
+                        toHandle.Free();
+                    }
                 }
                 else
                 {
-                    array = new T[elementCount];
+                    // We have to convert each individual element from bytes, since the byte order has to be reversed
+                    var fromBytes = (Func<byte[], int, T>)PrimitiveFromByteMethods[typeof(T)];
 
-                    // We always store in little endian, so we can do a direct memory mapping, which is a lot faster
-                    if (BitConverter.IsLittleEndian)
+                    for (var i = 0; i < elementCount; i++)
                     {
-                        var toHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
-
-                        try
-                        {
-                            fixed (byte* fromBase = this.buffer)
-                            {
-                                void* from = (fromBase + this.bufferIndex);
-                                void* to = toHandle.AddrOfPinnedObject().ToPointer();
-                                UnsafeUtilities.MemoryCopy(from, to, byteCount);
-                            }
-
-                        }
-                        finally { toHandle.Free(); }
+                        array[i] = fromBytes(buffer, bufferIndex + i * bytesPerElement);
                     }
-                    else
-                    {
-                        // We have to convert each individual element from bytes, since the byte order has to be reversed
-                        Func<byte[], int, T> fromBytes = (Func<byte[], int, T>)PrimitiveFromByteMethods[typeof(T)];
-
-                        for (int i = 0; i < elementCount; i++)
-                        {
-                            array[i] = fromBytes(this.buffer, this.bufferIndex + i * bytesPerElement);
-                        }
-                    }
-
-                    this.bufferIndex += byteCount;
-                    return true;
                 }
+
+                bufferIndex += byteCount;
+                return true;
             }
-            else
-            {
-                this.SkipEntry();
-                array = null;
-                return false;
-            }
+
+            SkipEntry();
+            array = null;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="bool" /> value. This call will succeed if the next entry is an <see cref="EntryType.Boolean" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="bool" /> value. This call will succeed if the next entry is an <see cref="EntryType.Boolean" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadBoolean(out bool value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedEntryType == EntryType.Boolean)
+            if (peekedEntryType == EntryType.Boolean)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
-                if (this.HasBufferData(1))
+                if (HasBufferData(1))
                 {
-                    value = this.buffer[this.bufferIndex++] == 1;
+                    value = buffer[bufferIndex++] == 1;
                     return true;
                 }
-                else
-                {
-                    value = false;
-                    return false;
-                }
-            }
-            else
-            {
-                this.SkipEntry();
-                value = default(bool);
+
+                value = false;
                 return false;
             }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an <see cref="sbyte" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="sbyte.MinValue" /> or larger than <see cref="sbyte.MaxValue" />, the result will be default(<see cref="sbyte" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an <see cref="sbyte" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="sbyte.MinValue" /> or larger than
+        ///     <see cref="sbyte.MaxValue" />, the result will be default(<see cref="sbyte" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadSByte(out sbyte value)
         {
             long longValue;
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -696,34 +721,34 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(sbyte);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(sbyte);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="byte" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="byte.MinValue" /> or larger than <see cref="byte.MaxValue" />, the result will be default(<see cref="byte" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="byte" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="byte.MinValue" /> or larger than
+        ///     <see cref="byte.MaxValue" />, the result will be default(<see cref="byte" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadByte(out byte value)
         {
             ulong ulongValue;
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -733,34 +758,35 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(byte);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(byte);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="short" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="short.MinValue" /> or larger than <see cref="short.MaxValue" />, the result will be default(<see cref="short" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="short" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />
+        ///     .
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="short.MinValue" /> or larger than
+        ///     <see cref="short.MaxValue" />, the result will be default(<see cref="short" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadInt16(out short value)
         {
             long longValue;
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -770,34 +796,35 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(short);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(short);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an <see cref="ushort" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="ushort.MinValue" /> or larger than <see cref="ushort.MaxValue" />, the result will be default(<see cref="ushort" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an <see cref="ushort" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="ushort.MinValue" /> or larger than
+        ///     <see cref="ushort.MaxValue" />, the result will be default(<see cref="ushort" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadUInt16(out ushort value)
         {
             ulong ulongValue;
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -807,34 +834,34 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(ushort);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(ushort);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an <see cref="int" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="int.MinValue" /> or larger than <see cref="int.MaxValue" />, the result will be default(<see cref="int" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an <see cref="int" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="int.MinValue" /> or larger than
+        ///     <see cref="int.MaxValue" />, the result will be default(<see cref="int" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadInt32(out int value)
         {
             long longValue;
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -844,34 +871,35 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(int);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(int);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an <see cref="uint" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="uint.MinValue" /> or larger than <see cref="uint.MaxValue" />, the result will be default(<see cref="uint" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an <see cref="uint" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />
+        ///     .
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="uint.MinValue" /> or larger than
+        ///     <see cref="uint.MaxValue" />, the result will be default(<see cref="uint" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadUInt32(out uint value)
         {
             ulong ulongValue;
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -881,48 +909,48 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(uint);
+                        value = default;
                     }
                 }
 
                 return true;
             }
-            else
-            {
-                value = default(uint);
-                return false;
-            }
+
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="long" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="long.MinValue" /> or larger than <see cref="long.MaxValue" />, the result will be default(<see cref="long" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="long" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="long.MinValue" /> or larger than
+        ///     <see cref="long.MaxValue" />, the result will be default(<see cref="long" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadInt64(out long value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    switch (this.peekedBinaryEntryType)
+                    switch (peekedBinaryEntryType)
                     {
                         case BinaryEntryType.NamedSByte:
                         case BinaryEntryType.UnnamedSByte:
                             sbyte i8;
-                            if (this.UNSAFE_Read_1_SByte(out i8))
+                            if (UNSAFE_Read_1_SByte(out i8))
                             {
                                 value = i8;
                             }
@@ -931,11 +959,12 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
                         case BinaryEntryType.NamedByte:
                         case BinaryEntryType.UnnamedByte:
                             byte ui8;
-                            if (this.UNSAFE_Read_1_Byte(out ui8))
+                            if (UNSAFE_Read_1_Byte(out ui8))
                             {
                                 value = ui8;
                             }
@@ -944,12 +973,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedShort:
                         case BinaryEntryType.UnnamedShort:
                             short i16;
-                            if (this.UNSAFE_Read_2_Int16(out i16))
+                            if (UNSAFE_Read_2_Int16(out i16))
                             {
                                 value = i16;
                             }
@@ -958,12 +988,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedUShort:
                         case BinaryEntryType.UnnamedUShort:
                             ushort ui16;
-                            if (this.UNSAFE_Read_2_UInt16(out ui16))
+                            if (UNSAFE_Read_2_UInt16(out ui16))
                             {
                                 value = ui16;
                             }
@@ -972,12 +1003,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedInt:
                         case BinaryEntryType.UnnamedInt:
                             int i32;
-                            if (this.UNSAFE_Read_4_Int32(out i32))
+                            if (UNSAFE_Read_4_Int32(out i32))
                             {
                                 value = i32;
                             }
@@ -986,12 +1018,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedUInt:
                         case BinaryEntryType.UnnamedUInt:
                             uint ui32;
-                            if (this.UNSAFE_Read_4_UInt32(out ui32))
+                            if (UNSAFE_Read_4_UInt32(out ui32))
                             {
                                 value = ui32;
                             }
@@ -1000,20 +1033,22 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedLong:
                         case BinaryEntryType.UnnamedLong:
-                            if (!this.UNSAFE_Read_8_Int64(out value))
+                            if (!UNSAFE_Read_8_Int64(out value))
                             {
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedULong:
                         case BinaryEntryType.UnnamedULong:
                             ulong uint64;
-                            if (this.UNSAFE_Read_8_UInt64(out uint64))
+                            if (UNSAFE_Read_8_UInt64(out uint64))
                             {
                                 if (uint64 > long.MaxValue)
                                 {
@@ -1030,6 +1065,7 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         default:
@@ -1040,48 +1076,49 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.MarkEntryContentConsumed();
+                    MarkEntryContentConsumed();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(long);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an <see cref="ulong" /> value. This call will succeed if the next entry is an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the value of the stored integer is smaller than <see cref="ulong.MinValue" /> or larger than <see cref="ulong.MaxValue" />, the result will be default(<see cref="ulong" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an <see cref="ulong" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the value of the stored integer is smaller than <see cref="ulong.MinValue" /> or larger than
+        ///     <see cref="ulong.MaxValue" />, the result will be default(<see cref="ulong" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadUInt64(out ulong value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    switch (this.peekedBinaryEntryType)
+                    switch (peekedBinaryEntryType)
                     {
                         case BinaryEntryType.NamedSByte:
                         case BinaryEntryType.UnnamedSByte:
                         case BinaryEntryType.NamedByte:
                         case BinaryEntryType.UnnamedByte:
                             byte i8;
-                            if (this.UNSAFE_Read_1_Byte(out i8))
+                            if (UNSAFE_Read_1_Byte(out i8))
                             {
                                 value = i8;
                             }
@@ -1090,12 +1127,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedShort:
                         case BinaryEntryType.UnnamedShort:
                             short i16;
-                            if (this.UNSAFE_Read_2_Int16(out i16))
+                            if (UNSAFE_Read_2_Int16(out i16))
                             {
                                 if (i16 >= 0)
                                 {
@@ -1112,12 +1150,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedUShort:
                         case BinaryEntryType.UnnamedUShort:
                             ushort ui16;
-                            if (this.UNSAFE_Read_2_UInt16(out ui16))
+                            if (UNSAFE_Read_2_UInt16(out ui16))
                             {
                                 value = ui16;
                             }
@@ -1126,12 +1165,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedInt:
                         case BinaryEntryType.UnnamedInt:
                             int i32;
-                            if (this.UNSAFE_Read_4_Int32(out i32))
+                            if (UNSAFE_Read_4_Int32(out i32))
                             {
                                 if (i32 >= 0)
                                 {
@@ -1148,12 +1188,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedUInt:
                         case BinaryEntryType.UnnamedUInt:
                             uint ui32;
-                            if (this.UNSAFE_Read_4_UInt32(out ui32))
+                            if (UNSAFE_Read_4_UInt32(out ui32))
                             {
                                 value = ui32;
                             }
@@ -1162,12 +1203,13 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedLong:
                         case BinaryEntryType.UnnamedLong:
                             long i64;
-                            if (this.UNSAFE_Read_8_Int64(out i64))
+                            if (UNSAFE_Read_8_Int64(out i64))
                             {
                                 if (i64 >= 0)
                                 {
@@ -1184,14 +1226,16 @@ namespace OdinSerializer
                                 value = 0;
                                 return false;
                             }
+
                             break;
 
                         case BinaryEntryType.NamedULong:
                         case BinaryEntryType.UnnamedULong:
-                            if (!this.UNSAFE_Read_8_UInt64(out value))
+                            if (!UNSAFE_Read_8_UInt64(out value))
                             {
                                 return false;
                             }
+
                             break;
 
                         default:
@@ -1202,95 +1246,100 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.MarkEntryContentConsumed();
+                    MarkEntryContentConsumed();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(ulong);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="char" /> value. This call will succeed if the next entry is an <see cref="EntryType.String" />.
-        /// <para />
-        /// If the string of the entry is longer than 1 character, the first character of the string will be taken as the result.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="char" /> value. This call will succeed if the next entry is an <see cref="EntryType.String" />.
+        ///     <para />
+        ///     If the string of the entry is longer than 1 character, the first character of the string will be taken as the
+        ///     result.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadChar(out char value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedChar || this.peekedBinaryEntryType == BinaryEntryType.UnnamedChar)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedChar ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedChar)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_2_Char(out value);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_2_Char(out value);
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedString || this.peekedBinaryEntryType == BinaryEntryType.UnnamedString)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedString ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedString)
             {
-                this.MarkEntryContentConsumed();
-                var str = this.ReadStringValue();
+                MarkEntryContentConsumed();
+                var str = ReadStringValue();
 
                 if (str == null || str.Length == 0)
                 {
-                    value = default(char);
+                    value = default;
                     return false;
                 }
-                else
-                {
-                    value = str[0];
-                    return true;
-                }
+
+                value = str[0];
+                return true;
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(char);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="float" /> value. This call will succeed if the next entry is an <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the stored integer or floating point value is smaller than <see cref="float.MinValue" /> or larger than <see cref="float.MaxValue" />, the result will be default(<see cref="float" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="float" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the stored integer or floating point value is smaller than <see cref="float.MinValue" /> or larger than
+        ///     <see cref="float.MaxValue" />, the result will be default(<see cref="float" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadSingle(out float value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedFloat || this.peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedFloat ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_4_Float32(out value);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_4_Float32(out value);
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedDouble || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDouble ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 double d;
-                if (!this.UNSAFE_Read_8_Float64(out d))
+                if (!UNSAFE_Read_8_Float64(out d))
                 {
                     value = 0;
                     return false;
@@ -1305,17 +1354,19 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(float);
+                    value = default;
                 }
 
                 return true;
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedDecimal || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDecimal ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 decimal d;
-                if (!this.UNSAFE_Read_16_Decimal(out d))
+                if (!UNSAFE_Read_16_Decimal(out d))
                 {
                     value = 0;
                     return false;
@@ -1330,15 +1381,16 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(float);
+                    value = default;
                 }
 
                 return true;
             }
-            else if (this.peekedEntryType == EntryType.Integer)
+
+            if (peekedEntryType == EntryType.Integer)
             {
                 long val;
-                if (!this.ReadInt64(out val))
+                if (!ReadInt64(out val))
                 {
                     value = 0;
                     return false;
@@ -1353,49 +1405,53 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(float);
+                    value = default;
                 }
 
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(float);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="double" /> value. This call will succeed if the next entry is an <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the stored integer or floating point value is smaller than <see cref="double.MinValue" /> or larger than <see cref="double.MaxValue" />, the result will be default(<see cref="double" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="double" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the stored integer or floating point value is smaller than <see cref="double.MinValue" /> or larger than
+        ///     <see cref="double.MaxValue" />, the result will be default(<see cref="double" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadDouble(out double value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedDouble || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDouble ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_8_Float64(out value);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_8_Float64(out value);
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedFloat || this.peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedFloat ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 float s;
-                if (!this.UNSAFE_Read_4_Float32(out s))
+                if (!UNSAFE_Read_4_Float32(out s))
                 {
                     value = 0;
                     return false;
@@ -1404,12 +1460,14 @@ namespace OdinSerializer
                 value = s;
                 return true;
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedDecimal || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDecimal ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 decimal d;
-                if (!this.UNSAFE_Read_16_Decimal(out d))
+                if (!UNSAFE_Read_16_Decimal(out d))
                 {
                     value = 0;
                     return false;
@@ -1429,10 +1487,11 @@ namespace OdinSerializer
 
                 return true;
             }
-            else if (this.peekedEntryType == EntryType.Integer)
+
+            if (peekedEntryType == EntryType.Integer)
             {
                 long val;
-                if (!this.ReadInt64(out val))
+                if (!ReadInt64(out val))
                 {
                     value = 0;
                     return false;
@@ -1452,44 +1511,48 @@ namespace OdinSerializer
 
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(double);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="decimal" /> value. This call will succeed if the next entry is an <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
-        /// <para />
-        /// If the stored integer or floating point value is smaller than <see cref="decimal.MinValue" /> or larger than <see cref="decimal.MaxValue" />, the result will be default(<see cref="decimal" />).
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="decimal" /> value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.FloatingPoint" /> or an <see cref="EntryType.Integer" />.
+        ///     <para />
+        ///     If the stored integer or floating point value is smaller than <see cref="decimal.MinValue" /> or larger than
+        ///     <see cref="decimal.MaxValue" />, the result will be default(<see cref="decimal" />).
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadDecimal(out decimal value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedDecimal || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDecimal ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDecimal)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_16_Decimal(out value);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_16_Decimal(out value);
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedDouble || this.peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedDouble ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedDouble)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 double d;
-                if (!this.UNSAFE_Read_8_Float64(out d))
+                if (!UNSAFE_Read_8_Float64(out d))
                 {
                     value = 0;
                     return false;
@@ -1504,17 +1567,19 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(decimal);
+                    value = default;
                 }
 
                 return true;
             }
-            else if (this.peekedBinaryEntryType == BinaryEntryType.NamedFloat || this.peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
+
+            if (peekedBinaryEntryType == BinaryEntryType.NamedFloat ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedFloat)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
 
                 float f;
-                if (!this.UNSAFE_Read_4_Float32(out f))
+                if (!UNSAFE_Read_4_Float32(out f))
                 {
                     value = 0;
                     return false;
@@ -1529,15 +1594,16 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(decimal);
+                    value = default;
                 }
 
                 return true;
             }
-            else if (this.peekedEntryType == EntryType.Integer)
+
+            if (peekedEntryType == EntryType.Integer)
             {
                 long val;
-                if (!this.ReadInt64(out val))
+                if (!ReadInt64(out val))
                 {
                     value = 0;
                     return false;
@@ -1552,258 +1618,262 @@ namespace OdinSerializer
                 }
                 catch (OverflowException)
                 {
-                    value = default(decimal);
+                    value = default;
                 }
 
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(decimal);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an external reference guid. This call will succeed if the next entry is an <see cref="EntryType.ExternalReferenceByGuid" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an external reference guid. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.ExternalReferenceByGuid" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="guid">The external reference guid.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadExternalReference(out Guid guid)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByGuid || this.peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByGuid)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByGuid ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByGuid)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_16_Guid(out guid);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_16_Guid(out guid);
             }
-            else
-            {
-                this.SkipEntry();
-                guid = default(Guid);
-                return false;
-            }
+
+            SkipEntry();
+            guid = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="Guid" /> value. This call will succeed if the next entry is an <see cref="EntryType.Guid" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="Guid" /> value. This call will succeed if the next entry is an <see cref="EntryType.Guid" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadGuid(out Guid value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedGuid || this.peekedBinaryEntryType == BinaryEntryType.UnnamedGuid)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedGuid ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedGuid)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_16_Guid(out value);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_16_Guid(out value);
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(Guid);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Reads an external reference index. This call will succeed if the next entry is an <see cref="EntryType.ExternalReferenceByIndex" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an external reference index. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.ExternalReferenceByIndex" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="index">The external reference index.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadExternalReference(out int index)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByIndex || this.peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByIndex)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByIndex ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByIndex)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_4_Int32(out index);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_4_Int32(out index);
             }
-            else
-            {
-                this.SkipEntry();
-                index = -1;
-                return false;
-            }
+
+            SkipEntry();
+            index = -1;
+            return false;
         }
 
         /// <summary>
-        /// Reads an external reference string. This call will succeed if the next entry is an <see cref="EntryType.ExternalReferenceByString" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an external reference string. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.ExternalReferenceByString" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="id">The external reference string.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadExternalReference(out string id)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByString || this.peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByString)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedExternalReferenceByString ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedExternalReferenceByString)
             {
-                id = this.ReadStringValue();
-                this.MarkEntryContentConsumed();
+                id = ReadStringValue();
+                MarkEntryContentConsumed();
                 return id != null;
             }
-            else
-            {
-                this.SkipEntry();
-                id = null;
-                return false;
-            }
+
+            SkipEntry();
+            id = null;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <c>null</c> value. This call will succeed if the next entry is an <see cref="EntryType.Null" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <c>null</c> value. This call will succeed if the next entry is an <see cref="EntryType.Null" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadNull()
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedNull || this.peekedBinaryEntryType == BinaryEntryType.UnnamedNull)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedNull ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedNull)
             {
-                this.MarkEntryContentConsumed();
+                MarkEntryContentConsumed();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                return false;
-            }
+
+            SkipEntry();
+            return false;
         }
 
         /// <summary>
-        /// Reads an internal reference id. This call will succeed if the next entry is an <see cref="EntryType.InternalReference" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads an internal reference id. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.InternalReference" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="id">The internal reference id.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadInternalReference(out int id)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedInternalReference || this.peekedBinaryEntryType == BinaryEntryType.UnnamedInternalReference)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedInternalReference ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedInternalReference)
             {
-                this.MarkEntryContentConsumed();
-                return this.UNSAFE_Read_4_Int32(out id);
+                MarkEntryContentConsumed();
+                return UNSAFE_Read_4_Int32(out id);
             }
-            else
-            {
-                this.SkipEntry();
-                id = -1;
-                return false;
-            }
+
+            SkipEntry();
+            id = -1;
+            return false;
         }
 
         /// <summary>
-        /// Reads a <see cref="string" /> value. This call will succeed if the next entry is an <see cref="EntryType.String" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a <see cref="string" /> value. This call will succeed if the next entry is an <see cref="EntryType.String" />
+        ///     .
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
         /// <param name="value">The value that has been read.</param>
         /// <returns>
-        ///   <c>true</c> if reading the value succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading the value succeeded, otherwise <c>false</c>
         /// </returns>
         public override bool ReadString(out string value)
         {
-            if (!this.peekedEntryType.HasValue)
+            if (!peekedEntryType.HasValue)
             {
                 string name;
-                this.PeekEntry(out name);
+                PeekEntry(out name);
             }
 
-            if (this.peekedBinaryEntryType == BinaryEntryType.NamedString || this.peekedBinaryEntryType == BinaryEntryType.UnnamedString)
+            if (peekedBinaryEntryType == BinaryEntryType.NamedString ||
+                peekedBinaryEntryType == BinaryEntryType.UnnamedString)
             {
-                value = this.ReadStringValue();
-                this.MarkEntryContentConsumed();
+                value = ReadStringValue();
+                MarkEntryContentConsumed();
                 return value != null;
             }
-            else
-            {
-                this.SkipEntry();
-                value = null;
-                return false;
-            }
+
+            SkipEntry();
+            value = null;
+            return false;
         }
 
         /// <summary>
-        /// Tells the reader that a new serialization session is about to begin, and that it should clear all cached values left over from any prior serialization sessions.
-        /// This method is only relevant when the same reader is used to deserialize several different, unrelated values.
+        ///     Tells the reader that a new serialization session is about to begin, and that it should clear all cached values
+        ///     left over from any prior serialization sessions.
+        ///     This method is only relevant when the same reader is used to deserialize several different, unrelated values.
         /// </summary>
         public override void PrepareNewSerializationSession()
         {
             base.PrepareNewSerializationSession();
-            this.peekedEntryType = null;
-            this.peekedEntryName = null;
-            this.peekedBinaryEntryType = BinaryEntryType.Invalid;
-            this.types.Clear();
-            this.bufferIndex = 0;
-            this.bufferEnd = 0;
-            this.buffer = this.internalBufferBackup;
+            peekedEntryType = null;
+            peekedEntryName = null;
+            peekedBinaryEntryType = BinaryEntryType.Invalid;
+            types.Clear();
+            bufferIndex = 0;
+            bufferEnd = 0;
+            buffer = internalBufferBackup;
         }
 
         public override string GetDataDump()
         {
             byte[] bytes;
 
-            if (this.bufferEnd == this.buffer.Length)
+            if (bufferEnd == buffer.Length)
             {
-                bytes = this.buffer;
+                bytes = buffer;
             }
             else
             {
-                bytes = new byte[this.bufferEnd];
+                bytes = new byte[bufferEnd];
 
-                fixed (void* from = this.buffer)
+                fixed (void* from = buffer)
                 fixed (void* to = bytes)
                 {
                     UnsafeUtilities.MemoryCopy(from, to, bytes.Length);
@@ -1813,44 +1883,38 @@ namespace OdinSerializer
             return "Binary hex dump: " + ProperBitConverter.BytesToHexString(bytes);
         }
 
-        private struct Struct256Bit
-        {
-            public decimal d1;
-            public decimal d2;
-        }
-
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private string ReadStringValue()
         {
             byte charSizeFlag;
 
-            if (!this.UNSAFE_Read_1_Byte(out charSizeFlag))
+            if (!UNSAFE_Read_1_Byte(out charSizeFlag))
             {
                 return null;
             }
 
             int length;
 
-            if (!this.UNSAFE_Read_4_Int32(out length))
+            if (!UNSAFE_Read_4_Int32(out length))
             {
                 return null;
             }
 
-            string str = new string(' ', length);
+            var str = new string(' ', length);
 
             if (charSizeFlag == 0)
             {
                 // 8 bit
 
-                fixed (byte* baseFromPtr = this.buffer)
+                fixed (byte* baseFromPtr = buffer)
                 fixed (char* baseToPtr = str)
                 {
-                    byte* fromPtr = baseFromPtr + this.bufferIndex;
-                    byte* toPtr = (byte*)baseToPtr;
+                    var fromPtr = baseFromPtr + bufferIndex;
+                    var toPtr = (byte*)baseToPtr;
 
                     if (BitConverter.IsLittleEndian)
                     {
-                        for (int i = 0; i < length; i++)
+                        for (var i = 0; i < length; i++)
                         {
                             *toPtr++ = *fromPtr++;
                             toPtr++; // Skip every other string byte
@@ -1858,7 +1922,7 @@ namespace OdinSerializer
                     }
                     else
                     {
-                        for (int i = 0; i < length; i++)
+                        for (var i = 0; i < length; i++)
                         {
                             toPtr++; // Skip every other string byte
                             *toPtr++ = *fromPtr++;
@@ -1866,71 +1930,69 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += length;
+                bufferIndex += length;
                 return str;
             }
-            else
+
+            // 16 bit
+            var bytes = length * 2;
+
+            fixed (byte* baseFromPtr = buffer)
+            fixed (char* baseToPtr = str)
             {
-                // 16 bit
-                int bytes = length * 2;
-
-                fixed (byte* baseFromPtr = this.buffer)
-                fixed (char* baseToPtr = str)
+                if (BitConverter.IsLittleEndian)
                 {
-                    if (BitConverter.IsLittleEndian)
+                    var fromLargePtr = (Struct256Bit*)(baseFromPtr + bufferIndex);
+                    var toLargePtr = (Struct256Bit*)baseToPtr;
+
+                    var end = (byte*)baseToPtr + bytes;
+
+                    while (toLargePtr + 1 < end)
                     {
-                        Struct256Bit* fromLargePtr = (Struct256Bit*)(baseFromPtr + this.bufferIndex);
-                        Struct256Bit* toLargePtr = (Struct256Bit*)baseToPtr;
-
-                        byte* end = (byte*)baseToPtr + bytes;
-
-                        while ((toLargePtr + 1) < end)
-                        {
-                            *toLargePtr++ = *fromLargePtr++;
-                        }
-
-                        byte* fromSmallPtr = (byte*)fromLargePtr;
-                        byte* toSmallPtr = (byte*)toLargePtr;
-
-                        while (toSmallPtr < end)
-                        {
-                            *toSmallPtr++ = *fromSmallPtr++;
-                        }
+                        *toLargePtr++ = *fromLargePtr++;
                     }
-                    else
+
+                    var fromSmallPtr = (byte*)fromLargePtr;
+                    var toSmallPtr = (byte*)toLargePtr;
+
+                    while (toSmallPtr < end)
                     {
-                        byte* fromPtr = baseFromPtr + this.bufferIndex;
-                        byte* toPtr = (byte*)baseToPtr;
-
-                        for (int i = 0; i < length; i++)
-                        {
-                            *toPtr = *(fromPtr + 1);
-                            *(toPtr + 1) = *fromPtr;
-
-                            fromPtr += 2;
-                            toPtr += 2;
-                        }
+                        *toSmallPtr++ = *fromSmallPtr++;
                     }
                 }
+                else
+                {
+                    var fromPtr = baseFromPtr + bufferIndex;
+                    var toPtr = (byte*)baseToPtr;
 
-                this.bufferIndex += bytes;
-                return str;
+                    for (var i = 0; i < length; i++)
+                    {
+                        *toPtr = *(fromPtr + 1);
+                        *(toPtr + 1) = *fromPtr;
+
+                        fromPtr += 2;
+                        toPtr += 2;
+                    }
+                }
             }
+
+            bufferIndex += bytes;
+            return str;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private void SkipStringValue()
         {
             byte charSizeFlag;
 
-            if (!this.UNSAFE_Read_1_Byte(out charSizeFlag))
+            if (!UNSAFE_Read_1_Byte(out charSizeFlag))
             {
                 return;
             }
 
             int skipBytes;
 
-            if (!this.UNSAFE_Read_4_Int32(out skipBytes))
+            if (!UNSAFE_Read_4_Int32(out skipBytes))
             {
                 return;
             }
@@ -1940,38 +2002,42 @@ namespace OdinSerializer
                 skipBytes *= 2;
             }
 
-            if (this.HasBufferData(skipBytes))
+            if (HasBufferData(skipBytes))
             {
-                this.bufferIndex += skipBytes;
+                bufferIndex += skipBytes;
             }
             else
             {
-                this.bufferIndex = this.bufferEnd;
+                bufferIndex = bufferEnd;
             }
         }
-        
+
         private void SkipPeekedEntryContent()
         {
-            if (this.peekedEntryType != null)
+            if (peekedEntryType != null)
             {
                 try
                 {
-                    switch (this.peekedBinaryEntryType)
+                    switch (peekedBinaryEntryType)
                     {
                         case BinaryEntryType.NamedStartOfReferenceNode:
                         case BinaryEntryType.UnnamedStartOfReferenceNode:
-                            this.ReadTypeEntry(); // Never actually skip type entries; they might contain type ids that we'll need later
-                            if (!this.SkipBuffer(4)) return; // Skip reference id int
+                            ReadTypeEntry(); // Never actually skip type entries; they might contain type ids that we'll need later
+                            if (!SkipBuffer(4))
+                            {
+                                return; // Skip reference id int
+                            }
+
                             break;
 
                         case BinaryEntryType.NamedStartOfStructNode:
                         case BinaryEntryType.UnnamedStartOfStructNode:
-                            this.ReadTypeEntry(); // Never actually skip type entries; they might contain type ids that we'll need later
+                            ReadTypeEntry(); // Never actually skip type entries; they might contain type ids that we'll need later
                             break;
 
                         case BinaryEntryType.StartOfArray:
                             // Skip length long
-                            this.SkipBuffer(8);
+                            SkipBuffer(8);
 
                             break;
 
@@ -1980,12 +2046,12 @@ namespace OdinSerializer
                             int elements;
                             int bytesPerElement;
 
-                            if (!this.UNSAFE_Read_4_Int32(out elements) || !this.UNSAFE_Read_4_Int32(out bytesPerElement))
+                            if (!UNSAFE_Read_4_Int32(out elements) || !UNSAFE_Read_4_Int32(out bytesPerElement))
                             {
                                 return;
                             }
 
-                            this.SkipBuffer(elements * bytesPerElement);
+                            SkipBuffer(elements * bytesPerElement);
                             break;
 
                         case BinaryEntryType.NamedSByte:
@@ -1994,7 +2060,7 @@ namespace OdinSerializer
                         case BinaryEntryType.UnnamedByte:
                         case BinaryEntryType.NamedBoolean:
                         case BinaryEntryType.UnnamedBoolean:
-                            this.SkipBuffer(1);
+                            SkipBuffer(1);
                             break;
 
                         case BinaryEntryType.NamedChar:
@@ -2003,7 +2069,7 @@ namespace OdinSerializer
                         case BinaryEntryType.UnnamedShort:
                         case BinaryEntryType.NamedUShort:
                         case BinaryEntryType.UnnamedUShort:
-                            this.SkipBuffer(2);
+                            SkipBuffer(2);
                             break;
 
                         case BinaryEntryType.NamedInternalReference:
@@ -2016,7 +2082,7 @@ namespace OdinSerializer
                         case BinaryEntryType.UnnamedExternalReferenceByIndex:
                         case BinaryEntryType.NamedFloat:
                         case BinaryEntryType.UnnamedFloat:
-                            this.SkipBuffer(4);
+                            SkipBuffer(4);
                             break;
 
                         case BinaryEntryType.NamedLong:
@@ -2025,7 +2091,7 @@ namespace OdinSerializer
                         case BinaryEntryType.UnnamedULong:
                         case BinaryEntryType.NamedDouble:
                         case BinaryEntryType.UnnamedDouble:
-                            this.SkipBuffer(8);
+                            SkipBuffer(8);
                             break;
 
                         case BinaryEntryType.NamedGuid:
@@ -2034,25 +2100,27 @@ namespace OdinSerializer
                         case BinaryEntryType.UnnamedExternalReferenceByGuid:
                         case BinaryEntryType.NamedDecimal:
                         case BinaryEntryType.UnnamedDecimal:
-                            this.SkipBuffer(8);
+                            SkipBuffer(8);
                             break;
 
                         case BinaryEntryType.NamedString:
                         case BinaryEntryType.UnnamedString:
                         case BinaryEntryType.NamedExternalReferenceByString:
                         case BinaryEntryType.UnnamedExternalReferenceByString:
-                            this.SkipStringValue();
+                            SkipStringValue();
                             break;
 
                         case BinaryEntryType.TypeName:
-                            this.Context.Config.DebugContext.LogError("Parsing error in binary data reader: should not be able to peek a TypeName entry.");
-                            this.SkipBuffer(4);
-                            this.ReadStringValue();
+                            Context.Config.DebugContext.LogError(
+                                "Parsing error in binary data reader: should not be able to peek a TypeName entry.");
+                            SkipBuffer(4);
+                            ReadStringValue();
                             break;
 
                         case BinaryEntryType.TypeID:
-                            this.Context.Config.DebugContext.LogError("Parsing error in binary data reader: should not be able to peek a TypeID entry.");
-                            this.SkipBuffer(4);
+                            Context.Config.DebugContext.LogError(
+                                "Parsing error in binary data reader: should not be able to peek a TypeID entry.");
+                            SkipBuffer(4);
                             break;
 
                         case BinaryEntryType.EndOfArray:
@@ -2068,59 +2136,63 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.MarkEntryContentConsumed();
+                    MarkEntryContentConsumed();
                 }
             }
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool SkipBuffer(int amount)
         {
-            int newIndex = this.bufferIndex + amount;
+            var newIndex = bufferIndex + amount;
 
-            if (newIndex > this.bufferEnd)
+            if (newIndex > bufferEnd)
             {
-                this.bufferIndex = this.bufferEnd;
+                bufferIndex = bufferEnd;
                 return false;
             }
 
-            this.bufferIndex = newIndex;
+            bufferIndex = newIndex;
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private Type ReadTypeEntry()
         {
-            if (!this.HasBufferData(1))
+            if (!HasBufferData(1))
+            {
                 return null;
+            }
 
-            BinaryEntryType entryType = (BinaryEntryType)this.buffer[this.bufferIndex++];
+            var entryType = (BinaryEntryType)buffer[bufferIndex++];
 
             Type type;
             int id;
 
             if (entryType == BinaryEntryType.TypeID)
             {
-                if (!this.UNSAFE_Read_4_Int32(out id))
+                if (!UNSAFE_Read_4_Int32(out id))
                 {
                     return null;
                 }
 
-                if (this.types.TryGetValue(id, out type) == false)
+                if (types.TryGetValue(id, out type) == false)
                 {
-                    this.Context.Config.DebugContext.LogError("Missing type ID during deserialization: " + id + " at node " + this.CurrentNodeName + " and depth " + this.CurrentNodeDepth + " and id " + this.CurrentNodeId);
+                    Context.Config.DebugContext.LogError("Missing type ID during deserialization: " + id + " at node " +
+                                                         CurrentNodeName + " and depth " + CurrentNodeDepth +
+                                                         " and id " + CurrentNodeId);
                 }
             }
             else if (entryType == BinaryEntryType.TypeName)
             {
-                if (!this.UNSAFE_Read_4_Int32(out id))
+                if (!UNSAFE_Read_4_Int32(out id))
                 {
                     return null;
                 }
 
-                string name = this.ReadStringValue();
-                type = name == null ? null : this.Context.Binder.BindToType(name, this.Context.Config.DebugContext);
-                this.types.Add(id, type);
+                var name = ReadStringValue();
+                type = name == null ? null : Context.Binder.BindToType(name, Context.Config.DebugContext);
+                types.Add(id, type);
             }
             else if (entryType == BinaryEntryType.UnnamedNull)
             {
@@ -2129,47 +2201,49 @@ namespace OdinSerializer
             else
             {
                 type = null;
-                this.Context.Config.DebugContext.LogError("Expected TypeName, TypeID or UnnamedNull entry flag for reading type data, but instead got the entry flag: " + entryType + ".");
+                Context.Config.DebugContext.LogError(
+                    "Expected TypeName, TypeID or UnnamedNull entry flag for reading type data, but instead got the entry flag: " +
+                    entryType + ".");
             }
 
             return type;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private void MarkEntryContentConsumed()
         {
-            this.peekedEntryType = null;
-            this.peekedEntryName = null;
-            this.peekedBinaryEntryType = BinaryEntryType.Invalid;
+            peekedEntryType = null;
+            peekedEntryName = null;
+            peekedBinaryEntryType = BinaryEntryType.Invalid;
         }
 
         /// <summary>
-        /// Peeks the current entry.
+        ///     Peeks the current entry.
         /// </summary>
         /// <returns>The peeked entry.</returns>
         protected override EntryType PeekEntry()
         {
             string name;
-            return this.PeekEntry(out name);
+            return PeekEntry(out name);
         }
 
         /// <summary>
-        /// Consumes the current entry, and reads to the next one.
+        ///     Consumes the current entry, and reads to the next one.
         /// </summary>
         /// <returns>The next entry.</returns>
         protected override EntryType ReadToNextEntry()
         {
             string name;
-            this.SkipPeekedEntryContent();
-            return this.PeekEntry(out name);
+            SkipPeekedEntryContent();
+            return PeekEntry(out name);
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_1_Byte(out byte value)
         {
-            if (this.HasBufferData(1))
+            if (HasBufferData(1))
             {
-                value = this.buffer[this.bufferIndex++];
+                value = buffer[bufferIndex++];
                 return true;
             }
 
@@ -2177,14 +2251,14 @@ namespace OdinSerializer
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_1_SByte(out sbyte value)
         {
-            if (this.HasBufferData(1))
+            if (HasBufferData(1))
             {
                 unchecked
                 {
-                    value = (sbyte)this.buffer[this.bufferIndex++];
+                    value = (sbyte)buffer[bufferIndex++];
                 }
 
                 return true;
@@ -2194,22 +2268,22 @@ namespace OdinSerializer
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_2_Int16(out short value)
         {
-            if (this.HasBufferData(2))
+            if (HasBufferData(2))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
-                        value = *((short*)(basePtr + this.bufferIndex));
+                        value = *(short*)(basePtr + bufferIndex);
                     }
                     else
                     {
                         short val = 0;
-                        byte* toPtr = (byte*)&val + 1;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 1;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr = *fromPtr;
@@ -2218,31 +2292,31 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 2;
+                bufferIndex += 2;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_2_UInt16(out ushort value)
         {
-            if (this.HasBufferData(2))
+            if (HasBufferData(2))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
-                        value = *((ushort*)(basePtr + this.bufferIndex));
+                        value = *(ushort*)(basePtr + bufferIndex);
                     }
                     else
                     {
                         ushort val = 0;
-                        byte* toPtr = (byte*)&val + 1;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 1;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr = *fromPtr;
@@ -2251,31 +2325,31 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 2;
+                bufferIndex += 2;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_2_Char(out char value)
         {
-            if (this.HasBufferData(2))
+            if (HasBufferData(2))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
-                        value = *((char*)(basePtr + this.bufferIndex));
+                        value = *(char*)(basePtr + bufferIndex);
                     }
                     else
                     {
-                        char val = default(char);
-                        byte* toPtr = (byte*)&val + 1;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var val = default(char);
+                        var toPtr = (byte*)&val + 1;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr = *fromPtr;
@@ -2284,31 +2358,31 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 2;
+                bufferIndex += 2;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
-            value = default(char);
+            bufferIndex = bufferEnd;
+            value = default;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_4_Int32(out int value)
         {
-            if (this.HasBufferData(4))
+            if (HasBufferData(4))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
-                        value = *((int*)(basePtr + this.bufferIndex));
+                        value = *(int*)(basePtr + bufferIndex);
                     }
                     else
                     {
-                        int val = 0;
-                        byte* toPtr = (byte*)&val + 3;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var val = 0;
+                        var toPtr = (byte*)&val + 3;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2319,31 +2393,31 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 4;
+                bufferIndex += 4;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_4_UInt32(out uint value)
         {
-            if (this.HasBufferData(4))
+            if (HasBufferData(4))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
-                        value = *((uint*)(basePtr + this.bufferIndex));
+                        value = *(uint*)(basePtr + bufferIndex);
                     }
                     else
                     {
                         uint val = 0;
-                        byte* toPtr = (byte*)&val + 3;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 3;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2354,42 +2428,42 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 4;
+                bufferIndex += 4;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_4_Float32(out float value)
         {
-            if (this.HasBufferData(4))
+            if (HasBufferData(4))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_Unaligned_Float32_Reads)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((float*)(basePtr + this.bufferIndex));
+                            value = *(float*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do a read through a 32-bit int and a locally addressed float instead, should be almost as fast as the real deal
                             float result = 0;
-                            *(int*)&result = *(int*)(basePtr + this.bufferIndex);
+                            *(int*)&result = *(int*)(basePtr + bufferIndex);
                             value = result;
                         }
                     }
                     else
                     {
                         float val = 0;
-                        byte* toPtr = (byte*)&val + 3;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 3;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2400,36 +2474,36 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 4;
+                bufferIndex += 4;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
-        
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_8_Int64(out long value)
         {
-            if (this.HasBufferData(8))
+            if (HasBufferData(8))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_All_Unaligned_ReadWrites)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((long*)(basePtr + this.bufferIndex));
+                            value = *(long*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do an int-by-int read instead, into an address that we know is aligned
                             long result = 0;
-                            int* toPtr = (int*)&result;
-                            int* fromPtr = (int*)(basePtr + this.bufferIndex);
-                            
+                            var toPtr = (int*)&result;
+                            var fromPtr = (int*)(basePtr + bufferIndex);
+
                             *toPtr++ = *fromPtr++;
                             *toPtr = *fromPtr;
 
@@ -2439,8 +2513,8 @@ namespace OdinSerializer
                     else
                     {
                         long val = 0;
-                        byte* toPtr = (byte*)&val + 7;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 7;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2455,36 +2529,36 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 8;
+                bufferIndex += 8;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_8_UInt64(out ulong value)
         {
-            if (this.HasBufferData(8))
+            if (HasBufferData(8))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_All_Unaligned_ReadWrites)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((ulong*)(basePtr + this.bufferIndex));
+                            value = *(ulong*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do an int-by-int read instead, into an address that we know is aligned
                             ulong result = 0;
 
-                            int* toPtr = (int*)&result;
-                            int* fromPtr = (int*)(basePtr + this.bufferIndex);
+                            var toPtr = (int*)&result;
+                            var fromPtr = (int*)(basePtr + bufferIndex);
 
                             *toPtr++ = *fromPtr++;
                             *toPtr = *fromPtr;
@@ -2495,8 +2569,8 @@ namespace OdinSerializer
                     else
                     {
                         ulong val = 0;
-                        byte* toPtr = (byte*)&val + 7;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 7;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2511,36 +2585,36 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 8;
+                bufferIndex += 8;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_8_Float64(out double value)
         {
-            if (this.HasBufferData(8))
+            if (HasBufferData(8))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_All_Unaligned_ReadWrites)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((double*)(basePtr + this.bufferIndex));
+                            value = *(double*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do an int-by-int read instead, into an address that we know is aligned
                             double result = 0;
 
-                            int* toPtr = (int*)&result;
-                            int* fromPtr = (int*)(basePtr + this.bufferIndex);
+                            var toPtr = (int*)&result;
+                            var fromPtr = (int*)(basePtr + bufferIndex);
 
                             *toPtr++ = *fromPtr++;
                             *toPtr = *fromPtr;
@@ -2551,8 +2625,8 @@ namespace OdinSerializer
                     else
                     {
                         double val = 0;
-                        byte* toPtr = (byte*)&val + 7;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 7;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2567,36 +2641,36 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 8;
+                bufferIndex += 8;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_16_Decimal(out decimal value)
         {
-            if (this.HasBufferData(16))
+            if (HasBufferData(16))
             {
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_All_Unaligned_ReadWrites)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((decimal*)(basePtr + this.bufferIndex));
+                            value = *(decimal*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do an int-by-int read instead, into an address that we know is aligned
                             decimal result = 0;
 
-                            int* toPtr = (int*)&result;
-                            int* fromPtr = (int*)(basePtr + this.bufferIndex);
+                            var toPtr = (int*)&result;
+                            var fromPtr = (int*)(basePtr + bufferIndex);
 
                             *toPtr++ = *fromPtr++;
                             *toPtr++ = *fromPtr++;
@@ -2609,8 +2683,8 @@ namespace OdinSerializer
                     else
                     {
                         decimal val = 0;
-                        byte* toPtr = (byte*)&val + 15;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var toPtr = (byte*)&val + 15;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr-- = *fromPtr++;
                         *toPtr-- = *fromPtr++;
@@ -2633,19 +2707,19 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 16;
+                bufferIndex += 16;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
+            bufferIndex = bufferEnd;
             value = 0;
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool UNSAFE_Read_16_Guid(out Guid value)
         {
-            if (this.HasBufferData(16))
+            if (HasBufferData(16))
             {
                 // First 10 bytes of a guid are always little endian
                 // Last 6 bytes depend on architecture endianness
@@ -2653,22 +2727,22 @@ namespace OdinSerializer
 
                 // TODO: Test if this actually works on big-endian architecture. Where the hell do we find that?
 
-                fixed (byte* basePtr = this.buffer)
+                fixed (byte* basePtr = buffer)
                 {
                     if (BitConverter.IsLittleEndian)
                     {
                         if (ArchitectureInfo.Architecture_Supports_All_Unaligned_ReadWrites)
                         {
                             // We can read directly from the buffer, safe in the knowledge that any potential unaligned reads will work
-                            value = *((Guid*)(basePtr + this.bufferIndex));
+                            value = *(Guid*)(basePtr + bufferIndex);
                         }
                         else
                         {
                             // We do an int-by-int read instead, into an address that we know is aligned
-                            Guid result = default(Guid);
+                            var result = default(Guid);
 
-                            int* toPtr = (int*)&result;
-                            int* fromPtr = (int*)(basePtr + this.bufferIndex);
+                            var toPtr = (int*)&result;
+                            var fromPtr = (int*)(basePtr + bufferIndex);
 
                             *toPtr++ = *fromPtr++;
                             *toPtr++ = *fromPtr++;
@@ -2680,9 +2754,9 @@ namespace OdinSerializer
                     }
                     else
                     {
-                        Guid val = default(Guid);
-                        byte* toPtr = (byte*)&val;
-                        byte* fromPtr = basePtr + this.bufferIndex;
+                        var val = default(Guid);
+                        var toPtr = (byte*)&val;
+                        var fromPtr = basePtr + bufferIndex;
 
                         *toPtr++ = *fromPtr++;
                         *toPtr++ = *fromPtr++;
@@ -2708,44 +2782,43 @@ namespace OdinSerializer
                     }
                 }
 
-                this.bufferIndex += 16;
+                bufferIndex += 16;
                 return true;
             }
 
-            this.bufferIndex = this.bufferEnd;
-            value = default(Guid);
+            bufferIndex = bufferEnd;
+            value = default;
             return false;
         }
 
-        
-        [MethodImpl((MethodImplOptions)0x100)]  // Set aggressive inlining flag, for the runtimes that understand that
+
+        [MethodImpl((MethodImplOptions)0x100)] // Set aggressive inlining flag, for the runtimes that understand that
         private bool HasBufferData(int amount)
         {
-            if (this.bufferEnd == 0)
+            if (bufferEnd == 0)
             {
-                this.ReadEntireStreamToBuffer();
+                ReadEntireStreamToBuffer();
             }
 
-            return this.bufferIndex + amount <= this.bufferEnd;
+            return bufferIndex + amount <= bufferEnd;
         }
 
         private void ReadEntireStreamToBuffer()
         {
-            this.bufferIndex = 0;
+            bufferIndex = 0;
 
-            if (this.Stream is MemoryStream)
-            {
+            if (Stream is MemoryStream)
                 // We can do a small trick and just steal the memory stream's internal buffer
                 // and totally avoid copying from the stream's internal buffer that way.
                 //
                 // This is pretty great, since most of the time we will be deserializing from
                 // a memory stream.
-
+            {
                 try
                 {
-                    this.buffer = (this.Stream as MemoryStream).GetBuffer();
-                    this.bufferEnd = (int)this.Stream.Length;
-                    this.bufferIndex = (int)this.Stream.Position;
+                    buffer = (Stream as MemoryStream).GetBuffer();
+                    bufferEnd = (int)Stream.Length;
+                    bufferIndex = (int)Stream.Position;
                     return;
                 }
                 catch (UnauthorizedAccessException)
@@ -2755,30 +2828,36 @@ namespace OdinSerializer
                 }
             }
 
-            this.buffer = this.internalBufferBackup;
+            buffer = internalBufferBackup;
 
-            int remainder = (int)(this.Stream.Length - this.Stream.Position);
+            var remainder = (int)(Stream.Length - Stream.Position);
 
-            if (this.buffer.Length >= remainder)
+            if (buffer.Length >= remainder)
             {
-                this.Stream.Read(this.buffer, 0, remainder);
+                Stream.Read(buffer, 0, remainder);
             }
             else
             {
-                this.buffer = new byte[remainder];
-                this.Stream.Read(this.buffer, 0, remainder);
+                buffer = new byte[remainder];
+                Stream.Read(buffer, 0, remainder);
 
                 if (remainder <= 1024 * 1024 * 10)
-                {
                     // We've made a larger buffer - might as well keep that, so long as it's not too ridiculously big (>10 MB)
                     // We don't want to be too much of a memory hog - at least there will usually only be one reader instance
                     // instantiated, ever.
-                    this.internalBufferBackup = this.buffer;
+                {
+                    internalBufferBackup = buffer;
                 }
             }
 
-            this.bufferIndex = 0;
-            this.bufferEnd = remainder;
+            bufferIndex = 0;
+            bufferEnd = remainder;
+        }
+
+        private struct Struct256Bit
+        {
+            public decimal d1;
+            public decimal d2;
         }
     }
 }

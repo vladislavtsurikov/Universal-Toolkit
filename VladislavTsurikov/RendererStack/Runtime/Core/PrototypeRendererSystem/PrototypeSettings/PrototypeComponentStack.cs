@@ -8,19 +8,19 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
     {
         internal void CreateAllComponents()
         {
-            Type rendererType = (Type)SetupData[0];
-            
-            foreach (var type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
+            var rendererType = (Type)SetupData[0];
+
+            foreach (Type type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
             {
                 CreateIfMissingType(type);
             }
         }
-        
+
         protected override void OnCreateElements()
         {
-            Type rendererType = (Type)SetupData[0];
-            
-            foreach (var type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
+            var rendererType = (Type)SetupData[0];
+
+            foreach (Type type in rendererType.GetAttribute<AddPrototypeComponentsAttribute>().PrototypeSettings)
             {
                 if (type.GetAttribute<PersistentComponentAttribute>() != null)
                 {

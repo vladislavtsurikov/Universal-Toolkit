@@ -1,6 +1,6 @@
-﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+﻿using OdinSerializer;
+using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.StreamingRules.StreamingRulesSystem
 {
@@ -8,17 +8,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.Strea
     public class AsynchronousLoading : StreamingRule
     {
         private ImmediatelyLoading _immediatelyLoading;
-        
-        private ImmediatelyLoading ImmediatelyLoading
-        {
-            get
-            {
-                return _immediatelyLoading ??= StreamingRuleComponentStack.GetElement<ImmediatelyLoading>();
-            }
-        }
-        
+
         [OdinSerialize]
         private float _maxDistance = 4000;
+
+
+        public float MaxLoadingScenePause = 1;
+
+        private ImmediatelyLoading ImmediatelyLoading =>
+            _immediatelyLoading ??= StreamingRuleComponentStack.GetElement<ImmediatelyLoading>();
 
         public float MaxDistance
         {
@@ -26,15 +24,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.Strea
             {
                 if (_maxDistance < ImmediatelyLoading.MaxDistance)
                 {
-                    _maxDistance = ImmediatelyLoading.MaxDistance; 
+                    _maxDistance = ImmediatelyLoading.MaxDistance;
                 }
-                
+
                 return Mathf.Max(ImmediatelyLoading.MaxDistance, _maxDistance);
             }
             set => _maxDistance = Mathf.Max(ImmediatelyLoading.MaxDistance, value);
         }
-
-
-        public float MaxLoadingScenePause = 1;
     }
 }

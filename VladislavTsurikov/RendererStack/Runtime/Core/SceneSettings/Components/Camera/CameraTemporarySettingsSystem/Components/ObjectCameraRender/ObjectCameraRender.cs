@@ -3,15 +3,18 @@ using UnityEngine;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 
-namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender
+namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.
+    ObjectCameraRender
 {
     public class ObjectCameraRender : CameraTemporaryComponent
     {
-        public readonly List<PrototypeRenderData> PrototypeRenderDataList = new List<PrototypeRenderData>();
+        public readonly List<PrototypeRenderData> PrototypeRenderDataList = new();
 
         protected override void SetupCameraTemporaryComponent()
         {
-            PrototypeRenderer prototypeRenderer = RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer.TerrainObjectRenderer)) as PrototypeRenderer;
+            var prototypeRenderer =
+                RendererStackManager.Instance.RendererStack.GetElement(
+                    typeof(TerrainObjectRenderer.TerrainObjectRenderer)) as PrototypeRenderer;
 
             PrototypeRenderDataList.Clear();
 
@@ -22,14 +25,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
 
             foreach (Prototype proto in prototypeRenderer.SelectionData.PrototypeList)
             {
-                PrototypeRenderData prototypeRenderData = new PrototypeRenderData(proto.RenderModel.LODs); 
+                var prototypeRenderData = new PrototypeRenderData(proto.RenderModel.LODs);
                 PrototypeRenderDataList.Add(prototypeRenderData);
             }
         }
 
         protected override void OnCreate()
         {
-            TerrainObjectRenderer.TerrainObjectRenderer instance = (TerrainObjectRenderer.TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer.TerrainObjectRenderer));
+            var instance =
+                (TerrainObjectRenderer.TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(
+                    typeof(TerrainObjectRenderer.TerrainObjectRenderer));
 
             if (instance != null)
             {
@@ -39,9 +44,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
 
         protected override void OnDisableElement()
         {
-            foreach (var prototypeRender in PrototypeRenderDataList)
+            foreach (PrototypeRenderData prototypeRender in PrototypeRenderDataList)
             {
-                prototypeRender.Dispose();    
+                prototypeRender.Dispose();
             }
         }
 
@@ -49,12 +54,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
         {
             if (shadows)
             {
-                return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].PositionShadowBuffer.ComputeBuffer;
+                return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].PositionShadowBuffer
+                    .ComputeBuffer;
             }
-            else
-            {
-                return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].PositionBuffer.ComputeBuffer;
-            }                      
+
+            return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].PositionBuffer.ComputeBuffer;
         }
 
         public List<ComputeBufferProperty> GetLODArgsBufferList(int protoIndex, int lodIndex, bool shadows)
@@ -63,10 +67,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
             {
                 return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].ShadowArgsBufferMergedLODList;
             }
-            else
-            {
-                return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].ArgsBufferMergedLODList;
-            }
+
+            return PrototypeRenderDataList[protoIndex].LODRenderDataList[lodIndex].ArgsBufferMergedLODList;
         }
     }
 }

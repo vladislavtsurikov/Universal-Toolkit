@@ -1,8 +1,8 @@
 ﻿namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 {
-    public enum FalloffType 
-    { 
+    public enum FalloffType
+    {
         None,
-        Add,
+        Add
     }
 }

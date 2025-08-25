@@ -1,22 +1,24 @@
 #if UNITY_EDITOR
 using System.IO;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Content;
 using VladislavTsurikov.UIElementsUtility.Editor.Core;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors;
 using VladislavTsurikov.UIElementsUtility.Runtime.Core.Utility;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
 {
-    public class DefaultEditorSelectableColorsCreator : DataGroupScriptableObjectCreator<EditorSelectableColorPalette, EditorSelectableColorInfo>
+    public class DefaultEditorSelectableColorsCreator : DataGroupScriptableObjectCreator<EditorSelectableColorPalette,
+        EditorSelectableColorInfo>
     {
         protected override void AddItems(EditorSelectableColorPalette data)
         {
             CreateDefaultEditorColorPaletteIfNecessary();
-            
+
             data.Items.Clear();
-            
-            EditorColorPalette defaultEditorColorPalette = DataGroupUtility.GetGroup<EditorColorPalette, EditorColorInfo>("Default");
+
+            EditorColorPalette defaultEditorColorPalette =
+                DataGroupUtility.GetGroup<EditorColorPalette, EditorColorInfo>("Default");
 
             foreach (EditorColorInfo colorInfo in defaultEditorColorPalette.Items)
             {
@@ -31,7 +33,8 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
                         (
                             new EditorSelectableColorInfo
                                 {
-                                    ColorName = colorInfo.ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters(),
+                                    ColorName =
+                                        colorInfo.ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters(),
                                     Normal = new EditorThemeColor
                                     {
                                         ColorOnDark = colorInfo.ThemeColor.ColorOnDark,
@@ -43,17 +46,17 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
                         break;
                 }
             }
+
             data.SortByHue();
         }
 
-        protected override string GetScriptableObjectGenerationPath()
-        {
-            return Path.Combine(ContentPath.Path, "SelectableColors");
-        }
+        protected override string GetScriptableObjectGenerationPath() =>
+            Path.Combine(ContentPath.Path, "SelectableColors");
 
         private void CreateDefaultEditorColorPaletteIfNecessary()
         {
-            EditorColorPalette defaultEditorColorPalette = DataGroupUtility.GetGroup<EditorColorPalette, EditorColorInfo>("Default");
+            EditorColorPalette defaultEditorColorPalette =
+                DataGroupUtility.GetGroup<EditorColorPalette, EditorColorInfo>("Default");
 
             if (defaultEditorColorPalette == null)
             {

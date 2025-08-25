@@ -10,24 +10,24 @@ namespace VladislavTsurikov.SceneUtility.Editor
     {
         public static SceneAsset CreateScene(string sceneName, string pathToFolder, bool uniqueName = false)
         {
-            string pathToScene = pathToFolder + "/" + sceneName + ".unity";
+            var pathToScene = pathToFolder + "/" + sceneName + ".unity";
             Directory.CreateDirectory(Path.GetDirectoryName(pathToScene));
-            
+
             SceneAsset sceneAsset = CreateScene(pathToScene);
 
             if (uniqueName)
             {
-                string newName = sceneName + "_" + sceneAsset.GetHashCode().ToString().RemoveChar('-');
-                
-                AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(sceneAsset), newName); 
+                var newName = sceneName + "_" + sceneAsset.GetHashCode().ToString().RemoveChar('-');
+
+                AssetDatabase.RenameAsset(AssetDatabase.GetAssetPath(sceneAsset), newName);
             }
-            
+
             return sceneAsset;
         }
-        
+
         private static SceneAsset CreateScene(string path)
         {
-            var sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
+            SceneAsset sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
             if (!sceneAsset)
             {
                 const string template = "" +
@@ -42,12 +42,12 @@ namespace VladislavTsurikov.SceneUtility.Editor
 
                 AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
                 sceneAsset = AssetDatabase.LoadAssetAtPath<SceneAsset>(path);
-                
+
                 if (true)
                 {
                     sceneAsset.name = sceneAsset.name + "_" + sceneAsset.GetHashCode().ToString().RemoveChar('-');
                 }
-                
+
                 AssetDatabase.ImportAsset(path, ImportAssetOptions.ForceSynchronousImport);
             }
 

@@ -1,4 +1,4 @@
-﻿using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+﻿using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem

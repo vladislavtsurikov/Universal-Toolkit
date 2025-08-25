@@ -10,15 +10,17 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
 {
     public class IMGUIInspectorFieldsDrawer : InspectorFieldsDrawer<IMGUIFieldDrawer>
     {
-        private readonly IMGUIRecursiveFieldsDrawer _imguiRecursiveFieldsDrawer = new IMGUIRecursiveFieldsDrawer();
-        
-        private float _totalHeight = 0;
-        
+        private readonly IMGUIRecursiveFieldsDrawer _imguiRecursiveFieldsDrawer = new();
+
+        private float _totalHeight;
+
         public IMGUIInspectorFieldsDrawer(
             List<Type> excludedDeclaringTypes = null,
             bool excludeInternal = true,
             BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-            : base(excludedDeclaringTypes, excludeInternal, bindingFlags) { }
+            : base(excludedDeclaringTypes, excludeInternal, bindingFlags)
+        {
+        }
 
         public void DrawFields(object target, Rect rect)
         {
@@ -29,7 +31,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
             }
 
             _totalHeight = 0;
-            
+
             DrawFieldsRecursive(target, rect);
         }
 
@@ -40,18 +42,18 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
                 return;
             }
 
-            foreach (var (drawer, field, fieldName, value) in GetProcessedFields(target))
+            foreach ((IMGUIFieldDrawer drawer, FieldInfo field, var fieldName, var value) in GetProcessedFields(target))
             {
-                GUIContent fieldLabel = new GUIContent(fieldName);
+                var fieldLabel = new GUIContent(fieldName);
 
                 if (drawer != null)
                 {
-                    float fieldHeight = drawer.GetFieldsHeight(value);
+                    var fieldHeight = drawer.GetFieldsHeight(value);
                     Rect fieldRect = EditorGUI.IndentedRect(new Rect(rect.x, rect.y, rect.width, fieldHeight));
 
                     EditorGUI.BeginChangeCheck();
 
-                    object newValue = drawer.Draw(fieldRect, fieldLabel, field.FieldType, value);
+                    var newValue = drawer.Draw(fieldRect, fieldLabel, field.FieldType, value);
 
                     if (EditorGUI.EndChangeCheck())
                     {
@@ -63,7 +65,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
                 }
                 else
                 {
-                    float recursiveFieldsHeight =
+                    var recursiveFieldsHeight =
                         _imguiRecursiveFieldsDrawer.DrawRecursiveFields(value, field, rect, DrawFieldsRecursive);
 
                     rect.y += recursiveFieldsHeight;
@@ -71,7 +73,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
                 }
             }
         }
-        
+
         public float GetFieldsHeight(object target)
         {
             if (target == null)

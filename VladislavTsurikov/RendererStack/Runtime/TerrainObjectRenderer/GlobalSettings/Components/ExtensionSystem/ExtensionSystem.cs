@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem
@@ -8,11 +10,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
     public class ExtensionSystem : GlobalComponent
     {
         [OdinSerialize]
-        public ComponentStackOnlyDifferentTypes<Extension> ExtensionStack = new ComponentStackOnlyDifferentTypes<Extension>();
+        public ComponentStackOnlyDifferentTypes<Extension> ExtensionStack = new();
 
-        protected override void SetupComponent(object[] setupData = null)
-        {
-            ExtensionStack.Setup();
-        }
+        protected override UniTask SetupComponent(object[] setupData = null) => ExtensionStack.Setup();
     }
 }

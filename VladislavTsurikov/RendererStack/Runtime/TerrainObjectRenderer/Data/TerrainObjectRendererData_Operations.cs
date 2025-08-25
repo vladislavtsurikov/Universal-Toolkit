@@ -7,44 +7,47 @@ using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
 {
-    public partial class TerrainObjectRendererData 
+    public partial class TerrainObjectRendererData
     {
         public static TerrainObjectInstance AddInstance(TerrainObjectInstance instance, string sectorLayerTag)
         {
-            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.OverlapPosition(instance.Position, sectorLayerTag, false);
-                
+            List<SceneDataManager> sceneDataManagers =
+                SceneDataManagerFinder.OverlapPosition(instance.Position, sectorLayerTag, false);
+
             if (sceneDataManagers.Count != 0)
             {
                 return AddInstance(instance, sceneDataManagers[0]);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
-        private static TerrainObjectInstance AddInstance(TerrainObjectInstance instance, SceneDataManager sceneDataManager)
+        private static TerrainObjectInstance AddInstance(TerrainObjectInstance instance,
+            SceneDataManager sceneDataManager)
         {
-            TerrainObjectRendererData terrainObjectRendererData = (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
+            var terrainObjectRendererData =
+                (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(
+                    typeof(TerrainObjectRendererData));
 
-            if(terrainObjectRendererData == null)
+            if (terrainObjectRendererData == null)
             {
                 return null;
             }
-            
-            Rect positionRect = new Rect(new Vector2(instance.Position.x, instance.Position.z), Vector2.zero);
 
-            List<Cell> overlapCellList = new List<Cell>();                 
+            var positionRect = new Rect(new Vector2(instance.Position.x, instance.Position.z), Vector2.zero);
+
+            var overlapCellList = new List<Cell>();
             terrainObjectRendererData._cellQuadTree.Query(positionRect, overlapCellList);
-            
-            if(overlapCellList.Count == 0)
+
+            if (overlapCellList.Count == 0)
             {
                 return null;
             }
 
             Cell cell = overlapCellList[0];
 
-            PrototypeRendererData prototypeRendererData = cell.PrototypeRenderDataStack.GetPrototypeRenderData(instance.Proto.ID);
+            PrototypeRendererData prototypeRendererData =
+                cell.PrototypeRenderDataStack.GetPrototypeRenderData(instance.Proto.ID);
 
             if (prototypeRendererData == null)
             {
@@ -52,23 +55,23 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
                 cell.PrototypeRenderDataStack.PrototypeRenderDataList.Add(prototypeRendererData);
             }
 
-            TerrainObjectCollider instantObjectCollider = cell.TerrainObjectRendererCollider.RegisterObject(instance, cell, prototypeRendererData, sceneDataManager);
+            TerrainObjectCollider instantObjectCollider =
+                cell.TerrainObjectRendererCollider.RegisterObject(instance, cell, prototypeRendererData,
+                    sceneDataManager);
 
-            if(instantObjectCollider != null)
+            if (instantObjectCollider != null)
             {
                 prototypeRendererData.AddPersistentData(instance);
                 terrainObjectRendererData.ChangeNodeSizeIfNecessary(instantObjectCollider, cell);
                 return instance;
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
-        
+
         public static void AddInstances(List<TerrainObjectCollider> instantObjects, string sectorLayerTag)
         {
-            foreach (var instance in instantObjects)
+            foreach (TerrainObjectCollider instance in instantObjects)
             {
                 AddInstance(instance.Instance, sectorLayerTag);
             }

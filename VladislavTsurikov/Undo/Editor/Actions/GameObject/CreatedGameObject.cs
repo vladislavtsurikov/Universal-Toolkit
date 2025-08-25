@@ -8,12 +8,12 @@ namespace VladislavTsurikov.Undo.Editor.GameObject
 {
     public class CreatedGameObject : UndoRecord
     {
-        private readonly List<UnityEngine.GameObject> _gameObjectList = new List<UnityEngine.GameObject>();
+        private readonly List<UnityEngine.GameObject> _gameObjectList = new();
 
-        public CreatedGameObject(UnityEngine.GameObject gameObject) 
+        public CreatedGameObject(UnityEngine.GameObject gameObject)
         {
             UnityEngine.GameObject prefabRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
-            
+
             _gameObjectList.Add(prefabRoot);
         }
 
@@ -23,12 +23,13 @@ namespace VladislavTsurikov.Undo.Editor.GameObject
             {
                 return;
             }
+
             _gameObjectList.AddRange(gameObjectUndo._gameObjectList);
         }
 
         public override void Undo()
         {
-            foreach (var gameObject in _gameObjectList)
+            foreach (UnityEngine.GameObject gameObject in _gameObjectList)
             {
                 Object.DestroyImmediate(gameObject);
             }

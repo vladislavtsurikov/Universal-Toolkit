@@ -12,17 +12,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
     {
         private NoiseFilter _noiseFilter;
 
-        public override void OnEnable()
-        {
-            _noiseFilter = (NoiseFilter)Target;
-        }
-        
         private NoiseSettingsGUI _noiseSettingsGUI;
+
         private NoiseSettingsGUI NoiseSettingsGUI
         {
             get
             {
-                if(_noiseSettingsGUI == null)
+                if (_noiseSettingsGUI == null)
                 {
                     _noiseSettingsGUI = new NoiseSettingsGUI(_noiseFilter.NoiseSettings);
                 }
@@ -31,11 +27,15 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             }
         }
 
-        public override void OnGUI(Rect rect, int index) 
+        public override void OnEnable() => _noiseFilter = (NoiseFilter)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            if(index != 0)
+            if (index != 0)
             {
-                _noiseFilter.BlendMode = (BlendMode)EditorGUI.EnumPopup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Blend Mode"), _noiseFilter.BlendMode);
+                _noiseFilter.BlendMode = (BlendMode)EditorGUI.EnumPopup(
+                    new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    new GUIContent("Blend Mode"), _noiseFilter.BlendMode);
                 rect.y += EditorGUIUtility.singleLineHeight;
             }
 
@@ -44,11 +44,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             NoiseSettingsGUI.OnGUI(rect);
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
             CreateNoiseSettingsIfNecessary();
-            
-            float height = EditorGUIUtility.singleLineHeight;
+
+            var height = EditorGUIUtility.singleLineHeight;
 
             if (_noiseFilter.NoiseSettings.ShowNoisePreviewTexture)
             {
@@ -58,6 +58,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             {
                 height += EditorGUIUtility.singleLineHeight;
             }
+
             if (_noiseFilter.NoiseSettings.ShowNoiseTransformSettings)
             {
                 height += EditorGUIUtility.singleLineHeight * 7;
@@ -66,6 +67,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             {
                 height += EditorGUIUtility.singleLineHeight;
             }
+
             if (_noiseFilter.NoiseSettings.ShowNoiseTypeSettings)
             {
                 height += EditorGUIUtility.singleLineHeight * 15;
@@ -79,10 +81,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
 
             return height;
         }
-        
+
         private void CreateNoiseSettingsIfNecessary()
         {
-            if(_noiseFilter.NoiseSettings == null)
+            if (_noiseFilter.NoiseSettings == null)
             {
                 _noiseFilter.NoiseSettings = new NoiseSettings();
             }

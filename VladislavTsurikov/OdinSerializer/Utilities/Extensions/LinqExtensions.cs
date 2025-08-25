@@ -16,24 +16,24 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Various LinQ extensions.
+    ///     Various LinQ extensions.
     /// </summary>
     public static class LinqExtensions
     {
         /// <summary>
-        /// Perform an action on each item.
+        ///     Perform an action on each item.
         /// </summary>
-		/// <param name="source">The source.</param>
-		/// <param name="action">The action to perform.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="action">The action to perform.</param>
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T> action)
         {
-            foreach (var item in source)
+            foreach (T item in source)
             {
                 action(item);
             }
@@ -42,15 +42,15 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Perform an action on each item.
+        ///     Perform an action on each item.
         /// </summary>
-		/// <param name="source">The source.</param>
-		/// <param name="action">The action to perform.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="action">The action to perform.</param>
         public static IEnumerable<T> ForEach<T>(this IEnumerable<T> source, Action<T, int> action)
         {
-            int counter = 0;
+            var counter = 0;
 
-            foreach (var item in source)
+            foreach (T item in source)
             {
                 action(item, counter++);
             }
@@ -59,18 +59,18 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Add a collection to the end of another collection.
+        ///     Add a collection to the end of another collection.
         /// </summary>
         /// <param name="source">The collection.</param>
         /// <param name="append">The collection to append.</param>
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, IEnumerable<T> append)
         {
-            foreach (var item in source)
+            foreach (T item in source)
             {
                 yield return item;
             }
 
-            foreach (var item in append)
+            foreach (T item in append)
             {
                 yield return item;
             }

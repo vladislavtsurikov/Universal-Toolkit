@@ -7,6 +7,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     {
         private static NoiseBlitShaderGenerator _sInstance;
 
+        private static readonly ShaderGeneratorDescriptor _mDesc = new()
+        {
+            Name = "NoiseBlit",
+            ShaderCategory = "Hidden/TerrainTools/Noise/NoiseBlit",
+            OutputDir = MaskFilterShadersPath.Path + "/Generated/",
+            TemplatePath = MaskFilterShadersPath.Path + "/NoiseLib/Templates/Blit.noisehlsltemplate"
+        };
+
         public static NoiseBlitShaderGenerator Instance
         {
             get
@@ -19,15 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 return _sInstance;
             }
         }
-        
-        private static readonly ShaderGeneratorDescriptor _mDesc = new ShaderGeneratorDescriptor
-        {
-            Name = "NoiseBlit",
-            ShaderCategory = "Hidden/TerrainTools/Noise/NoiseBlit",
-            OutputDir = MaskFilterShadersPath.Path + "/Generated/",
-            TemplatePath = MaskFilterShadersPath.Path + "/NoiseLib/Templates/Blit.noisehlsltemplate"
-        };
 
-        public override ShaderGeneratorDescriptor GetDescription() => _mDesc;   
+        public override ShaderGeneratorDescriptor GetDescription() => _mDesc;
     }
 }

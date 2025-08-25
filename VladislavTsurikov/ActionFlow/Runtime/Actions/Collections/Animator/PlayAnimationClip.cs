@@ -1,7 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Animator
 {
@@ -19,6 +19,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Animator
             {
                 Animator.Play(_clip.name);
             }
+
             return UniTask.FromResult(true);
         }
     }

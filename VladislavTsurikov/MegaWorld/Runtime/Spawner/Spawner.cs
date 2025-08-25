@@ -2,7 +2,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
@@ -19,24 +18,25 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.ReflectionUtility;
-using Area = VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.Area;
 using Common_Stamper_Area = VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.Area;
-using Stamper_Area = VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.Area;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Spawner
 {
     [ExecuteInEditMode]
     [Name("Spawner")]
     [SupportMultipleSelectedGroups]
-    [SupportedPrototypeTypes(new []{typeof(PrototypeGameObject)})]
-    [AddMonoBehaviourComponents(new[]{typeof(Common_Stamper_Area), typeof(StamperControllerSettings)})]
-    [AddGlobalCommonComponents(new []{typeof(LayerSettings)})]
-    [AddGeneralPrototypeComponents(typeof(PrototypeGameObject), new []{typeof(SuccessSettings), typeof(OverlapCheckSettings), typeof(TransformComponentSettings)})]
-    [AddGeneralGroupComponents(new []{typeof(PrototypeGameObject)}, new []{typeof(RandomSeedSettings), typeof(ScatterComponentSettings)})]
+    [SupportedPrototypeTypes(new[] { typeof(PrototypeGameObject) })]
+    [AddMonoBehaviourComponents(new[] { typeof(Common_Stamper_Area), typeof(StamperControllerSettings) })]
+    [AddGlobalCommonComponents(new[] { typeof(LayerSettings) })]
+    [AddGeneralPrototypeComponents(typeof(PrototypeGameObject),
+        new[] { typeof(SuccessSettings), typeof(OverlapCheckSettings), typeof(TransformComponentSettings) })]
+    [AddGeneralGroupComponents(new[] { typeof(PrototypeGameObject) },
+        new[] { typeof(RandomSeedSettings), typeof(ScatterComponentSettings) })]
     public class Spawner : StamperTool
     {
         [NonSerialized]
         private Common_Stamper_Area _area;
+
         [NonSerialized]
         private StamperControllerSettings _stamperControllerSettings;
 
@@ -59,38 +59,35 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Spawner
             {
                 if (_stamperControllerSettings == null || _stamperControllerSettings.IsHappenedReset)
                 {
-                    _stamperControllerSettings = (StamperControllerSettings)GetElement(typeof(StamperControllerSettings));
+                    _stamperControllerSettings =
+                        (StamperControllerSettings)GetElement(typeof(StamperControllerSettings));
                 }
 
                 return _stamperControllerSettings;
             }
         }
 
-        private protected override void OnStamperEnable()
-        {
-            Area.SetAreaBoundsIfNecessary(this, true);
-        }
+        private protected override void OnStamperEnable() => Area.SetAreaBoundsIfNecessary(this, true);
 
-        protected override void OnUpdate()
-        {
-            Area.SetAreaBoundsIfNecessary(this);
-        }
+        protected override void OnUpdate() => Area.SetAreaBoundsIfNecessary(this);
 
         protected override async UniTask Spawn(CancellationToken token, bool displayProgressBar)
         {
-            int maxTypes = Data.GroupList.Count;
-            int completedTypes = 0;
-            
-            for (int typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
+            var maxTypes = Data.GroupList.Count;
+            var completedTypes = 0;
+
+            for (var typeIndex = 0; typeIndex < Data.GroupList.Count; typeIndex++)
             {
                 token.ThrowIfCancellationRequested();
 #if UNITY_EDITOR
                 UpdateDisplayProgressBar("Running", "Running " + Data.GroupList[typeIndex].name);
 #endif
 
-                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(Data.GroupList[typeIndex].PrototypeType));
-        
-                if(rayHit == null)
+                RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(transform.position),
+                    GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(
+                        Data.GroupList[typeIndex].PrototypeType));
+
+                if (rayHit == null)
                 {
                     continue;
                 }
@@ -98,7 +95,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Spawner
                 BoxArea boxArea = Area.GetAreaVariables(rayHit);
 
                 await SpawnGroup(token, Data.GroupList[typeIndex], boxArea, displayProgressBar);
-                
+
                 completedTypes++;
                 SpawnProgress = completedTypes / (float)maxTypes;
             }
@@ -106,13 +103,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Spawner
 
         private async UniTask SpawnGroup(CancellationToken token, Group group, BoxArea boxArea, bool displayProgressBar)
         {
-            if(group.HasAllActivePrototypes())
+            if (group.HasAllActivePrototypes())
             {
                 if (group.PrototypeType == typeof(PrototypeGameObject))
                 {
-                    RandomSeedSettings randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
+                    var randomSeedSettings = (RandomSeedSettings)group.GetElement(typeof(RandomSeedSettings));
                     randomSeedSettings.GenerateRandomSeedIfNecessary();
-                    
+
                     await Utility.SpawnGroup.SpawnGameObject(token, group, boxArea, displayProgressBar);
                 }
             }

@@ -11,12 +11,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings
     public class LayerSettingsEditor : IMGUIElementEditor
     {
         private LayerSettings _layerSettings => (LayerSettings)Target;
-        
-        public override void OnGUI()
-        {
-            _layerSettings.PaintLayers = CustomEditorGUILayout.LayerField(new GUIContent("Paint Layers", 
+
+        public override void OnGUI() =>
+            _layerSettings.PaintLayers = CustomEditorGUILayout.LayerField(new GUIContent("Paint Layers",
                 "Allows you to set the layers on which to spawn."), _layerSettings.PaintLayers);
-        }
     }
 }
 #endif

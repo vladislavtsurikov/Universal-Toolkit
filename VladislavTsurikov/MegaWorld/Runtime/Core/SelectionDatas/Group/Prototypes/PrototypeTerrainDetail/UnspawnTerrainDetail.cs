@@ -9,28 +9,30 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             foreach (PrototypeTerrainDetail prototype in protoTerrainDetailList)
             {
-                if(unspawnSelected)
+                if (unspawnSelected)
                 {
-                    if(prototype.Selected == false)
+                    if (prototype.Selected == false)
                     {
                         continue;
                     }
                 }
 
-                foreach (var terrain in Terrain.activeTerrains)
+                foreach (Terrain terrain in Terrain.activeTerrains)
                 {
-                    if(terrain.terrainData.detailResolution == 0)
+                    if (terrain.terrainData.detailResolution == 0)
                     {
                         continue;
                     }
 
-                    if(prototype.TerrainProtoId > terrain.terrainData.detailPrototypes.Length - 1)
+                    if (prototype.TerrainProtoId > terrain.terrainData.detailPrototypes.Length - 1)
                     {
-                        Debug.LogWarning("You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");
+                        Debug.LogWarning(
+                            "You need all Terrain Details prototypes to be in the terrain. Click \"Add Missing Resources To Terrain\"");
                     }
                     else
                     {
-                        terrain.terrainData.SetDetailLayer(0, 0, prototype.TerrainProtoId, new int[terrain.terrainData.detailWidth, terrain.terrainData.detailWidth]);
+                        terrain.terrainData.SetDetailLayer(0, 0, prototype.TerrainProtoId,
+                            new int[terrain.terrainData.detailWidth, terrain.terrainData.detailWidth]);
                     }
                 }
             }

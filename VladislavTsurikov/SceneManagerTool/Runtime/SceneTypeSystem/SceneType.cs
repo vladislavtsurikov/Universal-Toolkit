@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
@@ -20,30 +19,33 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
         Open,
         DoNotOpen
     }
-    
+
     public abstract class SceneType : Component
     {
         private SceneCollection _sceneCollection;
-        
-        public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new ComponentStackOnlyDifferentTypes<SettingsComponent>();
 
-        protected override void SetupComponent(object[] setupData = null)
+        public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new();
+
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
             _sceneCollection = (SceneCollection)setupData[0];
 
             SettingsStack.Setup();
+
+            return UniTask.CompletedTask;
         }
 
         internal async UniTask LoadInternal(bool force = false)
         {
-            SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
+            var sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
             if (!force && sceneBehavior is { SceneOpenBehavior: SceneOpenBehavior.DoNotOpen })
             {
                 return;
             }
-            
-            BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
+
+            var beforeLoadOperationsSettings =
+                (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
 
             if (beforeLoadOperationsSettings != null)
             {
@@ -51,8 +53,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
             }
 
             await Load();
-            
-            AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
+
+            var afterLoadOperationsSettings =
+                (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
 
             if (afterLoadOperationsSettings != null)
             {
@@ -62,14 +65,15 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 
         internal async UniTask UnloadInternal(SceneCollection nextLoadSceneCollection = null, bool force = false)
         {
-            SceneBehavior sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
+            var sceneBehavior = (SceneBehavior)SettingsStack.GetElement(typeof(SceneBehavior));
 
             if (!force && sceneBehavior is { SceneCloseBehavior: SceneCloseBehavior.KeepOpenAlways })
             {
                 return;
             }
-            
-            BeforeUnloadOperationsSettings beforeUnloadOperationsSettings = (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
+
+            var beforeUnloadOperationsSettings =
+                (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
 
             if (beforeUnloadOperationsSettings != null)
             {
@@ -78,7 +82,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 
             await Unload(nextLoadSceneCollection);
         }
-        
+
         internal async UniTask UnloadSceneReference(SceneCollection nextLoadSceneCollection, SceneReference scene)
         {
             if (nextLoadSceneCollection == null)
@@ -93,15 +97,15 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 
         internal List<SceneReference> GetSceneReferencesInternal()
         {
-            List<SceneReference> sceneReferences = new List<SceneReference>();
-            
-            foreach (var component in SettingsStack.ElementList)
+            var sceneReferences = new List<SceneReference>();
+
+            foreach (SettingsComponent component in SettingsStack.ElementList)
             {
                 sceneReferences.AddRange(component.GetSceneReferences());
             }
-            
+
             sceneReferences.AddRange(GetSceneReferences());
-            
+
             return sceneReferences;
         }
 

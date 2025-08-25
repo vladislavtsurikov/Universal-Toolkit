@@ -9,10 +9,7 @@ namespace VladislavTsurikov.ColliderSystem.Editor
     {
         private static readonly string DEFINE_COLLIDER = "COLLIDER";
 
-        static ColliderDefines()
-        {
-            ScriptingDefineSymbolsUtility.SetScriptingDefineSymbols(DEFINE_COLLIDER);
-        }
+        static ColliderDefines() => ScriptingDefineSymbolsUtility.SetScriptingDefineSymbols(DEFINE_COLLIDER);
     }
 }
 #endif

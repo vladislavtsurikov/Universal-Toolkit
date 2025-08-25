@@ -1,27 +1,19 @@
 ﻿using System;
-using UnityEngine;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {
     /// <summary>
-    /// Prevents elements of the same type from being created.
+    ///     Prevents elements of the same type from being created.
     /// </summary>
     public class ComponentStackOnlyDifferentTypes<T> : AdvancedComponentStack<T>
         where T : Runtime_Core_Component
     {
-        public override void OnRemoveInvalidElements()
-        {
-            RemoveElementsWithSameType();
-        }
+        public override void OnRemoveInvalidElements() => RemoveElementsWithSameType();
 
-        public void SetupElement<T2>(bool force = false) where T2: Runtime_Core_Component
-        {
+        public void SetupElement<T2>(bool force = false) where T2 : Runtime_Core_Component =>
             SetupElement(typeof(T2), force);
-        }
-        
+
         public T2 GetElement<T2>() where T2 : Runtime_Core_Component
         {
             object component = GetElement(typeof(T2), out _);
@@ -34,7 +26,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             return (T2)component;
         }
 
-        public void SetupElement(Type type, bool force = false) 
+        public void SetupElement(Type type, bool force = false)
         {
             if (!typeof(T).IsAssignableFrom(type))
             {
@@ -45,25 +37,16 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
             component?.Setup(force);
         }
-        
-        public void CreateIfMissingType(Type[] types)
-        {
-            CreateElementIfMissingType(types);
-        }
 
-        public T CreateIfMissingType(Type type)
-        {
-            return CreateElementIfMissingType(type);
-        }
-        
-        public void AddIfMissingType(T element)
-        {
-            AddElementIfMissingType(element);
-        }
+        public void CreateIfMissingType(Type[] types) => CreateElementIfMissingType(types);
+
+        public T CreateIfMissingType(Type type) => CreateElementIfMissingType(type);
+
+        public void AddIfMissingType(T element) => AddElementIfMissingType(element);
 
         public bool Remove(Type type)
         {
-            GetElement(type, out int index);
+            GetElement(type, out var index);
 
             if (index != -1)
             {
@@ -75,7 +58,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
         public void ReplaceElement(T element)
         {
-            for (int i = 0; i < _elementList.Count; i++)
+            for (var i = 0; i < _elementList.Count; i++)
             {
                 if (_elementList[i].GetType() == element.GetType())
                 {
@@ -88,12 +71,12 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             _elementList.Add(element);
             IsDirty = true;
         }
-        
+
         public void Reset(Type type)
         {
-            for (int i = 0; i < _elementList.Count; i++)
+            for (var i = 0; i < _elementList.Count; i++)
             {
-                if(_elementList[i].GetType() == type)
+                if (_elementList[i].GetType() == type)
                 {
                     Reset(i);
                 }
@@ -107,7 +90,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             if (component != null)
             {
                 ListChanged += CollectionChanged;
-                
+
                 void CollectionChanged()
                 {
                     T2 newComponent = GetElement<T2>();
@@ -123,16 +106,13 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             return component;
         }
 
-        public bool HasType(Type type)
-        {
-            return GetElement(type) != null;
-        }
-        
+        public bool HasType(Type type) => GetElement(type) != null;
+
         protected bool HasMultipleType(Type type)
         {
-            int count = 0;
-            
-            foreach (var element in _elementList)
+            var count = 0;
+
+            foreach (T element in _elementList)
             {
                 if (element != null)
                 {
@@ -150,10 +130,10 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
             return false;
         }
-        
+
         protected void RemoveElementsWithSameType()
         {
-            for (int i = _elementList.Count - 1; i >= 0; i--)
+            for (var i = _elementList.Count - 1; i >= 0; i--)
             {
                 if (HasMultipleType(_elementList[i].GetType()))
                 {

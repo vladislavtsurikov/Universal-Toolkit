@@ -3,19 +3,19 @@
     /*[Name("Net Build")]
     public class NetBuild : BuildSceneCollection
     {
-        [OdinSerialize] 
+        [OdinSerialize]
         public SceneCollectionStack ServerSceneCollectionStack = new SceneCollectionStack();
 
         public override void OnCreate()
         {
             Name = "Net Build";
         }
-        
+
         public override List<SceneReference.Scripts.SceneReference> GetSceneReferences()
         {
 #if UNITY_SERVER
             return ServerSceneCollectionStack.GetSceneReferences();
-#else 
+#else
             return ServerSceneCollectionStack.GetSceneReferences();
 #endif
         }

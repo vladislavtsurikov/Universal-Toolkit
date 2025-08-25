@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor
 {
@@ -14,14 +16,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         private static AddRequest _addPackageRequest;
 
         private static bool _isAddressablesInstalled;
-        
+
         public static string ADDRESSABLES_KW = "SCENE_MANAGER_ADDRESSABLES";
 
         [DidReloadScripts]
-        public static void Init()
-        {
-            CheckUnityPackagesAndInit();
-        }
+        public static void Init() => CheckUnityPackagesAndInit();
 
         private static void CheckUnityPackagesAndInit()
         {
@@ -35,13 +34,14 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         private static void OnPackageListed()
         {
             EditorApplication.update -= OnPackageListed;
-            
-            if (_listPackageRequest == null || !_listPackageRequest.IsCompleted || _listPackageRequest.Error != null)
+
+            if (_listPackageRequest == null || !_listPackageRequest.IsCompleted ||
+                _listPackageRequest.Error != null)
             {
                 return;
             }
 
-            foreach (UnityEditor.PackageManager.PackageInfo p in _listPackageRequest.Result)
+            foreach (PackageInfo p in _listPackageRequest.Result)
             {
                 if (p.name.Equals("com.unity.addressables"))
                 {
@@ -58,8 +58,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
             BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
             BuildTargetGroup buildGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
 
-            string symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildGroup);
-            List<string> symbolList = new List<string>(symbols.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
+            var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildGroup);
+            var symbolList = new List<string>(symbols.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
 
             var isDirty = SetKeywordActive(symbolList, ADDRESSABLES_KW, _isAddressablesInstalled);
 
@@ -72,7 +72,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
 
         private static bool SetKeywordActive(List<string> kwList, string keyword, bool active)
         {
-            bool isDirty = false;
+            var isDirty = false;
             if (active && !kwList.Contains(keyword))
             {
                 kwList.Add(keyword);
@@ -83,17 +83,19 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                 kwList.RemoveAll(s => s.Equals(keyword));
                 isDirty = true;
             }
+
             return isDirty;
         }
 
         private static string ListElementsToString<T>(IEnumerable<T> list, string separator)
         {
             IEnumerator<T> i = list.GetEnumerator();
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            var s = new StringBuilder();
             while (i.MoveNext())
             {
                 s.Append(i.Current).Append(separator);
             }
+
             return s.ToString();
         }
     }

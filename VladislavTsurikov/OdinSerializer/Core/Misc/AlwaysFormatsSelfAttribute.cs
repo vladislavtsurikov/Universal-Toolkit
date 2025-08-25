@@ -15,19 +15,20 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Use this attribute to specify that a type that implements the <see cref="ISelfFormatter"/>
-    /// interface should *always* format itself regardless of other formatters being specified.
-    /// <para />
-    /// This means that the interface will be used to format all types derived from the type that
-    /// is decorated with this attribute, regardless of custom formatters for the derived types.
+    ///     Use this attribute to specify that a type that implements the <see cref="ISelfFormatter" />
+    ///     interface should *always* format itself regardless of other formatters being specified.
+    ///     <para />
+    ///     This means that the interface will be used to format all types derived from the type that
+    ///     is decorated with this attribute, regardless of custom formatters for the derived types.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
     public sealed class AlwaysFormatsSelfAttribute : Attribute
     {
     }

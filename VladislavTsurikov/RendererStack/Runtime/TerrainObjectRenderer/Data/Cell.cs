@@ -1,7 +1,7 @@
 using System;
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.QuadTree.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
@@ -13,26 +13,25 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
     [Serializable]
     public class Cell : IHasRect
     {
-        [NonSerialized]
-        private TerrainObjectRendererData _sceneData;
-
-        [NonSerialized]
-        public TerrainObjectRendererCollider TerrainObjectRendererCollider;
-        
         [OdinSerialize]
         public Bounds Bounds;
+
         [OdinSerialize]
-        public PrototypeRenderDataStack PrototypeRenderDataStack = new PrototypeRenderDataStack();
+        public PrototypeRenderDataStack PrototypeRenderDataStack = new();
+
         [OdinSerialize]
         public int Index;
 
         [NonSerialized]
+        private TerrainObjectRendererData _sceneData;
+
+        [NonSerialized]
         public AABB InitialObjectsAABB;
 
-        public Cell(Bounds bounds)
-        {
-            Bounds = bounds;
-        }
+        [NonSerialized]
+        public TerrainObjectRendererCollider TerrainObjectRendererCollider;
+
+        public Cell(Bounds bounds) => Bounds = bounds;
 
         public Cell(Rect rectangle, TerrainObjectRendererData sceneData, SelectionData selectionData)
         {
@@ -51,10 +50,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             _sceneData = sceneData;
 
             PrototypeRenderDataStack.Setup(selectionData);
-            
+
             if (TerrainObjectRendererCollider == null)
             {
-                TerrainObjectRendererCollider = new TerrainObjectRendererCollider(sceneData.SceneDataManager, this, PrototypeRenderDataStack);
+                TerrainObjectRendererCollider =
+                    new TerrainObjectRendererCollider(sceneData.SceneDataManager, this, PrototypeRenderDataStack);
             }
             else
             {
@@ -62,21 +62,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
             }
         }
 
-        public void ChangeNodeSizeIfNecessary(TerrainObjectCollider instantObject)
-        {
+        public void ChangeNodeSizeIfNecessary(TerrainObjectCollider instantObject) =>
             _sceneData.ChangeNodeSizeIfNecessary(instantObject, this);
-        }
 
-        public AABB GetObjectsAABB()
-        {
-            return TerrainObjectRendererCollider.GetAABB();
-        }
+        public AABB GetObjectsAABB() => TerrainObjectRendererCollider.GetAABB();
 
         public Bounds GetObjectBounds()
         {
             AABB aabb = GetObjectsAABB();
-            Bounds cellObjectBounds = new Bounds(aabb.Center, aabb.Size);
-                        
+            var cellObjectBounds = new Bounds(aabb.Center, aabb.Size);
+
             Bounds bounds = Bounds;
             bounds.Encapsulate(cellObjectBounds);
 

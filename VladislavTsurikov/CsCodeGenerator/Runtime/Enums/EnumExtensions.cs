@@ -3,7 +3,7 @@
     public static class EnumExtensions
     {
         /// <summary>
-        /// Convert string to Lowercase first, then replaces underscore '_' with space ' ', and  optionally adds append string.
+        ///     Convert string to Lowercase first, then replaces underscore '_' with space ' ', and  optionally adds append string.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>

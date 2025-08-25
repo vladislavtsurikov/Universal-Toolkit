@@ -11,21 +11,20 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.ScatterSystem
     public class FailureRateEditor : ReorderableListComponentEditor
     {
         private FailureRate _failureRate;
-        
-        public override void OnEnable()
+
+        public override void OnEnable() => _failureRate = (FailureRate)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _failureRate = (FailureRate)Target;
-        }
-        
-        public override void OnGUI(Rect rect, int index) 
-        {
-            _failureRate.Value = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Value (%)"), _failureRate.Value, 0f, 100f);
+            _failureRate.Value =
+                EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    new GUIContent("Value (%)"), _failureRate.Value, 0f, 100f);
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
 

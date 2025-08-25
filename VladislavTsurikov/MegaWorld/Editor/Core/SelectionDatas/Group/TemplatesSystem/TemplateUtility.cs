@@ -9,11 +9,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Templates
     {
         public static bool HasTemplate(Type toolType, Type prototypeType)
         {
-            foreach (var type in AllTemplateTypes.TypeList)
+            foreach (Type type in AllTemplateTypes.TypeList)
             {
                 TemplateAttribute templateAttribute = type.GetAttribute<TemplateAttribute>();
 
-                if(templateAttribute.ToolTypes.Contains(toolType) && templateAttribute.SupportedResourceTypes.Contains(prototypeType))
+                if (templateAttribute.ToolTypes.Contains(toolType) &&
+                    templateAttribute.SupportedResourceTypes.Contains(prototypeType))
                 {
                     return true;
                 }

@@ -3,43 +3,44 @@
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API
 {
     /// <summary>
-    /// Utility struct for creating all the different shader snippets that are
-    /// used when generating the shaders for the various NoiseTypes and FractalTypes
+    ///     Utility struct for creating all the different shader snippets that are
+    ///     used when generating the shaders for the various NoiseTypes and FractalTypes
     /// </summary>
     internal struct GeneratedShaderInfo
     {
         public FractalTypeDescriptor FractalDesc;
         public NoiseTypeDescriptor NoiseDesc;
         public string generatedIncludePath { get; private set; }
-        public string additionalIncludePaths { get; private set; }
-        public string noiseIncludeStr { get; private set; }
-        public string variantName { get; private set; }
+        public string additionalIncludePaths { get; }
+        public string noiseIncludeStr { get; }
+        public string variantName { get; }
         public string outputDir { get; private set; }
-        public string noiseStructName {get; private set;}
-        public string noiseStructDef {get; private set;}
-        public string fractalStructName {get; private set;}
-        public string fractalStructDef {get; private set;}
-        public string fractalParamStr {get; private set;}
-        public string noiseParamStr {get; private set;}
-        public string functionInputStr {get; private set;}
-        public string functionParamStr {get; private set;}
-        public string getDefaultInputsStr {get; private set;}
-        public string getInputsStr {get; private set;}
-        public string getNoiseInputStr {get; private set;}
-        public string getFractalInputStr {get; private set;}
-        public string getDefaultFractalInputStr {get; private set;}
-        public string getDefaultNoiseInputStr {get; private set;}
-        public string fractalPropertyDefStr {get; private set;}
-        public int numFractalInputs {get; private set;}
-        public int numNoiseInputs {get; private set;}
+        public string noiseStructName { get; }
+        public string noiseStructDef { get; private set; }
+        public string fractalStructName { get; }
+        public string fractalStructDef { get; }
+        public string fractalParamStr { get; }
+        public string noiseParamStr { get; }
+        public string functionInputStr { get; }
+        public string functionParamStr { get; }
+        public string getDefaultInputsStr { get; }
+        public string getInputsStr { get; }
+        public string getNoiseInputStr { get; }
+        public string getFractalInputStr { get; }
+        public string getDefaultFractalInputStr { get; }
+        public string getDefaultNoiseInputStr { get; }
+        public string fractalPropertyDefStr { get; }
+        public int numFractalInputs { get; }
+        public int numNoiseInputs { get; }
+
         public GeneratedShaderInfo(IFractalType fractalType, INoiseType noiseType)
         {
             FractalDesc = fractalType.GetDescription();
             NoiseDesc = noiseType.GetDescription();
 
             noiseIncludeStr = string.Format("#include \"{0}\"", NoiseDesc.SourcePath);
-            
-            if(!string.IsNullOrEmpty(FractalDesc.Name))
+
+            if (!string.IsNullOrEmpty(FractalDesc.Name))
             {
                 variantName = string.Format("{0}{1}", FractalDesc.Name, NoiseDesc.Name);
             }
@@ -52,8 +53,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             // to disk and when adding the include in any generated shaders that use this
             // fractal and noise type variant
             generatedIncludePath = string.Format("{0}/{1}/{2}.hlsl", NoiseDesc.OutputDir,
-                                                                            FractalDesc.Name,
-                                                                            NoiseDesc.Name);
+                FractalDesc.Name,
+                NoiseDesc.Name);
             outputDir = string.Format("{0}/{1}", NoiseDesc.OutputDir, FractalDesc.Name);
 
             fractalStructName = string.Format("{0}FractalInput", FractalDesc.Name);
@@ -63,27 +64,27 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             fractalParamStr = null;
             noiseParamStr = null;
             functionInputStr = "";
-            
+
             // construct include paths string
             additionalIncludePaths = "\n";
 
-            for(int i = 0; i < FractalDesc.AdditionalIncludePaths.Count; ++i)
+            for (var i = 0; i < FractalDesc.AdditionalIncludePaths.Count; ++i)
             {
-                additionalIncludePaths += $"#include \"{ FractalDesc.AdditionalIncludePaths[ i ] }\"\n";
+                additionalIncludePaths += $"#include \"{FractalDesc.AdditionalIncludePaths[i]}\"\n";
             }
 
             additionalIncludePaths += "\n";
 
             // generate the string for the fractal type structure as it would appear as a parameter
             // in an HLSL function declaration
-            if( numFractalInputs > 0)
+            if (numFractalInputs > 0)
             {
                 fractalParamStr = string.Format("{0} {1}", fractalStructName, "fractalInput");
             }
 
             // generate the string for the noise type structure as it would appear as a parameter
             // in an HLSL function declaration
-            if( numNoiseInputs > 0 )
+            if (numNoiseInputs > 0)
             {
                 noiseParamStr = string.Format("{0} {1}", noiseStructName, "noiseInput");
             }
@@ -92,19 +93,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             // using this combination of noise and fractal type structure definitions
             functionParamStr = "";
 
-            if(fractalParamStr != null)
+            if (fractalParamStr != null)
             {
                 functionParamStr += fractalParamStr;
                 functionInputStr += "fractalInput";
             }
-            
-            if(fractalParamStr != null && noiseParamStr != null)
+
+            if (fractalParamStr != null && noiseParamStr != null)
             {
                 functionParamStr += ", ";
                 functionInputStr += ", ";
             }
 
-            if(noiseParamStr != null)
+            if (noiseParamStr != null)
             {
                 functionParamStr += noiseParamStr;
                 functionInputStr += "noiseInput";
@@ -112,17 +113,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             fractalStructDef = "";
 
-            if(numFractalInputs > 0)
+            if (numFractalInputs > 0)
             {
                 fractalStructDef = NoiseLib.BuildStructString(fractalStructName, FractalDesc.InputStructDefinition);
 
-                string getDefaultFuncStr = NoiseLib.GetDefaultFunctionString(fractalStructName, FractalDesc.InputStructDefinition);
-                fractalStructDef += $"\n\n{ getDefaultFuncStr }\n\n";
+                var getDefaultFuncStr =
+                    NoiseLib.GetDefaultFunctionString(fractalStructName, FractalDesc.InputStructDefinition);
+                fractalStructDef += $"\n\n{getDefaultFuncStr}\n\n";
             }
 
             noiseStructDef = "";
 
-            if(numNoiseInputs > 0)
+            if (numNoiseInputs > 0)
             {
                 noiseStructDef = NoiseLib.BuildStructString(noiseStructName, NoiseDesc.InputStructDefinition);
             }
@@ -131,7 +133,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             getInputsStr = "";
             getFractalInputStr = NoiseLib.GetInputFunctionCallString(fractalStructName);
             getNoiseInputStr = NoiseLib.GetInputFunctionCallString(fractalStructName);
-            
+
             if (numFractalInputs > 0)
             {
                 getInputsStr += getFractalInputStr;
@@ -146,56 +148,60 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             {
                 getInputsStr += getNoiseInputStr;
             }
-            
+
             // get default input str construction
             getDefaultInputsStr = "";
             getDefaultFractalInputStr = NoiseLib.GetDefaultInputFunctionCallString(fractalStructName);
             getDefaultNoiseInputStr = NoiseLib.GetDefaultInputFunctionCallString(noiseStructName);
 
-            if(numFractalInputs > 0)
+            if (numFractalInputs > 0)
             {
                 getDefaultInputsStr += getDefaultFractalInputStr;
             }
 
-            if(numFractalInputs > 0 && numNoiseInputs > 0)
+            if (numFractalInputs > 0 && numNoiseInputs > 0)
             {
                 getDefaultInputsStr += ", ";
             }
 
-            if(numNoiseInputs > 0)
+            if (numNoiseInputs > 0)
             {
                 getDefaultInputsStr += getDefaultNoiseInputStr;
             }
 
             fractalPropertyDefStr = "";
 
-            if(FractalDesc.InputStructDefinition != null &&
-               FractalDesc.InputStructDefinition.Count > 0)
+            if (FractalDesc.InputStructDefinition != null &&
+                FractalDesc.InputStructDefinition.Count > 0)
             {
-                fractalPropertyDefStr = NoiseLib.GetPropertyDefinitionStr(FractalDesc.Name, FractalDesc.InputStructDefinition);
-                fractalPropertyDefStr += "\n" + NoiseLib.GetPropertyFunctionStr(fractalStructName, FractalDesc.Name, FractalDesc.InputStructDefinition);
+                fractalPropertyDefStr =
+                    NoiseLib.GetPropertyDefinitionStr(FractalDesc.Name, FractalDesc.InputStructDefinition);
+                fractalPropertyDefStr += "\n" + NoiseLib.GetPropertyFunctionStr(fractalStructName, FractalDesc.Name,
+                    FractalDesc.InputStructDefinition);
             }
         }
+
         public void ReplaceTags(StringBuilder sb)
         {
-            string fractalMacroDef = fractalStructName.ToUpper() + "_DEF";
-            string guardedFractalDataDefinitions =
-$@"
+            var fractalMacroDef = fractalStructName.ToUpper() + "_DEF";
+            var guardedFractalDataDefinitions =
+                $@"
 
-#ifndef { fractalMacroDef } // [ { fractalMacroDef }
-#define { fractalMacroDef }
+#ifndef {fractalMacroDef} // [ {fractalMacroDef}
+#define {fractalMacroDef}
 
 {fractalStructDef}
 {fractalPropertyDefStr}
 
-#endif // ] { fractalMacroDef }
+#endif // ] {fractalMacroDef}
 
 ";
 #if UNITY_EDITOR
-            sb.Replace(NoiseLib.Strings.KTagIncludes, noiseIncludeStr + additionalIncludePaths);       // add the noise include
-            sb.Replace(NoiseLib.Strings.KTagFractalName, FractalDesc.Name);                            // add fractal name
-            sb.Replace(NoiseLib.Strings.KTagNoiseName, NoiseDesc.Name);                                // add noise name
-            sb.Replace(NoiseLib.Strings.KTagVariantName, variantName);                                 // add combined fractal and noise name
+            sb.Replace(NoiseLib.Strings.KTagIncludes,
+                noiseIncludeStr + additionalIncludePaths); // add the noise include
+            sb.Replace(NoiseLib.Strings.KTagFractalName, FractalDesc.Name); // add fractal name
+            sb.Replace(NoiseLib.Strings.KTagNoiseName, NoiseDesc.Name); // add noise name
+            sb.Replace(NoiseLib.Strings.KTagVariantName, variantName); // add combined fractal and noise name
             sb.Replace(NoiseLib.Strings.KTagFractalDataDefinitions, guardedFractalDataDefinitions);
             sb.Replace(NoiseLib.Strings.KTagFunctionParams, functionParamStr);
             sb.Replace(NoiseLib.Strings.KTagFunctionInputs, functionInputStr);

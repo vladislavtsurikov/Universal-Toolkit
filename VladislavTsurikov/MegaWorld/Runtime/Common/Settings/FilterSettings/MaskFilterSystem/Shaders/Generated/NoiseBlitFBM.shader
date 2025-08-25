@@ -8,18 +8,20 @@
 
 Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
 {
-    Properties { _MainTex ("Texture", any) = "" {} }
+    Properties
+    {
+        _MainTex ("Texture", any) = "" {}
+    }
 
     SubShader
     {
         ZTest Always Cull OFF ZWrite Off
 
         HLSLINCLUDE
-
         #include "UnityCG.cginc"
 
         sampler2D _MainTex;
-        float4 _MainTex_TexelSize;      // 1/width, 1/height, width, height
+        float4 _MainTex_TexelSize; // 1/width, 1/height, width, height
 
         struct appdata_t
         {
@@ -33,20 +35,19 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             float2 uv : TEXCOORD0;
         };
 
-        v2f vert( appdata_t v )
+        v2f vert(appdata_t v)
         {
             v2f o;
-            
-            o.vertex = UnityObjectToClipPos( v.vertex );
+
+            o.vertex = UnityObjectToClipPos(v.vertex);
             o.uv = v.uv;
 
             return o;
         }
-
         ENDHLSL
 
-        
-        
+
+
         // Pass
         // {
         //     Name "Perlin Raw Noise Blit (2D)"
@@ -75,40 +76,39 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Perlin Raw Noise Blit (2D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Perlin.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler2D _NoiseTex;
 
-#endif
+            #endif
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // calc pos for center of pixel
-                float3 uv = float3( i.uv.x, 0, i.uv.y ) - float3( .5, 0, .5 );
-                uv +=  + float3(.5, 0, .5) * _MainTex_TexelSize.xxy; // offset by half a texel so we are sampling noise for the center of the texel
+                float3 uv = float3(i.uv.x, 0, i.uv.y) - float3(.5, 0, .5);
+                uv += +float3(.5, 0, .5) * _MainTex_TexelSize.xxy;
+                // offset by half a texel so we are sampling noise for the center of the texel
 
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
                 
                 float pos = tex2D( _NoiseTex, i.uv ).r * _NoiseTransform._m00 + _NoiseTransform._m13;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( uv.xyz );
+                float3 pos = ApplyNoiseTransform(uv.xyz);
 
-#endif
+                #endif
 
-                float n = noise_FbmPerlin( pos, GetFbmFractalInput() );
+                float n = noise_FbmPerlin(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
@@ -117,44 +117,42 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Perlin Raw Noise Blit (3D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _ USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Perlin.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler3D _NoiseTex;
 
-#endif
+            #endif
 
             float _UVY;
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
 
                 float pos = tex3D( _NoiseTex, float3(i.uv.x, _UVY, i.uv.y) ).r;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5) );
+                float3 pos = ApplyNoiseTransform(float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5));
 
-#endif
+                #endif
 
-                float n = noise_FbmPerlin( pos, GetFbmFractalInput() );
+                float n = noise_FbmPerlin(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
-        
 
-        
+
+
         // Pass
         // {
         //     Name "Ridge Raw Noise Blit (2D)"
@@ -183,40 +181,39 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Ridge Raw Noise Blit (2D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Ridge.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler2D _NoiseTex;
 
-#endif
+            #endif
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // calc pos for center of pixel
-                float3 uv = float3( i.uv.x, 0, i.uv.y ) - float3( .5, 0, .5 );
-                uv +=  + float3(.5, 0, .5) * _MainTex_TexelSize.xxy; // offset by half a texel so we are sampling noise for the center of the texel
+                float3 uv = float3(i.uv.x, 0, i.uv.y) - float3(.5, 0, .5);
+                uv += +float3(.5, 0, .5) * _MainTex_TexelSize.xxy;
+                // offset by half a texel so we are sampling noise for the center of the texel
 
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
                 
                 float pos = tex2D( _NoiseTex, i.uv ).r * _NoiseTransform._m00 + _NoiseTransform._m13;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( uv.xyz );
+                float3 pos = ApplyNoiseTransform(uv.xyz);
 
-#endif
+                #endif
 
-                float n = noise_FbmRidge( pos, GetFbmFractalInput() );
+                float n = noise_FbmRidge(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
@@ -225,44 +222,42 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Ridge Raw Noise Blit (3D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _ USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Ridge.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler3D _NoiseTex;
 
-#endif
+            #endif
 
             float _UVY;
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
 
                 float pos = tex3D( _NoiseTex, float3(i.uv.x, _UVY, i.uv.y) ).r;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5) );
+                float3 pos = ApplyNoiseTransform(float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5));
 
-#endif
+                #endif
 
-                float n = noise_FbmRidge( pos, GetFbmFractalInput() );
+                float n = noise_FbmRidge(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
-        
 
-        
+
+
         // Pass
         // {
         //     Name "Value Raw Noise Blit (2D)"
@@ -291,40 +286,39 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Value Raw Noise Blit (2D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Value.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler2D _NoiseTex;
 
-#endif
+            #endif
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // calc pos for center of pixel
-                float3 uv = float3( i.uv.x, 0, i.uv.y ) - float3( .5, 0, .5 );
-                uv +=  + float3(.5, 0, .5) * _MainTex_TexelSize.xxy; // offset by half a texel so we are sampling noise for the center of the texel
+                float3 uv = float3(i.uv.x, 0, i.uv.y) - float3(.5, 0, .5);
+                uv += +float3(.5, 0, .5) * _MainTex_TexelSize.xxy;
+                // offset by half a texel so we are sampling noise for the center of the texel
 
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
                 
                 float pos = tex2D( _NoiseTex, i.uv ).r * _NoiseTransform._m00 + _NoiseTransform._m13;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( uv.xyz );
+                float3 pos = ApplyNoiseTransform(uv.xyz);
 
-#endif
+                #endif
 
-                float n = noise_FbmValue( pos, GetFbmFractalInput() );
+                float n = noise_FbmValue(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
@@ -333,44 +327,42 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Value Raw Noise Blit (3D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _ USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Value.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler3D _NoiseTex;
 
-#endif
+            #endif
 
             float _UVY;
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
 
                 float pos = tex3D( _NoiseTex, float3(i.uv.x, _UVY, i.uv.y) ).r;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5) );
+                float3 pos = ApplyNoiseTransform(float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5));
 
-#endif
+                #endif
 
-                float n = noise_FbmValue( pos, GetFbmFractalInput() );
+                float n = noise_FbmValue(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
-        
 
-        
+
+
         // Pass
         // {
         //     Name "Voronoi Raw Noise Blit (2D)"
@@ -399,40 +391,39 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Voronoi Raw Noise Blit (2D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Voronoi.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler2D _NoiseTex;
 
-#endif
+            #endif
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
                 // calc pos for center of pixel
-                float3 uv = float3( i.uv.x, 0, i.uv.y ) - float3( .5, 0, .5 );
-                uv +=  + float3(.5, 0, .5) * _MainTex_TexelSize.xxy; // offset by half a texel so we are sampling noise for the center of the texel
+                float3 uv = float3(i.uv.x, 0, i.uv.y) - float3(.5, 0, .5);
+                uv += +float3(.5, 0, .5) * _MainTex_TexelSize.xxy;
+                // offset by half a texel so we are sampling noise for the center of the texel
 
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
                 
                 float pos = tex2D( _NoiseTex, i.uv ).r * _NoiseTransform._m00 + _NoiseTransform._m13;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( uv.xyz );
+                float3 pos = ApplyNoiseTransform(uv.xyz);
 
-#endif
+                #endif
 
-                float n = noise_FbmVoronoi( pos, GetFbmFractalInput() );
+                float n = noise_FbmVoronoi(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
@@ -441,42 +432,40 @@ Shader "Hidden/TerrainTools/Noise/NoiseBlit/NoiseBlitFbm"
             Name "Voronoi Raw Noise Blit (3D)"
 
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _ USE_NOISE_TEXTURE
 
             #include "Assets/VladislavTsurikov/MegaWorld/Runtime/Common/Settings/FilterSettings/MaskFilterSystem/Shaders/NoiseLib//Fbm/Voronoi.hlsl"
 
-#if USE_NOISE_TEXTURE
+            #if USE_NOISE_TEXTURE
 
             sampler3D _NoiseTex;
 
-#endif
+            #endif
 
             float _UVY;
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-#if USE_NOISE_TEXTURE
+                #if USE_NOISE_TEXTURE
 
                 float pos = tex3D( _NoiseTex, float3(i.uv.x, _UVY, i.uv.y) ).r;
 
-#else
+                #else
 
-                float3 pos = ApplyNoiseTransform( float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5) );
+                float3 pos = ApplyNoiseTransform(float3(i.uv.x, _UVY, i.uv.y) - float3(.5, 0, .5));
 
-#endif
+                #endif
 
-                float n = noise_FbmVoronoi( pos, GetFbmFractalInput() );
+                float n = noise_FbmVoronoi(pos, GetFbmFractalInput());
 
                 return n;
             }
-
             ENDHLSL
         }
 
-        
+
 
     }
 }

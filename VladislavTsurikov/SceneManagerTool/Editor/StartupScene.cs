@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 using System;
+using OdinSerializer;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 using VladislavTsurikov.SceneUtility.Editor;
 using VladislavTsurikov.SceneUtility.Runtime;
@@ -13,8 +13,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
     public sealed class StartupScene
     {
         [OdinSerialize]
-        private SceneReference _sceneReference = new SceneReference();
-        
+        private SceneReference _sceneReference = new();
+
         public void Setup()
         {
             if (_sceneReference.IsValid())
@@ -24,15 +24,13 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
 
             EditorApplication.delayCall += () =>
             {
-                _sceneReference = new SceneReference(SceneCreationUtility.CreateScene("Scene Manager", SceneManagerPath.PathToResourcesSceneManager)); 
+                _sceneReference = new SceneReference(SceneCreationUtility.CreateScene("Scene Manager",
+                    SceneManagerPath.PathToResourcesSceneManager));
             };
         }
-        
-        public static void Open()
-        {
-            EditorSceneManager.OpenScene(GetStartupScenePath(), OpenSceneMode.Single);
-        }
-        
+
+        public static void Open() => EditorSceneManager.OpenScene(GetStartupScenePath(), OpenSceneMode.Single);
+
         public static string GetStartupScenePath()
         {
             if (!SceneManagerData.Instance.SceneManagerEditorData.StartupScene._sceneReference.IsValid())

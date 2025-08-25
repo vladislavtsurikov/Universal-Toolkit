@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.Core;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using Zenject;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.ZenjectIntegration
@@ -9,7 +9,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.ZenjectIntegration
     {
         public override IEnumerable<ResourceLoader> GetLoaders()
         {
-            var container = ProjectContext.Instance.Container;
+            DiContainer container = ProjectContext.Instance.Container;
             return ReflectionFactory.CreateAllInstances<BindableResourceLoader>(container);
         }
     }

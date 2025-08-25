@@ -1,11 +1,13 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+using PackageInfo = UnityEditor.PackageManager.PackageInfo;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core
 {
@@ -21,10 +23,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
         public static bool IsMathematicsInstalled;
 
         [DidReloadScripts]
-        public static void Init()
-        {
-            CheckUnityPackagesAndInit();
-        }
+        public static void Init() => CheckUnityPackagesAndInit();
 
         private static void CheckUnityPackagesAndInit()
         {
@@ -39,21 +38,27 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
         private static void OnPackageListed()
         {
             if (_listPackageRequest == null)
+            {
                 return;
+            }
+
             if (!_listPackageRequest.IsCompleted)
+            {
                 return;
+            }
+
             if (_listPackageRequest.Error != null)
             {
-
             }
             else
             {
-                foreach (UnityEditor.PackageManager.PackageInfo p in _listPackageRequest.Result)
+                foreach (PackageInfo p in _listPackageRequest.Result)
                 {
                     if (p.name.Equals("com.unity.burst"))
                     {
                         IsBurstInstalled = true;
                     }
+
                     if (p.name.Equals("com.unity.mathematics"))
                     {
                         IsMathematicsInstalled = true;
@@ -71,18 +76,24 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
             {
                 SetupKeywords();
             }
+
             EditorApplication.update -= OnPackageListed;
         }
 
         private static void OnPackageAdded()
         {
             if (_addPackageRequest == null)
+            {
                 return;
+            }
+
             if (!_addPackageRequest.IsCompleted)
+            {
                 return;
+            }
+
             if (_addPackageRequest.Error != null)
             {
-
             }
             else
             {
@@ -99,10 +110,10 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
             BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
             BuildTargetGroup buildGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
 
-            string symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildGroup);
-            List<string> symbolList = new List<string>(symbols.Split(new string[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
+            var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildGroup);
+            var symbolList = new List<string>(symbols.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
 
-            bool isDirty = false;
+            var isDirty = false;
 
             isDirty = isDirty || SetKeywordActive(symbolList, BurstKw, IsBurstInstalled);
 
@@ -115,7 +126,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
 
         private static bool SetKeywordActive(List<string> kwList, string keyword, bool active)
         {
-            bool isDirty = false;
+            var isDirty = false;
             if (active && !kwList.Contains(keyword))
             {
                 kwList.Add(keyword);
@@ -126,17 +137,19 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
                 kwList.RemoveAll(s => s.Equals(keyword));
                 isDirty = true;
             }
+
             return isDirty;
         }
 
         public static string ListElementsToString<T>(IEnumerable<T> list, string separator)
         {
             IEnumerator<T> i = list.GetEnumerator();
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
+            var s = new StringBuilder();
             while (i.MoveNext())
             {
                 s.Append(i.Current).Append(separator);
             }
+
             return s.ToString();
         }
     }

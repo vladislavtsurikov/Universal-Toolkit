@@ -11,21 +11,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner.Utility
     {
         public static float Get(Group group, TerrainsMaskManager terrainsMaskManager, RayHit rayHit)
         {
-            FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(GravitySpawner), typeof(FilterSettings));
-            
-            if(filterSettings.FilterType == FilterType.MaskFilter)
+            var filterSettings = (FilterSettings)group.GetElement(typeof(GravitySpawner), typeof(FilterSettings));
+
+            if (filterSettings.FilterType == FilterType.MaskFilter)
             {
                 return terrainsMaskManager.GetFitness(group, filterSettings.MaskFilterComponentSettings, rayHit.Point);
             }
-            else
-            {
-                return Common.Utility.GetFitness.GetFromSimpleFilter(filterSettings.SimpleFilter, rayHit);
-            }
+
+            return Common.Utility.GetFitness.GetFromSimpleFilter(filterSettings.SimpleFilter, rayHit);
         }
-        
-        public static float Get(Group group, TerrainsMaskManager terrainsMaskManager, MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain, Vector3 point)
-        {
-            return terrainsMaskManager.GetFitness(group, maskFilterComponentSettings, terrain, point);
-        }
+
+        public static float Get(Group group, TerrainsMaskManager terrainsMaskManager,
+            MaskFilterComponentSettings maskFilterComponentSettings, Terrain terrain, Vector3 point) =>
+            terrainsMaskManager.GetFitness(group, maskFilterComponentSettings, terrain, point);
     }
 }

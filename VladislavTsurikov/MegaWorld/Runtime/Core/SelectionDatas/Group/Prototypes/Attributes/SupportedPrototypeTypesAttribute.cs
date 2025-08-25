@@ -6,10 +6,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
     public class SupportedPrototypeTypesAttribute : Attribute
     {
         public readonly Type[] PrototypeTypes;
-        
-        public SupportedPrototypeTypesAttribute(Type[] prototypeTypes)
-        {
-            PrototypeTypes = prototypeTypes;
-        }
+
+        public SupportedPrototypeTypesAttribute(Type[] prototypeTypes) => PrototypeTypes = prototypeTypes;
     }
 }

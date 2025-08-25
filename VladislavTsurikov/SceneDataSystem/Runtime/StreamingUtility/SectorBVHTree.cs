@@ -7,8 +7,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public class SectorBVHTree
     {
-        private Dictionary<Sector, BVHNodeAABB<Sector>> _leafNodes = new Dictionary<Sector, BVHNodeAABB<Sector>>();
-        private BVHTree<BVHNodeAABB<Sector>, Sector> _tree = new BVHTree<BVHNodeAABB<Sector>, Sector>();
+        private readonly Dictionary<Sector, BVHNodeAABB<Sector>> _leafNodes = new();
+        private readonly BVHTree<BVHNodeAABB<Sector>, Sector> _tree = new();
 
         public void Clear()
         {
@@ -18,31 +18,29 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         private void RegisterSector(Sector sector, AABB aabb)
         {
-            if(_leafNodes.ContainsKey(sector))
+            if (_leafNodes.ContainsKey(sector))
             {
                 return;
             }
-            
-            if(aabb.Size == Vector3.zero)
+
+            if (aabb.Size == Vector3.zero)
             {
                 return;
             }
-            
+
             var treeNode = new BVHNodeAABB<Sector>(sector);
             treeNode.Position = aabb.Center;
             treeNode.Size = aabb.Size;
             _tree.InsertLeafNode(treeNode);
-            _leafNodes.Add(sector, treeNode); 
+            _leafNodes.Add(sector, treeNode);
         }
 
-        public void RegisterSector(Sector sector)
-        {
+        public void RegisterSector(Sector sector) =>
             RegisterSector(sector, new AABB(sector.Bounds.center, sector.Bounds.size));
-        }
 
         public void RemoveNodes(Sector sector)
         {
-            if(!_leafNodes.ContainsKey(sector))
+            if (!_leafNodes.ContainsKey(sector))
             {
                 return;
             }
@@ -57,7 +55,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             {
                 return new List<Sector>();
             }
-                
+
             return GetCurrentOverlapScenes(_tree.OverlapBox(position, Vector3.one, Quaternion.identity));
         }
 
@@ -88,10 +86,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 return new List<Sector>();
             }
 
-            var nodeHits = _tree.RaycastAll(ray, false);
+            List<BVHNodeRayHit<Sector>> nodeHits = _tree.RaycastAll(ray, false);
 
             var overlappedObjects = new List<Sector>();
-            foreach (var hit in nodeHits)
+            foreach (BVHNodeRayHit<Sector> hit in nodeHits)
             {
                 overlappedObjects.Add(hit.HitNode.Data);
             }
@@ -107,17 +105,17 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             }
 
             var overlappedObjects = new List<Sector>();
-            foreach(var node in overlappedNodes)
+            foreach (BVHNode<Sector> node in overlappedNodes)
             {
                 overlappedObjects.Add(node.Data);
             }
 
             return overlappedObjects;
         }
-        
+
         public void ChangeNodeSize(Sector sector, AABB aabb)
         {
-            if(!_leafNodes.ContainsKey(sector))
+            if (!_leafNodes.ContainsKey(sector))
             {
                 return;
             }
@@ -129,27 +127,22 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public AABB GetAABB(Sector sector)
         {
-            if(!_leafNodes.ContainsKey(sector))
+            if (!_leafNodes.ContainsKey(sector))
             {
                 return AABB.GetInvalid();
             }
 
             BVHNodeAABB<Sector> node = _leafNodes[sector];
-            AABB worldAABB = new AABB(node.Position, node.Size);
+            var worldAABB = new AABB(node.Position, node.Size);
 
             return worldAABB;
         }
-        
-#if UNITY_EDITOR
-        public void DrawAllCells(Color nodeColor)
-        {
-            _tree.DrawAllCells(Matrix4x4.identity, nodeColor);
-        }
 
-        public List<BVHNodeRayHit<Sector>> DrawRaycast(Ray ray, Color nodeColor)
-        {
-            return _tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
-        }
+#if UNITY_EDITOR
+        public void DrawAllCells(Color nodeColor) => _tree.DrawAllCells(Matrix4x4.identity, nodeColor);
+
+        public List<BVHNodeRayHit<Sector>> DrawRaycast(Ray ray, Color nodeColor) =>
+            _tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
 #endif
     }
 }

@@ -16,10 +16,8 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime
             Types = GetAllAssemblyTypes().Where(t => t.IsSubclassOf(typeof(T))).ToArray();
 #endif
         }
-        
-        private static Type[] GetAllAssemblyTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes()).ToArray();
-        }
+
+        private static Type[] GetAllAssemblyTypes() =>
+            AppDomain.CurrentDomain.GetAssemblies().SelectMany(t => t.GetTypes()).ToArray();
     }
 }

@@ -4,13 +4,9 @@ namespace VladislavTsurikov.ObjectPool.Runtime
 {
     public abstract class ObjectPool<T> where T : class
     {
-        private readonly PoolCollection<T> _poolCollection;
-        private readonly int _maxSize;
         private readonly bool _collectionCheck;
-        
-        public int CountAll { get; private set; }
-        public int CountActive => CountAll - CountInactive;
-        public int CountInactive => _poolCollection.Count;
+        private readonly int _maxSize;
+        private readonly PoolCollection<T> _poolCollection;
 
         protected ObjectPool(PoolCollection<T> poolCollection, int maxSize = 10000, bool collectionCheck = false)
         {
@@ -24,11 +20,23 @@ namespace VladislavTsurikov.ObjectPool.Runtime
             _collectionCheck = collectionCheck;
         }
 
+        public int CountAll { get; private set; }
+        public int CountActive => CountAll - CountInactive;
+        public int CountInactive => _poolCollection.Count;
+
         protected abstract T CreateInstance();
 
-        protected virtual void OnGet(T obj) {}
-        protected virtual void OnRelease(T obj) {}
-        protected virtual void OnDestroy(T obj) {}
+        protected virtual void OnGet(T obj)
+        {
+        }
+
+        protected virtual void OnRelease(T obj)
+        {
+        }
+
+        protected virtual void OnDestroy(T obj)
+        {
+        }
 
         public T Get()
         {

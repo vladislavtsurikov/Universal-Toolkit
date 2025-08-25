@@ -16,24 +16,23 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
+using System.Text;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Globalization;
-    using System.Text;
-
     /// <summary>
-    /// String method extensions.
+    ///     String method extensions.
     /// </summary>
     public static class StringExtensions
     {
         /// <summary>
-        /// Eg MY_INT_VALUE => MyIntValue
+        ///     Eg MY_INT_VALUE => MyIntValue
         /// </summary>
         public static string ToTitleCase(this string input)
         {
             var builder = new StringBuilder();
-            for (int i = 0; i < input.Length; i++)
+            for (var i = 0; i < input.Length; i++)
             {
                 var current = input[i];
                 if (current == '_' && i + 1 < input.Length)
@@ -57,7 +56,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Returns true if this string is null, empty, or contains only whitespace.
+        ///     Returns true if this string is null, empty, or contains only whitespace.
         /// </summary>
         /// <param name="str">The string to check.</param>
         /// <returns><c>true</c> if this string is null, empty, or contains only whitespace; otherwise, <c>false</c>.</returns>
@@ -65,7 +64,7 @@ namespace OdinSerializer.Utilities
         {
             if (!string.IsNullOrEmpty(str))
             {
-                for (int i = 0; i < str.Length; i++)
+                for (var i = 0; i < str.Length; i++)
                 {
                     if (char.IsWhiteSpace(str[i]) == false)
                     {

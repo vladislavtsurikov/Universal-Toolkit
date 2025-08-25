@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting;
 
@@ -9,35 +8,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 {
     public class HierarchyTerrainObjectInstance : UnityEngine.MonoBehaviour
     {
-        public TerrainObjectInstance TerrainObjectInstance { get; private set; }
-        
         //What objects cause this GameObject to appear
-        internal readonly List<object> UsedObjects = new List<object>();
-        
-        internal void Setup(TerrainObjectInstance instance, Scripting scriptingComponent)
-        {
-            TerrainObjectInstance = instance;
-            instance.HierarchyTerrainObjectInstance = this;
-			
-            if (scriptingComponent.IsValid())
-            {
-                if (!Application.isPlaying)
-                {
-                    return;
-                }
-
-                foreach (var script in scriptingComponent.ScriptStack.ElementList)
-                {
-                    instance.AddScript(script);
-                }
-				
-                instance.SetupScripts();
-            }
-        }
+        internal readonly List<object> UsedObjects = new();
+        public TerrainObjectInstance TerrainObjectInstance { get; private set; }
 
         private void Update()
         {
-            foreach (var script in TerrainObjectInstance.GetScripts())
+            foreach (Script script in TerrainObjectInstance.GetScripts())
             {
                 script.Update();
             }
@@ -45,9 +22,30 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         private void OnCollisionEnter(Collision collision)
         {
-            foreach (var script in TerrainObjectInstance.GetScripts())
+            foreach (Script script in TerrainObjectInstance.GetScripts())
             {
                 script.OnCollisionEnter(collision);
+            }
+        }
+
+        internal void Setup(TerrainObjectInstance instance, Scripting scriptingComponent)
+        {
+            TerrainObjectInstance = instance;
+            instance.HierarchyTerrainObjectInstance = this;
+
+            if (scriptingComponent.IsValid())
+            {
+                if (!Application.isPlaying)
+                {
+                    return;
+                }
+
+                foreach (Script script in scriptingComponent.ScriptStack.ElementList)
+                {
+                    instance.AddScript(script);
+                }
+
+                instance.SetupScripts();
             }
         }
     }

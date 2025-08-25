@@ -11,7 +11,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
                 return;
             }
 
-            foreach (var element in stack.ElementList)
+            foreach (T element in stack.ElementList)
             {
                 action(element);
             }

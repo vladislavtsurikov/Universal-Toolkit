@@ -6,18 +6,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public interface IHasElementStack
     {
-        ComponentStackManager ComponentStackManager { get;}
+        ComponentStackManager ComponentStackManager { get; }
 
         public void SetupComponentStack();
 
-        public Component GetElement(Type elementType)
-        {
-            return ComponentStackManager.GeneralComponentStack.GetElement(elementType);
-        }
+        public Component GetElement(Type elementType) =>
+            ComponentStackManager.GeneralComponentStack.GetElement(elementType);
 
-        public Component GetElement(Type toolType, Type elementType)
-        {
-            return ComponentStackManager.ToolsComponentStack.GetElement(elementType, toolType);
-        }
+        public Component GetElement(Type toolType, Type elementType) =>
+            ComponentStackManager.ToolsComponentStack.GetElement(elementType, toolType);
     }
 }

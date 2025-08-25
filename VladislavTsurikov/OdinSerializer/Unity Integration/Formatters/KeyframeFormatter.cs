@@ -17,18 +17,17 @@
 //-----------------------------------------------------------------------
 
 using OdinSerializer;
+using OdinSerializer.Utilities;
+using UnityEngine;
 
 [assembly: RegisterFormatter(typeof(KeyframeFormatter))]
 
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using UnityEngine;
-
     /// <summary>
-    /// Custom formatter for the <see cref="Keyframe"/> type.
+    ///     Custom formatter for the <see cref="Keyframe" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Keyframe}" />
+    /// <seealso cref="Keyframe" />
     public class KeyframeFormatter : MinimalBaseFormatter<Keyframe>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();
@@ -45,7 +44,8 @@ namespace OdinSerializer
             {
                 if (EmitUtilities.CanEmit)
                 {
-                    Formatter = (IFormatter<Keyframe>)FormatterEmitter.GetEmittedFormatter(typeof(Keyframe), SerializationPolicies.Everything);
+                    Formatter = (IFormatter<Keyframe>)FormatterEmitter.GetEmittedFormatter(typeof(Keyframe),
+                        SerializationPolicies.Everything);
                 }
                 else
                 {
@@ -55,7 +55,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -67,8 +67,8 @@ namespace OdinSerializer
             if (first == EntryType.Integer && name == "ver")
             {
                 if (Formatter == null)
-                {
                     // We're deserializing 2018.1+ data in a lower version of Unity - so just give it a go
+                {
                     Formatter = new ReflectionFormatter<Keyframe>(SerializationPolicies.Everything);
                 }
 
@@ -81,19 +81,19 @@ namespace OdinSerializer
             else
             {
                 // Legacy Keyframe deserialization code
-                value.inTangent = KeyframeFormatter.FloatSerializer.ReadValue(reader);
-                value.outTangent = KeyframeFormatter.FloatSerializer.ReadValue(reader);
-                value.time = KeyframeFormatter.FloatSerializer.ReadValue(reader);
-                value.value = KeyframeFormatter.FloatSerializer.ReadValue(reader);
+                value.inTangent = FloatSerializer.ReadValue(reader);
+                value.outTangent = FloatSerializer.ReadValue(reader);
+                value.time = FloatSerializer.ReadValue(reader);
+                value.value = FloatSerializer.ReadValue(reader);
 
 #pragma warning disable 0618
-                value.tangentMode = KeyframeFormatter.IntSerializer.ReadValue(reader);
+                value.tangentMode = IntSerializer.ReadValue(reader);
 #pragma warning restore 0618
             }
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
@@ -107,13 +107,13 @@ namespace OdinSerializer
             else
             {
                 // Legacy Keyframe serialization code
-                KeyframeFormatter.FloatSerializer.WriteValue(value.inTangent, writer);
-                KeyframeFormatter.FloatSerializer.WriteValue(value.outTangent, writer);
-                KeyframeFormatter.FloatSerializer.WriteValue(value.time, writer);
-                KeyframeFormatter.FloatSerializer.WriteValue(value.value, writer);
+                FloatSerializer.WriteValue(value.inTangent, writer);
+                FloatSerializer.WriteValue(value.outTangent, writer);
+                FloatSerializer.WriteValue(value.time, writer);
+                FloatSerializer.WriteValue(value.value, writer);
 
 #pragma warning disable 0618
-                KeyframeFormatter.IntSerializer.WriteValue(value.tangentMode, writer);
+                IntSerializer.WriteValue(value.tangentMode, writer);
 #pragma warning restore 0618
             }
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Reflection;
 using VladislavTsurikov.AttributeUtility.Runtime;
@@ -11,28 +12,29 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
     {
         protected override void OnCreateElements()
         {
-            foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
+            foreach (Type rendererType in AllTypesDerivedFrom<Renderer>.Types)
             {
-                AddSceneComponentsAttribute addComponentsAttribute = rendererType.GetAttribute<AddSceneComponentsAttribute>();
+                AddSceneComponentsAttribute addComponentsAttribute =
+                    rendererType.GetAttribute<AddSceneComponentsAttribute>();
 
                 if (addComponentsAttribute == null)
                 {
                     continue;
                 }
-                
+
                 CreateElementIfMissingType(addComponentsAttribute.Types);
             }
         }
 
         public override void OnRemoveInvalidElements()
         {
-            for (int i = ElementList.Count - 1; i >= 0; i--)
+            for (var i = ElementList.Count - 1; i >= 0; i--)
             {
-                bool find = false;
-                
-                foreach (var rendererType in AllTypesDerivedFrom<Renderer>.Types)
+                var find = false;
+
+                foreach (Type rendererType in AllTypesDerivedFrom<Renderer>.Types)
                 {
-                    AddSceneComponentsAttribute addComponentsAttribute = 
+                    var addComponentsAttribute =
                         (AddSceneComponentsAttribute)rendererType.GetAttribute(typeof(AddSceneComponentsAttribute));
 
                     if (addComponentsAttribute == null)
@@ -61,14 +63,15 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings
             {
                 return;
             }
-            
-            AddSceneComponentsAttribute addSceneComponentsAttribute = (AddSceneComponentsAttribute)renderer.GetType().GetCustomAttribute(typeof(AddSceneComponentsAttribute));
+
+            var addSceneComponentsAttribute =
+                (AddSceneComponentsAttribute)renderer.GetType().GetCustomAttribute(typeof(AddSceneComponentsAttribute));
 
             foreach (SceneComponent setting in _elementList.Where(setting => setting != null))
             {
-                if(addSceneComponentsAttribute.Types.Contains(setting.GetType()))
+                if (addSceneComponentsAttribute.Types.Contains(setting.GetType()))
                 {
-                    if(setting.Selected)
+                    if (setting.Selected)
                     {
                         setting.OnSelectedDrawGizmos();
                     }

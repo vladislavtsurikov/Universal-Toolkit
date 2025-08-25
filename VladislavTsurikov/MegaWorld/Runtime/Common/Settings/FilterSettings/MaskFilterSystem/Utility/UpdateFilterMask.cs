@@ -4,18 +4,19 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility
 {
-    public static class UpdateFilterMask 
+    public static class UpdateFilterMask
     {
         public static void UpdateFilterMaskForPrototypes(IReadOnlyList<Prototype> prototypes, BoxArea boxArea)
         {
-            if(boxArea.TerrainUnder == null)
+            if (boxArea.TerrainUnder == null)
             {
                 return;
             }
-            
+
             foreach (Prototype proto in prototypes)
             {
-                MaskFilterComponentSettings maskFilterComponentSettings = (MaskFilterComponentSettings)proto.GetElement(typeof(MaskFilterComponentSettings));
+                var maskFilterComponentSettings =
+                    (MaskFilterComponentSettings)proto.GetElement(typeof(MaskFilterComponentSettings));
                 FilterMaskOperation.UpdateMaskTexture(maskFilterComponentSettings, boxArea);
             }
         }

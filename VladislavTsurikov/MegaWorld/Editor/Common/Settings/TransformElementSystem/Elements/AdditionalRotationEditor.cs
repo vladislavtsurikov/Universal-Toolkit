@@ -13,22 +13,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     public class AdditionalRotationEditor : ReorderableListComponentEditor
     {
         private AdditionalRotation _additionalRotation;
-        public override void OnEnable()
+
+        public override void OnEnable() => _additionalRotation = (AdditionalRotation)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _additionalRotation = (AdditionalRotation)Target;
-        }
-        
-        public override void OnGUI(Rect rect, int index) 
-        {
-            _additionalRotation.Rotation = EditorGUI.Vector3Field(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), 
+            _additionalRotation.Rotation = EditorGUI.Vector3Field(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
                 new GUIContent("Additional Rotation"), _additionalRotation.Rotation);
             rect.y += EditorGUIUtility.singleLineHeight;
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight * 2;
 

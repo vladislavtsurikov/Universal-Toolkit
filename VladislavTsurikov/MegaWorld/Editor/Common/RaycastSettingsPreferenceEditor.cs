@@ -7,16 +7,18 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common
 {
-	[ElementEditor(typeof(RaycastPreferenceSettings))]
+    [ElementEditor(typeof(RaycastPreferenceSettings))]
     public class RaycastSettingsPreferenceEditor : IMGUIElementEditor
     {
-	    private RaycastPreferenceSettings Settings => (RaycastPreferenceSettings)Target;
-	    
-	    public override void OnGUI()
+        private RaycastPreferenceSettings Settings => (RaycastPreferenceSettings)Target;
+
+        public override void OnGUI()
         {
-	        Settings.RaycastType = (RaycastType)CustomEditorGUILayout.EnumPopup(new GUIContent("Raycast Type", ""), Settings.RaycastType);
-	        Settings.Offset = CustomEditorGUILayout.FloatField(new GUIContent("Offset", 
-		        "If you want to spawn objects under pawns or inside buildings or in other similar cases. You need to decrease the Spawn Check Offset."), Settings.Offset);
+            Settings.RaycastType =
+                (RaycastType)CustomEditorGUILayout.EnumPopup(new GUIContent("Raycast Type", ""), Settings.RaycastType);
+            Settings.Offset = CustomEditorGUILayout.FloatField(new GUIContent("Offset",
+                    "If you want to spawn objects under pawns or inside buildings or in other similar cases. You need to decrease the Spawn Check Offset."),
+                Settings.Offset);
         }
     }
 }

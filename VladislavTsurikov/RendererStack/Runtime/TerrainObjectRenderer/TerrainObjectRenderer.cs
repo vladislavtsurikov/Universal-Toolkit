@@ -1,5 +1,5 @@
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
@@ -12,7 +12,8 @@ using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.Attributes;
-using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender;
+using
+    VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect;
@@ -30,15 +31,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
     [Name("Terrain Object Renderer")]
     [PrototypeType(typeof(PrototypeTerrainObject))]
     [GenerateGPUInstancedIndirectShaders]
-    [AddSceneData(new[] { typeof(TerrainObjectRendererData), typeof(TerrainManager)})]
-    [AddCameraTemporaryComponents(new[] { typeof(ObjectCameraRender), typeof(CameraCollidersController)})]
-    [AddCameraComponents(new[] { typeof(TerrainObjectRendererCameraSettings)})]
+    [AddSceneData(new[] { typeof(TerrainObjectRendererData), typeof(TerrainManager) })]
+    [AddCameraTemporaryComponents(new[] { typeof(ObjectCameraRender), typeof(CameraCollidersController) })]
+    [AddCameraComponents(new[] { typeof(TerrainObjectRendererCameraSettings) })]
     [AddSceneComponents(new[] { typeof(CameraManager), typeof(Quality) })]
     [AddGlobalComponents(new[] { typeof(Common.GlobalSettings.Quality), typeof(ExtensionSystem) })]
-    [AddPrototypeComponents(new[] { typeof(LODGroup), typeof(Shadow), typeof(DistanceCulling), typeof(FrustumCulling), typeof(Colliders), typeof(Scripting) })]
+    [AddPrototypeComponents(new[]
+    {
+        typeof(LODGroup), typeof(Shadow), typeof(DistanceCulling), typeof(FrustumCulling), typeof(Colliders),
+        typeof(Scripting)
+    })]
     public partial class TerrainObjectRenderer : PrototypeRenderer
     {
+        public delegate void SetupPrototypeRendererRendererAfter();
+
         private static TerrainObjectRenderer s_instance;
+        public static SetupPrototypeRendererRendererAfter AfterSetupPrototypeRendererRendererEvent;
+        public bool DebugAllCells = false;
+        public bool DebugVisibleCells = false;
+
+        public ScriptingSystem.ScriptingSystem ScriptingSystem;
 
         public static TerrainObjectRenderer Instance
         {
@@ -49,23 +61,20 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
                     return null;
                 }
 
-                s_instance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(typeof(TerrainObjectRenderer));
+                s_instance =
+                    (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.GetElement(
+                        typeof(TerrainObjectRenderer));
 
                 if (s_instance == null)
                 {
-                    s_instance = (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.CreateIfMissingType(typeof(TerrainObjectRenderer));
+                    s_instance =
+                        (TerrainObjectRenderer)RendererStackManager.Instance.RendererStack.CreateIfMissingType(
+                            typeof(TerrainObjectRenderer));
                 }
 
                 return s_instance;
             }
         }
-
-        public ScriptingSystem.ScriptingSystem ScriptingSystem;
-        public bool DebugAllCells = false;
-        public bool DebugVisibleCells = false;
-        
-        public delegate void SetupPrototypeRendererRendererAfter ();
-        public static SetupPrototypeRendererRendererAfter AfterSetupPrototypeRendererRendererEvent;
 
         protected override void SetupPrototypeRendererRenderer()
         {
@@ -73,7 +82,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             {
                 ScriptingSystem = new ScriptingSystem.ScriptingSystem();
             }
-            
+
             MergeInstancedIndirectBuffersID.Setup();
             GPUFrustumCullingID.Setup();
 
@@ -82,7 +91,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             TerrainManager.ChangedTerrainCountEvent -= NewTerrainAction;
             TerrainManager.ChangedTerrainCountEvent += NewTerrainAction;
 
-            AfterSetupPrototypeRendererRendererEvent?.Invoke(); 
+            AfterSetupPrototypeRendererRendererEvent?.Invoke();
         }
 
         protected override void OnDisableElement()
@@ -102,7 +111,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 
         public override void DrawDebug()
         {
-            foreach (var item in SceneDataStackUtility.GetAllSceneData<TerrainObjectRendererData>())
+            foreach (TerrainObjectRendererData item in
+                     SceneDataStackUtility.GetAllSceneData<TerrainObjectRendererData>())
             {
                 item.DrawDebug();
             }

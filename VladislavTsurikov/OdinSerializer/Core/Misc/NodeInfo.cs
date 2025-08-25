@@ -16,47 +16,47 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Contains information about a node during deserialization and serialization.
+    ///     Contains information about a node during deserialization and serialization.
     /// </summary>
     public struct NodeInfo
     {
         /// <summary>
-        /// An empty node.
+        ///     An empty node.
         /// </summary>
-        public static readonly NodeInfo Empty = new NodeInfo(true);
+        public static readonly NodeInfo Empty = new(true);
 
         /// <summary>
-        /// The name of the node.
+        ///     The name of the node.
         /// </summary>
         public readonly string Name;
 
         /// <summary>
-        /// The id of the node, or -1 if the node has no id.
+        ///     The id of the node, or -1 if the node has no id.
         /// </summary>
         public readonly int Id;
 
         /// <summary>
-        /// The type of the node, or null if the node has no type metadata.
+        ///     The type of the node, or null if the node has no type metadata.
         /// </summary>
         public readonly Type Type;
 
         /// <summary>
-        /// Whether the node is an array or not.
+        ///     Whether the node is an array or not.
         /// </summary>
         public readonly bool IsArray;
 
         /// <summary>
-        /// Whether the node is an empty node.
+        ///     Whether the node is an empty node.
         /// </summary>
         public readonly bool IsEmpty;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NodeInfo"/> struct.
+        ///     Initializes a new instance of the <see cref="NodeInfo" /> struct.
         /// </summary>
         /// <param name="name">The name of the node.</param>
         /// <param name="id">The id of the node.</param>
@@ -64,62 +64,57 @@ namespace OdinSerializer
         /// <param name="isArray">If set to <c>true</c> the node is an array node.</param>
         public NodeInfo(string name, int id, Type type, bool isArray)
         {
-            this.Name = name;
-            this.Id = id;
-            this.Type = type;
-            this.IsArray = isArray;
-            this.IsEmpty = false;
+            Name = name;
+            Id = id;
+            Type = type;
+            IsArray = isArray;
+            IsEmpty = false;
         }
 
         private NodeInfo(bool parameter)
         {
-            this.Name = null;
-            this.Id = -1;
-            this.Type = null;
-            this.IsArray = false;
-            this.IsEmpty = true;
+            Name = null;
+            Id = -1;
+            Type = null;
+            IsArray = false;
+            IsEmpty = true;
         }
 
         /// <summary>
-        /// Implements the operator == between <see cref="NodeInfo"/> and <see cref="NodeInfo"/>.
+        ///     Implements the operator == between <see cref="NodeInfo" /> and <see cref="NodeInfo" />.
         /// </summary>
-        /// <param name="a">The first <see cref="NodeInfo"/>.</param>
-        /// <param name="b">The second <see cref="NodeInfo"/>.</param>
+        /// <param name="a">The first <see cref="NodeInfo" />.</param>
+        /// <param name="b">The second <see cref="NodeInfo" />.</param>
         /// <returns>
-        /// <c>true</c> if the nodes were equal; otherwise, <c>false</c>.
+        ///     <c>true</c> if the nodes were equal; otherwise, <c>false</c>.
         /// </returns>
-        public static bool operator ==(NodeInfo a, NodeInfo b)
-        {
-            return a.Name == b.Name
-                && a.Id == b.Id
-                && a.Type == b.Type
-                && a.IsArray == b.IsArray
-                && a.IsEmpty == b.IsEmpty;
-        }
+        public static bool operator ==(NodeInfo a, NodeInfo b) =>
+            a.Name == b.Name
+            && a.Id == b.Id
+            && a.Type == b.Type
+            && a.IsArray == b.IsArray
+            && a.IsEmpty == b.IsEmpty;
 
         /// <summary>
-        /// Implements the operator != between <see cref="NodeInfo"/> and <see cref="NodeInfo"/>.
+        ///     Implements the operator != between <see cref="NodeInfo" /> and <see cref="NodeInfo" />.
         /// </summary>
-        /// <param name="a">The first <see cref="NodeInfo"/>.</param>
-        /// <param name="b">The second <see cref="NodeInfo"/>.</param>
+        /// <param name="a">The first <see cref="NodeInfo" />.</param>
+        /// <param name="b">The second <see cref="NodeInfo" />.</param>
         /// <returns>
-        /// <c>true</c> if the nodes were not equal; otherwise, <c>false</c>.
+        ///     <c>true</c> if the nodes were not equal; otherwise, <c>false</c>.
         /// </returns>
-        public static bool operator !=(NodeInfo a, NodeInfo b)
-        {
-            return !(a == b);
-        }
+        public static bool operator !=(NodeInfo a, NodeInfo b) => !(a == b);
 
         /// <summary>
-        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
+        ///     Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
         /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
         /// <returns>
-        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         public override bool Equals(object obj)
         {
-            if (object.ReferenceEquals(obj, null))
+            if (ReferenceEquals(obj, null))
             {
                 return false;
             }
@@ -133,14 +128,14 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        ///     Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
+        ///     A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
-            if (this.IsEmpty)
+            if (IsEmpty)
             {
                 return 0;
             }
@@ -150,11 +145,11 @@ namespace OdinSerializer
             unchecked
             {
                 return (int)2166136261
-                    ^ ((this.Name == null ? 12321 : this.Name.GetHashCode()) * P)
-                    ^ (this.Id * P)
-                    ^ ((this.Type == null ? 1423 : this.Type.GetHashCode()) * P)
-                    ^ ((this.IsArray ? 124124 : 43234) * P)
-                    ^ ((this.IsEmpty ? 872934 : 27323) * P);
+                       ^ ((Name == null ? 12321 : Name.GetHashCode()) * P)
+                       ^ (Id * P)
+                       ^ ((Type == null ? 1423 : Type.GetHashCode()) * P)
+                       ^ ((IsArray ? 124124 : 43234) * P)
+                       ^ ((IsEmpty ? 872934 : 27323) * P);
             }
         }
     }

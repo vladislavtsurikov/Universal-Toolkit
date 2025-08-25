@@ -16,20 +16,20 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using UnityEditor;
+
 #if UNITY_EDITOR
 
 namespace OdinSerializer.Utilities.Editor
 {
-    using System;
-    using System.Linq;
-    using UnityEditor;
-
     public enum AssemblyImportSettings
     {
         BuildOnly,
         EditorOnly,
         BuildAndEditor,
-        Exclude,
+        Exclude
     }
 
     public static class OdinSerializationBuiltSettingsConfig
@@ -42,10 +42,10 @@ namespace OdinSerializer.Utilities.Editor
         {
             get
             {
-                var buildGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
+                BuildTargetGroup buildGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
 
 #if UNITY_5_6_OR_NEWER
-                var backend = PlayerSettings.GetScriptingBackend(buildGroup);
+                ScriptingImplementation backend = PlayerSettings.GetScriptingBackend(buildGroup);
 #else
                 var backend = (ScriptingImplementation)PlayerSettings.GetPropertyInt("ScriptingBackend", buildGroup);
 #endif
@@ -55,46 +55,40 @@ namespace OdinSerializer.Utilities.Editor
                     return AOT;
                 }
 
-                var target = EditorUserBuildSettings.activeBuildTarget;
+                BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
 
                 if (OdinAssemblyImportSettingsUtility.JITPlatforms.Any(p => p == target))
                 {
                     return JIT;
                 }
-                else
-                {
-                    return AOT;
-                }
+
+                return AOT;
             }
         }
 
         [MenuItem("Tools/Odin Serializer/Refresh Assembly Import Settings")]
-        public static void RefreshAssemblyImportSettings()
-        {
-            Current.Apply();
-        }
+        public static void RefreshAssemblyImportSettings() => Current.Apply();
     }
 
     public static class OdinAssemblyImportSettingsUtility
     {
         public static readonly BuildTarget[] Platforms = Enum.GetValues(typeof(BuildTarget))
             .Cast<BuildTarget>()
-            .Where(t => t >= 0 && typeof(BuildTarget).GetMember(t.ToString())[0].IsDefined(typeof(ObsoleteAttribute), false) == false)
+            .Where(t => t >= 0 &&
+                        typeof(BuildTarget).GetMember(t.ToString())[0].IsDefined(typeof(ObsoleteAttribute), false) ==
+                        false)
             .ToArray();
 
-        public static readonly BuildTarget[] JITPlatforms = new BuildTarget[]
+        public static readonly BuildTarget[] JITPlatforms =
         {
-            BuildTarget.StandaloneOSX,
-            BuildTarget.StandaloneWindows,
-            BuildTarget.StandaloneWindows64,
-            BuildTarget.StandaloneLinux64,
-            BuildTarget.Android,
+            BuildTarget.StandaloneOSX, BuildTarget.StandaloneWindows, BuildTarget.StandaloneWindows64,
+            BuildTarget.StandaloneLinux64, BuildTarget.Android
         };
 
         public static void ApplyImportSettings(string assemblyFilePath, AssemblyImportSettings importSettings)
         {
-            bool includeInBuild = false;
-            bool includeInEditor = false;
+            var includeInBuild = false;
+            var includeInEditor = false;
 
             switch (importSettings)
             {
@@ -125,7 +119,8 @@ namespace OdinSerializer.Utilities.Editor
 #if UNITY_5_6_OR_NEWER
             if (importer.GetCompatibleWithAnyPlatform() != includeInBuild
                 || Platforms.Any(p => importer.GetCompatibleWithPlatform(p) != includeInBuild)
-                || (includeInBuild && importer.GetExcludeEditorFromAnyPlatform() != !includeInEditor || importer.GetCompatibleWithEditor()))
+                || (includeInBuild && importer.GetExcludeEditorFromAnyPlatform() != !includeInEditor) ||
+                importer.GetCompatibleWithEditor())
             {
                 importer.ClearSettings();
                 importer.SetCompatibleWithAnyPlatform(includeInBuild);
@@ -159,11 +154,19 @@ namespace OdinSerializer.Utilities.Editor
 
     public abstract class OdinSerializationBuiltSettings
     {
-        protected const string NoEditorSerializationMeta = "Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Serialization.dll";
+        protected const string NoEditorSerializationMeta =
+            "Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Serialization.dll";
+
         protected const string NoEditorUtilityMeta = "Assets/Plugins/Sirenix/Assemblies/NoEditor/Sirenix.Utilities.dll";
-        protected const string NoEmitNoEditorSerializationMeta = "Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll";
-        protected const string NoEmitNoEditorUtilityMeta = "Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Utilities.dll";
-        protected const string SerializationConfigMeta = "Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll";
+
+        protected const string NoEmitNoEditorSerializationMeta =
+            "Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Serialization.dll";
+
+        protected const string NoEmitNoEditorUtilityMeta =
+            "Assets/Plugins/Sirenix/Assemblies/NoEmitAndNoEditor/Sirenix.Utilities.dll";
+
+        protected const string SerializationConfigMeta =
+            "Assets/Plugins/Sirenix/Assemblies/Sirenix.Serialization.Config.dll";
 
         public abstract void Apply();
     }
@@ -172,11 +175,15 @@ namespace OdinSerializer.Utilities.Editor
     {
         public override void Apply()
         {
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta, AssemblyImportSettings.BuildOnly);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta, AssemblyImportSettings.BuildOnly);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta, AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta,
+                AssemblyImportSettings.BuildOnly);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta,
+                AssemblyImportSettings.BuildOnly);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta,
+                AssemblyImportSettings.Exclude);
             OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorUtilityMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta, AssemblyImportSettings.BuildAndEditor);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta,
+                AssemblyImportSettings.BuildAndEditor);
         }
     }
 
@@ -184,11 +191,16 @@ namespace OdinSerializer.Utilities.Editor
     {
         public override void Apply()
         {
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta, AssemblyImportSettings.BuildOnly);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorUtilityMeta, AssemblyImportSettings.BuildOnly);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta, AssemblyImportSettings.BuildAndEditor);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta,
+                AssemblyImportSettings.BuildOnly);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorUtilityMeta,
+                AssemblyImportSettings.BuildOnly);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta,
+                AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta,
+                AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta,
+                AssemblyImportSettings.BuildAndEditor);
         }
     }
 
@@ -196,11 +208,15 @@ namespace OdinSerializer.Utilities.Editor
     {
         public override void Apply()
         {
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta, AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorSerializationMeta,
+                AssemblyImportSettings.Exclude);
             OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEditorUtilityMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta, AssemblyImportSettings.Exclude);
-            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta, AssemblyImportSettings.EditorOnly);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorSerializationMeta,
+                AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(NoEmitNoEditorUtilityMeta,
+                AssemblyImportSettings.Exclude);
+            OdinAssemblyImportSettingsUtility.ApplyImportSettings(SerializationConfigMeta,
+                AssemblyImportSettings.EditorOnly);
         }
     }
 }

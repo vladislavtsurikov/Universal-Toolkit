@@ -8,44 +8,53 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFil
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.MaskFilterSystem
 {
-	[ElementEditor(typeof(VisualisationMaskFiltersPreference))]
+    [ElementEditor(typeof(VisualisationMaskFiltersPreference))]
     public class VisualisationMaskFiltersPreferenceEditor : IMGUIElementEditor
     {
-	    private VisualisationMaskFiltersPreference _element => (VisualisationMaskFiltersPreference)Target;
+        private VisualisationMaskFiltersPreference _element => (VisualisationMaskFiltersPreference)Target;
 
-	    public override void OnGUI()
-	    {
-		    _element.ColorSpace = (ColorSpaceForBrushMaskFilter)CustomEditorGUILayout.EnumPopup(new GUIContent("Color Space"), _element.ColorSpace);
-				
-		    switch (_element.ColorSpace)
-		    {
-			    case ColorSpaceForBrushMaskFilter.СustomColor:
-			    {
-				    _element.Color = CustomEditorGUILayout.ColorField(new GUIContent("Color"), _element.Color);
-				    _element.EnableStripe = CustomEditorGUILayout.Toggle(new GUIContent("Enable Brush Stripe"), _element.EnableStripe);
+        public override void OnGUI()
+        {
+            _element.ColorSpace =
+                (ColorSpaceForBrushMaskFilter)CustomEditorGUILayout.EnumPopup(new GUIContent("Color Space"),
+                    _element.ColorSpace);
 
-				    _element.AlphaVisualisationType = (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
-						
-				    break;
-			    }
-			    case ColorSpaceForBrushMaskFilter.Colorful:
-			    {							
-				    _element.AlphaVisualisationType = (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
+            switch (_element.ColorSpace)
+            {
+                case ColorSpaceForBrushMaskFilter.СustomColor:
+                {
+                    _element.Color = CustomEditorGUILayout.ColorField(new GUIContent("Color"), _element.Color);
+                    _element.EnableStripe =
+                        CustomEditorGUILayout.Toggle(new GUIContent("Enable Brush Stripe"), _element.EnableStripe);
 
-				    break;
-			    }
-			    case ColorSpaceForBrushMaskFilter.Heightmap:
-			    {
-				    _element.AlphaVisualisationType = (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
+                    _element.AlphaVisualisationType =
+                        (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(
+                            new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
 
-				    break;
-			    }
-			    default:
-				    throw new ArgumentOutOfRangeException();
-		    }
+                    break;
+                }
+                case ColorSpaceForBrushMaskFilter.Colorful:
+                {
+                    _element.AlphaVisualisationType =
+                        (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(
+                            new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
 
-		    _element.CustomAlpha = CustomEditorGUILayout.Slider(new GUIContent("Alpha"), _element.CustomAlpha, 0, 1);
-	    }
+                    break;
+                }
+                case ColorSpaceForBrushMaskFilter.Heightmap:
+                {
+                    _element.AlphaVisualisationType =
+                        (AlphaVisualisationType)CustomEditorGUILayout.EnumPopup(
+                            new GUIContent("Alpha Visualisation Type"), _element.AlphaVisualisationType);
+
+                    break;
+                }
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            _element.CustomAlpha = CustomEditorGUILayout.Slider(new GUIContent("Alpha"), _element.CustomAlpha, 0, 1);
+        }
     }
 }
 #endif

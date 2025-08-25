@@ -8,15 +8,15 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     public class CsGenerator
     {
         public static int DefaultTabSize = 4;
-        public static string IndentSingle => new String(' ', DefaultTabSize);
+        public static string IndentSingle => new(' ', DefaultTabSize);
         public string Path { get; set; }
-        public List<FileModel> Files { get; set; } = new List<FileModel>();
+        public List<FileModel> Files { get; set; } = new();
 
         public void CreateFiles()
         {
             if (!Directory.Exists(Path))
             {
-                string message = "Path not valid: " + Path;
+                var message = "Path not valid: " + Path;
                 Console.WriteLine(message);
                 throw new InvalidOperationException(message);
             }
@@ -26,15 +26,15 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
                 Directory.CreateDirectory(Path);
             }
 
-            foreach (var file in Files)
+            foreach (FileModel file in Files)
             {
-                string filePath = $@"{Path}\{file.FullName}";
+                var filePath = $@"{Path}\{file.FullName}";
                 using (StreamWriter writer = File.CreateText(filePath))
                 {
                     writer.Write(file);
                 }
             }
-            
+
 #if UNITY_EDITOR
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

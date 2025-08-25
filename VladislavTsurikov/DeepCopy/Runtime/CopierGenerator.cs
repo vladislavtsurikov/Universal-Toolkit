@@ -8,29 +8,35 @@ using UnityEngine;
 namespace VladislavTsurikov.DeepCopy.Runtime
 {
     /// <summary>
-    /// Generates copy delegates.
+    ///     Generates copy delegates.
     /// </summary>
     internal static class CopierGenerator<T>
     {
-        private static readonly ConcurrentDictionary<Type, DeepCopyDelegate<T>> Copiers = new ConcurrentDictionary<Type, DeepCopyDelegate<T>>();
+        private static readonly ConcurrentDictionary<Type, DeepCopyDelegate<T>> Copiers = new();
         private static readonly Type GenericType = typeof(T);
         private static readonly DeepCopyDelegate<T> MatchingTypeCopier = CreateCopier(GenericType);
         private static readonly Func<Type, DeepCopyDelegate<T>> GenerateCopier = CreateCopier;
-        
+
         public static T Copy(T original, CopyContext context)
         {
             // ReSharper disable once ExpressionIsAlwaysNull
-            if (original == null) return original;
+            if (original == null)
+            {
+                return original;
+            }
 
-            var type = original.GetType();
-            if (type == GenericType) return MatchingTypeCopier(original, context);
+            Type type = original.GetType();
+            if (type == GenericType)
+            {
+                return MatchingTypeCopier(original, context);
+            }
 
-            var result = Copiers.GetOrAdd(type, GenerateCopier);
+            DeepCopyDelegate<T> result = Copiers.GetOrAdd(type, GenerateCopier);
             return result(original, context);
         }
 
         /// <summary>
-        /// Gets a copier for the provided type.
+        ///     Gets a copier for the provided type.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>A copier for the provided type.</returns>
@@ -46,38 +52,44 @@ namespace VladislavTsurikov.DeepCopy.Runtime
                 return (original, context) => original;
             }
 
-            if (DeepCopier.CopyPolicy.IsImmutable(type)) return (original, context) => original;
+            if (DeepCopier.CopyPolicy.IsImmutable(type))
+            {
+                return (original, context) => original;
+            }
 
             // By-ref types are not supported.
-            if (type.IsByRef) return ThrowNotSupportedType(type);
+            if (type.IsByRef)
+            {
+                return ThrowNotSupportedType(type);
+            }
 
             var dynamicMethod = new DynamicMethod(
                 type.Name + "DeepCopier",
                 typeof(T),
-                new[] {typeof(T), typeof(CopyContext)},
+                new[] { typeof(T), typeof(CopyContext) },
                 typeof(DeepCopier).Module,
                 true);
 
-            var il = dynamicMethod.GetILGenerator();
+            ILGenerator il = dynamicMethod.GetILGenerator();
 
             // Declare a variable to store the result.
             il.DeclareLocal(type);
 
             var needsTracking = DeepCopier.CopyPolicy.NeedsTracking(type);
-            var hasCopyLabel = il.DefineLabel();
+            Label hasCopyLabel = il.DefineLabel();
             if (needsTracking)
             {
                 // C#: if (context.TryGetCopy(original, out object existingCopy)) return (T)existingCopy;
                 il.DeclareLocal(typeof(object));
                 il.Emit(OpCodes.Ldarg_1);
                 il.Emit(OpCodes.Ldarg_0);
-                il.Emit(OpCodes.Ldloca_S, (byte) 1);
+                il.Emit(OpCodes.Ldloca_S, (byte)1);
                 il.Emit(OpCodes.Call, DeepCopier.MethodInfos.TryGetCopy);
                 il.Emit(OpCodes.Brtrue, hasCopyLabel);
             }
 
             // Construct the result.
-            var constructorInfo = type.GetConstructor(Type.EmptyTypes);
+            ConstructorInfo constructorInfo = type.GetConstructor(Type.EmptyTypes);
             if (type.IsValueType)
             {
                 // Value types can be initialized directly.
@@ -112,12 +124,12 @@ namespace VladislavTsurikov.DeepCopy.Runtime
             }
 
             // Copy each field.
-            foreach (var field in DeepCopier.CopyPolicy.GetCopyableFields(type))
+            foreach (FieldInfo field in DeepCopier.CopyPolicy.GetCopyableFields(type))
             {
                 // Load a reference to the result.
                 if (type.IsValueType)
-                {
                     // Value types need to be loaded by address rather than copied onto the stack.
+                {
                     il.Emit(OpCodes.Ldloca_S, (byte)0);
                 }
                 else
@@ -159,7 +171,7 @@ namespace VladislavTsurikov.DeepCopy.Runtime
 
         private static DeepCopyDelegate<T> CreateArrayCopier(Type type)
         {
-            var elementType = type.GetElementType();
+            Type elementType = type.GetElementType();
 
             var rank = type.GetArrayRank();
             var isImmutable = DeepCopier.CopyPolicy.IsImmutable(elementType);
@@ -175,6 +187,7 @@ namespace VladislavTsurikov.DeepCopy.Runtime
                     {
                         methodInfo = DeepCopier.MethodInfos.CopyArrayRank1;
                     }
+
                     break;
                 case 2:
                     if (isImmutable)
@@ -185,18 +198,18 @@ namespace VladislavTsurikov.DeepCopy.Runtime
                     {
                         methodInfo = DeepCopier.MethodInfos.CopyArrayRank2;
                     }
+
                     break;
                 default:
                     return ArrayCopier.CopyArray;
             }
 
-            return (DeepCopyDelegate<T>) methodInfo.MakeGenericMethod(elementType).CreateDelegate(typeof(DeepCopyDelegate<T>));
+            return (DeepCopyDelegate<T>)methodInfo.MakeGenericMethod(elementType)
+                .CreateDelegate(typeof(DeepCopyDelegate<T>));
         }
-        
+
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static DeepCopyDelegate<T> ThrowNotSupportedType(Type type)
-        {
+        private static DeepCopyDelegate<T> ThrowNotSupportedType(Type type) =>
             throw new NotSupportedException($"Unable to copy object of type {type}.");
-        }
     }
 }

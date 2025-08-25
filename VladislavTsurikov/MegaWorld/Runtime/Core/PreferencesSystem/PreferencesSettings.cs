@@ -12,32 +12,25 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem
     public class PreferencesSettings : SerializedScriptableObjectSingleton<PreferencesSettings>
     {
         [OdinSerialize]
-        private ComponentStackOnlyDifferentTypes<PreferenceSettings> _stack =
-            new ComponentStackOnlyDifferentTypes<PreferenceSettings>();
+        private ComponentStackOnlyDifferentTypes<PreferenceSettings> _stack = new();
 
 #if UNITY_EDITOR
         public IMGUIComponentStackEditor<PreferenceSettings, IMGUIElementEditor> StackEditor;
 #endif
-        
+
         private void OnEnable()
         {
             _stack.CreateAllElementTypes();
-            
+
 #if UNITY_EDITOR
             StackEditor = new IMGUIComponentStackEditor<PreferenceSettings, IMGUIElementEditor>(_stack);
 #endif
         }
-        
-        public Component GetElement(Type elementType)
-        {
-            return _stack.GetElement(elementType);
-        }
+
+        public Component GetElement(Type elementType) => _stack.GetElement(elementType);
 
 #if UNITY_EDITOR
-        public void Save()
-        {
-            EditorUtility.SetDirty(this);
-        }
+        public void Save() => EditorUtility.SetDirty(this);
 #endif
     }
 }

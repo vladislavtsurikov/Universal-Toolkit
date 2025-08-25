@@ -6,10 +6,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
     public class AddGlobalCommonComponentsAttribute : Attribute
     {
         public readonly Type[] Types;
-        
-        public AddGlobalCommonComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+
+        public AddGlobalCommonComponentsAttribute(Type[] types) => Types = types;
     }
 }

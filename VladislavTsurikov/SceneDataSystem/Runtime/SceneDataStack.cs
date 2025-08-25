@@ -8,9 +8,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
     {
         protected override bool AllowCreate(Type type)
         {
-            AllowCreateComponentAttribute allowCreateComponentAttribute = type.GetAttribute<AllowCreateComponentAttribute>();
+            AllowCreateComponentAttribute allowCreateComponentAttribute =
+                type.GetAttribute<AllowCreateComponentAttribute>();
 
-            if (allowCreateComponentAttribute == null || allowCreateComponentAttribute.Allow((SceneDataManager)SetupData[0])) 
+            if (allowCreateComponentAttribute == null ||
+                allowCreateComponentAttribute.Allow((SceneDataManager)SetupData[0]))
             {
                 return true;
             }

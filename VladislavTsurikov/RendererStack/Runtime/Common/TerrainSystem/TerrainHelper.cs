@@ -1,8 +1,8 @@
 using System;
+using OdinSerializer;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 {
@@ -20,7 +20,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
 
         public abstract void Init();
         public abstract Bounds GetTerrainBounds();
-        public abstract JobHandle SetCellHeight(NativeArray<Bounds> cellBoundsList, float minHeightCells, Rect cellBoundsRect, JobHandle dependsOn = default);
+
+        public abstract JobHandle SetCellHeight(NativeArray<Bounds> cellBoundsList, float minHeightCells,
+            Rect cellBoundsRect, JobHandle dependsOn = default);
+
         public abstract void RefreshData();
         public abstract void OnDisable();
     }

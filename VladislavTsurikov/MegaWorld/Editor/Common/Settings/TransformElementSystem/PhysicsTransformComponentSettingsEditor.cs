@@ -13,20 +13,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSys
     public class PhysicsTransformComponentSettingsEditor : IMGUIElementEditor
     {
         private PhysicsTransformComponentSettings _physicsTransformComponentSettings;
-        
+
         private TransformStackEditor _transformEditor;
 
         public override void OnEnable()
         {
             _physicsTransformComponentSettings = (PhysicsTransformComponentSettings)Target;
-            List<Type> types = new List<Type> {typeof(Align)};
-            _transformEditor = new TransformStackEditor(new GUIContent("Transform Components Settings"), _physicsTransformComponentSettings.TransformComponentStack, types, true);
+            var types = new List<Type> { typeof(Align) };
+            _transformEditor = new TransformStackEditor(new GUIContent("Transform Components Settings"),
+                _physicsTransformComponentSettings.TransformComponentStack, types, true);
         }
 
-        public override void OnGUI() 
-        {
-            _transformEditor.OnGUI();
-        }
+        public override void OnGUI() => _transformEditor.OnGUI();
     }
 }
 #endif

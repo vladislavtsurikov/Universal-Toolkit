@@ -7,27 +7,21 @@ namespace VladislavTsurikov.ComponentStack.Runtime
     public abstract class DiContainerComponent : Component
     {
         protected DiContainer DiContainer;
-        
+
         protected override async UniTask SetupComponent(object[] setupData = null)
         {
             if (setupData == null)
             {
                 return;
             }
-            
+
             DiContainer = (DiContainer)setupData[0];
             InjectSelf();
             await SetupDiContainerComponent(setupData);
         }
 
-        protected virtual UniTask SetupDiContainerComponent(object[] setupData = null)
-        {
-            return UniTask.CompletedTask;
-        }
+        protected virtual UniTask SetupDiContainerComponent(object[] setupData = null) => UniTask.CompletedTask;
 
-        protected void InjectSelf()
-        {
-            DiContainer.Inject(this);
-        }
+        protected void InjectSelf() => DiContainer.Inject(this);
     }
 }

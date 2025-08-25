@@ -39,12 +39,12 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         private static async UniTask Lerp(float start, float end, float seconds, Action<float> callback)
         {
-            float waitForSeconds = seconds;
-            float timeLeft = seconds;
+            var waitForSeconds = seconds;
+            var timeLeft = seconds;
 
             while (timeLeft >= 0)
             {
-                float t = Mathf.InverseLerp(waitForSeconds, 0, timeLeft);
+                var t = Mathf.InverseLerp(waitForSeconds, 0, timeLeft);
                 callback?.Invoke(Mathf.Lerp(start, end, t));
 
                 timeLeft -= Time.deltaTime;

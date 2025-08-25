@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
@@ -12,29 +13,23 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         SurfaceNormal,
         Y
     }
-    
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Move Along Direction")]
+
+    [Name("Move Along Direction")]
     public class MoveAlongDirection : MouseAction
     {
         private ShortcutCombo _mainShortcutCombo;
         private Vector3 _startPosition;
         private float _surfaceOffset;
-        
+        public MouseSensitivitySettings MouseMoveAlongDirectionSettings = new();
+
         public MoveAlongAxis MoveAlongAxis = MoveAlongAxis.Y;
         public float WeightToNormal = 1;
-        public MouseSensitivitySettings MouseMoveAlongDirectionSettings = new MouseSensitivitySettings();
-        
-        [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
-        
+        [OnDeserializing]
+        private void OnDeserializing() => InitShortcutCombo();
+
+        protected override void OnCreate() => InitShortcutCombo();
+
         private void InitShortcutCombo()
         {
             _mainShortcutCombo = new ShortcutCombo();
@@ -43,9 +38,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         public override void CheckShortcutCombos(GameObject gameObject, Vector3 normal)
         {
-            if(_mainShortcutCombo.IsActive())
+            if (_mainShortcutCombo.IsActive())
             {
-                if(Begin(gameObject, normal))
+                if (Begin(gameObject, normal))
                 {
                     SetStartValue(gameObject);
                 }
@@ -68,7 +63,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
             Vector3 direction;
 
-            if(MoveAlongAxis == MoveAlongAxis.SurfaceNormal)
+            if (MoveAlongAxis == MoveAlongAxis.SurfaceNormal)
             {
                 direction = Vector3.Lerp(Vector3.up, Normal, WeightToNormal);
             }
@@ -84,7 +79,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         {
             Vector3 direction;
 
-            if(MoveAlongAxis == MoveAlongAxis.SurfaceNormal)
+            if (MoveAlongAxis == MoveAlongAxis.SurfaceNormal)
             {
                 direction = Vector3.Lerp(Vector3.up, Normal, WeightToNormal);
             }
@@ -94,7 +89,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             }
 
             Handles.color = Handles.selectedColor;
-            Handles.ArrowHandleCap(0, GameObject.transform.position, Quaternion.FromToRotation(Vector3.forward, direction), 0.5f * HandleUtility.GetHandleSize(GameObject.transform.position), EventType.Repaint);
+            Handles.ArrowHandleCap(0, GameObject.transform.position,
+                Quaternion.FromToRotation(Vector3.forward, direction),
+                0.5f * HandleUtility.GetHandleSize(GameObject.transform.position), EventType.Repaint);
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
+using VladislavTsurikov.ReflectionUtility;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     [Serializable]
     [Name("Height")]
-    public class HeightFilter : MaskFilter 
+    public class HeightFilter : MaskFilter
     {
         public BlendMode BlendMode = BlendMode.Multiply;
 
@@ -24,18 +24,21 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         public float AddHeightFalloff = 30;
 
         private ComputeShader _heightCs;
-        public ComputeShader GetComputeShader() 
+
+        public ComputeShader GetComputeShader()
         {
-            if (_heightCs == null) {
+            if (_heightCs == null)
+            {
                 _heightCs = (ComputeShader)Resources.Load("Height");
             }
+
             return _heightCs;
         }
 
-        public override void Eval(MaskFilterContext maskFilterContext, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             ComputeShader cs = GetComputeShader();
-            int kidx = cs.FindKernel("Height");
+            var kidx = cs.FindKernel("Height");
 
             cs.SetTexture(kidx, "In_BaseMaskTex", maskFilterContext.SourceRenderTexture);
             cs.SetTexture(kidx, "In_HeightTex", maskFilterContext.HeightContext.sourceRenderTexture);
@@ -44,14 +47,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             SetMaterial(cs, maskFilterContext, index);
 
             //using workgroup size of 1 here to avoid needing to resize render textures
-            cs.Dispatch(kidx, maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1);
+            cs.Dispatch(kidx, maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height,
+                1);
         }
 
         public void SetMaterial(ComputeShader cs, MaskFilterContext fс, int index)
         {
             Terrain terrain = fс.BoxArea.TerrainUnder;
-            
-            if(index == 0)
+
+            if (index == 0)
             {
                 cs.SetInt("_BlendMode", (int)BlendMode.Multiply);
             }
@@ -63,7 +67,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             cs.SetFloat("_MinHeight", MinHeight);
             cs.SetFloat("_MaxHeight", MaxHeight);
 
-            var position = terrain.transform.position;
+            Vector3 position = terrain.transform.position;
             cs.SetFloat("_ClampMinHeight", position.y);
             cs.SetFloat("_ClampMaxHeight", terrain.terrainData.size.y + position.y);
 
@@ -71,10 +75,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             {
                 case FalloffType.Add:
                 {
-                    float localMinAddHeightFalloff = AddHeightFalloff;
-                    float localMaxAddHeightFalloff = AddHeightFalloff;
+                    var localMinAddHeightFalloff = AddHeightFalloff;
+                    var localMaxAddHeightFalloff = AddHeightFalloff;
 
-                    if(HeightFalloffMinMax)
+                    if (HeightFalloffMinMax)
                     {
                         localMinAddHeightFalloff = MinAddHeightFalloff;
                         localMaxAddHeightFalloff = MaxAddHeightFalloff;
@@ -89,7 +93,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 {
                     cs.SetInt("_HeightFalloffType", 0);
                     break;
-                }   
+                }
             }
         }
     }

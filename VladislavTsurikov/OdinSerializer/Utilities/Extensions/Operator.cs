@@ -15,112 +15,113 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace OdinSerializer.Utilities
 {
     /// <summary>
-    /// Determines the type of operator.
+    ///     Determines the type of operator.
     /// </summary>
     /// <seealso cref="TypeExtensions" />
     public enum Operator
     {
         /// <summary>
-        /// The == operator.
+        ///     The == operator.
         /// </summary>
         Equality,
 
         /// <summary>
-        /// The != operator.
+        ///     The != operator.
         /// </summary>
         Inequality,
 
         /// <summary>
-        /// The + operator.
+        ///     The + operator.
         /// </summary>
         Addition,
 
         /// <summary>
-        /// The - operator.
+        ///     The - operator.
         /// </summary>
         Subtraction,
 
         /// <summary>
-        /// The * operator.
+        ///     The * operator.
         /// </summary>
         Multiply,
 
         /// <summary>
-        /// The / operator.
+        ///     The / operator.
         /// </summary>
         Division,
 
         /// <summary>
-        /// The &lt; operator.
+        ///     The &lt; operator.
         /// </summary>
         LessThan,
 
         /// <summary>
-        /// The &gt; operator.
+        ///     The &gt; operator.
         /// </summary>
         GreaterThan,
 
         /// <summary>
-        /// The &lt;= operator.
+        ///     The &lt;= operator.
         /// </summary>
         LessThanOrEqual,
 
         /// <summary>
-        /// The &gt;= operator.
+        ///     The &gt;= operator.
         /// </summary>
         GreaterThanOrEqual,
 
         /// <summary>
-        /// The % operator.
+        ///     The % operator.
         /// </summary>
         Modulus,
 
         /// <summary>
-        /// The &gt;&gt; operator.
+        ///     The &gt;&gt; operator.
         /// </summary>
         RightShift,
 
         /// <summary>
-        /// The &lt;&lt; operator.
+        ///     The &lt;&lt; operator.
         /// </summary>
         LeftShift,
 
         /// <summary>
-        /// The &amp; operator.
+        ///     The &amp; operator.
         /// </summary>
         BitwiseAnd,
 
         /// <summary>
-        /// The | operator.
+        ///     The | operator.
         /// </summary>
         BitwiseOr,
 
         /// <summary>
-        /// The ^ operator.
+        ///     The ^ operator.
         /// </summary>
         ExclusiveOr,
 
         /// <summary>
-        /// The ~ operator.
+        ///     The ~ operator.
         /// </summary>
         BitwiseComplement,
 
         /// <summary>
-        /// The &amp;&amp; operator.
+        ///     The &amp;&amp; operator.
         /// </summary>
         LogicalAnd,
 
         /// <summary>
-        /// The || operator.
+        ///     The || operator.
         /// </summary>
         LogicalOr,
 
         /// <summary>
-        /// The ! operator.
+        ///     The ! operator.
         /// </summary>
-        LogicalNot,
+        LogicalNot
     }
 }

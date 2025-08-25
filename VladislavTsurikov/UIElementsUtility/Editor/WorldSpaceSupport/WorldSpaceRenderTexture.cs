@@ -12,12 +12,9 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
         private RenderTexture _targetRenderTexture;
 
         public RenderTexture TargetRenderTexture => _targetRenderTexture;
-        
-        public void Setup(Vector2Int resolution)
-        {
-            CreateRenderTextureIfNecessary(resolution);
-        }
-        
+
+        public void Setup(Vector2Int resolution) => CreateRenderTextureIfNecessary(resolution);
+
         public void RecreateRenderTexture(Vector2Int resolution)
         {
             if (_targetRenderTexture == null)
@@ -25,12 +22,12 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
                 CreateRenderTextureIfNecessary(resolution);
                 return;
             }
-            
-            string renderTexturePath = AssetDatabase.GetAssetPath(_targetRenderTexture);
-            string renderTextureName = _targetRenderTexture.name;
+
+            var renderTexturePath = AssetDatabase.GetAssetPath(_targetRenderTexture);
+            var renderTextureName = _targetRenderTexture.name;
 
             AssetDatabase.DeleteAsset(renderTexturePath);
-            
+
             CreateRenderTextureIfNecessary(resolution, renderTextureName, renderTexturePath);
         }
 
@@ -52,9 +49,9 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
                 {
                     AssetDatabase.CreateFolder("Assets", EditorWorldSpaceUIDocumentSupport.AssetsFolderName);
                 }
-                
+
                 var searchInFolders = new[] { $"Assets/{EditorWorldSpaceUIDocumentSupport.AssetsFolderName}" };
-                
+
                 var texturesGUIDs = AssetDatabase.FindAssets("t:RenderTexture", searchInFolders);
 
                 AssetDatabase.CreateAsset(_targetRenderTexture,

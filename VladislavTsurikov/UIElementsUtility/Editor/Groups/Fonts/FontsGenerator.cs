@@ -13,26 +13,25 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Fonts
     {
         protected override void Generate(List<FontFamily> groups)
         {
-            ClassModel classModel = new ClassModel("GetFont");
+            var classModel = new ClassModel("GetFont");
             classModel.SingleKeyWord = KeyWord.Static;
-            List<ClassModel> nestedClasses = new List<ClassModel>();
-            foreach (var group in groups)
+            var nestedClasses = new List<ClassModel>();
+            foreach (FontFamily group in groups)
             {
-                ClassModel nestedClass = new ClassModel(group.GroupName);
+                var nestedClass = new ClassModel(group.GroupName);
                 nestedClass.SingleKeyWord = KeyWord.Static;
-                
-                string groupName = "FontFamily";
 
-                var fields = new Field[]
+                var groupName = "FontFamily";
+
+                var fields = new[]
                 {
                     new Field(typeof(FontFamily), "s_fontFamily")
                     {
-                        AccessModifier = AccessModifier.Private,
-                        SingleKeyWord = KeyWord.Static,
-                    },
+                        AccessModifier = AccessModifier.Private, SingleKeyWord = KeyWord.Static
+                    }
                 }.ToList();
 
-                var properties = new Property[]
+                var properties = new[]
                 {
                     new Property(typeof(FontFamily), groupName)
                     {
@@ -41,37 +40,33 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Fonts
                         IsGetOnly = true,
                         GetterBody =
                             $"s_fontFamily != null? s_fontFamily: s_fontFamily = {nameof(DataGroupUtility)}.GetGroup<{nameof(FontFamily)}, {nameof(FontInfo)}>(\"{group.GroupName}\")"
-                    },
+                    }
                 }.ToList();
 
-                var methods = new Method[]
+                var methods = new[]
                 {
                     new Method(typeof(Font), "GetFont")
                     {
                         SingleKeyWord = KeyWord.Static,
                         AccessModifier = AccessModifier.Private,
-                        Parameters = new List<Parameter> { new Parameter("FontWeight", "weight") },
-                        BodyLines = new List<string>
-                        {
-                            $"return {groupName}.GetFont((int)weight);"
-                        }
-                    },
+                        Parameters = new List<Parameter> { new("FontWeight", "weight") },
+                        BodyLines = new List<string> { $"return {groupName}.GetFont((int)weight);" }
+                    }
                 }.ToList();
 
-                EnumModel enumModel = new EnumModel("FontWeight");
+                var enumModel = new EnumModel("FontWeight");
 
-                foreach (var item in group.Items)
+                foreach (FontInfo item in group.Items)
                 {
-                    string privateFieldItemName = $"s_{item.Weight.ToString().ToLowerFirstChar()}";
+                    var privateFieldItemName = $"s_{item.Weight.ToString().ToLowerFirstChar()}";
                     enumModel.EnumValues.Add(new EnumValue(item.Weight.ToString(), (int)item.Weight));
 
-                    Field field = new Field(typeof(Font), privateFieldItemName)
+                    var field = new Field(typeof(Font), privateFieldItemName)
                     {
-                        AccessModifier = AccessModifier.Private,
-                        SingleKeyWord = KeyWord.Static,
+                        AccessModifier = AccessModifier.Private, SingleKeyWord = KeyWord.Static
                     };
 
-                    Property property = new Property(typeof(Font), item.Weight.ToString())
+                    var property = new Property(typeof(Font), item.Weight.ToString())
                     {
                         SingleKeyWord = KeyWord.Static,
                         IsGetOnly = true,
@@ -93,7 +88,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Fonts
 
             classModel.NestedClasses.AddRange(nestedClasses);
 
-            FileModel fileModel = new FileModel(classModel.Name);
+            var fileModel = new FileModel(classModel.Name);
             fileModel.LoadUsingDirectives(
                 typeof(Font),
                 typeof(FontFamily),
@@ -101,7 +96,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Fonts
             fileModel.SetNamespaceFromFolder(TargetFilePath, "Assets", "Runtime", "API");
             fileModel.Classes.Add(classModel);
 
-            CsGenerator csGenerator = new CsGenerator();
+            var csGenerator = new CsGenerator();
             csGenerator.Files.Add(fileModel);
             csGenerator.Path = TargetFilePath;
             csGenerator.CreateFiles();

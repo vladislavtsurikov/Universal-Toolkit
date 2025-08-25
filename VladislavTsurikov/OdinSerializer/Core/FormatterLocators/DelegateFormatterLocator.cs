@@ -16,18 +16,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(DelegateFormatterLocator), -50)]
 
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-
     internal class DelegateFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
             if (!typeof(Delegate).IsAssignableFrom(type))
             {
@@ -42,12 +41,16 @@ namespace OdinSerializer
             catch (Exception ex)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
+                if (allowWeakFallbackFormatters &&
+                    (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
 #pragma warning restore CS0618 // Type or member is obsolete
                 {
                     formatter = new WeakDelegateFormatter(type);
                 }
-                else throw;
+                else
+                {
+                    throw;
+                }
             }
 
             return true;

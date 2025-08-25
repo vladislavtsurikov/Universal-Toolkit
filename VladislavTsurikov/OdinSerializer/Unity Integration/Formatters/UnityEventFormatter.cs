@@ -16,32 +16,29 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
+using UnityEngine.Events;
 
-[assembly: RegisterFormatter(typeof(UnityEventFormatter<>), weakFallback: typeof(WeakUnityEventFormatter))] 
+[assembly: RegisterFormatter(typeof(UnityEventFormatter<>), typeof(WeakUnityEventFormatter))]
 
 namespace OdinSerializer
 {
-    using System;
-    using UnityEngine.Events;
-
     /// <summary>
-    /// Custom generic formatter for the <see cref="UnityEvent{T0}"/>, <see cref="UnityEvent{T0, T1}"/>, <see cref="UnityEvent{T0, T1, T2}"/> and <see cref="UnityEvent{T0, T1, T2, T3}"/> types.
+    ///     Custom generic formatter for the <see cref="UnityEvent{T0}" />, <see cref="UnityEvent{T0, T1}" />,
+    ///     <see cref="UnityEvent{T0, T1, T2}" /> and <see cref="UnityEvent{T0, T1, T2, T3}" /> types.
     /// </summary>
     /// <typeparam name="T">The type of UnityEvent that this formatter can serialize and deserialize.</typeparam>
-    /// <seealso cref="ReflectionFormatter{UnityEngine.Events.UnityEvent}" />
+    /// <seealso cref="UnityEvent" />
     public class UnityEventFormatter<T> : ReflectionFormatter<T> where T : UnityEventBase, new()
     {
         /// <summary>
-        /// Get an uninitialized object of type <see cref="T" />.
+        ///     Get an uninitialized object of type <see cref="T" />.
         /// </summary>
         /// <returns>
-        /// An uninitialized object of type <see cref="T" />.
+        ///     An uninitialized object of type <see cref="T" />.
         /// </returns>
-        protected override T GetUninitializedObject()
-        {
-            return new T();
-        }
+        protected override T GetUninitializedObject() => new();
     }
 
     public class WeakUnityEventFormatter : WeakReflectionFormatter
@@ -50,9 +47,6 @@ namespace OdinSerializer
         {
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return Activator.CreateInstance(this.SerializedType);
-        }
+        protected override object GetUninitializedObject() => Activator.CreateInstance(SerializedType);
     }
 }

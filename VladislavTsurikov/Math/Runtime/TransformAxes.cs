@@ -7,7 +7,7 @@ namespace VladislavTsurikov.Math.Runtime
     {
         X,
         Y,
-        Z,
+        Z
     }
 
     public enum TransformSpace
@@ -28,30 +28,29 @@ namespace VladislavTsurikov.Math.Runtime
             globalVectors[(int)Axis.Y] = Vector3.up;
             globalVectors[(int)Axis.Z] = Vector3.forward;
         }
-        
+
         public static Vector3 GetVector(Axis axis, TransformSpace transformSpace, Transform transform)
         {
             if (transformSpace == TransformSpace.Local)
             {
                 return GetTransformLocalVector(axis, transform);
             }
-            else
-            {
-                return globalVectors[(int)axis];
-            }
+
+            return globalVectors[(int)axis];
         }
-        
+
         public static Vector3 GetTransformLocalVector(Axis axis, Transform transform)
         {
             if (axis == Axis.X)
             {
                 return transform.right;
             }
+
             if (axis == Axis.Y)
             {
                 return transform.up;
             }
-            
+
             return transform.forward;
         }
 
@@ -66,7 +65,8 @@ namespace VladislavTsurikov.Math.Runtime
             right = Vector3.Cross(up, forward).normalized;
         }
 
-        public static void GetOrientation(Transform transform, TransformSpace transformSpace, Axis upAxis, out Vector3 upwards, out Vector3 right, out Vector3 forward)
+        public static void GetOrientation(Transform transform, TransformSpace transformSpace, Axis upAxis,
+            out Vector3 upwards, out Vector3 right, out Vector3 forward)
         {
             upwards = GetVector(upAxis, transformSpace, transform);
 

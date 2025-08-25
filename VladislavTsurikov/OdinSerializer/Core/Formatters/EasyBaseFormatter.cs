@@ -19,25 +19,31 @@
 namespace OdinSerializer
 {
     /// <summary>
-    /// Provides an easy way of implementing custom formatters.
+    ///     Provides an easy way of implementing custom formatters.
     /// </summary>
     /// <typeparam name="T">The type which can be serialized and deserialized by the formatter.</typeparam>
     public abstract class EasyBaseFormatter<T> : BaseFormatter<T>
     {
         /// <summary>
-        /// Reads through all entries in the current node one at a time, and calls <see cref="EasyBaseFormatter{T}.ReadDataEntry(ref T, string, EntryType, IDataReader, DeserializationContext)" /> for each entry.
+        ///     Reads through all entries in the current node one at a time, and calls
+        ///     <see cref="EasyBaseFormatter{T}.ReadDataEntry(ref T, string, EntryType, IDataReader, DeserializationContext)" />
+        ///     for each entry.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected sealed override void DeserializeImplementation(ref T value, IDataReader reader)
         {
-            int count = 0;
+            var count = 0;
             string name;
             EntryType entry;
 
-            while ((entry = reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray && entry != EntryType.EndOfStream)
+            while ((entry = reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray &&
+                   entry != EntryType.EndOfStream)
             {
-                this.ReadDataEntry(ref value, name, entry, reader);
+                ReadDataEntry(ref value, name, entry, reader);
 
                 count++;
 
@@ -50,17 +56,15 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Calls <see cref="EasyBaseFormatter{T}.WriteDataEntries(ref T, IDataWriter)" /> directly.
+        ///     Calls <see cref="EasyBaseFormatter{T}.WriteDataEntries(ref T, IDataWriter)" /> directly.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
-        protected sealed override void SerializeImplementation(ref T value, IDataWriter writer)
-        {
-            this.WriteDataEntries(ref value, writer);
-        }
+        protected sealed override void SerializeImplementation(ref T value, IDataWriter writer) =>
+            WriteDataEntries(ref value, writer);
 
         /// <summary>
-        /// Reads a data entry into the value denoted by the entry name.
+        ///     Reads a data entry into the value denoted by the entry name.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="entryName">The name of the entry.</param>
@@ -69,7 +73,7 @@ namespace OdinSerializer
         protected abstract void ReadDataEntry(ref T value, string entryName, EntryType entryType, IDataReader reader);
 
         /// <summary>
-        /// Write the serialized values of a value of type <see cref="t" />.
+        ///     Write the serialized values of a value of type <see cref="t" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer currently used for serialization.</param>

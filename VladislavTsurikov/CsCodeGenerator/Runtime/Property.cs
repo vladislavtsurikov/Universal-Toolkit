@@ -5,7 +5,19 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     public class Property : Field
     {
         private bool _isAutoImplemented;
-        
+
+        public Property()
+        {
+        }
+
+        public Property(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name)
+        {
+        }
+
+        public Property(Type customDataType, string name) : base(customDataType, name)
+        {
+        }
+
         public override bool HasAttributes => false;
 
         public override AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
@@ -28,31 +40,21 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
                 {
                     return IsGetOnly ? " { get; }" : " { get; set; }";
                 }
-                else
+
+                if (IsGetOnly)
                 {
-                    if (IsGetOnly)
-                    {
-                        return " => " + GetterBody + ";";
-                    }
-                    else
-                    {
-                        string result = Constants.NewLine + Indent + "{";
-                        string currentIndent = Constants.NewLine + Indent + CsGenerator.IndentSingle;
-                    
-                        result += currentIndent + "get { return " + GetterBody + "; }";
-                        result += currentIndent + "set { " + SetterBody + "; }";
-                        result += Constants.NewLine + Indent + "}";
-
-                        return result;
-                    }
+                    return " => " + GetterBody + ";";
                 }
-            } 
+
+                var result = Constants.NewLine + Indent + "{";
+                var currentIndent = Constants.NewLine + Indent + CsGenerator.IndentSingle;
+
+                result += currentIndent + "get { return " + GetterBody + "; }";
+                result += currentIndent + "set { " + SetterBody + "; }";
+                result += Constants.NewLine + Indent + "}";
+
+                return result;
+            }
         }
-        
-        public Property() { }
-
-        public Property(BuiltInDataType builtInDataType, string name) : base(builtInDataType, name) { }
-
-        public Property(Type customDataType, string name) : base(customDataType, name) { }
     }
 }

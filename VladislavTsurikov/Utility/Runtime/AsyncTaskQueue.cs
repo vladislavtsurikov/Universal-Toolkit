@@ -8,13 +8,15 @@ namespace VladislavTsurikov.Utility.Runtime
     public class AsyncTaskQueue
     {
         private readonly Queue<Func<UniTask>> _queue = new();
-        private bool _isRunning;
+
+        public bool IsEmpty => _queue.Count == 0;
+        public bool IsRunning { get; private set; }
 
         public void Enqueue(Func<UniTask> task)
         {
             _queue.Enqueue(task);
 
-            if (!_isRunning)
+            if (!IsRunning)
             {
                 RunQueue().Forget();
             }
@@ -22,11 +24,11 @@ namespace VladislavTsurikov.Utility.Runtime
 
         private async UniTaskVoid RunQueue()
         {
-            _isRunning = true;
+            IsRunning = true;
 
             while (_queue.Count > 0)
             {
-                var task = _queue.Dequeue();
+                Func<UniTask> task = _queue.Dequeue();
 
                 try
                 {
@@ -38,15 +40,9 @@ namespace VladislavTsurikov.Utility.Runtime
                 }
             }
 
-            _isRunning = false;
+            IsRunning = false;
         }
 
-        public void Clear()
-        {
-            _queue.Clear();
-        }
-
-        public bool IsEmpty => _queue.Count == 0;
-        public bool IsRunning => _isRunning;
+        public void Clear() => _queue.Clear();
     }
 }

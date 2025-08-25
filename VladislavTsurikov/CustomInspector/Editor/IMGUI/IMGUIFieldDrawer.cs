@@ -9,11 +9,9 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
     public abstract class IMGUIFieldDrawer : FieldDrawer
     {
         public abstract object Draw(Rect rect, GUIContent label, Type fieldType, object value);
-        
-        public virtual float GetFieldsHeight(object target)
-        {
-            return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-        }
+
+        public virtual float GetFieldsHeight(object target) =>
+            EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
     }
 }
 #endif

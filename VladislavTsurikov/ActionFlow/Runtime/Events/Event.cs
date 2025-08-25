@@ -6,7 +6,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
     public abstract class Event : Core_Component
     {
         internal Trigger Trigger;
-        
+
         protected override UniTask SetupComponent(object[] setupData = null)
         {
             Trigger = (Trigger)setupData[0];

@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.Core.Runtime;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
@@ -11,14 +9,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
     {
         public static void InstanceSceneDataManagerForAllScenes()
         {
-            foreach (Scene scene in SceneManagement.GetAllScenes()) 
+            foreach (Scene scene in SceneManagement.GetAllScenes())
             {
                 if (!scene.isLoaded)
                 {
                     continue;
                 }
-                
-                InstanceSceneDataManager(scene);   
+
+                InstanceSceneDataManager(scene);
             }
         }
 
@@ -26,13 +24,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
         {
             SceneDataManager sceneDataManager = SceneDataManagerFinder.Find(scene, false);
 
-            if(sceneDataManager == null)
+            if (sceneDataManager == null)
             {
-                GameObject go = new GameObject("Scene Data Manager")
-                {
-                    hideFlags = HideFlags.HideInHierarchy 
-                };
-                
+                var go = new GameObject("Scene Data Manager") { hideFlags = HideFlags.HideInHierarchy };
+
                 SceneManager.MoveGameObjectToScene(go, scene);
 
                 sceneDataManager = go.AddComponent<SceneDataManager>();
@@ -48,9 +43,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
         public static List<SceneDataManager> GetAllSceneDataManager(bool getActive = true)
         {
-            List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
+            var sceneDataManagers = new List<SceneDataManager>();
 
-            for (int i = 0; i < SceneManager.sceneCount; i++)
+            for (var i = 0; i < SceneManager.sceneCount; i++)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
                 SceneDataManager sceneDataManager = SceneDataManagerFinder.Find(scene, getActive);
@@ -67,10 +62,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
         public static void SetupAllSceneDataManager(bool forceSetupSceneDatas = false)
         {
             List<SceneDataManager> sceneDataManagers = GetAllSceneDataManager();
-            
-            for (int i = 0; i < sceneDataManagers.Count; i++)
+
+            for (var i = 0; i < sceneDataManagers.Count; i++)
             {
-                sceneDataManagers[i].Setup(forceSetupSceneDatas); 
+                sceneDataManagers[i].Setup(forceSetupSceneDatas);
             }
         }
     }

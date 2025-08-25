@@ -6,16 +6,13 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
     [ComponentStack.Runtime.AdvancedComponentStack.Name("Explosion")]
-	public class Explosion : PhysicsEffect
+    public class Explosion : PhysicsEffect
     {
-        public float MaxForce => 500;
-        
         public float Force = 50f;
+        public float MaxForce => 500;
 
-        public override void ApplyEffect(Vector3 positionOffsetY, Rigidbody rb)
-        {            
+        public override void ApplyEffect(Vector3 positionOffsetY, Rigidbody rb) =>
             rb.AddExplosionForce(Force, positionOffsetY, Size / 2, 4.0F);
-        }
 
         public override void OnRepaint(RayHit rayHit)
         {

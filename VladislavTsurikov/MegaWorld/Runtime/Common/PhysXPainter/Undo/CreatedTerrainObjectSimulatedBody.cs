@@ -7,12 +7,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Undo
 {
     public class CreatedTerrainObjectSimulatedBody : UndoRecord
     {
-        private readonly List<TerrainObjectSimulatedBody> _instanceList = new List<TerrainObjectSimulatedBody>();
+        private readonly List<TerrainObjectSimulatedBody> _instanceList = new();
 
-        public CreatedTerrainObjectSimulatedBody(TerrainObjectSimulatedBody obj) 
-        {
-            _instanceList.Add(obj);
-        }
+        public CreatedTerrainObjectSimulatedBody(TerrainObjectSimulatedBody obj) => _instanceList.Add(obj);
 
         public override void Merge(UndoRecord record)
         {
@@ -26,7 +23,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Undo
 
         public override void Undo()
         {
-            foreach (var obj in _instanceList)
+            foreach (TerrainObjectSimulatedBody obj in _instanceList)
             {
                 if (obj.TerrainObjectInstance != null)
                 {

@@ -13,23 +13,22 @@ using VladislavTsurikov.SceneDataSystem.Editor.Utility;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 {
-    public static class TerrainObjectRendererAPI 
+    public static class TerrainObjectRendererAPI
     {
         public static void RemoveInstances(int id)
         {
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
-                TerrainObjectRendererData terrainObjectRendererData = (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
+                var terrainObjectRendererData =
+                    (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(
+                        typeof(TerrainObjectRendererData));
 
                 terrainObjectRendererData?.RemoveInstances(id);
             }
         }
-        
-        public static void RemoveInstances(GameObject prefab)
-        {
-            RemoveInstances(prefab.GetInstanceID());
-        }
-        
+
+        public static void RemoveInstances(GameObject prefab) => RemoveInstances(prefab.GetInstanceID());
+
         public static Prototype AddMissingPrototype(GameObject go)
         {
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
@@ -44,7 +43,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 
             Prototype proto = terrainObjectRenderer.SelectionData.GetProto(go);
 
-            if(proto == null)
+            if (proto == null)
             {
                 proto = terrainObjectRenderer.SelectionData.AddMissingPrototype(go);
             }
@@ -60,10 +59,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
             }
         }
 
-        public static TerrainObjectInstance AddInstance(GameObject prefab, Vector3 worldPosition, Vector3 scale, Quaternion rotation)
+        public static TerrainObjectInstance AddInstance(GameObject prefab, Vector3 worldPosition, Vector3 scale,
+            Quaternion rotation)
         {
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
-            
+
 #if UNITY_EDITOR
             if (terrainObjectRenderer == null)
             {
@@ -71,21 +71,22 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
                 terrainObjectRenderer = TerrainObjectRenderer.Instance;
             }
 #endif
-            
-            PrototypeTerrainObject proto = (PrototypeTerrainObject)terrainObjectRenderer.SelectionData.AddMissingPrototype(prefab);
+
+            var proto = (PrototypeTerrainObject)terrainObjectRenderer.SelectionData.AddMissingPrototype(prefab);
 
             return AddInstance(proto, worldPosition, scale, rotation);
         }
 
-        public static TerrainObjectInstance AddInstance(PrototypeTerrainObject proto, Vector3 position, Vector3 scale, Quaternion rotation)
+        public static TerrainObjectInstance AddInstance(PrototypeTerrainObject proto, Vector3 position, Vector3 scale,
+            Quaternion rotation)
         {
-            if(proto == null)
+            if (proto == null)
             {
                 return null;
             }
-            
+
             TerrainObjectRenderer terrainObjectRenderer = TerrainObjectRenderer.Instance;
-            
+
 #if UNITY_EDITOR
             if (terrainObjectRenderer == null)
             {
@@ -96,84 +97,101 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer
 
             terrainObjectRenderer.SelectionData.AddMissingPrototype(proto);
 
-            TerrainObjectInstance instance = new TerrainObjectInstance(position, scale, rotation, proto);
-            
+            var instance = new TerrainObjectInstance(position, scale, rotation, proto);
+
             return TerrainObjectRendererData.AddInstance(instance, Sectorize.Sectorize.GetSectorLayerTag());
         }
-        
-        public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
+
+        public static List<ColliderObject> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
         {
-            var sceneDataManagers = SceneDataManagerFinder.OverlapBox(boxCenter, boxSize, boxRotation, Sectorize.Sectorize.GetSectorLayerTag());
+            List<SceneDataManager> sceneDataManagers = SceneDataManagerFinder.OverlapBox(boxCenter, boxSize,
+                boxRotation,
+                Sectorize.Sectorize.GetSectorLayerTag());
 
-            List<ColliderObject> overlappedObjects = new List<ColliderObject>();
+            var overlappedObjects = new List<ColliderObject>();
 
-            foreach(var sceneDataManager in sceneDataManagers)
+            foreach (SceneDataManager sceneDataManager in sceneDataManagers)
             {
                 if (sceneDataManager == null)
                 {
                     continue;
                 }
 
-                TerrainObjectRendererData terrainObjectRendererData = (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
+                var terrainObjectRendererData =
+                    (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(
+                        typeof(TerrainObjectRendererData));
 
                 if (terrainObjectRendererData != null)
                 {
-                    overlappedObjects.AddRange(terrainObjectRendererData.OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, terrainObjectRendererData, quadTree, checkObbIntersection));
+                    overlappedObjects.AddRange(terrainObjectRendererData.OverlapBox(boxCenter, boxSize, boxRotation,
+                        objectFilter, terrainObjectRendererData, quadTree, checkObbIntersection));
                 }
             }
 
             return overlappedObjects;
         }
 
-        public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
+        public static List<ColliderObject> OverlapSphere(Vector3 sphereCenter, float sphereRadius,
+            ObjectFilter objectFilter, bool quadTree = false, bool checkObbIntersection = false)
         {
-            var sectorList = SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius, Sectorize.Sectorize.GetSectorLayerTag());
-            
-            List<ColliderObject> overlappedObjects = new List<ColliderObject>();
-            foreach(var sceneDataManager in sectorList)
+            List<SceneDataManager> sectorList =
+                SceneDataManagerFinder.OverlapSphere(sphereCenter, sphereRadius,
+                    Sectorize.Sectorize.GetSectorLayerTag());
+
+            var overlappedObjects = new List<ColliderObject>();
+            foreach (SceneDataManager sceneDataManager in sectorList)
             {
                 if (sceneDataManager == null)
                 {
                     continue;
                 }
 
-                TerrainObjectRendererData terrainObjectRendererData = (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(typeof(TerrainObjectRendererData));
+                var terrainObjectRendererData =
+                    (TerrainObjectRendererData)sceneDataManager.SceneDataStack.GetElement(
+                        typeof(TerrainObjectRendererData));
 
                 if (terrainObjectRendererData != null)
                 {
-                    overlappedObjects.AddRange(terrainObjectRendererData.OverlapSphere(sphereCenter, sphereRadius, objectFilter, terrainObjectRendererData, quadTree, checkObbIntersection));
+                    overlappedObjects.AddRange(terrainObjectRendererData.OverlapSphere(sphereCenter, sphereRadius,
+                        objectFilter, terrainObjectRendererData, quadTree, checkObbIntersection));
                 }
             }
 
             return overlappedObjects;
         }
 
-        public static void OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<TerrainObjectInstance, bool> func)
+        public static void OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter,
+            bool quadTree, bool checkObbIntersection, Func<TerrainObjectInstance, bool> func)
         {
-            foreach (ColliderObject colliderObject in OverlapSphere(sphereCenter, sphereRadius, objectFilter, quadTree, checkObbIntersection))
+            foreach (ColliderObject colliderObject in OverlapSphere(sphereCenter, sphereRadius, objectFilter, quadTree,
+                         checkObbIntersection))
             {
                 if (colliderObject == null)
                 {
                     continue;
                 }
 
-                TerrainObjectCollider obj = (TerrainObjectCollider)colliderObject;
+                var obj = (TerrainObjectCollider)colliderObject;
 
                 func.Invoke(obj.Instance);
             }
         }
 
-        public static void OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<TerrainObjectInstance, bool> func)
+        public static void OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            ObjectFilter objectFilter, bool quadTree, bool checkObbIntersection, Func<TerrainObjectInstance, bool> func)
         {
-            foreach (var colliderObject in OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, quadTree, checkObbIntersection))
+            foreach (ColliderObject colliderObject in OverlapBox(boxCenter, boxSize, boxRotation, objectFilter,
+                         quadTree,
+                         checkObbIntersection))
             {
                 if (colliderObject == null)
                 {
                     continue;
                 }
-                
-                TerrainObjectCollider obj = (TerrainObjectCollider)colliderObject;
-                
+
+                var obj = (TerrainObjectCollider)colliderObject;
+
                 if (!func.Invoke(obj.Instance))
                 {
                     return;

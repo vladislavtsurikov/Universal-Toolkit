@@ -16,39 +16,39 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Formatter for all non-primitive one-dimensional arrays.
+    ///     Formatter for all non-primitive one-dimensional arrays.
     /// </summary>
     /// <typeparam name="T">The element type of the formatted array.</typeparam>
     /// <seealso cref="BaseFormatter{T[]}" />
     public sealed class ArrayFormatter<T> : BaseFormatter<T[]>
     {
-        private static Serializer<T> valueReaderWriter = Serializer.Get<T>();
+        private static readonly Serializer<T> valueReaderWriter = Serializer.Get<T>();
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override T[] GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override T[] GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref T[] value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -58,15 +58,17 @@ namespace OdinSerializer
                 value = new T[length];
 
                 // We must remember to register the array reference ourselves, since we return null in GetUninitializedObject
-                this.RegisterReferenceID(value, reader);
+                RegisterReferenceID(value, reader);
 
                 // There aren't any OnDeserializing callbacks on arrays.
                 // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                     {
-                        reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                        reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                    " elements, when " + length +
+                                                                    " elements were expected.");
                         break;
                     }
 
@@ -87,7 +89,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -97,7 +99,7 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(value.Length);
 
-                for (int i = 0; i < value.Length; i++)
+                for (var i = 0; i < value.Length; i++)
                 {
                     valueReaderWriter.WriteValue(value[i], writer);
                 }
@@ -111,43 +113,42 @@ namespace OdinSerializer
 
     public sealed class WeakArrayFormatter : WeakBaseFormatter
     {
-        private readonly Serializer ValueReaderWriter;
         private readonly Type ElementType;
+        private readonly Serializer ValueReaderWriter;
 
         public WeakArrayFormatter(Type arrayType, Type elementType) : base(arrayType)
         {
-            this.ValueReaderWriter = Serializer.Get(elementType);
-            this.ElementType = elementType;
+            ValueReaderWriter = Serializer.Get(elementType);
+            ElementType = elementType;
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
                 long length;
                 reader.EnterArray(out length);
 
-                Array array = Array.CreateInstance(this.ElementType, length);
+                var array = Array.CreateInstance(ElementType, length);
                 value = array;
 
                 // We must remember to register the array reference ourselves, since we return null in GetUninitializedObject
-                this.RegisterReferenceID(value, reader);
+                RegisterReferenceID(value, reader);
 
                 // There aren't any OnDeserializing callbacks on arrays.
                 // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                     {
-                        reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                        reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                    " elements, when " + length +
+                                                                    " elements were expected.");
                         break;
                     }
 
@@ -169,14 +170,14 @@ namespace OdinSerializer
 
         protected override void SerializeImplementation(ref object value, IDataWriter writer)
         {
-            Array array = (Array)value;
+            var array = (Array)value;
 
             try
             {
-                int length = array.Length;
+                var length = array.Length;
                 writer.BeginArrayNode(length);
 
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     ValueReaderWriter.WriteValueWeak(array.GetValue(i), writer);
                 }

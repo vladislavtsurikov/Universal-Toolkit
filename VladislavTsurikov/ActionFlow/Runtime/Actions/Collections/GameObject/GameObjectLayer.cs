@@ -1,25 +1,25 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 {
     [Name("GameObject/Set Layer")]
     public class GameObjectLayer : GameObjectAction
     {
-        [SerializeField] 
+        private readonly bool _childrenToo = false;
+
+        [SerializeField]
         private LayerMask _layer;
-        [SerializeField] 
-        private bool _childrenToo = false;
-        
+
         public override string Name => string.Format(
             "Change Layer to {0} on {1} {2}",
             _layer,
             GameObject,
             _childrenToo ? "and children" : string.Empty
         );
-        
+
         protected override UniTask<bool> Run(CancellationToken token)
         {
             if (GameObject == null)

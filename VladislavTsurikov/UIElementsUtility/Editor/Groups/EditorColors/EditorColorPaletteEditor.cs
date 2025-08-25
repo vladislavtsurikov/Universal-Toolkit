@@ -8,21 +8,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors
     public class EditorColorPaletteEditor : UnityEditor.Editor
     {
         private EditorColorPalette _editorColorPalette => (EditorColorPalette)target;
-        
+
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("Setup"))
             {
                 Setup();
             }
-            
+
             base.OnInspectorGUI();
         }
 
-        private void Setup()
-        {
-            _editorColorPalette.Setup();
-        }
+        private void Setup() => _editorColorPalette.Setup();
     }
 }
 #endif

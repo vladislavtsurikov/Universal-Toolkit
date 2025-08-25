@@ -20,14 +20,14 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
         public override void OnGUI(Rect rect, int index)
         {
             SettingsStackEditor.OnGUI(rect);
-            
+
             rect.y += SettingsStackEditor.GetElementStackHeight();
         }
 
         public override float GetElementHeight(int index)
         {
             float height = 0;
-            
+
             height += SettingsStackEditor.GetElementStackHeight();
 
             return height;

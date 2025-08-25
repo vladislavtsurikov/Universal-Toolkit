@@ -16,36 +16,37 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using OdinSerializer.Utilities;
+
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
-
     /// <summary>
-    /// An attribute that lets you help the DefaultSerializationBinder bind type names to types. This is useful if you're renaming a type,
-    /// that would result in data loss, and what to specify the new type name to avoid loss of data.
+    ///     An attribute that lets you help the DefaultSerializationBinder bind type names to types. This is useful if you're
+    ///     renaming a type,
+    ///     that would result in data loss, and what to specify the new type name to avoid loss of data.
     /// </summary>
     /// <seealso cref="DefaultSerializationBinder" />
     /// <example>
-    /// <code>
+    ///     <code>
     /// [assembly: OdinSerializer.BindTypeNameToType("Namespace.OldTypeName", typeof(Namespace.NewTypeName))]
     /// //[assembly: OdinSerializer.BindTypeNameToType("Namespace.OldTypeName, OldFullAssemblyName", typeof(Namespace.NewTypeName))]
-    ///
+    /// 
     /// namespace Namespace
     /// {
     ///     public class SomeComponent : SerializedMonoBehaviour
     ///     {
     ///         public IInterface test; // Contains an instance of OldTypeName;
     ///     }
-    ///
+    /// 
     ///     public interface IInterface { }
-    ///
+    /// 
     ///     public class NewTypeName : IInterface { }
-    ///
+    /// 
     ///     //public class OldTypeName : IInterface { }
     /// }
     /// </code>
@@ -57,37 +58,41 @@ namespace OdinSerializer
         internal readonly string OldTypeName;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BindTypeNameToTypeAttribute"/> class.
+        ///     Initializes a new instance of the <see cref="BindTypeNameToTypeAttribute" /> class.
         /// </summary>
-        /// <param name="oldFullTypeName">Old old full type name. If it's moved to new a new assembly you must specify the old assembly name as well. See example code in the documentation.</param>
+        /// <param name="oldFullTypeName">
+        ///     Old old full type name. If it's moved to new a new assembly you must specify the old
+        ///     assembly name as well. See example code in the documentation.
+        /// </param>
         /// <param name="newType">The new type.</param>
         public BindTypeNameToTypeAttribute(string oldFullTypeName, Type newType)
         {
-            this.OldTypeName = oldFullTypeName;
-            this.NewType = newType;
+            OldTypeName = oldFullTypeName;
+            NewType = newType;
         }
     }
 
     /// <summary>
-    /// Provides a default, catch-all <see cref="TwoWaySerializationBinder"/> implementation. This binder only includes assembly names, without versions and tokens, in order to increase compatibility.
+    ///     Provides a default, catch-all <see cref="TwoWaySerializationBinder" /> implementation. This binder only includes
+    ///     assembly names, without versions and tokens, in order to increase compatibility.
     /// </summary>
     /// <seealso cref="TwoWaySerializationBinder" />
     /// <seealso cref="BindTypeNameToTypeAttribute" />
     public class DefaultSerializationBinder : TwoWaySerializationBinder
     {
-        private static readonly object ASSEMBLY_LOOKUP_LOCK = new object();
-        private static readonly Dictionary<string, Assembly> assemblyNameLookUp = new Dictionary<string, Assembly>();
-        private static readonly Dictionary<string, Type> customTypeNameToTypeBindings = new Dictionary<string, Type>();
+        private static readonly object ASSEMBLY_LOOKUP_LOCK = new();
+        private static readonly Dictionary<string, Assembly> assemblyNameLookUp = new();
+        private static readonly Dictionary<string, Type> customTypeNameToTypeBindings = new();
 
-        private static readonly object TYPETONAME_LOCK = new object();
-        private static readonly Dictionary<Type, string> nameMap = new Dictionary<Type, string>(FastTypeComparer.Instance);
+        private static readonly object TYPETONAME_LOCK = new();
+        private static readonly Dictionary<Type, string> nameMap = new(FastTypeComparer.Instance);
 
-        private static readonly object NAMETOTYPE_LOCK = new object();
-        private static readonly Dictionary<string, Type> typeMap = new Dictionary<string, Type>();
+        private static readonly object NAMETOTYPE_LOCK = new();
+        private static readonly Dictionary<string, Type> typeMap = new();
 
-        private static readonly object ASSEMBLY_REGISTER_QUEUE_LOCK = new object();
-        private static readonly List<Assembly> assembliesQueuedForRegister = new List<Assembly>();
-        private static readonly List<AssemblyLoadEventArgs> assemblyLoadEventsQueuedForRegister = new List<AssemblyLoadEventArgs>();
+        private static readonly object ASSEMBLY_REGISTER_QUEUE_LOCK = new();
+        private static readonly List<Assembly> assembliesQueuedForRegister = new();
+        private static readonly List<AssemblyLoadEventArgs> assemblyLoadEventsQueuedForRegister = new();
 
         static DefaultSerializationBinder()
         {
@@ -99,7 +104,7 @@ namespace OdinSerializer
                 }
             };
 
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 lock (ASSEMBLY_REGISTER_QUEUE_LOCK)
                 {
@@ -116,8 +121,13 @@ namespace OdinSerializer
 
         private static void RegisterAllQueuedAssembliesRepeating()
         {
-            while (RegisterQueuedAssemblies()) { }
-            while (RegisterQueuedAssemblyLoadEvents()) { }
+            while (RegisterQueuedAssemblies())
+            {
+            }
+
+            while (RegisterQueuedAssemblyLoadEvents())
+            {
+            }
         }
 
         private static bool RegisterQueuedAssemblies()
@@ -133,9 +143,12 @@ namespace OdinSerializer
                 }
             }
 
-            if (toRegister == null) return false;
+            if (toRegister == null)
+            {
+                return false;
+            }
 
-            for (int i = 0; i < toRegister.Length; i++)
+            for (var i = 0; i < toRegister.Length; i++)
             {
                 RegisterAssembly(toRegister[i]);
             }
@@ -156,18 +169,24 @@ namespace OdinSerializer
                 }
             }
 
-            if (toRegister == null) return false;
-
-            for (int i = 0; i < toRegister.Length; i++)
+            if (toRegister == null)
             {
-                var args = toRegister[i];
+                return false;
+            }
+
+            for (var i = 0; i < toRegister.Length; i++)
+            {
+                AssemblyLoadEventArgs args = toRegister[i];
                 Assembly assembly;
 
                 try
                 {
                     assembly = args.LoadedAssembly;
                 }
-                catch { continue; } // Assembly is invalid, likely causing a type load or bad image format exception of some sort
+                catch
+                {
+                    continue;
+                } // Assembly is invalid, likely causing a type load or bad image format exception of some sort
 
                 RegisterAssembly(assembly);
             }
@@ -183,9 +202,12 @@ namespace OdinSerializer
             {
                 name = assembly.GetName().Name;
             }
-            catch { return; } // Assembly is invalid somehow
+            catch
+            {
+                return;
+            } // Assembly is invalid somehow
 
-            bool wasAdded = false;
+            var wasAdded = false;
 
             lock (ASSEMBLY_LOOKUP_LOCK)
             {
@@ -203,7 +225,7 @@ namespace OdinSerializer
                     var customAttributes = assembly.SafeGetCustomAttributes(typeof(BindTypeNameToTypeAttribute), false);
                     if (customAttributes != null)
                     {
-                        for (int i = 0; i < customAttributes.Length; i++)
+                        for (var i = 0; i < customAttributes.Length; i++)
                         {
                             var attr = customAttributes[i] as BindTypeNameToTypeAttribute;
                             if (attr != null && attr.NewType != null)
@@ -223,17 +245,19 @@ namespace OdinSerializer
                         }
                     }
                 }
-                catch { } // Assembly is invalid somehow
+                catch
+                {
+                } // Assembly is invalid somehow
             }
         }
 
         /// <summary>
-        /// Bind a type to a name.
+        ///     Bind a type to a name.
         /// </summary>
         /// <param name="type">The type to bind.</param>
         /// <param name="debugContext">The debug context to log to.</param>
         /// <returns>
-        /// The name that the type has been bound to.
+        ///     The name that the type has been bound to.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The type argument is null.</exception>
         public override string BindToName(Type type, DebugContext debugContext = null)
@@ -252,12 +276,12 @@ namespace OdinSerializer
                     if (type.IsGenericType)
                     {
                         // We track down all assemblies in the generic type definition
-                        List<Type> toResolve = type.GetGenericArguments().ToList();
-                        HashSet<Assembly> assemblies = new HashSet<Assembly>();
+                        var toResolve = type.GetGenericArguments().ToList();
+                        var assemblies = new HashSet<Assembly>();
 
                         while (toResolve.Count > 0)
                         {
-                            var t = toResolve[0];
+                            Type t = toResolve[0];
 
                             if (t.IsGenericType)
                             {
@@ -270,7 +294,7 @@ namespace OdinSerializer
 
                         result = type.FullName + ", " + type.Assembly.GetName().Name;
 
-                        foreach (var ass in assemblies)
+                        foreach (Assembly ass in assemblies)
                         {
                             result = result.Replace(ass.FullName, ass.GetName().Name);
                         }
@@ -292,7 +316,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Determines whether the specified type name is mapped.
+        ///     Determines whether the specified type name is mapped.
         /// </summary>
         public override bool ContainsType(string typeName)
         {
@@ -303,12 +327,12 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Binds a name to type.
+        ///     Binds a name to type.
         /// </summary>
         /// <param name="typeName">The name of the type to bind.</param>
         /// <param name="debugContext">The debug context to log to.</param>
         /// <returns>
-        /// The type that the name has been bound to, or null if the type could not be resolved.
+        ///     The type that the name has been bound to, or null if the type could not be resolved.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The typeName argument is null.</exception>
         public override Type BindToType(string typeName, DebugContext debugContext = null)
@@ -326,7 +350,7 @@ namespace OdinSerializer
             {
                 if (typeMap.TryGetValue(typeName, out result) == false)
                 {
-                    result = this.ParseTypeName(typeName, debugContext);
+                    result = ParseTypeName(typeName, debugContext);
 
                     if (result == null && debugContext != null)
                     {
@@ -356,11 +380,17 @@ namespace OdinSerializer
 
             // Let's try it the traditional .NET way
             type = Type.GetType(typeName);
-            if (type != null) return type;
-            
+            if (type != null)
+            {
+                return type;
+            }
+
             // Generic/array type name handling
             type = ParseGenericAndOrArrayType(typeName, debugContext);
-            if (type != null) return type;
+            if (type != null)
+            {
+                return type;
+            }
 
             string typeStr, assemblyStr;
 
@@ -393,7 +423,9 @@ namespace OdinSerializer
                         {
                             assembly = Assembly.Load(assemblyStr);
                         }
-                        catch { }
+                        catch
+                        {
+                        }
                     }
 
                     if (assembly != null)
@@ -402,16 +434,21 @@ namespace OdinSerializer
                         {
                             type = assembly.GetType(typeStr);
                         }
-                        catch { } // Assembly is invalid
+                        catch
+                        {
+                        } // Assembly is invalid
 
-                        if (type != null) return type;
+                        if (type != null)
+                        {
+                            return type;
+                        }
                     }
                 }
 
                 // Try to check all assemblies for the type string
-                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
-                for (int i = 0; i < assemblies.Length; i++)
+                for (var i = 0; i < assemblies.Length; i++)
                 {
                     assembly = assemblies[i];
 
@@ -419,15 +456,20 @@ namespace OdinSerializer
                     {
                         type = assembly.GetType(typeStr, false);
                     }
-                    catch { } // Assembly is invalid
+                    catch
+                    {
+                    } // Assembly is invalid
 
-                    if (type != null) return type;
+                    if (type != null)
+                    {
+                        return type;
+                    }
                 }
             }
 
             //type = AssemblyUtilities.GetTypeByCachedFullName(typeStr);
             //if (type != null) return type;
-            
+
             return null;
         }
 
@@ -436,19 +478,17 @@ namespace OdinSerializer
             typeName = null;
             assemblyName = null;
 
-            int firstComma = fullName.IndexOf(',');
+            var firstComma = fullName.IndexOf(',');
 
-            if (firstComma < 0 || (firstComma + 1) == fullName.Length)
+            if (firstComma < 0 || firstComma + 1 == fullName.Length)
             {
                 typeName = fullName.Trim(',', ' ');
                 return;
             }
-            else
-            {
-                typeName = fullName.Substring(0, firstComma);
-            }
 
-            int secondComma = fullName.IndexOf(',', firstComma + 1);
+            typeName = fullName.Substring(0, firstComma);
+
+            var secondComma = fullName.IndexOf(',', firstComma + 1);
 
             if (secondComma < 0)
             {
@@ -469,43 +509,65 @@ namespace OdinSerializer
             bool isArray;
             int arrayRank;
 
-            if (!TryParseGenericAndOrArrayTypeName(typeName, out actualTypeName, out isGeneric, out genericArgNames, out isArray, out arrayRank)) return null;
+            if (!TryParseGenericAndOrArrayTypeName(typeName, out actualTypeName, out isGeneric, out genericArgNames,
+                    out isArray, out arrayRank))
+            {
+                return null;
+            }
 
-            Type type = this.BindToType(actualTypeName, debugContext);
+            Type type = BindToType(actualTypeName, debugContext);
 
-            if (type == null) return null;
+            if (type == null)
+            {
+                return null;
+            }
 
             if (isGeneric)
             {
-                if (!type.IsGenericType) return null;
+                if (!type.IsGenericType)
+                {
+                    return null;
+                }
 
                 using (var argsCache = Cache<List<Type>>.Claim())
                 {
                     List<Type> args = argsCache.Value;
                     args.Clear();
 
-                    for (int i = 0; i < genericArgNames.Count; i++)
+                    for (var i = 0; i < genericArgNames.Count; i++)
                     {
-                        Type arg = this.BindToType(genericArgNames[i], debugContext);
-                        if (arg == null) return null;
+                        Type arg = BindToType(genericArgNames[i], debugContext);
+                        if (arg == null)
+                        {
+                            return null;
+                        }
+
                         args.Add(arg);
                     }
 
-                    var argsArray = args.ToArray();
+                    Type[] argsArray = args.ToArray();
 
                     if (!type.AreGenericConstraintsSatisfiedBy(argsArray))
                     {
                         if (debugContext != null)
                         {
-                            string argsStr = "";
+                            var argsStr = "";
 
-                            foreach (var arg in argsArray)
+                            foreach (Type arg in argsArray)
                             {
-                                if (argsStr != "") argsStr += ", ";
+                                if (argsStr != "")
+                                {
+                                    argsStr += ", ";
+                                }
+
                                 argsStr += arg.GetNiceFullName();
                             }
 
-                            debugContext.LogWarning("Deserialization type lookup failure: The generic type arguments '" + argsStr + "' do not satisfy the generic constraints of generic type definition '" + type.GetNiceFullName() + "'. All this parsed from the full type name string: '" + typeName + "'");
+                            debugContext.LogWarning(
+                                "Deserialization type lookup failure: The generic type arguments '" + argsStr +
+                                "' do not satisfy the generic constraints of generic type definition '" +
+                                type.GetNiceFullName() + "'. All this parsed from the full type name string: '" +
+                                typeName + "'");
                         }
 
                         return null;
@@ -530,20 +592,21 @@ namespace OdinSerializer
 
             return type;
         }
-        
-        private static bool TryParseGenericAndOrArrayTypeName(string typeName, out string actualTypeName, out bool isGeneric, out List<string> genericArgNames, out bool isArray, out int arrayRank)
+
+        private static bool TryParseGenericAndOrArrayTypeName(string typeName, out string actualTypeName,
+            out bool isGeneric, out List<string> genericArgNames, out bool isArray, out int arrayRank)
         {
             isGeneric = false;
             isArray = false;
             arrayRank = 0;
 
-            bool parsingGenericArguments = false;
+            var parsingGenericArguments = false;
 
             string argName;
             genericArgNames = null;
             actualTypeName = null;
 
-            for (int i = 0; i < typeName.Length; i++)
+            for (var i = 0; i < typeName.Length; i++)
             {
                 if (typeName[i] == '[')
                 {
@@ -570,7 +633,9 @@ namespace OdinSerializer
                             }
 
                             if (next != ']')
+                            {
                                 return false; // Malformed type name
+                            }
                         }
                     }
                     else
@@ -586,12 +651,21 @@ namespace OdinSerializer
                         {
                             genericArgNames.Add(argName);
                         }
-                        else return false; // Malformed type name
+                        else
+                        {
+                            return false;
+                        }
+                        // Malformed type name
                     }
                 }
                 else if (typeName[i] == ']')
                 {
-                    if (!parsingGenericArguments) return false; // This is not a valid type name, since we're hitting "]" without currently being in the process of parsing the generic arguments or an array thingy
+                    if (!parsingGenericArguments)
+                    {
+                        return
+                            false; // This is not a valid type name, since we're hitting "]" without currently being in the process of parsing the generic arguments or an array thingy
+                    }
+
                     parsingGenericArguments = false;
                 }
                 else if (typeName[i] == ',' && !parsingGenericArguments)
@@ -600,34 +674,44 @@ namespace OdinSerializer
                     break;
                 }
             }
-            
+
             return isArray || isGeneric;
         }
 
         private static char Peek(string str, int i, int ahead)
         {
-            if (i + ahead < str.Length) return str[i + ahead];
+            if (i + ahead < str.Length)
+            {
+                return str[i + ahead];
+            }
+
             return '\0';
         }
 
         private static bool ReadGenericArg(string typeName, ref int i, out string argName)
         {
             argName = null;
-            if (typeName[i] != '[') return false;
+            if (typeName[i] != '[')
+            {
+                return false;
+            }
 
-            int start = i + 1;
-            int genericDepth = 0;
+            var start = i + 1;
+            var genericDepth = 0;
 
             for (; i < typeName.Length; i++)
             {
-                if (typeName[i] == '[') genericDepth++;
+                if (typeName[i] == '[')
+                {
+                    genericDepth++;
+                }
                 else if (typeName[i] == ']')
                 {
                     genericDepth--;
 
                     if (genericDepth == 0)
                     {
-                        int length = i - start;
+                        var length = i - start;
                         argName = typeName.Substring(start, length);
                         return true;
                     }

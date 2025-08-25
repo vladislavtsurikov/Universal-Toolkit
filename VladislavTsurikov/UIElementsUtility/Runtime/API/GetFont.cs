@@ -38,11 +38,14 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
             private static Font s_extraBold;
             private static Font s_black;
 
-            private static FontFamily FontFamily => s_fontFamily != null? s_fontFamily: s_fontFamily = DataGroupUtility.GetGroup<FontFamily, FontInfo>("Inter");
+            private static FontFamily FontFamily => s_fontFamily != null
+                ? s_fontFamily
+                : s_fontFamily = DataGroupUtility.GetGroup<FontFamily, FontInfo>("Inter");
 
             public static Font Thin => s_thin ? s_thin : s_thin = GetFont(FontWeight.Thin);
 
-            public static Font ExtraLight => s_extraLight ? s_extraLight : s_extraLight = GetFont(FontWeight.ExtraLight);
+            public static Font ExtraLight =>
+                s_extraLight ? s_extraLight : s_extraLight = GetFont(FontWeight.ExtraLight);
 
             public static Font Light => s_light ? s_light : s_light = GetFont(FontWeight.Light);
 
@@ -58,10 +61,7 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
 
             public static Font Black => s_black ? s_black : s_black = GetFont(FontWeight.Black);
 
-            private static Font GetFont(FontWeight weight)
-            {
-                return FontFamily.GetFont((int)weight);
-            }
+            private static Font GetFont(FontWeight weight) => FontFamily.GetFont((int)weight);
         }
 
         public static class Ubuntu
@@ -80,7 +80,9 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
             private static Font s_medium;
             private static Font s_bold;
 
-            private static FontFamily FontFamily => s_fontFamily != null? s_fontFamily: s_fontFamily = DataGroupUtility.GetGroup<FontFamily, FontInfo>("Ubuntu");
+            private static FontFamily FontFamily => s_fontFamily != null
+                ? s_fontFamily
+                : s_fontFamily = DataGroupUtility.GetGroup<FontFamily, FontInfo>("Ubuntu");
 
             public static Font Light => s_light ? s_light : s_light = GetFont(FontWeight.Light);
 
@@ -90,10 +92,7 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
 
             public static Font Bold => s_bold ? s_bold : s_bold = GetFont(FontWeight.Bold);
 
-            private static Font GetFont(FontWeight weight)
-            {
-                return FontFamily.GetFont((int)weight);
-            }
+            private static Font GetFont(FontWeight weight) => FontFamily.GetFont((int)weight);
         }
     }
 }

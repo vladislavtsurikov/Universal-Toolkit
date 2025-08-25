@@ -14,15 +14,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
     public class RandomSeedSettingsEditor : IMGUIElementEditor
     {
         private RandomSeedSettings _settings => (RandomSeedSettings)Target;
-        
+
         public override void OnGUI()
         {
-            _settings.GenerateRandomSeed = CustomEditorGUILayout.Toggle(new GUIContent("Generate Random Seed"), _settings.GenerateRandomSeed);
-            if(_settings.GenerateRandomSeed)
+            _settings.GenerateRandomSeed =
+                CustomEditorGUILayout.Toggle(new GUIContent("Generate Random Seed"), _settings.GenerateRandomSeed);
+            if (_settings.GenerateRandomSeed)
             {
                 EditorGUI.indentLevel++;
-				
-                _settings.RandomSeed = CustomEditorGUILayout.IntField(new GUIContent("Random Seed"), _settings.RandomSeed);
+
+                _settings.RandomSeed =
+                    CustomEditorGUILayout.IntField(new GUIContent("Random Seed"), _settings.RandomSeed);
 
                 EditorGUI.indentLevel--;
             }

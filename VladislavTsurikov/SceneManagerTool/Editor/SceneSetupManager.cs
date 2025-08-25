@@ -1,9 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Linq;
+using OdinSerializer;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor
 {
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                 }
             }
         }
-        
+
         internal void SaveSceneSetup()
         {
             if (EditorSceneManager.GetSceneManagerSetup().Any())
@@ -37,7 +37,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
 
         private void RestoreSceneSetup()
         {
-            if(SceneSetups == null || !SceneSetups.Any())
+            if (SceneSetups == null || !SceneSetups.Any())
             {
                 return;
             }

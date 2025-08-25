@@ -7,12 +7,10 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 {
     public class TerrainObjectTransform : UndoRecord
     {
-        private readonly List<TransformData> _transformList = new List<TransformData>();
+        private readonly List<TransformData> _transformList = new();
 
-        public TerrainObjectTransform(TerrainObjectInstance gameObject) 
-        {
+        public TerrainObjectTransform(TerrainObjectInstance gameObject) =>
             _transformList.Add(new TransformData(gameObject));
-        }
 
         public override void Merge(UndoRecord record)
         {
@@ -47,9 +45,9 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
                 {
                     return;
                 }
-            
+
                 _gameObject.Position = _instance.Position;
-                _gameObject.Scale = _instance.Scale; 
+                _gameObject.Scale = _instance.Scale;
                 _gameObject.Rotation = _instance.Rotation;
             }
         }

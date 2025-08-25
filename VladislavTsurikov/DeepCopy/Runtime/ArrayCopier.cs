@@ -6,65 +6,74 @@ namespace VladislavTsurikov.DeepCopy.Runtime
     {
         internal static T[] CopyArrayRank1<T>(T[] originalArray, CopyContext context)
         {
-            if (context.TryGetCopy(originalArray, out var existingCopy)) return (T[]) existingCopy;
+            if (context.TryGetCopy(originalArray, out var existingCopy))
+            {
+                return (T[])existingCopy;
+            }
 
             var length = originalArray.Length;
             var result = new T[length];
             context.RecordCopy(originalArray, result);
             for (var i = 0; i < length; i++)
             {
-                var original = originalArray[i];
+                T original = originalArray[i];
                 if (original != null)
                 {
                     if (context.TryGetCopy(original, out var existingElement))
                     {
-                        result[i] = (T) existingElement;
+                        result[i] = (T)existingElement;
                     }
                     else
                     {
-                        var copy = CopierGenerator<T>.Copy(original, context);
+                        T copy = CopierGenerator<T>.Copy(original, context);
                         context.RecordCopy(original, copy);
                         result[i] = copy;
                     }
                 }
             }
+
             return result;
         }
 
         internal static T[,] CopyArrayRank2<T>(T[,] originalArray, CopyContext context)
         {
-            if (context.TryGetCopy(originalArray, out var existingCopy)) return (T[,])existingCopy;
+            if (context.TryGetCopy(originalArray, out var existingCopy))
+            {
+                return (T[,])existingCopy;
+            }
 
             var lenI = originalArray.GetLength(0);
             var lenJ = originalArray.GetLength(1);
             var result = new T[lenI, lenJ];
             context.RecordCopy(originalArray, result);
             for (var i = 0; i < lenI; i++)
+            for (var j = 0; j < lenJ; j++)
             {
-                for (var j = 0; j < lenJ; j++)
+                T original = originalArray[i, j];
+                if (original != null)
                 {
-                    var original = originalArray[i, j];
-                    if (original != null)
+                    if (context.TryGetCopy(original, out var existingElement))
                     {
-                        if (context.TryGetCopy(original, out var existingElement))
-                        {
-                            result[i, j] = (T) existingElement;
-                        }
-                        else
-                        {
-                            var copy = CopierGenerator<T>.Copy(original, context);
-                            context.RecordCopy(original, copy);
-                            result[i, j] = copy;
-                        }
+                        result[i, j] = (T)existingElement;
+                    }
+                    else
+                    {
+                        T copy = CopierGenerator<T>.Copy(original, context);
+                        context.RecordCopy(original, copy);
+                        result[i, j] = copy;
                     }
                 }
             }
+
             return result;
         }
 
         internal static T[] CopyArrayRank1Shallow<T>(T[] array, CopyContext context)
         {
-            if (context.TryGetCopy(array, out var existingCopy)) return (T[])existingCopy;
+            if (context.TryGetCopy(array, out var existingCopy))
+            {
+                return (T[])existingCopy;
+            }
 
             var length = array.Length;
             var result = new T[length];
@@ -75,7 +84,10 @@ namespace VladislavTsurikov.DeepCopy.Runtime
 
         internal static T[,] CopyArrayRank2Shallow<T>(T[,] array, CopyContext context)
         {
-            if (context.TryGetCopy(array, out var existingCopy)) return (T[,])existingCopy;
+            if (context.TryGetCopy(array, out var existingCopy))
+            {
+                return (T[,])existingCopy;
+            }
 
             var lenI = array.GetLength(0);
             var lenJ = array.GetLength(1);
@@ -87,12 +99,19 @@ namespace VladislavTsurikov.DeepCopy.Runtime
 
         internal static T CopyArray<T>(T array, CopyContext context)
         {
-            if (context.TryGetCopy(array, out var existingCopy)) return (T)existingCopy;
+            if (context.TryGetCopy(array, out var existingCopy))
+            {
+                return (T)existingCopy;
+            }
 
             var originalArray = array as Array;
-            if (originalArray == null) throw new InvalidCastException($"Cannot cast non-array type {array?.GetType()} to Array.");
-            var elementType = array.GetType().GetElementType();
-            
+            if (originalArray == null)
+            {
+                throw new InvalidCastException($"Cannot cast non-array type {array?.GetType()} to Array.");
+            }
+
+            Type elementType = array.GetType().GetElementType();
+
             var rank = originalArray.Rank;
             var lengths = new int[rank];
             for (var i = 0; i < rank; i++)
@@ -115,6 +134,7 @@ namespace VladislavTsurikov.DeepCopy.Runtime
             {
                 sizes[k] = sizes[k + 1] * lengths[k + 1];
             }
+
             for (var i = 0; i < originalArray.Length; i++)
             {
                 var k = i;
@@ -124,6 +144,7 @@ namespace VladislavTsurikov.DeepCopy.Runtime
                     k = k - offset * sizes[n];
                     index[n] = offset;
                 }
+
                 var original = originalArray.GetValue(index);
                 if (original != null)
                 {

@@ -16,27 +16,29 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using OdinSerializer.Utilities;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using UnityEngine;
-    using Utilities;
-
     /// <summary>
-    /// Provides an array of utility wrapper methods for easy serialization and deserialization of objects of any type.
+    ///     Provides an array of utility wrapper methods for easy serialization and deserialization of objects of any type.
     /// </summary>
     public static class SerializationUtility
     {
         /// <summary>
-        /// Creates an <see cref="IDataWriter" /> for a given format.
+        ///     Creates an <see cref="IDataWriter" /> for a given format.
         /// </summary>
         /// <param name="stream">The stream to write to.</param>
         /// <param name="context">The serialization context to use.</param>
         /// <param name="format">The format to write.</param>
         /// <returns>
-        /// An <see cref="IDataWriter" /> for a given format.
+        ///     An <see cref="IDataWriter" /> for a given format.
         /// </returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public static IDataWriter CreateWriter(Stream stream, SerializationContext context, DataFormat format)
@@ -50,7 +52,8 @@ namespace OdinSerializer
                     return new JsonDataWriter(stream, context);
 
                 case DataFormat.Nodes:
-                    Debug.LogError("Cannot automatically create a writer for the format '" + DataFormat.Nodes + "', because it does not use a stream.");
+                    Debug.LogError("Cannot automatically create a writer for the format '" + DataFormat.Nodes +
+                                   "', because it does not use a stream.");
                     return null;
 
                 default:
@@ -59,13 +62,13 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Creates an <see cref="IDataReader" /> for a given format.
+        ///     Creates an <see cref="IDataReader" /> for a given format.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
         /// <param name="context">The deserialization context to use.</param>
         /// <param name="format">The format to read.</param>
         /// <returns>
-        /// An <see cref="IDataReader" /> for a given format.
+        ///     An <see cref="IDataReader" /> for a given format.
         /// </returns>
         /// <exception cref="System.NotImplementedException"></exception>
         public static IDataReader CreateReader(Stream stream, DeserializationContext context, DataFormat format)
@@ -79,7 +82,8 @@ namespace OdinSerializer
                     return new JsonDataReader(stream, context);
 
                 case DataFormat.Nodes:
-                    Debug.LogError("Cannot automatically create a reader for the format '" + DataFormat.Nodes + "', because it does not use a stream.");
+                    Debug.LogError("Cannot automatically create a reader for the format '" + DataFormat.Nodes +
+                                   "', because it does not use a stream.");
                     return null;
 
                 default:
@@ -87,14 +91,15 @@ namespace OdinSerializer
             }
         }
 
-        private static IDataWriter GetCachedWriter(out IDisposable cache, DataFormat format, Stream stream, SerializationContext context)
+        private static IDataWriter GetCachedWriter(out IDisposable cache, DataFormat format, Stream stream,
+            SerializationContext context)
         {
             IDataWriter writer;
 
             if (format == DataFormat.Binary)
             {
                 var binaryCache = Cache<BinaryDataWriter>.Claim();
-                var binaryWriter = binaryCache.Value;
+                BinaryDataWriter binaryWriter = binaryCache.Value;
 
                 binaryWriter.Stream = stream;
                 binaryWriter.Context = context;
@@ -106,7 +111,7 @@ namespace OdinSerializer
             else if (format == DataFormat.JSON)
             {
                 var jsonCache = Cache<JsonDataWriter>.Claim();
-                var jsonWriter = jsonCache.Value;
+                JsonDataWriter jsonWriter = jsonCache.Value;
 
                 jsonWriter.Stream = stream;
                 jsonWriter.Context = context;
@@ -117,7 +122,8 @@ namespace OdinSerializer
             }
             else if (format == DataFormat.Nodes)
             {
-                throw new InvalidOperationException("Cannot automatically create a writer for the format '" + DataFormat.Nodes + "', because it does not use a stream.");
+                throw new InvalidOperationException("Cannot automatically create a writer for the format '" +
+                                                    DataFormat.Nodes + "', because it does not use a stream.");
             }
             else
             {
@@ -127,14 +133,15 @@ namespace OdinSerializer
             return writer;
         }
 
-        private static IDataReader GetCachedReader(out IDisposable cache, DataFormat format, Stream stream, DeserializationContext context)
+        private static IDataReader GetCachedReader(out IDisposable cache, DataFormat format, Stream stream,
+            DeserializationContext context)
         {
             IDataReader reader;
 
             if (format == DataFormat.Binary)
             {
                 var binaryCache = Cache<BinaryDataReader>.Claim();
-                var binaryReader = binaryCache.Value;
+                BinaryDataReader binaryReader = binaryCache.Value;
 
                 binaryReader.Stream = stream;
                 binaryReader.Context = context;
@@ -146,7 +153,7 @@ namespace OdinSerializer
             else if (format == DataFormat.JSON)
             {
                 var jsonCache = Cache<JsonDataReader>.Claim();
-                var jsonReader = jsonCache.Value;
+                JsonDataReader jsonReader = jsonCache.Value;
 
                 jsonReader.Stream = stream;
                 jsonReader.Context = context;
@@ -157,7 +164,8 @@ namespace OdinSerializer
             }
             else if (format == DataFormat.Nodes)
             {
-                throw new InvalidOperationException("Cannot automatically create a reader for the format '" + DataFormat.Nodes + "', because it does not use a stream.");
+                throw new InvalidOperationException("Cannot automatically create a reader for the format '" +
+                                                    DataFormat.Nodes + "', because it does not use a stream.");
             }
             else
             {
@@ -168,7 +176,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the given writer.
+        ///     Serializes the given value using the given writer.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
@@ -179,12 +187,12 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value, using the given writer.
+        ///     Serializes the given value, using the given writer.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
-        public static void SerializeValueWeak(object value, IDataWriter writer, out List<UnityEngine.Object> unityObjects)
+        public static void SerializeValueWeak(object value, IDataWriter writer, out List<Object> unityObjects)
         {
             using (var unityResolver = Cache<UnityReferenceResolver>.Claim())
             {
@@ -196,7 +204,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the given writer.
+        ///     Serializes the given value using the given writer.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
@@ -221,17 +229,18 @@ namespace OdinSerializer
                     serializer.WriteValueWeak(value, writer);
                 }
             }
+
             writer.FlushToStream();
         }
 
         /// <summary>
-        /// Serializes the given value, using the given writer.
+        ///     Serializes the given value, using the given writer.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
-        public static void SerializeValue<T>(T value, IDataWriter writer, out List<UnityEngine.Object> unityObjects)
+        public static void SerializeValue<T>(T value, IDataWriter writer, out List<Object> unityObjects)
         {
             using (var unityResolver = Cache<UnityReferenceResolver>.Claim())
             {
@@ -254,24 +263,25 @@ namespace OdinSerializer
                         serializer.WriteValueWeak(value, writer);
                     }
                 }
+
                 writer.FlushToStream();
                 unityObjects = unityResolver.Value.GetReferencedUnityObjects();
             }
         }
 
 
-
         /// <summary>
-        /// Serializes the given value to a given stream in the specified format.
+        ///     Serializes the given value to a given stream in the specified format.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="stream">The stream to serialize to.</param>
         /// <param name="format">The format to serialize in.</param>
         /// <param name="context">The context.</param>
-        public static void SerializeValueWeak(object value, Stream stream, DataFormat format, SerializationContext context = null)
+        public static void SerializeValueWeak(object value, Stream stream, DataFormat format,
+            SerializationContext context = null)
         {
             IDisposable cache;
-            var writer = GetCachedWriter(out cache, format, stream, context);
+            IDataWriter writer = GetCachedWriter(out cache, format, stream, context);
 
             try
             {
@@ -295,17 +305,18 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value to a given stream in the specified format.
+        ///     Serializes the given value to a given stream in the specified format.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="stream">The stream to serialize to.</param>
         /// <param name="format">The format to serialize in.</param>
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
         /// <param name="context">The context.</param>
-        public static void SerializeValueWeak(object value, Stream stream, DataFormat format, out List<UnityEngine.Object> unityObjects, SerializationContext context = null)
+        public static void SerializeValueWeak(object value, Stream stream, DataFormat format,
+            out List<Object> unityObjects, SerializationContext context = null)
         {
             IDisposable cache;
-            var writer = GetCachedWriter(out cache, format, stream, context);
+            IDataWriter writer = GetCachedWriter(out cache, format, stream, context);
 
             try
             {
@@ -329,17 +340,18 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value to a given stream in the specified format.
+        ///     Serializes the given value to a given stream in the specified format.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
         /// <param name="stream">The stream to serialize to.</param>
         /// <param name="format">The format to serialize in.</param>
         /// <param name="context">The context.</param>
-        public static void SerializeValue<T>(T value, Stream stream, DataFormat format, SerializationContext context = null)
+        public static void SerializeValue<T>(T value, Stream stream, DataFormat format,
+            SerializationContext context = null)
         {
             IDisposable cache;
-            var writer = GetCachedWriter(out cache, format, stream, context);
+            IDataWriter writer = GetCachedWriter(out cache, format, stream, context);
 
             try
             {
@@ -363,7 +375,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value to a given stream in the specified format.
+        ///     Serializes the given value to a given stream in the specified format.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
@@ -371,10 +383,11 @@ namespace OdinSerializer
         /// <param name="format">The format to serialize in.</param>
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
         /// <param name="context">The context.</param>
-        public static void SerializeValue<T>(T value, Stream stream, DataFormat format, out List<UnityEngine.Object> unityObjects, SerializationContext context = null)
+        public static void SerializeValue<T>(T value, Stream stream, DataFormat format, out List<Object> unityObjects,
+            SerializationContext context = null)
         {
             IDisposable cache;
-            var writer = GetCachedWriter(out cache, format, stream, context);
+            IDataWriter writer = GetCachedWriter(out cache, format, stream, context);
 
             try
             {
@@ -398,7 +411,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the specified format, and returns the result as a byte array.
+        ///     Serializes the given value using the specified format, and returns the result as a byte array.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="format">The format to use.</param>
@@ -406,7 +419,7 @@ namespace OdinSerializer
         /// <returns>A byte array containing the serialized value.</returns>
         public static byte[] SerializeValueWeak(object value, DataFormat format, SerializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             {
                 SerializeValueWeak(value, stream.Value.MemoryStream, format, context);
                 return stream.Value.MemoryStream.ToArray();
@@ -414,15 +427,15 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the specified format, and returns the result as a byte array.
+        ///     Serializes the given value using the specified format, and returns the result as a byte array.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="format">The format to use.</param>
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
         /// <returns>A byte array containing the serialized value.</returns>
-        public static byte[] SerializeValueWeak(object value, DataFormat format, out List<UnityEngine.Object> unityObjects)
+        public static byte[] SerializeValueWeak(object value, DataFormat format, out List<Object> unityObjects)
         {
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             {
                 SerializeValueWeak(value, stream.Value.MemoryStream, format, out unityObjects);
                 return stream.Value.MemoryStream.ToArray();
@@ -430,7 +443,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the specified format, and returns the result as a byte array.
+        ///     Serializes the given value using the specified format, and returns the result as a byte array.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
@@ -439,7 +452,7 @@ namespace OdinSerializer
         /// <returns>A byte array containing the serialized value.</returns>
         public static byte[] SerializeValue<T>(T value, DataFormat format, SerializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             {
                 SerializeValue(value, stream.Value.MemoryStream, format, context);
                 return stream.Value.MemoryStream.ToArray();
@@ -447,7 +460,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes the given value using the specified format and returns the result as a byte array.
+        ///     Serializes the given value using the specified format and returns the result as a byte array.
         /// </summary>
         /// <typeparam name="T">The type of the value to serialize.</typeparam>
         /// <param name="value">The value to serialize.</param>
@@ -455,9 +468,10 @@ namespace OdinSerializer
         /// <param name="unityObjects">A list of the Unity objects which were referenced during serialization.</param>
         /// <param name="context">The context to use.</param>
         /// <returns>A byte array containing the serialized value.</returns>
-        public static byte[] SerializeValue<T>(T value, DataFormat format, out List<UnityEngine.Object> unityObjects, SerializationContext context = null)
+        public static byte[] SerializeValue<T>(T value, DataFormat format, out List<Object> unityObjects,
+            SerializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             {
                 SerializeValue(value, stream.Value.MemoryStream, format, out unityObjects, context);
                 return stream.Value.MemoryStream.ToArray();
@@ -465,24 +479,24 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value from the given reader. This might fail with primitive values, as they don't come with metadata.
+        ///     Deserializes a value from the given reader. This might fail with primitive values, as they don't come with
+        ///     metadata.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>The deserialized value.</returns>
-        public static object DeserializeValueWeak(IDataReader reader)
-        {
-            return Serializer.Get(typeof(object)).ReadValueWeak(reader);
-        }
+        public static object DeserializeValueWeak(IDataReader reader) =>
+            Serializer.Get(typeof(object)).ReadValueWeak(reader);
 
         /// <summary>
-        /// Deserializes a value from the given reader, using the given list of Unity objects for external index reference resolution. This might fail with primitive values, as they don't come with type metadata.
+        ///     Deserializes a value from the given reader, using the given list of Unity objects for external index reference
+        ///     resolution. This might fail with primitive values, as they don't come with type metadata.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static object DeserializeValueWeak(IDataReader reader, List<UnityEngine.Object> referencedUnityObjects)
+        public static object DeserializeValueWeak(IDataReader reader, List<Object> referencedUnityObjects)
         {
             using (var unityResolver = Cache<UnityReferenceResolver>.Claim())
             {
@@ -493,7 +507,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value from the given reader.
+        ///     Deserializes a value from the given reader.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="reader">The reader to use.</param>
@@ -504,32 +518,29 @@ namespace OdinSerializer
             {
                 return Serializer.Get<T>().ReadValue(reader);
             }
-            else
-            {
-                var serializer = Serializer.Get(typeof(T));
-                var strong = serializer as Serializer<T>;
 
-                if (strong != null)
-                {
-                    return strong.ReadValue(reader);
-                }
-                else
-                {
-                    return (T)serializer.ReadValueWeak(reader);
-                }
+            var serializer = Serializer.Get(typeof(T));
+            var strong = serializer as Serializer<T>;
+
+            if (strong != null)
+            {
+                return strong.ReadValue(reader);
             }
+
+            return (T)serializer.ReadValueWeak(reader);
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from the given reader, using the given list of Unity objects for external index reference resolution.
+        ///     Deserializes a value of a given type from the given reader, using the given list of Unity objects for external
+        ///     index reference resolution.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="reader">The reader to use.</param>
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static T DeserializeValue<T>(IDataReader reader, List<UnityEngine.Object> referencedUnityObjects)
+        public static T DeserializeValue<T>(IDataReader reader, List<Object> referencedUnityObjects)
         {
             using (var unityResolver = Cache<UnityReferenceResolver>.Claim())
             {
@@ -540,36 +551,34 @@ namespace OdinSerializer
                 {
                     return Serializer.Get<T>().ReadValue(reader);
                 }
-                else
-                {
-                    var serializer = Serializer.Get(typeof(T));
-                    var strong = serializer as Serializer<T>;
 
-                    if (strong != null)
-                    {
-                        return strong.ReadValue(reader);
-                    }
-                    else
-                    {
-                        return (T)serializer.ReadValueWeak(reader);
-                    }
+                var serializer = Serializer.Get(typeof(T));
+                var strong = serializer as Serializer<T>;
+
+                if (strong != null)
+                {
+                    return strong.ReadValue(reader);
                 }
+
+                return (T)serializer.ReadValueWeak(reader);
             }
         }
 
         /// <summary>
-        /// Deserializes a value from the given stream in the given format. This might fail with primitive values, as they don't come with type metadata.
+        ///     Deserializes a value from the given stream in the given format. This might fail with primitive values, as they
+        ///     don't come with type metadata.
         /// </summary>
         /// <param name="stream">The reader to use.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="context">The context.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static object DeserializeValueWeak(Stream stream, DataFormat format, DeserializationContext context = null)
+        public static object DeserializeValueWeak(Stream stream, DataFormat format,
+            DeserializationContext context = null)
         {
             IDisposable cache;
-            var reader = GetCachedReader(out cache, format, stream, context);
+            IDataReader reader = GetCachedReader(out cache, format, stream, context);
 
             try
             {
@@ -593,19 +602,21 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value from the given stream in the given format, using the given list of Unity objects for external index reference resolution. This might fail with primitive values, as they don't come with type metadata.
+        ///     Deserializes a value from the given stream in the given format, using the given list of Unity objects for external
+        ///     index reference resolution. This might fail with primitive values, as they don't come with type metadata.
         /// </summary>
         /// <param name="stream">The stream to read from.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <param name="context">The context.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static object DeserializeValueWeak(Stream stream, DataFormat format, List<UnityEngine.Object> referencedUnityObjects, DeserializationContext context = null)
+        public static object DeserializeValueWeak(Stream stream, DataFormat format, List<Object> referencedUnityObjects,
+            DeserializationContext context = null)
         {
             IDisposable cache;
-            var reader = GetCachedReader(out cache, format, stream, context);
+            IDataReader reader = GetCachedReader(out cache, format, stream, context);
 
             try
             {
@@ -629,19 +640,19 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from the given stream in the given format.
+        ///     Deserializes a value of a given type from the given stream in the given format.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="stream">The stream to read from.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="context">The context.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
         public static T DeserializeValue<T>(Stream stream, DataFormat format, DeserializationContext context = null)
         {
             IDisposable cache;
-            var reader = GetCachedReader(out cache, format, stream, context);
+            IDataReader reader = GetCachedReader(out cache, format, stream, context);
 
             try
             {
@@ -665,7 +676,8 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from the given stream in the given format, using the given list of Unity objects for external index reference resolution.
+        ///     Deserializes a value of a given type from the given stream in the given format, using the given list of Unity
+        ///     objects for external index reference resolution.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="stream">The stream to read from.</param>
@@ -673,12 +685,13 @@ namespace OdinSerializer
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <param name="context">The context.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static T DeserializeValue<T>(Stream stream, DataFormat format, List<UnityEngine.Object> referencedUnityObjects, DeserializationContext context = null)
+        public static T DeserializeValue<T>(Stream stream, DataFormat format, List<Object> referencedUnityObjects,
+            DeserializationContext context = null)
         {
             IDisposable cache;
-            var reader = GetCachedReader(out cache, format, stream, context);
+            IDataReader reader = GetCachedReader(out cache, format, stream, context);
 
             try
             {
@@ -702,59 +715,63 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value from the given byte array in the given format. This might fail with primitive values, as they don't come with type metadata.
+        ///     Deserializes a value from the given byte array in the given format. This might fail with primitive values, as they
+        ///     don't come with type metadata.
         /// </summary>
         /// <param name="bytes">The bytes to deserialize from.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="context">The context.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static object DeserializeValueWeak(byte[] bytes, DataFormat format, DeserializationContext context = null)
+        public static object DeserializeValueWeak(byte[] bytes, DataFormat format,
+            DeserializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim(bytes))
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim(bytes))
             {
                 return DeserializeValueWeak(stream.Value.MemoryStream, format, context);
             }
         }
 
         /// <summary>
-        /// Deserializes a value from the given byte array in the given format, using the given list of Unity objects for external index reference resolution. This might fail with primitive values, as they don't come with type metadata.
+        ///     Deserializes a value from the given byte array in the given format, using the given list of Unity objects for
+        ///     external index reference resolution. This might fail with primitive values, as they don't come with type metadata.
         /// </summary>
         /// <param name="bytes">The bytes to deserialize from.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static object DeserializeValueWeak(byte[] bytes, DataFormat format, List<UnityEngine.Object> referencedUnityObjects)
+        public static object DeserializeValueWeak(byte[] bytes, DataFormat format, List<Object> referencedUnityObjects)
         {
-            using (var stream = CachedMemoryStream.Claim(bytes))
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim(bytes))
             {
                 return DeserializeValueWeak(stream.Value.MemoryStream, format, referencedUnityObjects);
             }
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from the given byte array in the given format.
+        ///     Deserializes a value of a given type from the given byte array in the given format.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="bytes">The bytes to deserialize from.</param>
         /// <param name="format">The format to read.</param>
         /// <param name="context">The context to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
         public static T DeserializeValue<T>(byte[] bytes, DataFormat format, DeserializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim(bytes))
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim(bytes))
             {
                 return DeserializeValue<T>(stream.Value.MemoryStream, format, context);
             }
         }
 
         /// <summary>
-        /// Deserializes a value of a given type from the given byte array in the given format, using the given list of Unity objects for external index reference resolution.
+        ///     Deserializes a value of a given type from the given byte array in the given format, using the given list of Unity
+        ///     objects for external index reference resolution.
         /// </summary>
         /// <typeparam name="T">The type to deserialize.</typeparam>
         /// <param name="bytes">The bytes to deserialize from.</param>
@@ -762,20 +779,23 @@ namespace OdinSerializer
         /// <param name="referencedUnityObjects">The list of Unity objects to use for external index reference resolution.</param>
         /// <param name="context">The context to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        public static T DeserializeValue<T>(byte[] bytes, DataFormat format, List<UnityEngine.Object> referencedUnityObjects, DeserializationContext context = null)
+        public static T DeserializeValue<T>(byte[] bytes, DataFormat format, List<Object> referencedUnityObjects,
+            DeserializationContext context = null)
         {
-            using (var stream = CachedMemoryStream.Claim(bytes))
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim(bytes))
             {
                 return DeserializeValue<T>(stream.Value.MemoryStream, format, referencedUnityObjects, context);
             }
         }
 
         /// <summary>
-        /// Creates a deep copy of an object. Returns null if null. All Unity objects references will remain the same - they will not get copied.
-        /// Similarly, strings are not copied, nor are reflection types such as System.Type, or types derived from System.Reflection.MemberInfo,
-        /// System.Reflection.Assembly or System.Reflection.Module.
+        ///     Creates a deep copy of an object. Returns null if null. All Unity objects references will remain the same - they
+        ///     will not get copied.
+        ///     Similarly, strings are not copied, nor are reflection types such as System.Type, or types derived from
+        ///     System.Reflection.MemberInfo,
+        ///     System.Reflection.Assembly or System.Reflection.Module.
         /// </summary>
         public static object CreateCopy(object obj)
         {
@@ -789,32 +809,33 @@ namespace OdinSerializer
                 return obj;
             }
 
-            var type = obj.GetType();
+            Type type = obj.GetType();
 
             if (type.IsValueType)
             {
                 return obj;
             }
 
-            if (type.InheritsFrom(typeof(UnityEngine.Object))
-                || type.InheritsFrom(typeof(System.Reflection.MemberInfo))
-                || type.InheritsFrom(typeof(System.Reflection.Assembly))
-                || type.InheritsFrom(typeof(System.Reflection.Module)))
+            if (type.InheritsFrom(typeof(Object))
+                || type.InheritsFrom(typeof(MemberInfo))
+                || type.InheritsFrom(typeof(Assembly))
+                || type.InheritsFrom(typeof(Module)))
             {
                 return obj;
             }
 
-            using (var stream = CachedMemoryStream.Claim())
+            using (Cache<CachedMemoryStream> stream = CachedMemoryStream.Claim())
             using (var serContext = Cache<SerializationContext>.Claim())
             using (var deserContext = Cache<DeserializationContext>.Claim())
             {
                 serContext.Value.Config.SerializationPolicy = SerializationPolicies.Everything;
                 deserContext.Value.Config.SerializationPolicy = SerializationPolicies.Everything;
 
-                List<UnityEngine.Object> unityReferences;
+                List<Object> unityReferences;
                 SerializeValue(obj, stream.Value.MemoryStream, DataFormat.Binary, out unityReferences, serContext);
                 stream.Value.MemoryStream.Position = 0;
-                return DeserializeValue<object>(stream.Value.MemoryStream, DataFormat.Binary, unityReferences, deserContext);
+                return DeserializeValue<object>(stream.Value.MemoryStream, DataFormat.Binary, unityReferences,
+                    deserContext);
             }
         }
     }

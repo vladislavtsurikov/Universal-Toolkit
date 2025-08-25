@@ -13,16 +13,16 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
 
         private void OnGUI()
         {
-            string currentScene = SceneManager.GetActiveScene().name;
+            var currentScene = SceneManager.GetActiveScene().name;
 
-            int width = 500;
-            int height = 150;
-            int spacing = 40;
+            var width = 500;
+            var height = 150;
+            var spacing = 40;
 
-            int centerX = (Screen.width - width) / 2;
-            int centerY = (Screen.height - (height * 2 + spacing)) / 2;
+            var centerX = (Screen.width - width) / 2;
+            var centerY = (Screen.height - (height * 2 + spacing)) / 2;
 
-            GUIStyle style = new GUIStyle(GUI.skin.button);
+            var style = new GUIStyle(GUI.skin.button);
             style.fontSize = 32;
 
             if (currentScene != "TestScene_A")

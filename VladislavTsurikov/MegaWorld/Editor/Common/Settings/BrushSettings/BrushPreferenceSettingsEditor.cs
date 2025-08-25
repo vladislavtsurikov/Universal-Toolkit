@@ -11,11 +11,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.BrushSettings
     public class BrushPreferenceSettingsEditor : IMGUIElementEditor
     {
         private BrushPreferenceSettings PreferenceSettings => (BrushPreferenceSettings)Target;
-        
-        public override void OnGUI()
-        {
-            PreferenceSettings.MaxBrushSize = Mathf.Max(0.5f, CustomEditorGUILayout.FloatField(new GUIContent("Max Brush Size"), PreferenceSettings.MaxBrushSize));
-        }
+
+        public override void OnGUI() =>
+            PreferenceSettings.MaxBrushSize = Mathf.Max(0.5f,
+                CustomEditorGUILayout.FloatField(new GUIContent("Max Brush Size"), PreferenceSettings.MaxBrushSize));
     }
 }
 #endif

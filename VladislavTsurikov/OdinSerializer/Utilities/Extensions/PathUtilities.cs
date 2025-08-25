@@ -15,19 +15,18 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System.IO;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.IO;
-    using System.Text;
-
     /// <summary>
-    /// DirectoryInfo method extensions.
+    ///     DirectoryInfo method extensions.
     /// </summary>
     public static class PathUtilities
     {
         /// <summary>
-        /// Determines whether the directory has a given directory in its hierarchy of children.
+        ///     Determines whether the directory has a given directory in its hierarchy of children.
         /// </summary>
         /// <param name="parentDir">The parent directory.</param>
         /// <param name="subDir">The sub directory.</param>
@@ -41,10 +40,8 @@ namespace OdinSerializer.Utilities
                 {
                     return true;
                 }
-                else
-                {
-                    subDir = subDir.Parent;
-                }
+
+                subDir = subDir.Parent;
             }
 
             return false;

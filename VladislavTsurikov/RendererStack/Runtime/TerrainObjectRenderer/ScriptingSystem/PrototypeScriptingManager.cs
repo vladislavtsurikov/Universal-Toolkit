@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.CellsInstancesSelector;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.DefaultInstancesSelector;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.
+    CellsInstancesSelector;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.InstancesSelectorSystem.
+    DefaultInstancesSelector;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.MonoBehaviour;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting;
@@ -18,31 +19,31 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 {
     public class PrototypeScriptingManager
     {
-        private Transform _scriptingSystemGameObjectParent;
-        
         private readonly GameObject _sourcePrototypeColliderObject;
 
-        [NonSerialized] 
-        public readonly DefaultPrototypeInstancesSelector DefaultPrototypeInstancesSelector;
-        [NonSerialized] 
+        [NonSerialized]
         public readonly CellsPrototypeInstancesSelector CellsPrototypeInstancesSelector;
-        
+
+        [NonSerialized]
+        public readonly DefaultPrototypeInstancesSelector DefaultPrototypeInstancesSelector;
+
         public readonly PrototypeTerrainObject Proto;
-        
-        public Colliders CollidersComponent => (Colliders)Proto.GetSettings(typeof(Colliders));
-        public Scripting ScriptingComponent => (Scripting)Proto.GetSettings(typeof(Scripting));
-        
+        private Transform _scriptingSystemGameObjectParent;
+
         public PrototypeScriptingManager(PrototypeTerrainObject proto, Transform parent)
         {
             Proto = proto;
-            
+
             CreateScriptingSystemGameObjectParent(proto, parent);
-            
+
             _sourcePrototypeColliderObject = CreateSourceColliderGameObject();
-            
+
             DefaultPrototypeInstancesSelector = new DefaultPrototypeInstancesSelector(this, proto);
             CellsPrototypeInstancesSelector = new CellsPrototypeInstancesSelector(this, proto);
         }
+
+        public Colliders CollidersComponent => (Colliders)Proto.GetSettings(typeof(Colliders));
+        public Scripting ScriptingComponent => (Scripting)Proto.GetSettings(typeof(Scripting));
 
         public void OnDisable()
         {
@@ -52,18 +53,20 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             }
             else
             {
-                Object.DestroyImmediate(_sourcePrototypeColliderObject);  
+                Object.DestroyImmediate(_sourcePrototypeColliderObject);
             }
 
             DestroyScriptingSystemGameObjectParent();
         }
-        
+
         public void SetColliders(Sphere sphere, object usedObj)
         {
             if (sphere.Radius >= 50)
             {
                 DefaultPrototypeInstancesSelector.OnDisableCollider(usedObj);
-                CellPrototypeInstancesSelectorData cellPrototypeInstancesSelectorData = (CellPrototypeInstancesSelectorData)CellsPrototypeInstancesSelector.GetPrototypeInstancesSelectorData(usedObj);
+                var cellPrototypeInstancesSelectorData =
+                    (CellPrototypeInstancesSelectorData)CellsPrototypeInstancesSelector
+                        .GetPrototypeInstancesSelectorData(usedObj);
 
                 if (cellPrototypeInstancesSelectorData.IsNeedUpdate(sphere))
                 {
@@ -73,7 +76,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             else
             {
                 CellsPrototypeInstancesSelector.OnDisableCollider(usedObj);
-                DefaultPrototypeInstancesSelectorData defaultPrototypeInstancesSelectorData = (DefaultPrototypeInstancesSelectorData)DefaultPrototypeInstancesSelector.GetPrototypeInstancesSelectorData(usedObj);
+                var defaultPrototypeInstancesSelectorData =
+                    (DefaultPrototypeInstancesSelectorData)DefaultPrototypeInstancesSelector
+                        .GetPrototypeInstancesSelectorData(usedObj);
 
                 if (defaultPrototypeInstancesSelectorData.IsNeedUpdate(sphere))
                 {
@@ -84,7 +89,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         private void CreateScriptingSystemGameObjectParent(PrototypeTerrainObject proto, Transform parent)
         {
-            GameObject parentObject = new GameObject(proto.Prefab.name) {hideFlags = HideFlags.DontSave};
+            var parentObject = new GameObject(proto.Prefab.name) { hideFlags = HideFlags.DontSave };
             GameObjectUtility.ParentGameObject(parentObject, parent.gameObject);
             _scriptingSystemGameObjectParent = parentObject.transform;
         }
@@ -95,7 +100,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             {
                 return;
             }
-            
+
             if (Application.isPlaying)
             {
                 Object.Destroy(_scriptingSystemGameObjectParent.gameObject);
@@ -108,7 +113,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         private GameObject CreateSourceColliderGameObject()
         {
-            GameObject sourceColliderObject = new GameObject("SourceColliderObject") {hideFlags = HideFlags.DontSave};
+            var sourceColliderObject = new GameObject("SourceColliderObject") { hideFlags = HideFlags.DontSave };
             sourceColliderObject.transform.SetParent(_scriptingSystemGameObjectParent);
             sourceColliderObject.transform.position = Vector3.zero;
             sourceColliderObject.transform.localScale = Vector3.one;
@@ -124,16 +129,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
                 tmpColliderObject.transform.position = Vector3.zero;
                 tmpColliderObject.transform.localScale = Vector3.one;
                 tmpColliderObject.transform.rotation = Quaternion.identity;
-				
+
                 Collider[] colliders = tmpColliderObject.GetComponentsInChildren<Collider>();
 
-                foreach (var colliderComponent in colliders)
+                foreach (Collider colliderComponent in colliders)
                 {
-                    string colliderObjectName = colliderComponent.GetType().ToString().Split('.').Last();
-				
-                    GameObject colliderObject = new GameObject(colliderObjectName) {hideFlags = HideFlags.DontSave};			
+                    var colliderObjectName = colliderComponent.GetType().ToString().Split('.').Last();
+
+                    var colliderObject = new GameObject(colliderObjectName) { hideFlags = HideFlags.DontSave };
                     colliderObject.transform.SetParent(sourceColliderObject.transform);
-                    var transform = colliderComponent.transform;
+                    Transform transform = colliderComponent.transform;
                     colliderObject.transform.position = transform.position;
                     colliderObject.transform.localScale = transform.localScale;
                     colliderObject.transform.rotation = transform.rotation;
@@ -142,7 +147,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
                     GameObjectUtility.CopyComponent(colliderComponent, colliderObject);
                 }
-				
+
                 Object.DestroyImmediate(tmpColliderObject);
             }
 
@@ -160,7 +165,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         private void UpdateGameObjectHierarchyLargeObjectInstance(GameObject go, TerrainObjectInstance instance)
         {
-            var hierarchyLargeObjectInstance = go.GetComponent<HierarchyTerrainObjectInstance>();
+            HierarchyTerrainObjectInstance hierarchyLargeObjectInstance =
+                go.GetComponent<HierarchyTerrainObjectInstance>();
 
             if (!hierarchyLargeObjectInstance)
             {
@@ -172,26 +178,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
         public GameObject CreateGameObject(string objText)
         {
-            var newObject = Object.Instantiate(_sourcePrototypeColliderObject, _scriptingSystemGameObjectParent, true);
+            GameObject newObject =
+                Object.Instantiate(_sourcePrototypeColliderObject, _scriptingSystemGameObjectParent, true);
             newObject.name = "Hierarchy Object_" + objText;
             newObject.hideFlags = GetVisibilityHideFlags();
-            newObject.tag = Proto.Prefab.tag;	
+            newObject.tag = Proto.Prefab.tag;
             newObject.layer = Proto.Prefab.layer;
-			
+
             newObject.SetActive(true);
             newObject.AddComponent<HierarchyTerrainObjectInstance>();
-            
+
             return newObject;
         }
-        
-        private static HideFlags GetVisibilityHideFlags()
-        {
-            return RendererStackSettings.Instance.ShowColliders ? HideFlags.DontSave : HideFlags.HideAndDontSave;
-        }
-        
+
+        private static HideFlags GetVisibilityHideFlags() => RendererStackSettings.Instance.ShowColliders
+            ? HideFlags.DontSave
+            : HideFlags.HideAndDontSave;
+
         public void RemoveColliders(object usedObj)
         {
-            DefaultPrototypeInstancesSelector.OnDisableCollider(usedObj); 
+            DefaultPrototypeInstancesSelector.OnDisableCollider(usedObj);
             CellsPrototypeInstancesSelector.OnDisableCollider(usedObj);
         }
 
@@ -201,6 +207,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
             {
                 return CollidersComponent.MaxDistance;
             }
+
             if (ScriptingComponent.IsValid())
             {
                 return ScriptingComponent.MaxDistance;

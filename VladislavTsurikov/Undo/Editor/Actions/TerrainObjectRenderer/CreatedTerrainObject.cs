@@ -6,12 +6,9 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 {
     public class CreatedTerrainObject : UndoRecord
     {
-        private readonly List<TerrainObjectInstance> _instanceList = new List<TerrainObjectInstance>();
+        private readonly List<TerrainObjectInstance> _instanceList = new();
 
-        public CreatedTerrainObject(TerrainObjectInstance terrainObject) 
-        {
-            _instanceList.Add(terrainObject);
-        }
+        public CreatedTerrainObject(TerrainObjectInstance terrainObject) => _instanceList.Add(terrainObject);
 
         public override void Merge(UndoRecord record)
         {
@@ -25,7 +22,7 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 
         public override void Undo()
         {
-            foreach (var terrainObject in _instanceList)
+            foreach (TerrainObjectInstance terrainObject in _instanceList)
             {
                 terrainObject.Destroy();
             }

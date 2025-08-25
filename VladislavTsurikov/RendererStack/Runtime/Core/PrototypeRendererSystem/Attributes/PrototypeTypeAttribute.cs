@@ -7,9 +7,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
     {
         public readonly Type Type;
 
-        public PrototypeTypeAttribute(Type type)
-        {
-            Type = type;
-        }
+        public PrototypeTypeAttribute(Type type) => Type = type;
     }
 }

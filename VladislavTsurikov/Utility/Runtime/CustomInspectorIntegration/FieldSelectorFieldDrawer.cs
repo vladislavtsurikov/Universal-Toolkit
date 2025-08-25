@@ -12,10 +12,7 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
 {
     public class FieldSelectorFieldDrawer : IMGUIFieldDrawer
     {
-        public override bool CanDraw(Type type)
-        {
-            return typeof(FieldSelector).IsAssignableFrom(type);
-        }
+        public override bool CanDraw(Type type) => typeof(FieldSelector).IsAssignableFrom(type);
 
         public override object Draw(Rect rect, GUIContent label, Type fieldType, object value)
         {
@@ -29,9 +26,10 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
                 return value;
             }
 
-            Rect labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
-            Rect buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y, rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
-            
+            var labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+            var buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y,
+                rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
+
             if (fieldSelector.DeclaringType == null)
             {
                 EditorGUI.LabelField(labelRect, "DeclaringType is not set");
@@ -40,7 +38,7 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
 
             EditorGUI.LabelField(labelRect, label);
 
-            string currentFieldName = fieldSelector.FieldInfo?.Name ?? "(None)";
+            var currentFieldName = fieldSelector.FieldInfo?.Name ?? "(None)";
             if (GUI.Button(buttonRect, currentFieldName))
             {
                 OpenFieldSelectorPopup(buttonRect, fieldSelector);

@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
+using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
@@ -10,26 +11,23 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
     public class PrototypesStorage : SerializedScriptableObjectSingleton<PrototypesStorage>
     {
         [OdinSerialize]
-        public List<PrototypesRendererStorage> PrototypeRendererStacks = new List<PrototypesRendererStorage>();
-        
+        public List<PrototypesRendererStorage> PrototypeRendererStacks = new();
+
         [OnDeserializing]
-        private void OnDeserializing()
-        {
-            PrototypeRendererStacks ??= new List<PrototypesRendererStorage>();
-        }
+        private void OnDeserializing() => PrototypeRendererStacks ??= new List<PrototypesRendererStorage>();
 
         public void DeleteInvalidPrototypes()
         {
-            foreach (var item in PrototypeRendererStacks)
+            foreach (PrototypesRendererStorage item in PrototypeRendererStacks)
             {
                 item.DeleteInvalidPrototypes();
             }
         }
 
-        public Prototype GeneratePrototypeIfNecessary(UnityEngine.Object obj, Type prototypeType, Type rendererType)
+        public Prototype GeneratePrototypeIfNecessary(Object obj, Type prototypeType, Type rendererType)
         {
             PrototypesRendererStorage prototypesRendererStorage = GetPrototypeRendererStack(rendererType);
-            
+
             if (prototypesRendererStorage == null)
             {
                 prototypesRendererStorage = new PrototypesRendererStorage(rendererType);
@@ -38,21 +36,21 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return prototypesRendererStorage.GeneratePrototypeIfNecessary(obj, prototypeType);
         }
-        
+
         public void Remove(List<Prototype> protoList, Type rendererType)
         {
             PrototypesRendererStorage prototypesRendererStorage = GetPrototypeRendererStack(rendererType);
-            
+
             if (prototypesRendererStorage != null)
             {
                 prototypesRendererStorage.Remove(protoList);
             }
         }
 
-        public Prototype GetPrototype(UnityEngine.Object obj, Type rendererType)
+        public Prototype GetPrototype(Object obj, Type rendererType)
         {
             PrototypesRendererStorage prototypesRendererStorage = GetPrototypeRendererStack(rendererType);
-            
+
             if (prototypesRendererStorage != null)
             {
                 return prototypesRendererStorage.GetPrototype(obj);
@@ -60,11 +58,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return null;
         }
-        
+
         public Prototype GetPrototype(int id, Type rendererType)
         {
             PrototypesRendererStorage prototypesRendererStorage = GetPrototypeRendererStack(rendererType);
-            
+
             if (prototypesRendererStorage != null)
             {
                 return prototypesRendererStorage.GetPrototype(id);
@@ -72,11 +70,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return null;
         }
-        
+
         public bool HasPrototype(Prototype findProto, Type rendererType)
         {
             PrototypesRendererStorage prototypesRendererStorage = GetPrototypeRendererStack(rendererType);
-            
+
             if (prototypesRendererStorage != null)
             {
                 return prototypesRendererStorage.HasPrototype(findProto);
@@ -87,10 +85,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
         private PrototypesRendererStorage GetPrototypeRendererStack(Type rendererType)
         {
-            foreach (var item in PrototypeRendererStacks)
+            foreach (PrototypesRendererStorage item in PrototypeRendererStacks)
             {
                 if (item.RendererType == rendererType)
+                {
                     return item;
+                }
             }
 
             return null;

@@ -16,15 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using JetBrains.Annotations;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Indicates that an instance field or auto-property should be serialized by Odin.
+    ///     Indicates that an instance field or auto-property should be serialized by Odin.
     /// </summary>
     /// <seealso cref="System.Attribute" />
-    [JetBrains.Annotations.MeansImplicitUse]
+    [MeansImplicitUse]
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class OdinSerializeAttribute : Attribute
     {

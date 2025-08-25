@@ -9,16 +9,13 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
     public class RendererGlobalComponentStackEditor : IMGUIElementEditor
     {
         private IMGUIComponentStackEditor<GlobalComponent, IMGUIElementEditor> _componentStackEditor;
-        
-        public override void OnEnable()
-        {
-            _componentStackEditor = new IMGUIComponentStackEditor<GlobalComponent, IMGUIElementEditor>(((RendererGlobalComponentStack)Target).ComponentStack);
-        }
 
-        public override void OnGUI()
-        {
-            _componentStackEditor.OnGUI();
-        }
+        public override void OnEnable() =>
+            _componentStackEditor =
+                new IMGUIComponentStackEditor<GlobalComponent, IMGUIElementEditor>(
+                    ((RendererGlobalComponentStack)Target).ComponentStack);
+
+        public override void OnGUI() => _componentStackEditor.OnGUI();
     }
 }
 #endif

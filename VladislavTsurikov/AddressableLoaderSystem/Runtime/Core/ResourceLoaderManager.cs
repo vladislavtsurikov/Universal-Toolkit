@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.Utility.Runtime;
 using UnityEngine;
 using Zenject;
 
@@ -11,11 +10,9 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
     public class ResourceLoaderManager
     {
-        private readonly DiContainer _container;
-        private readonly List<ResourceLoader> _allLoaders = new();
         private readonly HashSet<ResourceLoader> _activeLoaders = new();
-
-        public IReadOnlyList<ResourceLoader> GetAllLoaders() => _allLoaders;
+        private readonly List<ResourceLoader> _allLoaders = new();
+        private readonly DiContainer _container;
 
         public ResourceLoaderManager(DiContainer container)
         {
@@ -23,13 +20,16 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             LoaderRegistrarUtility.RegisterLoaderInitializers(this);
         }
 
-        public async UniTask Load(Func<FilterAttribute, bool> attributePredicate, CancellationToken cancellationToken = default)
+        public IReadOnlyList<ResourceLoader> GetAllLoaders() => _allLoaders;
+
+        public async UniTask Load(Func<FilterAttribute, bool> attributePredicate,
+            CancellationToken cancellationToken = default)
         {
             var selected = new HashSet<ResourceLoader>();
 
-            foreach (var loader in _allLoaders)
+            foreach (ResourceLoader loader in _allLoaders)
             {
-                var attributes = loader.GetType()
+                FilterAttribute[] attributes = loader.GetType()
                     .GetCustomAttributes(typeof(FilterAttribute), true)
                     .Cast<FilterAttribute>()
                     .ToArray();
@@ -50,7 +50,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
             _activeLoaders.Clear();
 
-            foreach (var loader in selected)
+            foreach (ResourceLoader loader in selected)
             {
                 _activeLoaders.Add(loader);
             }
@@ -59,10 +59,10 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             Debug.Log($"[ResourceLoaderManager] End Loading");
 #endif
         }
-        
+
         internal bool Register(ResourceLoader loader)
         {
-            var type = loader.GetType();
+            Type type = loader.GetType();
 
             if (_allLoaders.Any(l => l.GetType() == type))
             {
@@ -75,10 +75,11 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             return true;
         }
 
-        private async UniTask UnloadObsoleteLoaders(HashSet<ResourceLoader> desired, CancellationToken cancellationToken)
+        private async UniTask UnloadObsoleteLoaders(HashSet<ResourceLoader> desired,
+            CancellationToken cancellationToken)
         {
-            var toUnload = _activeLoaders.Except(desired);
-            foreach (var loader in toUnload)
+            IEnumerable<ResourceLoader> toUnload = _activeLoaders.Except(desired);
+            foreach (ResourceLoader loader in toUnload)
             {
                 await loader.Unload(cancellationToken);
             }
@@ -86,7 +87,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
         private async UniTask LoadMissingLoaders(HashSet<ResourceLoader> desired, CancellationToken cancellationToken)
         {
-            var toLoad = desired.Except(_activeLoaders);
+            IEnumerable<ResourceLoader> toLoad = desired.Except(_activeLoaders);
 
 #if ADDRESSABLE_LOADER_LOGS
             var totalLoadTime = System.Diagnostics.Stopwatch.StartNew();
@@ -94,7 +95,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
             var loadTasks = new List<UniTask>();
 
-            foreach (var loader in toLoad)
+            foreach (ResourceLoader loader in toLoad)
             {
                 var task = UniTask.Create(async () =>
                 {
@@ -111,7 +112,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError($"[ResourceLoaderManager] Exception while loading {loader.GetType().Name}: {ex}");
+                        Debug.LogError(
+                            $"[ResourceLoaderManager] Exception while loading {loader.GetType().Name}: {ex}");
                     }
                 });
 

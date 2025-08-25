@@ -5,9 +5,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     public static class FindSector
     {
-        public static List<Sector> OverlapSphere(Vector3 center, float radius, string sectorLayerTag = null, bool objectBounds = true, bool sort = true)
+        public static List<Sector> OverlapSphere(Vector3 center, float radius, string sectorLayerTag = null,
+            bool objectBounds = true, bool sort = true)
         {
-            List<Sector> findSectors = new List<Sector>();
+            var findSectors = new List<Sector>();
 
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
@@ -16,14 +17,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 return new List<Sector>();
             }
 
-            foreach (var sectorLayer in sectorLayers)
+            foreach (SectorLayer sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
                     ? sectorLayer.ObjectBoundsBVHTree.OverlapSphere(center, radius)
                     : sectorLayer.SectorBvhTree.OverlapSphere(center, radius));
             }
-            
-            if(sort)
+
+            if (sort)
             {
                 SortCloserToCenter(findSectors, center);
             }
@@ -31,9 +32,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             return findSectors;
         }
 
-        public static List<Sector> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, string sectorLayerTag = null, bool objectBounds = true, bool sort = true)
+        public static List<Sector> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            string sectorLayerTag = null, bool objectBounds = true, bool sort = true)
         {
-            List<Sector> findSectors = new List<Sector>();
+            var findSectors = new List<Sector>();
 
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
@@ -42,24 +44,25 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 return new List<Sector>();
             }
 
-            foreach (var sectorLayer in sectorLayers)
+            foreach (SectorLayer sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
-                    ? sectorLayer.ObjectBoundsBVHTree.OverlapBox(boxCenter,  boxSize, boxRotation)
-                    : sectorLayer.SectorBvhTree.OverlapBox(boxCenter,  boxSize, boxRotation));
+                    ? sectorLayer.ObjectBoundsBVHTree.OverlapBox(boxCenter, boxSize, boxRotation)
+                    : sectorLayer.SectorBvhTree.OverlapBox(boxCenter, boxSize, boxRotation));
             }
-            
-            if(sort)
+
+            if (sort)
             {
                 SortCloserToCenter(findSectors, boxCenter);
             }
 
             return findSectors;
         }
-        
-        public static List<Sector> OverlapPosition(Vector3 position, string sectorLayerTag = null, bool objectBounds = true)
+
+        public static List<Sector> OverlapPosition(Vector3 position, string sectorLayerTag = null,
+            bool objectBounds = true)
         {
-            List<Sector> findSectors = new List<Sector>();
+            var findSectors = new List<Sector>();
 
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
@@ -68,7 +71,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 return new List<Sector>();
             }
 
-            foreach (var sectorLayer in sectorLayers)
+            foreach (SectorLayer sectorLayer in sectorLayers)
             {
                 findSectors.AddRange(objectBounds
                     ? sectorLayer.ObjectBoundsBVHTree.OverlapPosition(position)
@@ -87,8 +90,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
             sectors.Sort(delegate(Sector h0, Sector h1)
             {
-                float distance0 = Vector3.Distance(center, h0.Bounds.center);
-                float distance1 = Vector3.Distance(center, h1.Bounds.center);
+                var distance0 = Vector3.Distance(center, h0.Bounds.center);
+                var distance1 = Vector3.Distance(center, h1.Bounds.center);
                 return distance0.CompareTo(distance1);
             });
         }

@@ -1,4 +1,3 @@
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.ReflectionUtility;
 
@@ -7,13 +6,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
     [Name("Transform Settings")]
     public class TransformComponentSettings : Component
     {
-        public TransformComponentStack TransformComponentStack = new TransformComponentStack();
+        public TransformComponentStack TransformComponentStack = new();
 
         protected override void OnCreate()
-		{
-			TransformComponentStack.CreateIfMissingType(typeof(PositionOffset));
-			TransformComponentStack.CreateIfMissingType(typeof(Rotation));
-			TransformComponentStack.CreateIfMissingType(typeof(Scale));
-		}
+        {
+            TransformComponentStack.CreateIfMissingType(typeof(PositionOffset));
+            TransformComponentStack.CreateIfMissingType(typeof(Rotation));
+            TransformComponentStack.CreateIfMissingType(typeof(Scale));
+        }
     }
 }

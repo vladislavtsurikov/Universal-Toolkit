@@ -15,60 +15,54 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace OdinSerializer
 {
     /// <summary>
-    /// Contains global configuration options for the serialization system.
+    ///     Contains global configuration options for the serialization system.
     /// </summary>
     public class GlobalSerializationConfig
     {
-        private static readonly GlobalSerializationConfig instance = new GlobalSerializationConfig();
+        /// <summary>
+        ///     Gets the global configuration instance.
+        /// </summary>
+        public static GlobalSerializationConfig Instance { get; } = new();
 
         /// <summary>
-        /// Gets the global configuration instance.
+        ///     Gets the logger.
         /// </summary>
-        public static GlobalSerializationConfig Instance { get { return GlobalSerializationConfig.instance; } }
+        public ILogger Logger => DefaultLoggers.UnityLogger;
 
         /// <summary>
-        /// Gets the logger.
+        ///     Gets the editor serialization format.
         /// </summary>
-        public ILogger Logger { get { return DefaultLoggers.UnityLogger; } }
+        public DataFormat EditorSerializationFormat => DataFormat.Nodes;
 
         /// <summary>
-        /// Gets the editor serialization format.
+        ///     Gets the build serialization format.
         /// </summary>
-        public DataFormat EditorSerializationFormat { get { return DataFormat.Nodes; } }
+        public DataFormat BuildSerializationFormat => DataFormat.Binary;
 
         /// <summary>
-        /// Gets the build serialization format.
+        ///     Gets the logging policy.
         /// </summary>
-        public DataFormat BuildSerializationFormat { get { return DataFormat.Binary; } }
+        public LoggingPolicy LoggingPolicy => LoggingPolicy.LogErrors;
 
         /// <summary>
-        /// Gets the logging policy.
+        ///     Gets the error handling policy.
         /// </summary>
-        public LoggingPolicy LoggingPolicy { get { return LoggingPolicy.LogErrors; } }
+        public ErrorHandlingPolicy ErrorHandlingPolicy => ErrorHandlingPolicy.Resilient;
 
-        /// <summary>
-        /// Gets the error handling policy.
-        /// </summary>
-        public ErrorHandlingPolicy ErrorHandlingPolicy { get { return ErrorHandlingPolicy.Resilient; } }
+        internal static bool HasInstanceLoaded =>
+            // TODO: @Integration: If you store your config in an asset or file somewhere, return true here if it is loaded, otherwise false.
+            // If your config is stored in a Unity asset, do NOT load it here; this property is often called from the
+            // serialization thread, meaning you are not allowed to use Unity's API for loading assets here.
+            // If this value is false, default configuration values will be used - the same defaults as are set in this class.
+            true;
 
         internal static void LoadInstanceIfAssetExists()
         {
             // TODO: @Integration: If you store your config in an asset or file somewhere, load it here.
-        }
-
-        internal static bool HasInstanceLoaded
-        {
-            get
-            {
-                // TODO: @Integration: If you store your config in an asset or file somewhere, return true here if it is loaded, otherwise false.
-                // If your config is stored in a Unity asset, do NOT load it here; this property is often called from the
-                // serialization thread, meaning you are not allowed to use Unity's API for loading assets here.
-                // If this value is false, default configuration values will be used - the same defaults as are set in this class.
-                return true;
-            }
         }
     }
 }

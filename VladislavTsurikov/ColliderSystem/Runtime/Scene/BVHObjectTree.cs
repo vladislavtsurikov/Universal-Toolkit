@@ -5,10 +5,10 @@ using VladislavTsurikov.Math.Runtime;
 
 namespace VladislavTsurikov.ColliderSystem.Runtime
 {
-    public class BVHObjectTree<T> where T: ColliderObject
+    public class BVHObjectTree<T> where T : ColliderObject
     {
-        public readonly BVHTree<BVHNodeAABB<T>, T> Tree = new BVHTree<BVHNodeAABB<T>, T>();
-        
+        public readonly BVHTree<BVHNodeAABB<T>, T> Tree = new();
+
         public List<T> FindAllInstance(List<object> pathDatas = null)
         {
             List<BVHNode<T>> overlappedNodes = Tree.FindAllLeafNode();
@@ -19,7 +19,7 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
             var overlappedObjects = new List<T>();
 
-            foreach (var node in overlappedNodes)
+            foreach (BVHNode<T> node in overlappedNodes)
             {
                 node.Data.SetPathToObjectCollider(pathDatas, this, node);
                 overlappedObjects.Add(node.Data);
@@ -28,7 +28,8 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
             return overlappedObjects;
         }
 
-        public List<T> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter, bool checkOBBIntersection = false, List<object> pathDatas = null)
+        public List<T> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, ObjectFilter objectFilter,
+            bool checkOBBIntersection = false, List<object> pathDatas = null)
         {
             List<BVHNode<T>> overlappedNodes = Tree.OverlapBox(boxCenter, boxSize, boxRotation);
             if (overlappedNodes.Count == 0)
@@ -38,28 +39,29 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
             var overlappedObjects = new List<T>();
 
-            foreach(var node in overlappedNodes)
+            foreach (BVHNode<T> node in overlappedNodes)
             {
-                if(!node.Data.IsValid())
+                if (!node.Data.IsValid())
                 {
                     continue;
                 }
 
                 if (objectFilter != null)
                 {
-                    if(!objectFilter.Filter(node.Data))
+                    if (!objectFilter.Filter(node.Data))
                     {
                         continue;
                     }
                 }
-                
+
                 if (checkOBBIntersection)
                 {
-                    if(node.Data.IsRendererEnabled())
+                    if (node.Data.IsRendererEnabled())
                     {
                         OBB worldOBB = node.Data.GetOBB();
 
-                        if (BoxMath.BoxIntersectsBox(worldOBB.Center, worldOBB.Size, worldOBB.Rotation, boxCenter, boxSize, boxRotation))
+                        if (BoxMath.BoxIntersectsBox(worldOBB.Center, worldOBB.Size, worldOBB.Rotation, boxCenter,
+                                boxSize, boxRotation))
                         {
                             node.Data.SetPathToObjectCollider(pathDatas, this, node);
                             overlappedObjects.Add(node.Data);
@@ -76,22 +78,23 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
             return overlappedObjects;
         }
 
-        public List<T> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter, bool checkOBBIntersection = false, List<object> pathDatas = null)
+        public List<T> OverlapSphere(Vector3 sphereCenter, float sphereRadius, ObjectFilter objectFilter,
+            bool checkOBBIntersection = false, List<object> pathDatas = null)
         {
-            var overlappedNodes = Tree.OverlapSphere(sphereCenter, sphereRadius);
+            List<BVHNode<T>> overlappedNodes = Tree.OverlapSphere(sphereCenter, sphereRadius);
             if (overlappedNodes.Count == 0)
             {
                 return new List<T>();
             }
 
-            float radiusSqr = sphereRadius * sphereRadius;
+            var radiusSqr = sphereRadius * sphereRadius;
             var overlappedObjects = new List<T>();
 
-            foreach (var node in overlappedNodes)
+            foreach (BVHNode<T> node in overlappedNodes)
             {
                 if (objectFilter != null)
                 {
-                    if(!objectFilter.Filter(node.Data))
+                    if (!objectFilter.Filter(node.Data))
                     {
                         continue;
                     }
@@ -99,12 +102,13 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
                 if (checkOBBIntersection)
                 {
-                    if(node.Data.IsRendererEnabled())
+                    if (node.Data.IsRendererEnabled())
                     {
                         OBB worldOBB = node.Data.GetOBB();
 
-                        Vector3 closestPt = BoxMath.CalcBoxPtClosestToPt(sphereCenter, worldOBB.Center, worldOBB.Size, worldOBB.Rotation);
-                        if ((closestPt - sphereCenter).sqrMagnitude <= radiusSqr) 
+                        Vector3 closestPt = BoxMath.CalcBoxPtClosestToPt(sphereCenter, worldOBB.Center, worldOBB.Size,
+                            worldOBB.Rotation);
+                        if ((closestPt - sphereCenter).sqrMagnitude <= radiusSqr)
                         {
                             node.Data.SetPathToObjectCollider(pathDatas, this, node);
                             overlappedObjects.Add(node.Data);
@@ -113,7 +117,7 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
                 }
                 else
                 {
-                    if(Contains(node.Data.GetMatrix().GetTranslation(), sphereCenter, sphereRadius))
+                    if (Contains(node.Data.GetMatrix().GetTranslation(), sphereCenter, sphereRadius))
                     {
                         node.Data.SetPathToObjectCollider(pathDatas, this, node);
                         overlappedObjects.Add(node.Data);
@@ -123,14 +127,11 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
             return overlappedObjects;
         }
-        
-        public bool Contains(Vector3 point, Vector3 Center, float Radius)
-        {
-            return Vector3.Distance(point, Center) <= Radius;
-        }
+
+        public bool Contains(Vector3 point, Vector3 Center, float Radius) => Vector3.Distance(point, Center) <= Radius;
 
         public RayHit Raycast(Ray ray, ObjectFilter raycastFilter, List<object> pathDatas = null)
-        {            
+        {
             List<RayHit> allObjectHits = RaycastAll(ray, raycastFilter);
             RayHit closestObjectHit = allObjectHits.Count != 0 ? allObjectHits[0] : null;
 
@@ -139,18 +140,18 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 
         public List<RayHit> RaycastAll(Ray ray, ObjectFilter objectFilter, List<object> pathDatas = null)
         {
-            var nodeHits = Tree.RaycastAll(ray, false);
+            List<BVHNodeRayHit<T>> nodeHits = Tree.RaycastAll(ray, false);
             if (nodeHits.Count == 0)
             {
                 return new List<RayHit>();
             }
 
-            List<RayHit> sortedObjectHits = new List<RayHit>(20);
-            foreach (var hit in nodeHits)
+            var sortedObjectHits = new List<RayHit>(20);
+            foreach (BVHNodeRayHit<T> hit in nodeHits)
             {
                 if (objectFilter != null)
                 {
-                    if(!objectFilter.Filter(hit.HitNode.Data))
+                    if (!objectFilter.Filter(hit.HitNode.Data))
                     {
                         continue;
                     }
@@ -165,23 +166,18 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
             return sortedObjectHits;
         }
 
-        public void Clear()
-        {
-            Tree.Clear();
-        }
+        public void Clear() => Tree.Clear();
 
 #if UNITY_EDITOR
-        #region Gizmos
-        public void DrawRaycast(Ray ray, Color nodeColor)
-        {
-            Tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
-        }
 
-        public void DrawAllCells(Color nodeColor)
-        {
-            Tree.DrawAllCells(Matrix4x4.identity, nodeColor);
-        }
+        #region Gizmos
+
+        public void DrawRaycast(Ray ray, Color nodeColor) => Tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
+
+        public void DrawAllCells(Color nodeColor) => Tree.DrawAllCells(Matrix4x4.identity, nodeColor);
+
         #endregion
+
 #endif
     }
 }

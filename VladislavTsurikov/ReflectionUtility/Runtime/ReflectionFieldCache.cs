@@ -10,7 +10,7 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime
 
         public static FieldInfo[] GetCachedFields(Type type, BindingFlags flags)
         {
-            if (!_fieldCache.TryGetValue(type, out var fields))
+            if (!_fieldCache.TryGetValue(type, out FieldInfo[] fields))
             {
                 fields = type.GetFields(flags);
                 _fieldCache[type] = fields;

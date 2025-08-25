@@ -11,9 +11,9 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
     public abstract class InspectorFieldsDrawer<TDrawer>
         where TDrawer : FieldDrawer
     {
+        private readonly BindingFlags _bindingFlags;
         private readonly List<Type> _excludedDeclaringTypes;
         private readonly bool _excludeInternal;
-        private readonly BindingFlags _bindingFlags;
 
         protected InspectorFieldsDrawer(
             List<Type> excludedDeclaringTypes = null,
@@ -25,14 +25,15 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
             _bindingFlags = bindingFlags;
         }
 
-        protected IEnumerable<(TDrawer fieldDrawer, FieldInfo field, string fieldName, object value)> GetProcessedFields(object target)
+        protected IEnumerable<(TDrawer fieldDrawer, FieldInfo field, string fieldName, object value)>
+            GetProcessedFields(object target)
         {
             FieldInfo[] fields = FieldUtility.GetSerializableFields(
-                            target.GetType(),
-                            _bindingFlags,
-                            _excludeInternal,
-                            _excludedDeclaringTypes.ToArray()
-                        );
+                target.GetType(),
+                _bindingFlags,
+                _excludeInternal,
+                _excludedDeclaringTypes.ToArray()
+            );
 
             foreach (FieldInfo field in fields)
             {
@@ -43,23 +44,23 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
 
                 TDrawer drawer = FieldDrawerResolver<TDrawer>.GetFieldDrawer(field.FieldType);
 
-                object value = drawer == null || drawer.ShouldCreateInstanceIfNull()
+                var value = drawer == null || drawer.ShouldCreateInstanceIfNull()
                     ? FieldUtility.GetOrCreateFieldInstance(field, target)
                     : field.GetValue(target);
-                
-                string fieldName = FieldUtility.GetFieldLabel(field);
+
+                var fieldName = FieldUtility.GetFieldLabel(field);
 
                 yield return (drawer, field, fieldName, value);
             }
         }
-        
+
         private bool IsFieldVisible(FieldInfo field)
         {
             if (CustomInspectorPreferences.Instance.ShowFieldWithHideInInspectorAttribute)
             {
                 return true;
             }
-            
+
             return field.GetAttribute<HideInInspector>() == null;
         }
     }

@@ -16,22 +16,23 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Binds types to strings during serialization, and strings to types during deserialization.
+    ///     Binds types to strings during serialization, and strings to types during deserialization.
     /// </summary>
     public abstract class TwoWaySerializationBinder
     {
-		/// <summary>
-		/// Provides a default, catch-all <see cref="TwoWaySerializationBinder"/> implementation. This binder only includes assembly names, without versions and tokens, in order to increase compatibility.
-		/// </summary>
-		public static readonly TwoWaySerializationBinder Default = new DefaultSerializationBinder();
-	
         /// <summary>
-        /// Bind a type to a name.
+        ///     Provides a default, catch-all <see cref="TwoWaySerializationBinder" /> implementation. This binder only includes
+        ///     assembly names, without versions and tokens, in order to increase compatibility.
+        /// </summary>
+        public static readonly TwoWaySerializationBinder Default = new DefaultSerializationBinder();
+
+        /// <summary>
+        ///     Bind a type to a name.
         /// </summary>
         /// <param name="type">The type to bind.</param>
         /// <param name="debugContext">The debug context to log to.</param>
@@ -39,7 +40,7 @@ namespace OdinSerializer
         public abstract string BindToName(Type type, DebugContext debugContext = null);
 
         /// <summary>
-        /// Binds a name to a type.
+        ///     Binds a name to a type.
         /// </summary>
         /// <param name="typeName">The name of the type to bind.</param>
         /// <param name="debugContext">The debug context to log to.</param>
@@ -47,7 +48,7 @@ namespace OdinSerializer
         public abstract Type BindToType(string typeName, DebugContext debugContext = null);
 
         /// <summary>
-        /// Determines whether the specified type name is mapped.
+        ///     Determines whether the specified type name is mapped.
         /// </summary>
         public abstract bool ContainsType(string typeName);
     }

@@ -1,13 +1,13 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings;
+using VladislavTsurikov.ReflectionUtility;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     [Serializable]
     [Name("Slope")]
-    public class SlopeFilter : MaskFilter 
+    public class SlopeFilter : MaskFilter
     {
         public BlendMode BlendMode = BlendMode.Multiply;
 
@@ -25,16 +25,17 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         private Material _slopeMat;
 
-        private Material GetMaterial() 
+        private Material GetMaterial()
         {
-            if (_slopeMat == null) 
+            if (_slopeMat == null)
             {
-                _slopeMat = new Material( Shader.Find("Hidden/MegaWorld/Slope"));
+                _slopeMat = new Material(Shader.Find("Hidden/MegaWorld/Slope"));
             }
+
             return _slopeMat;
         }
 
-        public override void Eval(MaskFilterContext maskFilterContext, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             Material mat = GetMaterial();
 
@@ -48,7 +49,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         public void SetMaterial(Material mat, int index)
         {
-            if(index == 0)
+            if (index == 0)
             {
                 mat.SetInt("_BlendMode", (int)BlendMode.Multiply);
             }
@@ -64,10 +65,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             {
                 case FalloffType.Add:
                 {
-                    float localMinAddSlopeFalloff = AddSlopeFalloff;
-                    float localMaxAddSlopeFalloff = AddSlopeFalloff;
+                    var localMinAddSlopeFalloff = AddSlopeFalloff;
+                    var localMaxAddSlopeFalloff = AddSlopeFalloff;
 
-                    if(SlopeFalloffMinMax)
+                    if (SlopeFalloffMinMax)
                     {
                         localMinAddSlopeFalloff = MinAddSlopeFalloff;
                         localMaxAddSlopeFalloff = MaxAddSlopeFalloff;
@@ -83,7 +84,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 {
                     mat.SetInt("_SlopeFalloffType", 0);
                     break;
-                }   
+                }
             }
         }
     }

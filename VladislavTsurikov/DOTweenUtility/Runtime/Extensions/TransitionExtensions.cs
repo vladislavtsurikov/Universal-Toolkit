@@ -5,12 +5,10 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
 {
     public static class TransitionExtensions
     {
-        public static Tweener ApplyTransition(this Tweener tweener, Transition transition)
-        {
-            return tweener
+        public static Tweener ApplyTransition(this Tweener tweener, Transition transition) =>
+            tweener
                 .SetEase(transition.EaseType)
                 .SetUpdate(transition.Time);
-        }
 
         public static async UniTask AsyncWaitForCompletion(this Tweener tweener, Transition transition)
         {

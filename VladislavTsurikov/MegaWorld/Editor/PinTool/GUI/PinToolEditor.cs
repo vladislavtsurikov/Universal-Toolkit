@@ -8,10 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PinTool.GUI
     [ElementEditor(typeof(PinTool))]
     public class PinToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-		{
-			UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-		}
+        public override void DrawButtons() => UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
     }
 }
 #endif

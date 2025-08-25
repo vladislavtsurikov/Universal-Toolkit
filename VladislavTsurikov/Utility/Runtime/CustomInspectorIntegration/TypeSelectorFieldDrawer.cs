@@ -1,6 +1,7 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.CustomInspector.Editor.IMGUI;
@@ -10,10 +11,8 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime.CustomInspectorIntegration
 {
     public class TypeSelectorFieldDrawer : IMGUIFieldDrawer
     {
-        public override bool CanDraw(Type type)
-        {
-            return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(TypeSelector<>);
-        }
+        public override bool CanDraw(Type type) =>
+            type.IsGenericType && type.GetGenericTypeDefinition() == typeof(TypeSelector<>);
 
         public override object Draw(Rect rect, GUIContent label, Type fieldType, object value)
         {
@@ -31,8 +30,9 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime.CustomInspectorIntegration
                 return value;
             }
 
-            Rect labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
-            Rect buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y, rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
+            var labelRect = new Rect(rect.x, rect.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+            var buttonRect = new Rect(rect.x + EditorGUIUtility.labelWidth + 5, rect.y,
+                rect.width - EditorGUIUtility.labelWidth - 5, EditorGUIUtility.singleLineHeight);
 
             EditorGUI.LabelField(labelRect, label);
 
@@ -52,14 +52,12 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime.CustomInspectorIntegration
 
         private static IEnumerable<Type> GetDerivedTypes(Type baseType)
         {
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Type type in assembly.GetTypes())
             {
-                foreach (var type in assembly.GetTypes())
+                if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
                 {
-                    if (baseType.IsAssignableFrom(type) && !type.IsAbstract)
-                    {
-                        yield return type;
-                    }
+                    yield return type;
                 }
             }
         }

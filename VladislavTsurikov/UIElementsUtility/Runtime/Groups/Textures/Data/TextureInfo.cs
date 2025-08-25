@@ -10,9 +10,6 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Textures
         public string TextureName;
         public Texture2D TextureReference;
 
-        public void ValidateName()
-        {
-            TextureName = TextureName.RemoveWhitespaces().RemoveAllSpecialCharacters();
-        }
+        public void ValidateName() => TextureName = TextureName.RemoveWhitespaces().RemoveAllSpecialCharacters();
     }
 }

@@ -12,20 +12,20 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
     public class Trigger : SerializedMonoBehaviour
     {
         private CancellationTokenSource _cancellationTokenSource;
-        
-        [OdinSerialize]
-        public SingleElementStack<Event> SingleElementStack = new SingleElementStack<Event>();
-        
-        [OdinSerialize]
-        public ActionCollection ActionCollection = new ActionCollection();
 
         private Action<int> _onCollectionChangedHandler;
+
+        [OdinSerialize]
+        public ActionCollection ActionCollection = new();
+
+        [OdinSerialize]
+        public SingleElementStack<Event> SingleElementStack = new();
 
         private void OnEnable()
         {
             InitializeSingleElementStack();
             InitializeCancellation();
-            
+
             _onCollectionChangedHandler = _ =>
             {
                 EventCallbacksUtility.SetupEventCallbacksForce(gameObject, SingleElementStack.GetElement());
@@ -42,22 +42,16 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
             UnsubscribeFromCollectionChanges();
         }
 
-        internal void Run()
-        {
-            ActionCollection.Run(_cancellationTokenSource.Token).Forget();
-        }
+        internal void Run() => ActionCollection.Run(_cancellationTokenSource.Token).Forget();
 
         private void InitializeSingleElementStack()
         {
             SingleElementStack ??= new SingleElementStack<Event>();
-            SingleElementStack.Setup(true, new object[]{this}).Forget();
+            SingleElementStack.Setup(true, new object[] { this }).Forget();
             SingleElementStack.CreateFirstElementIfNecessary(typeof(OnEnableEvent));
         }
 
-        private void InitializeCancellation()
-        {
-            _cancellationTokenSource = new CancellationTokenSource();
-        }
+        private void InitializeCancellation() => _cancellationTokenSource = new CancellationTokenSource();
 
         private void UnsubscribeFromCollectionChanges()
         {

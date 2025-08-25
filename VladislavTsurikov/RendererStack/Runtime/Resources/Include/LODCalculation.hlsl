@@ -1,6 +1,6 @@
 void CalculateLODFade(float cameraDistance, uint nextLOD, out float4 lodFade)
 {
-    if(isStandardRenderPipeline)
+    if (isStandardRenderPipeline)
     {
         lodFade = float4(0, 0, 0, 0);
     }
@@ -16,7 +16,7 @@ void CalculateLODFade(float cameraDistance, uint nextLOD, out float4 lodFade)
     {
         float fade = clamp(distance / LODFadeDistance, 0, 1);
 
-        if(fade != 0)
+        if (fade != 0)
         {
             float lodFadeQuantified = 1 - clamp(round(fade * 16) / 16, 0.0625, 1);
             lodFade = float4(fade, lodFadeQuantified, 0, 0);
@@ -29,7 +29,7 @@ void CalculateLOD(float distanceToCamera, float loadBias, out uint lod, out uint
     lod = 9;
     shadowLod = 9;
 
-    if(isStandardRenderPipeline)
+    if (isStandardRenderPipeline)
     {
         lodFade = float4(0, 0, 0, 0);
     }
@@ -37,25 +37,25 @@ void CalculateLOD(float distanceToCamera, float loadBias, out uint lod, out uint
     {
         lodFade = float4(1, 0, 0, 0);
     }
-	
+
     for (uint i = startLOD; i < LODCount; i++)
     {
         bool lastLOD = i == LODCount - 1;
 
         float lodDistance = lodDistances[i / 4][i % 4] * loadBias;
-    	
+
         if (lastLOD || distanceToCamera <= lodDistance)
         {
             lod = i;
             shadowLod = shadowLODMap[i / 4][i % 4];
-        	
-            if(i != LODCount - 1)
+
+            if (i != LODCount - 1)
             {
                 if (useLODFade)
                 {
-                    if(lodFadeForLastLOD)
+                    if (lodFadeForLastLOD)
                     {
-                        if(i == LODCount - 2)
+                        if (i == LODCount - 2)
                         {
                             CalculateLODFade(distanceToCamera, i, lodFade);
                         }

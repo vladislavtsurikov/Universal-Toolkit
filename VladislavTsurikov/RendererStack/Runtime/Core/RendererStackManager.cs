@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using OdinSerializer;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 using VladislavTsurikov.SceneDataSystem.Runtime;
-#if UNITY_EDITOR 
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
+#if UNITY_EDITOR
 using VladislavTsurikov.RendererStack.Editor.Core.RendererSystem;
 using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings;
 #endif
@@ -15,8 +16,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
     [RequiredSceneType(SceneType.ParentScene)]
     public class RendererStackManager : SingletonSceneData<RendererStackManager>
     {
+        public delegate void OnEditorPlayModeSimulation(bool editorPlayModeSimulation);
+
+        public static OnEditorPlayModeSimulation OnEditorPlayModeSimulationEvent;
+
         [NonSerialized]
         private bool _editorPlayModeSimulation;
+
+        [OdinSerialize]
+        public RendererSystem.RendererStack RendererStack = new();
+
+        [OdinSerialize]
+        public SceneComponentStack SceneComponentStack = new();
 
         public bool EditorPlayModeSimulation
         {
@@ -26,7 +37,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
                 {
                     return false;
                 }
-                
+
                 return _editorPlayModeSimulation;
             }
             set
@@ -38,21 +49,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
                 }
             }
         }
-        
-        [OdinSerialize]
-        public RendererSystem.RendererStack RendererStack = new RendererSystem.RendererStack();
-        [OdinSerialize]
-        public SceneComponentStack SceneComponentStack = new SceneComponentStack(); 
-        
-        public delegate void OnEditorPlayModeSimulation (bool editorPlayModeSimulation);
-        public static OnEditorPlayModeSimulation OnEditorPlayModeSimulationEvent;
-
-#if UNITY_EDITOR 
-        [NonSerialized]
-        public RendererStackEditor RendererStackStackEditor;
-        [NonSerialized]
-		public SceneComponentStackEditor SceneComponentStackEditor;
-#endif
 
         [OnDeserializing]
         private void OnDeserializing()
@@ -60,10 +56,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
             SceneComponentStack ??= new SceneComponentStack();
             RendererStack ??= new RendererSystem.RendererStack();
         }
-        
+
         public override void LateUpdate()
         {
-            if(!IsSetup)
+            if (!IsSetup)
             {
                 return;
             }
@@ -71,13 +67,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
 #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
-                RendererStack.CheckChanges();  
+                RendererStack.CheckChanges();
             }
 #endif
-            
+
             RendererStack.Render();
         }
-        
+
         protected override void SetupSceneData()
         {
             RendererStack.ForceUpdateRendererData();
@@ -85,7 +81,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
             SceneComponentStackEditor ??= new SceneComponentStackEditor(SceneComponentStack);
             RendererStackStackEditor ??= new RendererStackEditor(RendererStack);
 #endif
-            
+
             RendererStack.Setup();
 
             SceneComponentStack.CreateIfMissingType(typeof(CameraManager));
@@ -96,21 +92,29 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core
 
         protected override void OnDisableElement()
         {
-            SceneComponentStack.OnDisable(); 
+            SceneComponentStack.OnDisable();
             RendererStack.OnDisable();
         }
 
 #if UNITY_EDITOR
         public override void DrawDebug()
         {
-            foreach (var customRenderer in RendererStack.ElementList)
+            foreach (Renderer customRenderer in RendererStack.ElementList)
             {
                 SceneComponentStack.DrawDebug(customRenderer);
                 GlobalSettings.GlobalSettings.Instance.DrawGizmos(customRenderer);
-                
+
                 customRenderer.DrawDebug();
             }
         }
+#endif
+
+#if UNITY_EDITOR
+        [NonSerialized]
+        public RendererStackEditor RendererStackStackEditor;
+
+        [NonSerialized]
+        public SceneComponentStackEditor SceneComponentStackEditor;
 #endif
     }
 }

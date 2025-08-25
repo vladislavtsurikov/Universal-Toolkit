@@ -14,11 +14,12 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 
         protected override UniTask<bool> Run(CancellationToken token)
         {
-            Type componentType = Type.GetType(ComponentType);
+            var componentType = Type.GetType(ComponentType);
             if (componentType != null)
             {
                 GameObject.AddComponent(componentType);
             }
+
             return UniTask.FromResult(true);
         }
     }

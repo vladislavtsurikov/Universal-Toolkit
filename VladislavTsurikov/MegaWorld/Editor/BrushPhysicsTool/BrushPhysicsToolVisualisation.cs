@@ -18,8 +18,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushPhysicsTool
             {
                 return;
             }
-            
-            BrushPhysicsToolSettings brushPhysicsToolSettings = (BrushPhysicsToolSettings)ToolsComponentStack.GetElement(typeof(BrushPhysicsTool), typeof(BrushPhysicsToolSettings));
+
+            var brushPhysicsToolSettings =
+                (BrushPhysicsToolSettings)ToolsComponentStack.GetElement(typeof(BrushPhysicsTool),
+                    typeof(BrushPhysicsToolSettings));
 
             VisualisationBrushHandlesPreference visualisationBrushHandlesPreference =
                 PreferenceElementSingleton<VisualisationBrushHandlesPreference>.Instance;

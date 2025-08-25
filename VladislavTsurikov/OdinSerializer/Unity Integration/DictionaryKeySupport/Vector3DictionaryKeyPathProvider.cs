@@ -16,25 +16,24 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System.Globalization;
 using OdinSerializer;
+using UnityEngine;
 
 [assembly: RegisterDictionaryKeyPathProvider(typeof(Vector3DictionaryKeyPathProvider))]
 
 namespace OdinSerializer
 {
-    using System.Globalization;
-    using UnityEngine;
-
     /// <summary>
-    /// Dictionary key path provider for <see cref="UnityEngine.Vector3"/>
+    ///     Dictionary key path provider for <see cref="UnityEngine.Vector3" />
     /// </summary>
     public sealed class Vector3DictionaryKeyPathProvider : BaseDictionaryKeyPathProvider<Vector3>
     {
-        public override string ProviderID { get { return "v3"; } }
+        public override string ProviderID => "v3";
 
         public override int Compare(Vector3 x, Vector3 y)
         {
-            int result = x.x.CompareTo(y.x);
+            var result = x.x.CompareTo(y.x);
 
             if (result == 0)
             {
@@ -51,12 +50,12 @@ namespace OdinSerializer
 
         public override Vector3 GetKeyFromPathString(string pathStr)
         {
-            int sep1 = pathStr.IndexOf('|');
-            int sep2 = pathStr.IndexOf('|', sep1 + 1);
+            var sep1 = pathStr.IndexOf('|');
+            var sep2 = pathStr.IndexOf('|', sep1 + 1);
 
-            string x = pathStr.Substring(1, sep1 - 1).Trim();
-            string y = pathStr.Substring(sep1 + 1, sep2 - (sep1 + 1)).Trim();
-            string z = pathStr.Substring(sep2 + 1, pathStr.Length - (sep2 + 2)).Trim();
+            var x = pathStr.Substring(1, sep1 - 1).Trim();
+            var y = pathStr.Substring(sep1 + 1, sep2 - (sep1 + 1)).Trim();
+            var z = pathStr.Substring(sep2 + 1, pathStr.Length - (sep2 + 2)).Trim();
 
             return new Vector3(float.Parse(x), float.Parse(y), float.Parse(z));
         }

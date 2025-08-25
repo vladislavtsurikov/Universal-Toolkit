@@ -13,8 +13,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
         public override void OnTabStackGUI()
         {
             _tabStackEditor.OnGUI();
-            
-            if(Stack.SelectedElement == null)
+
+            if (Stack.SelectedElement == null)
             {
                 EditorGUILayout.BeginVertical(EditorStyles.helpBox);
                 EditorGUILayout.LabelField("No Tool Selected");

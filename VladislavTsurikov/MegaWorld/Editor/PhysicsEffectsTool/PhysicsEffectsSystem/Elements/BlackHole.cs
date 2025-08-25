@@ -6,16 +6,14 @@ using VladislavTsurikov.ColliderSystem.Runtime;
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
     [ComponentStack.Runtime.AdvancedComponentStack.Name("Black Hole")]
-	public class BlackHole : PhysicsEffect
+    public class BlackHole : PhysicsEffect
     {
-        public float MaxForce => 500;
-        
         public float Force = 50F;
+        public float MaxForce => 500;
 
-        public override void ApplyEffect(Vector3 positionOffsetY, Rigidbody rb)
-        {
-            rb.AddForce(Force * (positionOffsetY - rb.transform.position) / Vector3.Distance(positionOffsetY, rb.transform.position));
-        }
+        public override void ApplyEffect(Vector3 positionOffsetY, Rigidbody rb) =>
+            rb.AddForce(Force * (positionOffsetY - rb.transform.position) /
+                        Vector3.Distance(positionOffsetY, rb.transform.position));
 
         public override void OnRepaint(RayHit rayHit)
         {

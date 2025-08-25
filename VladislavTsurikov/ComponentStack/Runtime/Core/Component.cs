@@ -7,19 +7,39 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
     public abstract class Component : Element, ISelectable, IRemovable
     {
         [OdinSerialize]
-        protected bool _selected;
-        
-        [OdinSerialize]
         protected bool _active = true;
-        
+
+        [OdinSerialize]
+        protected bool _selected;
+
         protected internal object Stack;
-        
+
+        public virtual bool Active
+        {
+            get => _active;
+            set
+            {
+                if (_active != value)
+                {
+                    _active = value;
+                    OnChangeActive();
+                }
+            }
+        }
+
+        void IRemovable.OnRemove()
+        {
+            IsSetup = false;
+            OnDeleteElement();
+            ((IDisableable)this).OnDisable();
+        }
+
         public bool Selected
         {
             get => _selected;
             set
             {
-                bool changedSelect = _selected != value;
+                var changedSelect = _selected != value;
 
                 _selected = value;
 
@@ -37,51 +57,40 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             }
         }
 
-        public virtual bool Active
-        {
-            get => _active;
-            set
-            {
-                if (_active != value)
-                {
-                    _active = value;
-                    OnChangeActive();
-                }
-            }
-        }
-        
         public bool IsDeletable()
         {
             if (GetType().GetAttribute<PersistentComponentAttribute>() != null)
             {
                 return false;
             }
-            
+
             return IsDeletableComponent();
         }
 
-        protected virtual bool IsDeletableComponent()
+        protected virtual bool IsDeletableComponent() => true;
+
+        internal void OnCreateInternal() => OnCreate();
+
+        protected virtual void OnDeleteElement()
         {
-            return true;
         }
 
-        void IRemovable.OnRemove()
+        protected virtual void OnCreate()
         {
-            IsSetup = false;
-            OnDeleteElement();
-            ((IDisableable)this).OnDisable();
         }
 
-        internal void OnCreateInternal()
+        protected virtual void OnDeselect()
         {
-            OnCreate();
         }
 
-        protected virtual void OnDeleteElement(){}
-        protected virtual void OnCreate(){}
-        protected virtual void OnDeselect(){}
-        protected virtual void OnSelect(){}
-        protected virtual void OnChangeActive(){}
-        public virtual bool DeleteElement() { return true; }
+        protected virtual void OnSelect()
+        {
+        }
+
+        protected virtual void OnChangeActive()
+        {
+        }
+
+        public virtual bool DeleteElement() => true;
     }
 }

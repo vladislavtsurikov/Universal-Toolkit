@@ -8,11 +8,19 @@ namespace Assemblies.VladislavTsurikov.ComponentStack.Runtime.SingleElementStack
         object GetObjectElement();
         void ReplaceElement(Type elementType);
     }
-    
+
     public class SingleElementStack<T> : ComponentStack<T>, ISingleElementStack where T : Component
     {
         public T Value => _elementList.Count > 0 ? _elementList[0] : null;
-        
+
+        public void ReplaceElement(Type elementType)
+        {
+            RemoveAll();
+            Create(elementType);
+        }
+
+        public object GetObjectElement() => GetElement();
+
         public override void OnRemoveInvalidElements()
         {
             if (_elementList.Count > 1)
@@ -20,13 +28,7 @@ namespace Assemblies.VladislavTsurikov.ComponentStack.Runtime.SingleElementStack
                 RemoveAll();
             }
         }
-        
-        public void ReplaceElement(Type elementType)
-        {
-            RemoveAll();
-            Create(elementType);
-        }
-        
+
         public void CreateFirstElementIfNecessary(Type elementType)
         {
             if (IsEmpty())
@@ -34,20 +36,9 @@ namespace Assemblies.VladislavTsurikov.ComponentStack.Runtime.SingleElementStack
                 Create(elementType);
             }
         }
-        
-        public object GetObjectElement()
-        {
-            return GetElement();
-        }
-        
-        public T GetElement()
-        {
-            return _elementList.Count > 0 ? _elementList[0] : null;
-        }
-        
-        public bool IsEmpty()
-        {
-            return _elementList.Count == 0;
-        }
+
+        public T GetElement() => _elementList.Count > 0 ? _elementList[0] : null;
+
+        public bool IsEmpty() => _elementList.Count == 0;
     }
 }

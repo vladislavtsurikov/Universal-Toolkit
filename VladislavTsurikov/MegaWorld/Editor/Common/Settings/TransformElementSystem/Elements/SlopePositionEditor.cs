@@ -7,26 +7,28 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSystem
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.TransformElementSystem
 {
-    [ElementEditor(typeof(SlopePosition))] 
+    [ElementEditor(typeof(SlopePosition))]
     public class SlopePositionEditor : ReorderableListComponentEditor
     {
         private SlopePosition _slopePosition;
-        public override void OnEnable()
+
+        public override void OnEnable() => _slopePosition = (SlopePosition)Target;
+
+        public override void OnGUI(Rect rect, int index)
         {
-            _slopePosition = (SlopePosition)Target;
-        }
-        
-        public override void OnGUI(Rect rect, int index) 
-        {
-            _slopePosition.MaxSlope = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Max Slope"), _slopePosition.MaxSlope, 20, 90);
+            _slopePosition.MaxSlope =
+                EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                    new GUIContent("Max Slope"), _slopePosition.MaxSlope, 20, 90);
             rect.y += EditorGUIUtility.singleLineHeight;
-            _slopePosition.PositionOffsetY = EditorGUI.FloatField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Position Offset Y"), _slopePosition.PositionOffsetY);
+            _slopePosition.PositionOffsetY = EditorGUI.FloatField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                new GUIContent("Position Offset Y"), _slopePosition.PositionOffsetY);
             rect.y += EditorGUIUtility.singleLineHeight;
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
             height += EditorGUIUtility.singleLineHeight;

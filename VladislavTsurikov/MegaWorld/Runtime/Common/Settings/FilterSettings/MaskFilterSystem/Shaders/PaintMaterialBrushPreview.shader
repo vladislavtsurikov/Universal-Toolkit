@@ -6,22 +6,21 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
         Blend SrcAlpha OneMinusSrcAlpha
 
         CGINCLUDE
-            // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
-            #pragma exclude_renderers gles
+        // Upgrade NOTE: excluded shader from OpenGL ES 2.0 because it uses non-square matrices
+        #pragma exclude_renderers gles
 
-            #include "UnityCG.cginc"
-            #include "TerrainPreview.cginc"
+        #include "UnityCG.cginc"
+        #include "TerrainPreview.cginc"
 
-            sampler2D _BrushTex;
-            float4 _Color;
-            int _EnableBrushStripe;
-            int _ColorSpace;
-            int _AlphaVisualisationType;
-            float _Alpha;
-
+        sampler2D _BrushTex;
+        float4 _Color;
+        int _EnableBrushStripe;
+        int _ColorSpace;
+        int _AlphaVisualisationType;
+        float _Alpha;
         ENDCG
 
-        Pass    // 0
+        Pass // 0
         {
             Name "PaintMaterialTerrainPreview"
 
@@ -29,7 +28,8 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
             #pragma vertex vert
             #pragma fragment frag
 
-            struct v2f {
+            struct v2f
+            {
                 float4 clipPosition : SV_POSITION;
                 float3 positionWorld : TEXCOORD0;
                 float3 positionWorldOrig : TEXCOORD1;
@@ -62,7 +62,7 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
                 return o;
             }
 
-            float Lerp(float v0, float v1, float t) 
+            float Lerp(float v0, float v1, float t)
             {
                 return (1 - t) * v0 + t * v1;
             }
@@ -78,11 +78,11 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
 
             float GetAlpha(float4 color, float brushSample)
             {
-                if(_AlphaVisualisationType == 0)
+                if (_AlphaVisualisationType == 0)
                 {
                     color.a = 1.0f * saturate(brushSample * 5.0f);
                 }
-                else if(_AlphaVisualisationType == 1)
+                else if (_AlphaVisualisationType == 1)
                 {
                     color.a = brushSample;
                 }
@@ -94,11 +94,11 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
 
             float GetAlphaForCustomColor(float4 color, float brushSample)
             {
-                if(_AlphaVisualisationType == 0)
+                if (_AlphaVisualisationType == 0)
                 {
                     color.a = 1.0f * saturate(brushSample * 5.0f);
                 }
-                else if(_AlphaVisualisationType == 1)
+                else if (_AlphaVisualisationType == 1)
                 {
                     color.a = brushSample;
                 }
@@ -118,18 +118,18 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
 
                 brushSample = clamp(brushSample, 0, 1);
 
-                if(_ColorSpace == 0) //CustomColor
+                if (_ColorSpace == 0) //CustomColor
                 {
                     // out of bounds multiplier
                     float oob = all(saturate(i.brushUV) == i.brushUV) ? 1.0f : 0.0f;
 
                     float brushStripe = 0;
 
-                    if(_EnableBrushStripe == 1)
+                    if (_EnableBrushStripe == 1)
                     {
                         // brush outline stripe
-                        float stripeWidth = 0.0f;       // pixels
-                        float stripeLocation = 0.2f;    // at 20% alpha
+                        float stripeWidth = 0.0f; // pixels
+                        float stripeLocation = 0.2f; // at 20% alpha
                         brushStripe = Stripe(brushSample, stripeLocation, stripeWidth);
                     }
 
@@ -140,16 +140,16 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
                     //color.a = 1.0f * saturate(brushSample * 5.0f);
                     color *= oob;
                 }
-                else if(_ColorSpace == 1) //Colorful
+                else if (_ColorSpace == 1) //Colorful
                 {
                     // out of bounds multiplier
-                    float oob = all(saturate(i.brushUV) == i.brushUV) ? 1.0f : 0.0f;    
+                    float oob = all(saturate(i.brushUV) == i.brushUV) ? 1.0f : 0.0f;
 
                     float4 colorRed = float4(1, 0, 0, 1);
                     float4 colorYellow = float4(1, 1, 0, 1);
                     float4 colorGreen = float4(0, 1, 0, 1);
 
-                    if(brushSample < 0.5)
+                    if (brushSample < 0.5)
                     {
                         float difference = brushSample / 0.5f;
                         color = ColorLerp(colorRed, colorYellow, difference);
@@ -159,24 +159,24 @@ Shader "Hidden/MegaWorld/PaintMaterialBrushPreview"
                         float difference = (brushSample - 0.5f) / 0.5f;
                         color = ColorLerp(colorYellow, colorGreen, difference);
                     }
-    
+
                     color.a = GetAlpha(color, brushSample);
 
                     color *= oob;
                 }
-                else if(_ColorSpace == 2) //Heightmap
+                else if (_ColorSpace == 2) //Heightmap
                 {
                     // out of bounds multiplier
                     float oob = all(saturate(i.brushUV) == i.brushUV) ? 1.0f : 0.0f;
 
-                    color = float4(brushSample, brushSample, brushSample, 1.0f); 
+                    color = float4(brushSample, brushSample, brushSample, 1.0f);
 
                     color.a = GetAlpha(color, brushSample);
-                    
+
                     color *= oob;
                 }
-                
-				return color;
+
+                return color;
             }
             ENDCG
         }

@@ -5,25 +5,21 @@ using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.PhysicsSimulator.Runtime
 {
-    public class SimulatedBody 
+    public class SimulatedBody
     {
         protected readonly GameObject _gameObject;
+
+        private readonly List<OnDisableSimulatedBodyEvent> _onDisablePhysicsEvents = new();
         private Collider _addedCollider;
         private List<Collider> _nonConvexColliders;
-        
-        private readonly List<OnDisableSimulatedBodyEvent> _onDisablePhysicsEvents = new List<OnDisableSimulatedBodyEvent>();
-        
+
         protected internal Action OnAddToSimulatedBodyStack;
-
-        public Rigidbody Rigidbody { get; private set; }
-
-        public GameObject GameObject => _gameObject;
 
         public SimulatedBody(GameObject gameObject)
         {
             _gameObject = gameObject;
 
-            ApplyPositionDown applyPositionDown =
+            var applyPositionDown =
                 new ApplyPositionDown(PhysicsSimulatorSettings.Instance.AutoPositionDownSettings)
                 {
                     SimulatedBody = this
@@ -33,7 +29,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
 
             AddPhysicsSupport();
         }
-        
+
         public SimulatedBody(GameObject gameObject, List<OnDisableSimulatedBodyEvent> onDisablePhysicsEvents)
         {
             _gameObject = gameObject;
@@ -43,32 +39,36 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
                 onDisablePhysicsEvents = new List<OnDisableSimulatedBodyEvent>();
             }
 
-            foreach (var onDisablePhysicsAction in onDisablePhysicsEvents)
+            foreach (OnDisableSimulatedBodyEvent onDisablePhysicsAction in onDisablePhysicsEvents)
             {
                 onDisablePhysicsAction.SimulatedBody = this;
             }
-            
+
             _onDisablePhysicsEvents = onDisablePhysicsEvents;
-            
-            ApplyPositionDown applyPositionDown =
+
+            var applyPositionDown =
                 new ApplyPositionDown(PhysicsSimulatorSettings.Instance.AutoPositionDownSettings)
                 {
                     SimulatedBody = this
                 };
-            
+
             _onDisablePhysicsEvents.Insert(0, applyPositionDown);
-            
+
             AddPhysicsSupport();
         }
 
+        public Rigidbody Rigidbody { get; private set; }
+
+        public GameObject GameObject => _gameObject;
+
         public bool IsRigidbodyStopping()
         {
-            if(_gameObject == null)
+            if (_gameObject == null)
             {
                 return true;
             }
 
-            if(Rigidbody == null || Rigidbody.IsSleeping())
+            if (Rigidbody == null || Rigidbody.IsSleeping())
             {
                 return true;
             }
@@ -86,7 +86,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             {
                 collider.hideFlags = HideFlags.HideInHierarchy;
 
-                if(collider is MeshCollider { convex: false } meshCollider)
+                if (collider is MeshCollider { convex: false } meshCollider)
                 {
                     _nonConvexColliders.Add(meshCollider);
 
@@ -116,10 +116,10 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             }
 
             _nonConvexColliders = null;
-            
+
             try
             {
-                foreach (var onDisablePhysicsAction in _onDisablePhysicsEvents)
+                foreach (OnDisableSimulatedBodyEvent onDisablePhysicsAction in _onDisablePhysicsEvents)
                 {
                     onDisablePhysicsAction.OnDisablePhysics();
                 }
@@ -173,12 +173,12 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
 
         private void RemoveAddedComponents()
         {
-            if(Rigidbody != null)
+            if (Rigidbody != null)
             {
                 Object.DestroyImmediate(Rigidbody);
             }
 
-            if(_addedCollider != null)
+            if (_addedCollider != null)
             {
                 Object.DestroyImmediate(_addedCollider);
             }

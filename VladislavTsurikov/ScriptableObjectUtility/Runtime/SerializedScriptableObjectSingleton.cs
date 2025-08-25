@@ -7,9 +7,11 @@ using UnityEngine;
 
 namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
 {
-    public class SerializedScriptableObjectSingleton<T> : SerializedScriptableObject where T : SerializedScriptableObject
+    public class SerializedScriptableObjectSingleton<T> : SerializedScriptableObject
+        where T : SerializedScriptableObject
     {
         private static T s_Instance;
+
         public static T Instance
         {
             get
@@ -18,6 +20,7 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
                 {
                     s_Instance = GetPackage();
                 }
+
                 return s_Instance;
             }
         }
@@ -28,16 +31,16 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
 
             if (locationAssetAttribute == null)
             {
-                Debug.LogError("Location Attribute missing!");  
+                Debug.LogError("Location Attribute missing!");
                 return null;
             }
-            
+
             T scriptableObject = Resources.Load<T>(locationAssetAttribute.RelativePath);
 
             if (scriptableObject == null)
             {
                 scriptableObject = CreateInstance<T>();
-#if UNITY_EDITOR 
+#if UNITY_EDITOR
                 if (!Application.isPlaying)
                 {
                     var locationFilePath = locationAssetAttribute.FilePath;
@@ -46,9 +49,9 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
                     {
                         return scriptableObject;
                     }
-                    
+
                     Directory.CreateDirectory(directoryName);
-                    
+
                     AssetDatabase.CreateAsset(scriptableObject, locationAssetAttribute.FilePath);
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
@@ -60,9 +63,7 @@ namespace VladislavTsurikov.ScriptableObjectUtility.Runtime
         }
 
         [CanBeNull]
-        private static LocationAssetAttribute GetCustomAttributes()
-        {
-            return (LocationAssetAttribute)typeof(T).GetCustomAttribute(typeof(LocationAssetAttribute));
-        }
+        private static LocationAssetAttribute GetCustomAttributes() =>
+            (LocationAssetAttribute)typeof(T).GetCustomAttribute(typeof(LocationAssetAttribute));
     }
 }

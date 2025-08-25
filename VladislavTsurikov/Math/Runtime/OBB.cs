@@ -11,9 +11,12 @@ namespace VladislavTsurikov.Math.Runtime
 
         public Vector3 Center { get; set; }
 
-        public Vector3 Size { get => _size;
+        public Vector3 Size
+        {
+            get => _size;
             set => _size = value.Abs();
         }
+
         public Vector3 Extents => Size * 0.5f;
         public Quaternion Rotation { get; set; }
 
@@ -103,26 +106,21 @@ namespace VladislavTsurikov.Math.Runtime
             IsValid = copy.IsValid;
         }
 
-        public static OBB GetInvalid()
-        {
-            return new OBB();
-        }
+        public static OBB GetInvalid() => new();
 
-        public void Inflate(float amount)
-        {
-            Size += Vector3Ex.FromValue(amount);
-        }
+        public void Inflate(float amount) => Size += Vector3Ex.FromValue(amount);
 
         public Matrix4x4 GetUnitBoxTransform()
         {
-            if (!IsValid) return Matrix4x4.identity;
+            if (!IsValid)
+            {
+                return Matrix4x4.identity;
+            }
+
             return Matrix4x4.TRS(Center, Rotation, Size);
         }
 
-        public List<Vector3> GetCornerPoints()
-        {
-            return BoxMath.CalcBoxCornerPoints(Center, _size, Rotation);
-        }
+        public List<Vector3> GetCornerPoints() => BoxMath.CalcBoxCornerPoints(Center, _size, Rotation);
 
         public List<Vector3> GetCenterAndCornerPoints()
         {
@@ -134,22 +132,22 @@ namespace VladislavTsurikov.Math.Runtime
 
         public void Encapsulate(OBB otherOBB)
         {
-            var otherPts = BoxMath.CalcBoxCornerPoints(otherOBB.Center, otherOBB.Size, otherOBB.Rotation);
+            List<Vector3> otherPts = BoxMath.CalcBoxCornerPoints(otherOBB.Center, otherOBB.Size, otherOBB.Rotation);
 
-            Matrix4x4 transformMtx = Matrix4x4.TRS(Center, Rotation, Vector3.one);
-            var modelPts = transformMtx.inverse.TransformPoints(otherPts);
+            var transformMtx = Matrix4x4.TRS(Center, Rotation, Vector3.one);
+            List<Vector3> modelPts = transformMtx.inverse.TransformPoints(otherPts);
 
-            AABB modelAABB = new AABB(Vector3.zero, Size);
+            var modelAABB = new AABB(Vector3.zero, Size);
             modelAABB.Encapsulate(modelPts);
 
-            Center = (Rotation * modelAABB.Center) + Center;
+            Center = Rotation * modelAABB.Center + Center;
             Size = modelAABB.Size;
         }
-        
+
         public bool IntersectsSphere(Vector3 sphereCenter, float sphereRadius)
         {
-            float radiusSqr = sphereRadius * sphereRadius;
-            
+            var radiusSqr = sphereRadius * sphereRadius;
+
             Vector3 closestPt = BoxMath.CalcBoxPtClosestToPt(sphereCenter, Center, Size, Rotation);
             if ((closestPt - sphereCenter).sqrMagnitude <= radiusSqr)
             {
@@ -159,14 +157,9 @@ namespace VladislavTsurikov.Math.Runtime
             return false;
         }
 
-        public bool IntersectsOBB(OBB otherOBB)
-        {
-            return BoxMath.BoxIntersectsBox(Center, _size, Rotation, otherOBB.Center, otherOBB.Size, otherOBB.Rotation);
-        }
+        public bool IntersectsOBB(OBB otherOBB) => BoxMath.BoxIntersectsBox(Center, _size, Rotation, otherOBB.Center,
+            otherOBB.Size, otherOBB.Rotation);
 
-        public Vector3 GetClosestPoint(Vector3 point)
-        {
-            return BoxMath.CalcBoxPtClosestToPt(point, Center, _size, Rotation);
-        }
+        public Vector3 GetClosestPoint(Vector3 point) => BoxMath.CalcBoxPtClosestToPt(point, Center, _size, Rotation);
     }
 }

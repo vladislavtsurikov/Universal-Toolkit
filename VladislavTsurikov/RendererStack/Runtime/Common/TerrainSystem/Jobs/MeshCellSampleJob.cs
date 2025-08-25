@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
@@ -18,10 +17,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
         {
             Bounds cellBounds = CellBoundsList[index];
             Rect cellRect = RectExtension.CreateRectFromBounds(cellBounds);
-            if (!TerrainRect.Overlaps(cellRect)) return;
+            if (!TerrainRect.Overlaps(cellRect))
+            {
+                return;
+            }
 
             float minHeight;
-            float maxHeight = cellBounds.center.y + cellBounds.extents.y;
+            var maxHeight = cellBounds.center.y + cellBounds.extents.y;
 
             if (cellBounds.center.y < 99999)
             {
@@ -32,11 +34,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
                 minHeight = cellBounds.center.y - cellBounds.extents.y;
             }
 
-            if (TerrainMinHeight < minHeight) minHeight = TerrainMinHeight;
-            if (TerrainMaxHeight > maxHeight) maxHeight = TerrainMaxHeight;
+            if (TerrainMinHeight < minHeight)
+            {
+                minHeight = TerrainMinHeight;
+            }
 
-            float centerY = (maxHeight + minHeight) / 2f;
-            float height = maxHeight - minHeight;
+            if (TerrainMaxHeight > maxHeight)
+            {
+                maxHeight = TerrainMaxHeight;
+            }
+
+            var centerY = (maxHeight + minHeight) / 2f;
+            var height = maxHeight - minHeight;
             cellBounds =
                 new Bounds(new Vector3(cellBounds.center.x, centerY, cellBounds.center.z),
                     new Vector3(cellBounds.size.x, height, cellBounds.size.z));

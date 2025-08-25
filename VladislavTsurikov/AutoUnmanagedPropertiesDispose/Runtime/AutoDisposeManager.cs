@@ -4,7 +4,7 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
     {
         private List<AutoDisposeProperty> s_autoDisposePropertyList = new List<AutoDisposeProperty>();
 
-        private void OnDisable() 
+        private void OnDisable()
         {
             DisposeAllUnmanagedMemory();
         }

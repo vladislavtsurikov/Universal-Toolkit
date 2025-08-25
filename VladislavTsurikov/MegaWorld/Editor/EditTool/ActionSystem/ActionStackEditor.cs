@@ -14,22 +14,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 
         public void DrawSettings()
         {
-			if(Stack.SelectedElement == null)
-		    {
-		    	EditorGUILayout.BeginVertical(EditorStyles.helpBox);
-            	EditorGUILayout.LabelField("No Action Selected");
-            	EditorGUILayout.EndVertical();
-		    }
+            if (Stack.SelectedElement == null)
+            {
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                EditorGUILayout.LabelField("No Action Selected");
+                EditorGUILayout.EndVertical();
+            }
             else
             {
                 SelectedEditor?.OnGUI();
             }
         }
 
-        public void DrawButtons()
-        {
-            _tabStackEditor.OnGUI();
-        }
+        public void DrawButtons() => _tabStackEditor.OnGUI();
     }
 }
 #endif

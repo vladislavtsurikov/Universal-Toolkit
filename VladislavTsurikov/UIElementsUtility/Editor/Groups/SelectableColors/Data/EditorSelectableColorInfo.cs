@@ -2,8 +2,8 @@
 using System;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
 {
@@ -13,19 +13,14 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
         public string ColorName;
 
         public EditorThemeColor Normal;
-        public Color NormalColor => Normal.Color;
 
         public EditorThemeColor Highlighted;
-        public Color HighlightedColor => Highlighted.Color;
 
         public EditorThemeColor Pressed;
-        public Color PressedColor => Pressed.Color;
 
         public EditorThemeColor Selected;
-        public Color SelectedColor => Selected.Color;
 
         public EditorThemeColor Disabled;
-        public Color DisabledColor => Disabled.Color;
 
         public EditorSelectableColorInfo()
         {
@@ -35,6 +30,12 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
             Selected = new EditorThemeColor();
             Disabled = new EditorThemeColor();
         }
+
+        public Color NormalColor => Normal.Color;
+        public Color HighlightedColor => Highlighted.Color;
+        public Color PressedColor => Pressed.Color;
+        public Color SelectedColor => Selected.Color;
+        public Color DisabledColor => Disabled.Color;
 
         public Color GetColor(SelectionState state)
         {
@@ -77,18 +78,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
             Disabled.ColorOnDark = Normal.ColorOnDark.WithAlpha(0.6f);
             return this;
         }
-        
+
         public EditorSelectableColorInfo GenerateOnLightColorVariantsFromNormalColor()
         {
-            Highlighted.ColorOnLight = Normal.ColorOnLight.SetHSLHue(Normal.ColorOnLight.Hue() - 0.02f).WithRGBShade(0.2f);
+            Highlighted.ColorOnLight =
+                Normal.ColorOnLight.SetHSLHue(Normal.ColorOnLight.Hue() - 0.02f).WithRGBShade(0.2f);
             Pressed.ColorOnLight = Highlighted.ColorOnLight.WithRGBShade(0.1f);
             Selected.ColorOnLight = Highlighted.ColorOnLight.WithRGBTint(0.1f);
             Disabled.ColorOnLight = Normal.ColorOnLight.WithAlpha(0.6f);
             return this;
         }
-        
-        public void ValidateName() =>
-            ColorName = ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
+
+        public void ValidateName() => ColorName = ColorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
     }
 }
 #endif

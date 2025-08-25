@@ -35,7 +35,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter
             
             bool addedInstance = false;
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, position.y + 1, position.z)), 
+            RayHit rayHit =
+ RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, position.y + 1, position.z)), 
                 GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(_group.PrototypeType));
             
             if (rayHit != null)

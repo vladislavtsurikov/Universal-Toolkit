@@ -16,21 +16,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Runtime.Serialization;
 using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(ISerializableFormatterLocator), -110)]
 
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-    using System.Runtime.Serialization;
-
     internal class ISerializableFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
-            if (step != FormatterLocationStep.AfterRegisteredFormatters || !typeof(ISerializable).IsAssignableFrom(type))
+            if (step != FormatterLocationStep.AfterRegisteredFormatters ||
+                !typeof(ISerializable).IsAssignableFrom(type))
             {
                 formatter = null;
                 return false;
@@ -43,12 +43,16 @@ namespace OdinSerializer
             catch (Exception ex)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
+                if (allowWeakFallbackFormatters &&
+                    (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
 #pragma warning restore CS0618 // Type or member is obsolete
                 {
                     formatter = new WeakSerializableFormatter(type);
                 }
-                else throw;
+                else
+                {
+                    throw;
+                }
             }
 
             return true;

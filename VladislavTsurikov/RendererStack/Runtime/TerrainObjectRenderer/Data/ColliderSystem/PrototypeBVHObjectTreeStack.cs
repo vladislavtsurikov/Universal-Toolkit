@@ -7,11 +7,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 {
     public class PrototypeBVHObjectTreeStack
     {
-        public List<PrototypeBVHObjectTree> PrototypeBVHObjectTreeList = new List<PrototypeBVHObjectTree>();
+        public List<PrototypeBVHObjectTree> PrototypeBVHObjectTreeList = new();
 
         public void PreparePrototypeRenderCount(SelectionData selectionData)
         {
-            foreach (var prototype in selectionData.PrototypeList)
+            foreach (Prototype prototype in selectionData.PrototypeList)
             {
                 if (prototype == null || prototype.PrototypeConsole.HasError())
                 {
@@ -25,13 +25,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             }
         }
 
-        public bool RegisterObject(TerrainObjectCollider terrainObjectCollider, Cell cell, ColliderCell colliderCell, PrototypeRendererData prototypeStorageRendererData, SceneDataManager sceneDataManager)
+        public bool RegisterObject(TerrainObjectCollider terrainObjectCollider, Cell cell, ColliderCell colliderCell,
+            PrototypeRendererData prototypeStorageRendererData, SceneDataManager sceneDataManager)
         {
-            PrototypeBVHObjectTree prototypeBvhObjectTree = GetPrototypeBVHObjectTree(terrainObjectCollider.Instance.Proto.ID);
+            PrototypeBVHObjectTree prototypeBvhObjectTree =
+                GetPrototypeBVHObjectTree(terrainObjectCollider.Instance.Proto.ID);
 
             if (prototypeBvhObjectTree != null)
             {
-                prototypeBvhObjectTree.RegisterObject(terrainObjectCollider, cell, colliderCell, prototypeStorageRendererData, sceneDataManager);
+                prototypeBvhObjectTree.RegisterObject(terrainObjectCollider, cell, colliderCell,
+                    prototypeStorageRendererData, sceneDataManager);
                 return true;
             }
 
@@ -48,7 +51,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
         }
 
         public void ClearBvhObjectTree()
-        {          
+        {
             foreach (PrototypeBVHObjectTree prototypeBvhObjectTree in PrototypeBVHObjectTreeList)
             {
                 prototypeBvhObjectTree.ClearBVHObjectTree();
@@ -63,7 +66,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             {
                 return new List<TerrainObjectCollider>();
             }
-            
+
             return prototypeBvhObjectTree.BVHObjectTree.FindAllInstance();
         }
 
@@ -71,7 +74,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
         {
             foreach (PrototypeBVHObjectTree item in PrototypeBVHObjectTreeList)
             {
-                if (item.PrototypeID == id) 
+                if (item.PrototypeID == id)
                 {
                     return item;
                 }

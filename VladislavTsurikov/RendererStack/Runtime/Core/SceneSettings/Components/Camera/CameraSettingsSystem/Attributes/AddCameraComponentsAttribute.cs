@@ -7,9 +7,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.Came
     {
         public readonly Type[] Types;
 
-        public AddCameraComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddCameraComponentsAttribute(Type[] types) => Types = types;
     }
 }

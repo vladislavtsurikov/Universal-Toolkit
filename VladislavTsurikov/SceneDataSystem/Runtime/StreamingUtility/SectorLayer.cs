@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Cysharp.Threading.Tasks;
@@ -15,47 +14,45 @@ using UnityEditor;
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 {
     [Serializable]
-    public class SectorLayer 
+    public class SectorLayer
     {
         public string Tag;
-        
-        [OdinSerialize] 
-        public List<Sector> SectorList = new List<Sector>();
-        public SectorBVHTree SectorBvhTree { get; private set; } = new SectorBVHTree();
 
-        public ObjectBoundsBVHTree ObjectBoundsBVHTree { get; private set; } = new ObjectBoundsBVHTree();
+        [OdinSerialize]
+        public List<Sector> SectorList = new();
 
-        public SectorLayer(string tag)
-        {
-            Tag = tag;
-        }
-        
+        public SectorLayer(string tag) => Tag = tag;
+
+        public SectorBVHTree SectorBvhTree { get; private set; } = new();
+
+        public ObjectBoundsBVHTree ObjectBoundsBVHTree { get; private set; } = new();
+
         [OnDeserializing]
         private void Initialize()
         {
             SectorBvhTree = new SectorBVHTree();
             ObjectBoundsBVHTree = new ObjectBoundsBVHTree();
         }
-        
+
         public void Setup()
         {
             SectorList.RemoveAll(sector => sector == null || !sector.IsValid());
-            
+
             SectorBvhTree.Clear();
             ObjectBoundsBVHTree.Clear();
 
-            foreach (var sector in SectorList)
+            foreach (Sector sector in SectorList)
             {
                 sector.Setup(ObjectBoundsBVHTree);
-                
-                SectorBvhTree.RegisterSector(sector); 
+
+                SectorBvhTree.RegisterSector(sector);
                 ObjectBoundsBVHTree.RegisterSector(sector, SceneObjectsBounds.GetSceneObjectsBounds(sector));
             }
         }
 
         public void RemoveNullScene()
         {
-            for (int i = SectorList.Count - 1; i >= 0; i--)
+            for (var i = SectorList.Count - 1; i >= 0; i--)
             {
                 if (SectorList[i] == null || !SectorList[i].IsValid())
                 {
@@ -63,26 +60,25 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 }
             }
         }
-        
+
         public static void ChangeObjectBoundsNodeSize(Scene scene)
         {
-            foreach (var sectorLayer in SectorLayerManager.Instance.SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerManager.Instance.SectorLayerList)
+            foreach (Sector sector in sectorLayer.SectorList)
             {
-                foreach (var sector in sectorLayer.SectorList)
+                if (sector.SceneReference.SceneName == scene.name)
                 {
-                    if (sector.SceneReference.SceneName == scene.name)
-                    {
-                        sectorLayer.ObjectBoundsBVHTree.ChangeNodeSize(sector, SceneObjectsBounds.GetSceneObjectsBounds(sector));
-                    }
+                    sectorLayer.ObjectBoundsBVHTree.ChangeNodeSize(sector,
+                        SceneObjectsBounds.GetSceneObjectsBounds(sector));
                 }
             }
         }
 
         public List<Sector> GetLoadedScenes()
         {
-            List<Sector> loadedScene = new List<Sector>();
+            var loadedScene = new List<Sector>();
 
-            foreach (var sector in SectorList)
+            foreach (Sector sector in SectorList)
             {
                 if (sector.IsLoaded)
                 {
@@ -92,7 +88,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
             return loadedScene;
         }
-        
+
         public static List<SectorLayer> GetCurrentSectorLayers(string tag = null)
         {
             if (tag != null)
@@ -106,10 +102,8 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
                 return new List<SectorLayer> { sectorLayer };
             }
-            else
-            {
-                return SectorLayerManager.Instance.SectorLayerList;
-            }
+
+            return SectorLayerManager.Instance.SectorLayerList;
         }
 
         private void RemoveSector(Sector sector)
@@ -119,11 +113,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 SectorBvhTree.RemoveNodes(sector);
             }
         }
-        
+
 #if UNITY_EDITOR
         private bool HasSceneAsset(SceneAsset sceneAsset)
         {
-            foreach (var sector in SectorList)
+            foreach (Sector sector in SectorList)
             {
                 if (sector.SceneReference.SceneAsset == sceneAsset)
                 {
@@ -140,50 +134,50 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             {
                 return null;
             }
-            
-            Sector sector = new Sector(sceneAsset, bounds, ObjectBoundsBVHTree); 
+
+            var sector = new Sector(sceneAsset, bounds, ObjectBoundsBVHTree);
             SectorList.Add(sector);
             SectorBvhTree.RegisterSector(sector);
-            
+
             return sector;
         }
-        
+
         public SceneReference CreateScene(string sceneName, Bounds bounds)
         {
             Scene activeScene = SceneManager.GetActiveScene();
-            string pathToFolder = "Assets/Scenes/Streaming Utility/" + activeScene.name + "/" + Tag;
-            
+            var pathToFolder = "Assets/Scenes/Streaming Utility/" + activeScene.name + "/" + Tag;
+
             SceneAsset sceneAsset = SceneCreationUtility.CreateScene(sceneName, pathToFolder, true);
-            
+
             return AddSector(sceneAsset, bounds).SceneReference;
         }
-        
+
         public void DeleteScene(Sector sector)
         {
             if (!SectorList.Contains(sector))
             {
                 return;
             }
-            
+
             RemoveSector(sector);
-            
+
             Scene activeScene = SceneManager.GetActiveScene();
-            
+
             var roots = new List<GameObject>(Mathf.Max(1, sector.SceneReference.Scene.rootCount));
             sector.SceneReference.Scene.GetRootGameObjects(roots);
 
-            foreach (var gameObject in roots)
+            foreach (GameObject gameObject in roots)
             {
                 if (gameObject.GetComponent(typeof(SceneDataManager)) != null)
                 {
                     continue;
                 }
-                        
+
                 SceneManager.MoveGameObjectToScene(gameObject, activeScene);
             }
-            
+
             Async().Forget();
-            
+
             async UniTask Async()
             {
                 await sector.SceneReference.UnloadScene();

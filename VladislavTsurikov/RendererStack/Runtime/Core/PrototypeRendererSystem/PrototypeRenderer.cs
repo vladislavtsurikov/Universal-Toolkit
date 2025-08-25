@@ -1,4 +1,4 @@
-﻿using VladislavTsurikov.OdinSerializer.Core.Misc;
+﻿using OdinSerializer;
 using VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
@@ -6,7 +6,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
     public abstract class PrototypeRenderer : Renderer
     {
         [OdinSerialize]
-        public SelectionData SelectionData = new SelectionData();
+        public SelectionData SelectionData = new();
 
         protected override void SetupRenderer()
         {
@@ -15,11 +15,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
             SetupPrototypeRendererRenderer();
         }
 
-        public override void CheckChanges()
-        {
-            SelectionData.CheckPrototypeChanges(); 
-        }
+        public override void CheckChanges() => SelectionData.CheckPrototypeChanges();
 
-        protected virtual void SetupPrototypeRendererRenderer(){}
+        protected virtual void SetupPrototypeRendererRenderer()
+        {
+        }
     }
 }

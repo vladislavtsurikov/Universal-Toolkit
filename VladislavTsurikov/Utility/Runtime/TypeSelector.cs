@@ -22,10 +22,7 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime
                 _type = value;
             }
         }
-        
-        private static bool IsValidType(Type type)
-        {
-            return typeof(TBaseType).IsAssignableFrom(type);
-        }
+
+        private static bool IsValidType(Type type) => typeof(TBaseType).IsAssignableFrom(type);
     }
 }

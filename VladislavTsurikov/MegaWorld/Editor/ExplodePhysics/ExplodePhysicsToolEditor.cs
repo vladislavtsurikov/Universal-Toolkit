@@ -10,15 +10,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.ExplodePhysics
     [ElementEditor(typeof(ExplodePhysicsTool))]
     public class ExplodePhysicsToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-	    {
-		    UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-	    }
-	    
-		public override void DrawFirstSettings()
-		{
-			PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance);
-		}
+        public override void DrawButtons() => UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
+
+        public override void DrawFirstSettings() =>
+            PhysicsSimulatorSettingsEditor.OnGUI<ObjectTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance);
     }
 }
 #endif

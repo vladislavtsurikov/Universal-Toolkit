@@ -11,22 +11,22 @@ namespace VladislavTsurikov.Utility
         [MenuItem("Tools/Localization/Find Duplicate Localization IDs")]
         public static void FindDuplicates()
         {
-            string[] sharedTableGuids = AssetDatabase.FindAssets("t:SharedTableData");
+            var sharedTableGuids = AssetDatabase.FindAssets("t:SharedTableData");
 
             var globalIdMap = new Dictionary<long, List<string>>();
-            bool hasDuplicates = false;
+            var hasDuplicates = false;
 
             foreach (var guid in sharedTableGuids)
             {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                var sharedTableData = AssetDatabase.LoadAssetAtPath<SharedTableData>(path);
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                SharedTableData sharedTableData = AssetDatabase.LoadAssetAtPath<SharedTableData>(path);
 
                 if (sharedTableData == null)
                 {
                     continue;
                 }
 
-                foreach (var entry in sharedTableData.Entries)
+                foreach (SharedTableData.SharedTableEntry entry in sharedTableData.Entries)
                 {
                     if (!globalIdMap.ContainsKey(entry.Id))
                     {
@@ -37,7 +37,7 @@ namespace VladislavTsurikov.Utility
                 }
             }
 
-            foreach (var kvp in globalIdMap)
+            foreach (KeyValuePair<long, List<string>> kvp in globalIdMap)
             {
                 if (kvp.Value.Count > 1)
                 {

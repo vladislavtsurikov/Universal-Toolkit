@@ -9,7 +9,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
                 return input;
             }
 
-            char firstChar = char.ToLower(input[0]);
+            var firstChar = char.ToLower(input[0]);
             return firstChar + input.Substring(1);
         }
     }

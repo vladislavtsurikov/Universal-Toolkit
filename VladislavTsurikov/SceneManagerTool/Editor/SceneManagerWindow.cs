@@ -13,32 +13,28 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
         Scenes,
         Settings
     }
-    
+
     public class SceneManagerWindow : BaseWindow<SceneManagerWindow>
     {
-        private Vector2 _windowScrollPos;
-        private SettingsType _settingsType = SettingsType.Scenes;
-        
         private const string WINDOW_TITLE = "Scene Manager";
         public const string k_WindowMenuPath = "Window/Vladislav Tsurikov/Scene Manager";
+        private SettingsType _settingsType = SettingsType.Scenes;
+        private Vector2 _windowScrollPos;
 
-        [MenuItem(k_WindowMenuPath, false, 0)]
-        public static void Open() => OpenWindow(WINDOW_TITLE);
-        
         protected override void OnEnable()
         {
             base.OnEnable();
-            
+
             EditorApplication.modifierKeysChanged += Repaint;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            
+
             EditorApplication.modifierKeysChanged -= Repaint;
         }
-        
+
         protected override void OnGUI()
         {
             base.OnGUI();
@@ -47,13 +43,16 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
 
             SceneManagerData.MaskAsDirty();
         }
-        
+
+        [MenuItem(k_WindowMenuPath, false, 0)]
+        public static void Open() => OpenWindow(WINDOW_TITLE);
+
         private void OnMainGUI()
         {
             EditorGUI.BeginChangeCheck();
-            
+
             _windowScrollPos = EditorGUILayout.BeginScrollView(_windowScrollPos);
-            
+
             EditorGUI.BeginDisabledGroup(Application.isPlaying);
 
             if (SceneManagerData.Instance.Profile == null)
@@ -65,12 +64,14 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Space(5);
-                
+
                     Rect rect = EditorGUILayout.GetControlRect(true, EditorGUIUtility.singleLineHeight);
                     rect.width -= 60;
-                    SceneManagerData.Instance.Profile = (Profile)CustomEditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), null, SceneManagerData.Instance.Profile, typeof(Profile));
+                    SceneManagerData.Instance.Profile = (Profile)CustomEditorGUI.ObjectField(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), null,
+                        SceneManagerData.Instance.Profile, typeof(Profile));
 
-                    Rect clickRect = new Rect(rect.x + rect.width + 2, rect.y, 60, rect.height);
+                    var clickRect = new Rect(rect.x + rect.width + 2, rect.y, 60, rect.height);
 
                     if (CustomEditorGUI.ClickButton(clickRect, "Create", ButtonStyle.Add))
                     {
@@ -89,27 +90,28 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                 if (SceneManagerData.Instance.EnableSceneManager == false)
                 {
                     Rect backgroundRect = EditorGUILayout.GetControlRect(true, 30);
-                    
+
                     Rect settingsRect = CustomEditorGUILayout.ScreenRect;
                     settingsRect.width = 170;
                     settingsRect.height = 30;
                     settingsRect.y = backgroundRect.y;
                     settingsRect.y += 5;
                     settingsRect.x = CustomEditorGUILayout.ScreenRect.width / 2 - settingsRect.width / 2;
-            
+
                     if (CustomEditorGUI.ClickButton(settingsRect, "Enable Scene Manager", ButtonStyle.Add))
                     {
                         SceneManagerData.Instance.EnableSceneManager = true;
                     }
-                    
+
                     GUILayout.Space(5);
-                    
-                    CustomEditorGUILayout.HelpBox("If you enable Scene Manager, this will remove your added scenes in Build Settings and will only add added automatically scenes to Scene Manager in Build Settings.");
+
+                    CustomEditorGUILayout.HelpBox(
+                        "If you enable Scene Manager, this will remove your added scenes in Build Settings and will only add added automatically scenes to Scene Manager in Build Settings.");
                 }
                 else
                 {
                     DrawSettingsTypes();
-            
+
                     GUILayout.BeginHorizontal();
                     {
                         GUILayout.Space(5);
@@ -120,7 +122,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                             {
                                 SceneManagerData.Instance.Profile.BuildSceneCollectionStackEditor.OnTabStackGUI();
 
-                                SceneManagerData.Instance.Profile.BuildSceneCollectionStackEditor.DrawSelectedSettings();
+                                SceneManagerData.Instance.Profile.BuildSceneCollectionStackEditor
+                                    .DrawSelectedSettings();
                             }
                             else
                             {
@@ -150,7 +153,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                     ScenesInBuildUtility.Setup(SceneManagerData.Instance.GetAllScenePaths());
                 }
             }
-            
+
             EditorGUI.EndDisabledGroup();
         }
 
@@ -159,11 +162,11 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
             Color initialColor = GUI.color;
 
             Rect backgroundRect = EditorGUILayout.GetControlRect(true, 60);
-            
+
             GUI.color = new Color().From256(48, 48, 48);
             GUI.DrawTexture(backgroundRect, Texture2D.whiteTexture, ScaleMode.StretchToFill, false);
             GUI.color = initialColor;
-            
+
             Rect rectPlay = backgroundRect;
             rectPlay = EditorGUI.IndentedRect(rectPlay);
             rectPlay.height = 40;
@@ -182,14 +185,14 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
             settingsRect.x = CustomEditorGUILayout.ScreenRect.width / 2;
             settingsRect.width = 70;
             settingsRect.height = 30;
-            
+
             if (CustomEditorGUI.RectTab(settingsRect, "Settings", _settingsType == SettingsType.Settings))
             {
                 _settingsType = SettingsType.Settings;
             }
 
             settingsRect.x -= settingsRect.width + 3;
-            
+
             if (CustomEditorGUI.RectTab(settingsRect, "Scenes", _settingsType == SettingsType.Scenes))
             {
                 _settingsType = SettingsType.Scenes;

@@ -4,6 +4,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize
     {
         Sectors,
         ActiveScene,
-        GlobalSettings,
+        GlobalSettings
     }
 }

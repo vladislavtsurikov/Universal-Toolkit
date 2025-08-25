@@ -16,14 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using OdinSerializer.Utilities;
+
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-    using System.Reflection;
-
     /// <summary>
-    /// Final fallback formatter for all types which have no other formatters. This formatter relies on reflection to work, and is thus comparatively slow and creates more garbage than a custom formatter.
+    ///     Final fallback formatter for all types which have no other formatters. This formatter relies on reflection to work,
+    ///     and is thus comparatively slow and creates more garbage than a custom formatter.
     /// </summary>
     /// <typeparam name="T">The type which can be serialized and deserialized by the formatter.</typeparam>
     /// <seealso cref="BaseFormatter{T}" />
@@ -33,17 +35,17 @@ namespace OdinSerializer
         {
         }
 
-        public ReflectionFormatter(ISerializationPolicy overridePolicy)
-        {
-            this.OverridePolicy = overridePolicy;
-        }
+        public ReflectionFormatter(ISerializationPolicy overridePolicy) => OverridePolicy = overridePolicy;
 
-        public ISerializationPolicy OverridePolicy { get; private set; }
+        public ISerializationPolicy OverridePolicy { get; }
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref T value, IDataReader reader)
         {
@@ -51,16 +53,19 @@ namespace OdinSerializer
             // At least we only box these once.
             object boxedValue = value;
 
-            var members = FormatterUtilities.GetSerializableMembersMap(typeof(T), this.OverridePolicy ?? reader.Context.Config.SerializationPolicy);
+            Dictionary<string, MemberInfo> members = FormatterUtilities.GetSerializableMembersMap(typeof(T),
+                OverridePolicy ?? reader.Context.Config.SerializationPolicy);
 
             EntryType entryType;
             string name;
 
-            while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode && entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
+            while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode &&
+                   entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
             {
                 if (string.IsNullOrEmpty(name))
                 {
-                    reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" + reader.CurrentNodeName + "\" is missing a name.");
+                    reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" +
+                                                                reader.CurrentNodeName + "\" is missing a name.");
                     reader.SkipEntry();
                     continue;
                 }
@@ -69,7 +74,11 @@ namespace OdinSerializer
 
                 if (members.TryGetValue(name, out member) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Lost serialization data for entry \"" + name + "\" of type \"" + entryType + "\" in node \"" + reader.CurrentNodeName + "\" because a serialized member of that name could not be found in type " + typeof(T).GetNiceFullName() + ".");
+                    reader.Context.Config.DebugContext.LogWarning("Lost serialization data for entry \"" + name +
+                                                                  "\" of type \"" + entryType + "\" in node \"" +
+                                                                  reader.CurrentNodeName +
+                                                                  "\" because a serialized member of that name could not be found in type " +
+                                                                  typeof(T).GetNiceFullName() + ".");
                     reader.SkipEntry();
                     continue;
                 }
@@ -79,7 +88,7 @@ namespace OdinSerializer
                 try
                 {
                     var serializer = Serializer.Get(expectedType);
-                    object entryValue = serializer.ReadValueWeak(reader);
+                    var entryValue = serializer.ReadValueWeak(reader);
                     FormatterUtilities.SetMemberValue(member, boxedValue, entryValue);
                 }
                 catch (Exception ex)
@@ -92,17 +101,18 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
         protected override void SerializeImplementation(ref T value, IDataWriter writer)
         {
-            var members = FormatterUtilities.GetSerializableMembers(typeof(T), this.OverridePolicy ?? writer.Context.Config.SerializationPolicy);
+            MemberInfo[] members = FormatterUtilities.GetSerializableMembers(typeof(T),
+                OverridePolicy ?? writer.Context.Config.SerializationPolicy);
 
-            for (int i = 0; i < members.Length; i++)
+            for (var i = 0; i < members.Length; i++)
             {
-                var member = members[i];
+                MemberInfo member = members[i];
                 Type type;
                 var memberValue = FormatterUtilities.GetMemberValue(member, value);
 
@@ -130,16 +140,19 @@ namespace OdinSerializer
 
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
-            var members = FormatterUtilities.GetSerializableMembersMap(this.SerializedType, reader.Context.Config.SerializationPolicy);
+            Dictionary<string, MemberInfo> members =
+                FormatterUtilities.GetSerializableMembersMap(SerializedType, reader.Context.Config.SerializationPolicy);
 
             EntryType entryType;
             string name;
 
-            while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode && entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
+            while ((entryType = reader.PeekEntry(out name)) != EntryType.EndOfNode &&
+                   entryType != EntryType.EndOfArray && entryType != EntryType.EndOfStream)
             {
                 if (string.IsNullOrEmpty(name))
                 {
-                    reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" + reader.CurrentNodeName + "\" is missing a name.");
+                    reader.Context.Config.DebugContext.LogError("Entry of type \"" + entryType + "\" in node \"" +
+                                                                reader.CurrentNodeName + "\" is missing a name.");
                     reader.SkipEntry();
                     continue;
                 }
@@ -148,7 +161,11 @@ namespace OdinSerializer
 
                 if (members.TryGetValue(name, out member) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Lost serialization data for entry \"" + name + "\" of type \"" + entryType + "\" in node \"" + reader.CurrentNodeName + "\" because a serialized member of that name could not be found in type " + this.SerializedType.GetNiceFullName() + ".");
+                    reader.Context.Config.DebugContext.LogWarning("Lost serialization data for entry \"" + name +
+                                                                  "\" of type \"" + entryType + "\" in node \"" +
+                                                                  reader.CurrentNodeName +
+                                                                  "\" because a serialized member of that name could not be found in type " +
+                                                                  SerializedType.GetNiceFullName() + ".");
                     reader.SkipEntry();
                     continue;
                 }
@@ -158,7 +175,7 @@ namespace OdinSerializer
                 try
                 {
                     var serializer = Serializer.Get(expectedType);
-                    object entryValue = serializer.ReadValueWeak(reader);
+                    var entryValue = serializer.ReadValueWeak(reader);
                     FormatterUtilities.SetMemberValue(member, value, entryValue);
                 }
                 catch (Exception ex)
@@ -170,11 +187,12 @@ namespace OdinSerializer
 
         protected override void SerializeImplementation(ref object value, IDataWriter writer)
         {
-            var members = FormatterUtilities.GetSerializableMembers(this.SerializedType, writer.Context.Config.SerializationPolicy);
+            MemberInfo[] members =
+                FormatterUtilities.GetSerializableMembers(SerializedType, writer.Context.Config.SerializationPolicy);
 
-            for (int i = 0; i < members.Length; i++)
+            for (var i = 0; i < members.Length; i++)
             {
-                var member = members[i];
+                MemberInfo member = members[i];
                 Type type;
                 var memberValue = FormatterUtilities.GetMemberValue(member, value);
 

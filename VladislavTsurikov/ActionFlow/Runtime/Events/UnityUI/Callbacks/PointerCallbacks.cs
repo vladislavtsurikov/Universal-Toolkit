@@ -9,14 +9,8 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events.UnityUI
     {
         private UIPointerEvent UIPointerEvent => (UIPointerEvent)TriggerEvent;
 
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            UIPointerEvent?.OnHoverEnter(eventData);
-        }
+        public void OnPointerEnter(PointerEventData eventData) => UIPointerEvent?.OnHoverEnter(eventData);
 
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            UIPointerEvent?.OnHoverExit(eventData);
-        }
+        public void OnPointerExit(PointerEventData eventData) => UIPointerEvent?.OnHoverExit(eventData);
     }
 }

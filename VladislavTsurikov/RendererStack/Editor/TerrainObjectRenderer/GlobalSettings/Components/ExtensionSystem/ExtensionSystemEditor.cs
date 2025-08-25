@@ -16,10 +16,7 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer.GlobalSet
             _settingsStackEditor = new ExtensionStackEditor(_extensionSystem.ExtensionStack);
         }
 
-        public override void OnGUI()
-        {
-            _settingsStackEditor.OnGUI();
-        }
+        public override void OnGUI() => _settingsStackEditor.OnGUI();
     }
 }
 #endif

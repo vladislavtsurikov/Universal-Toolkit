@@ -16,21 +16,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(GenericCollectionFormatterLocator), -100)]
 
 namespace OdinSerializer
 {
-    using Utilities;
-    using System;
-
     internal class GenericCollectionFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
             Type elementType;
-            if (step != FormatterLocationStep.AfterRegisteredFormatters || !GenericCollectionFormatter.CanFormat(type, out elementType))
+            if (step != FormatterLocationStep.AfterRegisteredFormatters ||
+                !GenericCollectionFormatter.CanFormat(type, out elementType))
             {
                 formatter = null;
                 return false;
@@ -38,17 +38,22 @@ namespace OdinSerializer
 
             try
             {
-                formatter = (IFormatter)Activator.CreateInstance(typeof(GenericCollectionFormatter<,>).MakeGenericType(type, elementType));
+                formatter = (IFormatter)Activator.CreateInstance(
+                    typeof(GenericCollectionFormatter<,>).MakeGenericType(type, elementType));
             }
             catch (Exception ex)
             {
 #pragma warning disable CS0618 // Type or member is obsolete
-                if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
+                if (allowWeakFallbackFormatters &&
+                    (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
 #pragma warning restore CS0618 // Type or member is obsolete
                 {
                     formatter = new WeakGenericCollectionFormatter(type, elementType);
                 }
-                else throw;
+                else
+                {
+                    throw;
+                }
             }
 
             return true;

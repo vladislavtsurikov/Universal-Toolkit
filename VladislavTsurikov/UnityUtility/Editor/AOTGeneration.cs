@@ -1,4 +1,6 @@
 ﻿#if UNITY_EDITOR
+using System;
+using System.Collections.Generic;
 using System.IO;
 using OdinSerializer.Editor;
 using UnityEditor;
@@ -12,17 +14,17 @@ namespace VladislavTsurikov.UnityUtility.Editor
         [MenuItem("Tools/Vladislav Tsurikov/Generate AOT DLL", false, 0)]
         private static void OpenMegaWorldWindow()
         {
-            AOTSupportUtilities.ScanProjectForSerializedTypes(out var serializedTypes);
+            AOTSupportUtilities.ScanProjectForSerializedTypes(out List<Type> serializedTypes);
 
             Debug.Log(serializedTypes.Count);
 
-            string pathToFolder = CommonPath.CombinePath(CommonPath.PathToResources, "AOT Generation");
+            var pathToFolder = CommonPath.CombinePath(CommonPath.PathToResources, "AOT Generation");
 
             Directory.CreateDirectory(pathToFolder);
-                    
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            
+
             AOTSupportUtilities.GenerateDLL(pathToFolder, "VladislavTsurikov", serializedTypes);
         }
     }

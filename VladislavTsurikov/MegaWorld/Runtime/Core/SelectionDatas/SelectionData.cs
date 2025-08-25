@@ -8,42 +8,31 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas
     [Serializable]
     public class SelectionData
     {
-        public List<Group.Group> GroupList = new List<Group.Group>();
-        
-        public SelectedData SelectedData = new SelectedData();
+        public List<Group.Group> GroupList = new();
 
-        public SelectionData()
-        {
-            Setup();
-        }
+        public SelectedData SelectedData = new();
 
-        internal void Setup()
-        {
-            SelectedData.Setup(this);
-        }
-        
-        public void DeleteNullElements()
-        {
-            GroupList.RemoveAll(group => group == null);
-        }
-        
+        public SelectionData() => Setup();
+
+        internal void Setup() => SelectedData.Setup(this);
+
+        public void DeleteNullElements() => GroupList.RemoveAll(group => group == null);
+
 #if UNITY_EDITOR
-        public SelectionDataEditor SelectionDataEditor = new SelectionDataEditor();
+        public SelectionDataEditor SelectionDataEditor = new();
 
-        public void OnGUI(SelectionDataDrawer selectionDataDrawer, Type toolType)
-        {
+        public void OnGUI(SelectionDataDrawer selectionDataDrawer, Type toolType) =>
             SelectionDataEditor.OnGUI(this, selectionDataDrawer, toolType);
-        }
 
         public void SaveAllData()
         {
             GroupList.RemoveAll(group => group == null);
-            
-			foreach (Group.Group group in GroupList)
-			{
+
+            foreach (Group.Group group in GroupList)
+            {
                 group.Save();
             }
-		}
+        }
 #endif
     }
 }

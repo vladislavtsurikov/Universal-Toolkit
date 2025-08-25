@@ -7,9 +7,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
     {
         public readonly Type[] Types;
 
-        public AddToolComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddToolComponentsAttribute(Type[] types) => Types = types;
     }
 }

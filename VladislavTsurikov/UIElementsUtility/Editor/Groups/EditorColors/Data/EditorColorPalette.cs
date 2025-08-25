@@ -2,8 +2,8 @@
 using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Runtime.Core;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors
 {
@@ -16,24 +16,16 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors
     ]
     public class EditorColorPalette : DataGroup<EditorColorPalette, EditorColorInfo>
     {
-        public void AddNewItem()
-        {
-            _items.Insert(0, new EditorColorInfo());
-        }
+        public void AddNewItem() => _items.Insert(0, new EditorColorInfo());
 
-        public void SortByColorName()
-        {
-            _items = _items.OrderBy(item => item.ColorName).ToList();
-        }
+        public void SortByColorName() => _items = _items.OrderBy(item => item.ColorName).ToList();
 
-        public void SortByHue()
-        {
+        public void SortByHue() =>
             _items = _items.OrderByDescending(item => item.ThemeColor.ColorOnDark.Hue()).ToList();
-        }
 
         internal Color GetColor(string colorName, bool silent = false)
         {
-            string cleanName = colorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
+            var cleanName = colorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
 
             _items = _items.Where(item => item != null).ToList();
 

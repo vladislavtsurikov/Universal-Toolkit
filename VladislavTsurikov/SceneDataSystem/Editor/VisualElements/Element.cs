@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.UIElementsUtility;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors;
 using VladislavTsurikov.UIElementsUtility.Runtime;
 
@@ -13,14 +12,20 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 {
     public class Element
     {
-        public static class Default
-        {
-            public static EditorSelectableColorInfo ButtonContainerEditorSelectableColor => GetSelectableColor.EditorUI.ButtonContainer;
-            public static EditorSelectableColorInfo IconEditorSelectableColor => GetSelectableColor.EditorUI.ButtonIcon;
-            public static EditorSelectableColorInfo TextEditorSelectableColor => GetSelectableColor.EditorUI.ButtonText;
-        }
+        private SelectionState _mSelectionState;
+        public UnityAction<EventBase> OnClick;
+        public UnityAction<PointerDownEvent> OnPointerDown;
+        public UnityAction<PointerEnterEvent> OnPointerEnter;
+        public UnityAction<PointerLeaveEvent> OnPointerLeave;
+        public UnityAction<PointerUpEvent> OnPointerUp;
 
-        public bool HasAccentColor => EditorSelectableAccentColor != null; 
+        public UnityAction OnStateChanged;
+
+        public Element() => Reset();
+
+        public Element(VisualElement target) : this() => SetTarget(target);
+
+        public bool HasAccentColor => EditorSelectableAccentColor != null;
         public EditorSelectableColorInfo EditorSelectableAccentColor { get; private set; }
         public EditorSelectableColorInfo ButtonContainerEditorSelectableColor { get; private set; }
         public EditorSelectableColorInfo IconSelectableColor { get; private set; }
@@ -31,7 +36,6 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         public Color IconColor { get; set; }
         public Color TextColor { get; set; }
 
-        private SelectionState _mSelectionState;
         public SelectionState SelectionState
         {
             get => _mSelectionState;
@@ -42,27 +46,10 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             }
         }
 
-        public UnityAction OnStateChanged;
-        public UnityAction<EventBase> OnClick;
-        public UnityAction<PointerEnterEvent> OnPointerEnter;
-        public UnityAction<PointerLeaveEvent> OnPointerLeave;
-        public UnityAction<PointerDownEvent> OnPointerDown;
-        public UnityAction<PointerUpEvent> OnPointerUp;
-
         private Clickable Clickable { get; set; }
 
         public bool HasTarget => Target != null;
         public VisualElement Target { get; private set; }
-
-        public Element()
-        {
-            Reset();
-        }
-
-        public Element(VisualElement target) : this()
-        {
-            SetTarget(target);
-        }
 
         public void Reset()
         {
@@ -83,7 +70,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             SelectionState = SelectionState.Normal;
         }
 
-        
+
         /// <summary> Set an accent selectable color for this element </summary>
         /// <param name="value"> Selectable color info </param>
         public Element SetAccentColor(EditorSelectableColorInfo value)
@@ -93,8 +80,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             return this;
         }
 
-        public Element ResetAccentColor() =>
-            SetAccentColor(null);
+        public Element ResetAccentColor() => SetAccentColor(null);
 
         /// <summary> Set target VisualElement and connect to it (null value disconnects) </summary>
         /// <param name="value"> Target VisualElement </param>
@@ -152,16 +138,19 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         }
 
         /// <summary> Remove target VisualElement and disconnect from it </summary>
-        public Element ClearTarget() =>
-            SetTarget(null);
+        public Element ClearTarget() => SetTarget(null);
 
         /// <summary> Trigger a state change </summary>
         public void StateChanged()
         {
             ContainerColor = ButtonContainerEditorSelectableColor.GetColor(SelectionState);
             ContainerBorderColor = ContainerColor.WithRGBShade(0.2f);
-            IconColor = HasAccentColor ? EditorSelectableAccentColor.NormalColor : IconSelectableColor.GetColor(SelectionState);
-            TextColor = HasAccentColor ? EditorSelectableAccentColor.NormalColor : TextEditorSelectableColor.GetColor(SelectionState);
+            IconColor = HasAccentColor
+                ? EditorSelectableAccentColor.NormalColor
+                : IconSelectableColor.GetColor(SelectionState);
+            TextColor = HasAccentColor
+                ? EditorSelectableAccentColor.NormalColor
+                : TextEditorSelectableColor.GetColor(SelectionState);
 
             switch (SelectionState)
             {
@@ -183,7 +172,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             OnStateChanged?.Invoke();
         }
 
@@ -265,7 +254,8 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                 SelectionState = SelectionState.Highlighted;
             }
 
-            if (upEvent != null && HasTarget && !Target.ContainsPoint(upEvent.localPosition) && SelectionState == SelectionState.Pressed)
+            if (upEvent != null && HasTarget && !Target.ContainsPoint(upEvent.localPosition) &&
+                SelectionState == SelectionState.Pressed)
             {
                 SelectionState = SelectionState.Normal;
             }
@@ -285,6 +275,15 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             Target?.SetEnabled(false);
             SelectionState = SelectionState.Disabled;
             return this;
+        }
+
+        public static class Default
+        {
+            public static EditorSelectableColorInfo ButtonContainerEditorSelectableColor =>
+                GetSelectableColor.EditorUI.ButtonContainer;
+
+            public static EditorSelectableColorInfo IconEditorSelectableColor => GetSelectableColor.EditorUI.ButtonIcon;
+            public static EditorSelectableColorInfo TextEditorSelectableColor => GetSelectableColor.EditorUI.ButtonText;
         }
     }
 }

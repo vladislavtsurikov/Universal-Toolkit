@@ -26,18 +26,20 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
             private static StyleSheet s_listView;
             private static StyleSheet s_listViewItem;
 
-            private static StyleGroup StyleGroup => s_styleGroup != null? s_styleGroup: s_styleGroup = DataGroupUtility.GetGroup<StyleGroup, StyleInfo>("VisualElements");
+            private static StyleGroup StyleGroup => s_styleGroup != null
+                ? s_styleGroup
+                : s_styleGroup = DataGroupUtility.GetGroup<StyleGroup, StyleInfo>("VisualElements");
 
             public static StyleSheet Button => s_button ? s_button : s_button = GetStyleSheet(StyleName.Button);
 
-            public static StyleSheet ListView => s_listView ? s_listView : s_listView = GetStyleSheet(StyleName.ListView);
+            public static StyleSheet ListView =>
+                s_listView ? s_listView : s_listView = GetStyleSheet(StyleName.ListView);
 
-            public static StyleSheet ListViewItem => s_listViewItem ? s_listViewItem : s_listViewItem = GetStyleSheet(StyleName.ListViewItem);
+            public static StyleSheet ListViewItem =>
+                s_listViewItem ? s_listViewItem : s_listViewItem = GetStyleSheet(StyleName.ListViewItem);
 
-            private static StyleSheet GetStyleSheet(StyleName styleName)
-            {
-                return StyleGroup.GetStyleSheet(styleName.ToString());
-            }
+            private static StyleSheet GetStyleSheet(StyleName styleName) =>
+                StyleGroup.GetStyleSheet(styleName.ToString());
         }
     }
 }

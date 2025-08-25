@@ -16,17 +16,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(TypeFormatterLocator), -70)]
 
 namespace OdinSerializer
 {
-    using System;
-
     internal class TypeFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
             if (!typeof(Type).IsAssignableFrom(type))
             {

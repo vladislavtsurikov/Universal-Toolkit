@@ -12,7 +12,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem
             {
                 return;
             }
-            
+
             GPUInstancedIndirectShaderStack.Instance.ClearEmptyShaders();
 
 #if UNITY_EDITOR

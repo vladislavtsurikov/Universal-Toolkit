@@ -15,316 +15,263 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Garbage free enumerator methods.
+    ///     Garbage free enumerator methods.
     /// </summary>
     public static class GarbageFreeIterators
     {
         /// <summary>
-        /// Garbage free enumerator for lists.
+        ///     Garbage free enumerator for lists.
         /// </summary>
-        public static ListIterator<T> GFIterator<T>(this List<T> list)
-        {
-            return new ListIterator<T>(list);
-        }
+        public static ListIterator<T> GFIterator<T>(this List<T> list) => new(list);
 
         /// <summary>
-        /// Garbage free enumerator for dictionaries.
+        ///     Garbage free enumerator for dictionaries.
         /// </summary>
-        public static DictionaryIterator<T1, T2> GFIterator<T1, T2>(this Dictionary<T1, T2> dictionary)
-        {
-            return new DictionaryIterator<T1, T2>(dictionary);
-        }
+        public static DictionaryIterator<T1, T2> GFIterator<T1, T2>(this Dictionary<T1, T2> dictionary) =>
+            new(dictionary);
 
         /// <summary>
-        /// Garbage free enumator for dictionary values.
+        ///     Garbage free enumator for dictionary values.
         /// </summary>
-        public static DictionaryValueIterator<T1, T2> GFValueIterator<T1, T2>(this Dictionary<T1, T2> dictionary)
-        {
-            return new DictionaryValueIterator<T1, T2>(dictionary);
-        }
+        public static DictionaryValueIterator<T1, T2> GFValueIterator<T1, T2>(this Dictionary<T1, T2> dictionary) =>
+            new(dictionary);
 
         /// <summary>
-        /// Garbage free enumerator for hashsets.
+        ///     Garbage free enumerator for hashsets.
         /// </summary>
-        public static HashsetIterator<T> GFIterator<T>(this HashSet<T> hashset)
-        {
-            return new HashsetIterator<T>(hashset);
-        }
+        public static HashsetIterator<T> GFIterator<T>(this HashSet<T> hashset) => new(hashset);
 
         /// <summary>
-        /// List iterator.
+        ///     List iterator.
         /// </summary>
         public struct ListIterator<T> : IDisposable
         {
-            private bool isNull;
-            private List<T> list;
+            private readonly bool isNull;
+            private readonly List<T> list;
             private List<T>.Enumerator enumerator;
 
             /// <summary>
-            /// Creates a list iterator.
+            ///     Creates a list iterator.
             /// </summary>
             public ListIterator(List<T> list)
             {
-                this.isNull = list == null;
-                if (this.isNull)
+                isNull = list == null;
+                if (isNull)
                 {
                     this.list = null;
-                    this.enumerator = new List<T>.Enumerator();
+                    enumerator = new List<T>.Enumerator();
                 }
                 else
                 {
                     this.list = list;
-                    this.enumerator = this.list.GetEnumerator();
+                    enumerator = this.list.GetEnumerator();
                 }
             }
 
             /// <summary>
-            /// Gets the enumerator.
+            ///     Gets the enumerator.
             /// </summary>
-            public ListIterator<T> GetEnumerator()
-            {
-                return this;
-            }
+            public ListIterator<T> GetEnumerator() => this;
 
             /// <summary>
-            /// Gets the current value.
+            ///     Gets the current value.
             /// </summary>
-            public T Current
-            {
-                get
-                {
-                    return this.enumerator.Current;
-                }
-            }
+            public T Current => enumerator.Current;
 
             /// <summary>
-            /// Moves to the next value.
+            ///     Moves to the next value.
             /// </summary>
             public bool MoveNext()
             {
-                if (this.isNull)
+                if (isNull)
                 {
                     return false;
                 }
-                return this.enumerator.MoveNext();
+
+                return enumerator.MoveNext();
             }
 
             /// <summary>
-            /// Disposes the iterator.
+            ///     Disposes the iterator.
             /// </summary>
-            public void Dispose()
-            {
-                this.enumerator.Dispose();
-            }
+            public void Dispose() => enumerator.Dispose();
         }
 
         /// <summary>
-        /// Hashset iterator.
+        ///     Hashset iterator.
         /// </summary>
         public struct HashsetIterator<T> : IDisposable
         {
-            private bool isNull;
-            private HashSet<T> hashset;
+            private readonly bool isNull;
+            private readonly HashSet<T> hashset;
             private HashSet<T>.Enumerator enumerator;
 
             /// <summary>
-            /// Creates a hashset iterator.
+            ///     Creates a hashset iterator.
             /// </summary>
             public HashsetIterator(HashSet<T> hashset)
             {
-                this.isNull = hashset == null;
-                if (this.isNull)
+                isNull = hashset == null;
+                if (isNull)
                 {
                     this.hashset = null;
-                    this.enumerator = new HashSet<T>.Enumerator();
+                    enumerator = new HashSet<T>.Enumerator();
                 }
                 else
                 {
                     this.hashset = hashset;
-                    this.enumerator = this.hashset.GetEnumerator();
+                    enumerator = this.hashset.GetEnumerator();
                 }
             }
 
             /// <summary>
-            /// Gets the enumerator.
+            ///     Gets the enumerator.
             /// </summary>
-            public HashsetIterator<T> GetEnumerator()
-            {
-                return this;
-            }
+            public HashsetIterator<T> GetEnumerator() => this;
 
             /// <summary>
-            /// Gets the current value.
+            ///     Gets the current value.
             /// </summary>
-            public T Current
-            {
-                get
-                {
-                    return this.enumerator.Current;
-                }
-            }
+            public T Current => enumerator.Current;
 
             /// <summary>
-            /// Moves to the next value.
+            ///     Moves to the next value.
             /// </summary>
             public bool MoveNext()
             {
-                if (this.isNull)
+                if (isNull)
                 {
                     return false;
                 }
-                return this.enumerator.MoveNext();
+
+                return enumerator.MoveNext();
             }
 
-			/// <summary>
-            /// Disposes the iterator.
+            /// <summary>
+            ///     Disposes the iterator.
             /// </summary>
-            public void Dispose()
-            {
-                this.enumerator.Dispose();
-            }
+            public void Dispose() => enumerator.Dispose();
         }
 
         /// <summary>
-        /// Dictionary iterator.
+        ///     Dictionary iterator.
         /// </summary>
         public struct DictionaryIterator<T1, T2> : IDisposable
         {
-            private Dictionary<T1, T2> dictionary;
+            private readonly Dictionary<T1, T2> dictionary;
             private Dictionary<T1, T2>.Enumerator enumerator;
-            private bool isNull;
+            private readonly bool isNull;
 
             /// <summary>
-            /// Creates a dictionary iterator.
+            ///     Creates a dictionary iterator.
             /// </summary>
             public DictionaryIterator(Dictionary<T1, T2> dictionary)
             {
-                this.isNull = dictionary == null;
+                isNull = dictionary == null;
 
-                if (this.isNull)
+                if (isNull)
                 {
                     this.dictionary = null;
-                    this.enumerator = new Dictionary<T1, T2>.Enumerator();
+                    enumerator = new Dictionary<T1, T2>.Enumerator();
                 }
                 else
                 {
                     this.dictionary = dictionary;
-                    this.enumerator = this.dictionary.GetEnumerator();
+                    enumerator = this.dictionary.GetEnumerator();
                 }
             }
 
             /// <summary>
-            /// Gets the enumerator.
+            ///     Gets the enumerator.
             /// </summary>
-            public DictionaryIterator<T1, T2> GetEnumerator()
-            {
-                return this;
-            }
+            public DictionaryIterator<T1, T2> GetEnumerator() => this;
 
             /// <summary>
-            /// Gets the current value.
+            ///     Gets the current value.
             /// </summary>
-            public KeyValuePair<T1, T2> Current
-            {
-                get
-                {
-                    return this.enumerator.Current;
-                }
-            }
+            public KeyValuePair<T1, T2> Current => enumerator.Current;
 
             /// <summary>
-            /// Moves to the next value.
+            ///     Moves to the next value.
             /// </summary>
             public bool MoveNext()
             {
-                if (this.isNull)
+                if (isNull)
                 {
                     return false;
                 }
-                return this.enumerator.MoveNext();
+
+                return enumerator.MoveNext();
             }
 
             /// <summary>
-            /// Disposes the iterator.
+            ///     Disposes the iterator.
             /// </summary>
-            public void Dispose()
-            {
-                this.enumerator.Dispose();
-            }
+            public void Dispose() => enumerator.Dispose();
         }
 
         /// <summary>
-        /// Dictionary value iterator.
+        ///     Dictionary value iterator.
         /// </summary>
         public struct DictionaryValueIterator<T1, T2> : IDisposable
         {
-            private Dictionary<T1, T2> dictionary;
+            private readonly Dictionary<T1, T2> dictionary;
             private Dictionary<T1, T2>.Enumerator enumerator;
-            private bool isNull;
+            private readonly bool isNull;
 
             /// <summary>
-            /// Creates a dictionary value iterator.
+            ///     Creates a dictionary value iterator.
             /// </summary>
             public DictionaryValueIterator(Dictionary<T1, T2> dictionary)
             {
-                this.isNull = dictionary == null;
+                isNull = dictionary == null;
 
-                if (this.isNull)
+                if (isNull)
                 {
                     this.dictionary = null;
-                    this.enumerator = new Dictionary<T1, T2>.Enumerator();
+                    enumerator = new Dictionary<T1, T2>.Enumerator();
                 }
                 else
                 {
                     this.dictionary = dictionary;
-                    this.enumerator = this.dictionary.GetEnumerator();
+                    enumerator = this.dictionary.GetEnumerator();
                 }
             }
 
             /// <summary>
-            /// Gets the enumerator.
+            ///     Gets the enumerator.
             /// </summary>
-            public DictionaryValueIterator<T1, T2> GetEnumerator()
-            {
-                return this;
-            }
+            public DictionaryValueIterator<T1, T2> GetEnumerator() => this;
 
             /// <summary>
-            /// Gets the current value.
+            ///     Gets the current value.
             /// </summary>
-            public T2 Current
-            {
-                get
-                {
-                    return this.enumerator.Current.Value;
-                }
-            }
+            public T2 Current => enumerator.Current.Value;
 
             /// <summary>
-            /// Moves to the next value.
+            ///     Moves to the next value.
             /// </summary>
             public bool MoveNext()
             {
-                if (this.isNull)
+                if (isNull)
                 {
                     return false;
                 }
-                return this.enumerator.MoveNext();
+
+                return enumerator.MoveNext();
             }
 
             /// <summary>
-            /// Disposes the iterator.
+            ///     Disposes the iterator.
             /// </summary>
-            public void Dispose()
-            {
-                this.enumerator.Dispose();
-            }
+            public void Dispose() => enumerator.Dispose();
         }
     }
 }

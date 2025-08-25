@@ -13,10 +13,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 {
     public class GravitySpawnerGameObject : OnDisableSimulatedBodyEvent
     {
+        private readonly BoxArea _area;
         private readonly Group _group;
         private readonly TerrainsMaskManager _terrainsMaskManager;
-        private readonly BoxArea _area;
-        
+
         public GravitySpawnerGameObject(Group group, TerrainsMaskManager terrainsMaskManager, BoxArea area)
         {
             _group = group;
@@ -34,10 +34,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
                 return;
             }
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, _area.Center.y, position.z)), GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(_group.PrototypeType));
+            RayHit rayHit =
+                RaycastUtility.Raycast(RayUtility.GetRayDown(new Vector3(position.x, _area.Center.y, position.z)),
+                    GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(_group.PrototypeType));
             if (rayHit != null)
             {
-                float fitness = GetFitness.Get(_group, _terrainsMaskManager, rayHit);
+                var fitness = GetFitness.Get(_group, _terrainsMaskManager, rayHit);
 
                 if (Random.Range(0f, 1f) < 1 - fitness)
                 {

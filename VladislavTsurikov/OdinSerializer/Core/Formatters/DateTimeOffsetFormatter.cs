@@ -16,23 +16,22 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Globalization;
 using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(DateTimeOffsetFormatter))]
 
 namespace OdinSerializer
 {
-    using System.Globalization;
-    using System;
-
     /// <summary>
-    /// Custom formatter for the <see cref="DateTimeOffset"/> type.
+    ///     Custom formatter for the <see cref="DateTimeOffset" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{System.DateTimeOffset}" />
+    /// <seealso cref="DateTimeOffset" />
     public sealed class DateTimeOffsetFormatter : MinimalBaseFormatter<DateTimeOffset>
     {
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -49,13 +48,11 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
-        protected override void Write(ref DateTimeOffset value, IDataWriter writer)
-        {
+        protected override void Write(ref DateTimeOffset value, IDataWriter writer) =>
             writer.WriteString(null, value.ToString("O", CultureInfo.InvariantCulture));
-        }
     }
 }

@@ -1,5 +1,5 @@
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
@@ -7,18 +7,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComp
     [Name("Along")]
     public class Along : ModifyTransformComponent
     {
-        public override void ModifyTransform(ref Instance instance, ref ModifyInfo modifyInfo, float moveLenght, Vector3 strokeDirection, float fitness, Vector3 normal)
+        public override void ModifyTransform(ref Instance instance, ref ModifyInfo modifyInfo, float moveLenght,
+            Vector3 strokeDirection, float fitness, Vector3 normal)
         {
-            Vector3 upwards = new Vector3(0, 1, 0);
+            var upwards = new Vector3(0, 1, 0);
 
-            float strength = Mathf.InverseLerp(0, 15, moveLenght);
+            var strength = Mathf.InverseLerp(0, 15, moveLenght);
             strength *= fitness;
 
-            Vector3 forward = Vector3.Cross(strokeDirection, upwards);
-            
+            var forward = Vector3.Cross(strokeDirection, upwards);
+
             var rotation = Quaternion.LookRotation(forward, upwards);
 
             instance.Rotation = Quaternion.Lerp(instance.Rotation, rotation, strength);
-        } 
+        }
     }
 }

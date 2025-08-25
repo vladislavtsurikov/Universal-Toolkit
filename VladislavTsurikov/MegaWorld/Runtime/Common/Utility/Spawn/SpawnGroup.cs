@@ -12,59 +12,62 @@ using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Spawn
 {
-    public static class SpawnGroup 
+    public static class SpawnGroup
     {
-        public static void SpawnTerrainDetails(Group group, CallbackList<Prototype> protoTerrainDetailList, BoxArea boxArea)
+        public static void SpawnTerrainDetails(Group group, CallbackList<Prototype> protoTerrainDetailList,
+            BoxArea boxArea)
         {
-            if(TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
+            if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
                 return;
             }
 
-            UpdateFilterMask.UpdateFilterMaskForPrototypes(protoTerrainDetailList, boxArea);            
+            UpdateFilterMask.UpdateFilterMaskForPrototypes(protoTerrainDetailList, boxArea);
 
             foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                Bounds terrainBounds = new Bounds(terrain.terrainData.bounds.center + terrain.transform.position, terrain.terrainData.bounds.size);
+                var terrainBounds = new Bounds(terrain.terrainData.bounds.center + terrain.transform.position,
+                    terrain.terrainData.bounds.size);
 
-                if(terrainBounds.Intersects(boxArea.Bounds))
+                if (terrainBounds.Intersects(boxArea.Bounds))
                 {
-                    if(terrain.terrainData.detailPrototypes.Length == 0)
+                    if (terrain.terrainData.detailPrototypes.Length == 0)
                     {
                         Debug.LogWarning("Add Terrain Details");
                         return;
                     }
-        
+
                     foreach (PrototypeTerrainDetail proto in protoTerrainDetailList)
                     {
-                        if(proto.Active == false)
+                        if (proto.Active == false)
                         {
                             continue;
                         }
-                        
+
                         SpawnPrototype.SpawnTerrainDetails(proto, boxArea, terrain);
                     }
                 }
             }
         }
 
-        public static void SpawnTerrainTexture(Group group, IReadOnlyList<Prototype> prototypeTerrainTextures, BoxArea boxArea, float textureTargetStrength)
+        public static void SpawnTerrainTexture(Group group, IReadOnlyList<Prototype> prototypeTerrainTextures,
+            BoxArea boxArea, float textureTargetStrength)
         {
-            if(TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
+            if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
                 return;
             }
 
-            if(boxArea.TerrainUnder == null)
+            if (boxArea.TerrainUnder == null)
             {
                 return;
             }
 
-            TerrainPainterRenderHelper terrainPainterRenderHelper = new TerrainPainterRenderHelper(boxArea);
+            var terrainPainterRenderHelper = new TerrainPainterRenderHelper(boxArea);
 
             foreach (PrototypeTerrainTexture proto in prototypeTerrainTextures)
             {
-                if(proto.Active)
+                if (proto.Active)
                 {
                     SpawnPrototype.SpawnTexture(proto, terrainPainterRenderHelper, textureTargetStrength);
                 }

@@ -5,7 +5,8 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
 {
     public static class SkinnedMeshRendererExtensions
     {
-        public static Tweener DOBlendShapeWeight(this SkinnedMeshRenderer skinnedMeshRenderer, int blendShapeIndex, float endValue, float duration)
+        public static Tweener DOBlendShapeWeight(this SkinnedMeshRenderer skinnedMeshRenderer, int blendShapeIndex,
+            float endValue, float duration)
         {
             if (blendShapeIndex < 0 || blendShapeIndex >= skinnedMeshRenderer.sharedMesh.blendShapeCount)
             {
@@ -21,9 +22,10 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
             );
         }
 
-        public static Tweener DOBlendShapeWeight(this SkinnedMeshRenderer skinnedMeshRenderer, string blendShapeName, float endValue, float duration)
+        public static Tweener DOBlendShapeWeight(this SkinnedMeshRenderer skinnedMeshRenderer, string blendShapeName,
+            float endValue, float duration)
         {
-            int blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(blendShapeName);
+            var blendShapeIndex = skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(blendShapeName);
 
             if (blendShapeIndex < 0)
             {

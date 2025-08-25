@@ -15,7 +15,7 @@ namespace VladislavTsurikov.Utility.Runtime
 
             while (stack.Count > 0)
             {
-                var top = stack.Pop();
+                T top = stack.Pop();
                 if (EqualityComparer<T>.Default.Equals(top, item))
                 {
                     break;

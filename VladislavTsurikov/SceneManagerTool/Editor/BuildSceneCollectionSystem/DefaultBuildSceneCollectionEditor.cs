@@ -10,20 +10,17 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
     [ElementEditor(typeof(DefaultBuildSceneCollection))]
     public class DefaultBuildSceneCollectionEditor : IMGUIElementEditor
     {
-        protected SceneCollectionStackEditor _sceneCollectionStackEditor;
-        
         protected DefaultBuildSceneCollection _buildSceneCollection;
+        protected SceneCollectionStackEditor _sceneCollectionStackEditor;
 
         public override void OnEnable()
         {
             _buildSceneCollection = (DefaultBuildSceneCollection)Target;
-            _sceneCollectionStackEditor = new SceneCollectionStackEditor(new GUIContent("Scene Collections"), _buildSceneCollection.SceneCollectionStack);
+            _sceneCollectionStackEditor = new SceneCollectionStackEditor(new GUIContent("Scene Collections"),
+                _buildSceneCollection.SceneCollectionStack);
         }
 
-        public override void OnGUI()
-        {
-            _sceneCollectionStackEditor.OnGUI();
-        }
+        public override void OnGUI() => _sceneCollectionStackEditor.OnGUI();
     }
 }
 #endif

@@ -16,62 +16,60 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using OdinSerializer;
+using OdinSerializer.Utilities;
 
-[assembly: RegisterFormatter(typeof(DoubleLookupDictionaryFormatter<,,>), weakFallback: typeof(WeakDoubleLookupDictionaryFormatter))]
+[assembly: RegisterFormatter(typeof(DoubleLookupDictionaryFormatter<,,>), typeof(WeakDoubleLookupDictionaryFormatter))]
 
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Custom Odin serialization formatter for <see cref="DoubleLookupDictionary{TFirstKey, TSecondKey, TValue}"/>.
+    ///     Custom Odin serialization formatter for <see cref="DoubleLookupDictionary{TFirstKey, TSecondKey, TValue}" />.
     /// </summary>
     /// <typeparam name="TPrimary">Type of primary key.</typeparam>
     /// <typeparam name="TSecondary">Type of secondary key.</typeparam>
     /// <typeparam name="TValue">Type of value.</typeparam>
-    public sealed class DoubleLookupDictionaryFormatter<TPrimary, TSecondary, TValue> : BaseFormatter<DoubleLookupDictionary<TPrimary, TSecondary, TValue>>
+    public sealed class
+        DoubleLookupDictionaryFormatter<TPrimary, TSecondary, TValue> : BaseFormatter<
+        DoubleLookupDictionary<TPrimary, TSecondary, TValue>>
     {
         private static readonly Serializer<TPrimary> PrimaryReaderWriter = Serializer.Get<TPrimary>();
-        private static readonly Serializer<Dictionary<TSecondary, TValue>> InnerReaderWriter = Serializer.Get<Dictionary<TSecondary, TValue>>();
 
-        static DoubleLookupDictionaryFormatter()
-        {
-            new DoubleLookupDictionaryFormatter<int, int, string>();
-        }
+        private static readonly Serializer<Dictionary<TSecondary, TValue>> InnerReaderWriter =
+            Serializer.Get<Dictionary<TSecondary, TValue>>();
+
+        static DoubleLookupDictionaryFormatter() => new DoubleLookupDictionaryFormatter<int, int, string>();
 
         /// <summary>
-        /// Creates a new instance of <see cref="DoubleLookupDictionaryFormatter{TPrimary, TSecondary, TValue}"/>.
+        ///     Creates a new instance of <see cref="DoubleLookupDictionaryFormatter{TPrimary, TSecondary, TValue}" />.
         /// </summary>
         public DoubleLookupDictionaryFormatter()
         {
         }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
-        protected override DoubleLookupDictionary<TPrimary, TSecondary, TValue> GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override DoubleLookupDictionary<TPrimary, TSecondary, TValue> GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="!:T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
-        protected override void SerializeImplementation(ref DoubleLookupDictionary<TPrimary, TSecondary, TValue> value, IDataWriter writer)
+        protected override void SerializeImplementation(ref DoubleLookupDictionary<TPrimary, TSecondary, TValue> value,
+            IDataWriter writer)
         {
             try
             {
                 writer.BeginArrayNode(value.Count);
 
-                bool endNode = true;
+                var endNode = true;
 
-                foreach (var pair in value)
+                foreach (KeyValuePair<TPrimary, Dictionary<TSecondary, TValue>> pair in value)
                 {
                     try
                     {
@@ -104,14 +102,18 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
-        protected override void DeserializeImplementation(ref DoubleLookupDictionary<TPrimary, TSecondary, TValue> value, IDataReader reader)
+        protected override void DeserializeImplementation(
+            ref DoubleLookupDictionary<TPrimary, TSecondary, TValue> value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -122,17 +124,19 @@ namespace OdinSerializer
                     Type type;
                     value = new DoubleLookupDictionary<TPrimary, TSecondary, TValue>();
 
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
-                        bool exitNode = true;
+                        var exitNode = true;
 
                         try
                         {
@@ -161,7 +165,8 @@ namespace OdinSerializer
 
                         if (reader.IsInArrayNode == false)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -180,21 +185,18 @@ namespace OdinSerializer
 
     internal sealed class WeakDoubleLookupDictionaryFormatter : WeakBaseFormatter
     {
-        private readonly Serializer PrimaryReaderWriter;
         private readonly Serializer InnerReaderWriter;
+        private readonly Serializer PrimaryReaderWriter;
 
         public WeakDoubleLookupDictionaryFormatter(Type serializedType) : base(serializedType)
         {
-            var args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Dictionary<,>));
+            Type[] args = serializedType.GetArgumentsOfInheritedOpenGenericClass(typeof(Dictionary<,>));
 
-            this.PrimaryReaderWriter = Serializer.Get(args[0]);
-            this.InnerReaderWriter = Serializer.Get(args[1]);
+            PrimaryReaderWriter = Serializer.Get(args[0]);
+            InnerReaderWriter = Serializer.Get(args[1]);
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         protected override void SerializeImplementation(ref object value, IDataWriter writer)
         {
@@ -203,8 +205,8 @@ namespace OdinSerializer
                 var dict = (IDictionary)value;
                 writer.BeginArrayNode(dict.Count);
 
-                bool endNode = true;
-                var enumerator = dict.GetEnumerator();
+                var endNode = true;
+                IDictionaryEnumerator enumerator = dict.GetEnumerator();
 
                 try
                 {
@@ -237,8 +239,11 @@ namespace OdinSerializer
                 finally
                 {
                     enumerator.Reset();
-                    IDisposable dispose = enumerator as IDisposable;
-                    if (dispose != null) dispose.Dispose();
+                    var dispose = enumerator as IDisposable;
+                    if (dispose != null)
+                    {
+                        dispose.Dispose();
+                    }
                 }
             }
             finally
@@ -250,7 +255,7 @@ namespace OdinSerializer
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -259,26 +264,28 @@ namespace OdinSerializer
                     long length;
                     reader.EnterArray(out length);
                     Type type;
-                    value = Activator.CreateInstance(this.SerializedType);
+                    value = Activator.CreateInstance(SerializedType);
                     var dict = (IDictionary)value;
 
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
-                        bool exitNode = true;
+                        var exitNode = true;
 
                         try
                         {
                             reader.EnterNode(out type);
-                            object key = PrimaryReaderWriter.ReadValueWeak(reader);
-                            object inner = InnerReaderWriter.ReadValueWeak(reader);
+                            var key = PrimaryReaderWriter.ReadValueWeak(reader);
+                            var inner = InnerReaderWriter.ReadValueWeak(reader);
 
                             dict.Add(key, inner);
                         }
@@ -301,7 +308,8 @@ namespace OdinSerializer
 
                         if (reader.IsInArrayNode == false)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }

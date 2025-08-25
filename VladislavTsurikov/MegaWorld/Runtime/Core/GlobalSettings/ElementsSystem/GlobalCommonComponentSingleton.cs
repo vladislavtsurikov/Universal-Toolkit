@@ -5,6 +5,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
     public static class GlobalCommonComponentSingleton<T> where T : Component
     {
         private static T _instance;
+
         public static T Instance
         {
             get
@@ -13,7 +14,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem
                 {
                     _instance = (T)GlobalSettings.Instance.CommonComponentStack.GetElement(typeof(T));
                 }
-                
+
                 return _instance;
             }
         }

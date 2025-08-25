@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using OdinSerializer;
-using UnityEngine;
 
 namespace QuestsSystem.IntegrationActionFlow.Pointer
 {
@@ -9,10 +8,10 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
     public class FieldSelector
     {
         [OdinSerialize]
-        private string _fieldName;
-        
-        [OdinSerialize]
         private Type _declaringType;
+
+        [OdinSerialize]
+        private string _fieldName;
 
         public FieldInfo FieldInfo => !string.IsNullOrEmpty(_fieldName) && _declaringType != null
             ? _declaringType.GetField(_fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -27,7 +26,7 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
                 _fieldName = null;
             }
         }
-        
+
         public string FieldName
         {
             get => _fieldName;
@@ -35,10 +34,12 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
             {
                 if (!string.IsNullOrEmpty(value) && _declaringType != null)
                 {
-                    FieldInfo field = _declaringType.GetField(value, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    FieldInfo field = _declaringType.GetField(value,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
                     if (field == null || !IsValidFieldType(field.FieldType))
                     {
-                        throw new InvalidOperationException($"Field '{value}' is not a valid type in '{_declaringType}'.");
+                        throw new InvalidOperationException(
+                            $"Field '{value}' is not a valid type in '{_declaringType}'.");
                     }
                 }
 
@@ -46,11 +47,8 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
             }
         }
 
-        public virtual bool IsValidFieldType(Type fieldType)
-        {
-            return true;
-        }
-        
+        public virtual bool IsValidFieldType(Type fieldType) => true;
+
         public object GetFieldValue(object target)
         {
             if (FieldInfo == null || target == null)

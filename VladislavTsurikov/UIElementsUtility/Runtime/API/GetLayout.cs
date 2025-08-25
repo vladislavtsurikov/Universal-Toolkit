@@ -26,18 +26,22 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
             private static VisualTreeAsset s_listView;
             private static VisualTreeAsset s_listViewItem;
 
-            private static LayoutGroup LayoutGroup => s_layoutGroup != null ? s_layoutGroup: s_layoutGroup = DataGroupUtility.GetGroup<LayoutGroup, LayoutInfo>("VisualElements");
+            private static LayoutGroup LayoutGroup => s_layoutGroup != null
+                ? s_layoutGroup
+                : s_layoutGroup = DataGroupUtility.GetGroup<LayoutGroup, LayoutInfo>("VisualElements");
 
-            public static VisualTreeAsset Button => s_button ? s_button : s_button = GetVisualTreeAsset(LayoutName.Button);
+            public static VisualTreeAsset Button =>
+                s_button ? s_button : s_button = GetVisualTreeAsset(LayoutName.Button);
 
-            public static VisualTreeAsset ListView => s_listView ? s_listView : s_listView = GetVisualTreeAsset(LayoutName.ListView);
+            public static VisualTreeAsset ListView =>
+                s_listView ? s_listView : s_listView = GetVisualTreeAsset(LayoutName.ListView);
 
-            public static VisualTreeAsset ListViewItem => s_listViewItem ? s_listViewItem : s_listViewItem = GetVisualTreeAsset(LayoutName.ListViewItem);
+            public static VisualTreeAsset ListViewItem => s_listViewItem
+                ? s_listViewItem
+                : s_listViewItem = GetVisualTreeAsset(LayoutName.ListViewItem);
 
-            private static VisualTreeAsset GetVisualTreeAsset(LayoutName layoutName)
-            {
-                return LayoutGroup.GetVisualTreeAsset(layoutName.ToString());
-            }
+            private static VisualTreeAsset GetVisualTreeAsset(LayoutName layoutName) =>
+                LayoutGroup.GetVisualTreeAsset(layoutName.ToString());
         }
 
         public static class Samples
@@ -60,24 +64,33 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime
             private static VisualTreeAsset s_mainMenuDocument;
             private static VisualTreeAsset s_speedometer;
 
-            private static LayoutGroup LayoutGroup => s_layoutGroup != null ? s_layoutGroup: s_layoutGroup = DataGroupUtility.GetGroup<LayoutGroup, LayoutInfo>("Samples");
+            private static LayoutGroup LayoutGroup => s_layoutGroup != null
+                ? s_layoutGroup
+                : s_layoutGroup = DataGroupUtility.GetGroup<LayoutGroup, LayoutInfo>("Samples");
 
-            public static VisualTreeAsset Background => s_background ? s_background : s_background = GetVisualTreeAsset(LayoutName.Background);
+            public static VisualTreeAsset Background =>
+                s_background ? s_background : s_background = GetVisualTreeAsset(LayoutName.Background);
 
-            public static VisualTreeAsset Dialogue => s_dialogue ? s_dialogue : s_dialogue = GetVisualTreeAsset(LayoutName.Dialogue);
+            public static VisualTreeAsset Dialogue =>
+                s_dialogue ? s_dialogue : s_dialogue = GetVisualTreeAsset(LayoutName.Dialogue);
 
-            public static VisualTreeAsset Inventory => s_inventory ? s_inventory : s_inventory = GetVisualTreeAsset(LayoutName.Inventory);
+            public static VisualTreeAsset Inventory =>
+                s_inventory ? s_inventory : s_inventory = GetVisualTreeAsset(LayoutName.Inventory);
 
-            public static VisualTreeAsset InventoryItem => s_inventoryItem ? s_inventoryItem : s_inventoryItem = GetVisualTreeAsset(LayoutName.InventoryItem);
+            public static VisualTreeAsset InventoryItem => s_inventoryItem
+                ? s_inventoryItem
+                : s_inventoryItem = GetVisualTreeAsset(LayoutName.InventoryItem);
 
-            public static VisualTreeAsset MainMenuDocument => s_mainMenuDocument ? s_mainMenuDocument : s_mainMenuDocument = GetVisualTreeAsset(LayoutName.MainMenuDocument);
+            public static VisualTreeAsset MainMenuDocument => s_mainMenuDocument
+                ? s_mainMenuDocument
+                : s_mainMenuDocument = GetVisualTreeAsset(LayoutName.MainMenuDocument);
 
-            public static VisualTreeAsset Speedometer => s_speedometer ? s_speedometer : s_speedometer = GetVisualTreeAsset(LayoutName.Speedometer);
+            public static VisualTreeAsset Speedometer => s_speedometer
+                ? s_speedometer
+                : s_speedometer = GetVisualTreeAsset(LayoutName.Speedometer);
 
-            private static VisualTreeAsset GetVisualTreeAsset(LayoutName layoutName)
-            {
-                return LayoutGroup.GetVisualTreeAsset(layoutName.ToString());
-            }
+            private static VisualTreeAsset GetVisualTreeAsset(LayoutName layoutName) =>
+                LayoutGroup.GetVisualTreeAsset(layoutName.ToString());
         }
     }
 }

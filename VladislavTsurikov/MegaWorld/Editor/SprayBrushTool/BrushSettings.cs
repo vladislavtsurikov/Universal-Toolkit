@@ -1,8 +1,8 @@
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
@@ -11,10 +11,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
     public class BrushSettings : Component
     {
         [OdinSerialize]
-        private float _brushSpacing = 30; 
+        private float _brushSize = 100;
 
         [OdinSerialize]
-        private float _brushSize = 100;
+        private float _brushSpacing = 30;
 
         public float Spacing
         {
@@ -32,22 +32,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.SprayBrushTool
 
         public void ScrollBrushRadiusEvent()
         {
-            if(Event.current.shift)
+            if (Event.current.shift)
             {
-                if (Event.current.type == EventType.ScrollWheel) 
+                if (Event.current.type == EventType.ScrollWheel)
                 {
                     BrushSize += Event.current.delta.y;
                     Event.current.Use();
-			    }
+                }
             }
         }
 
         public BoxArea GetAreaVariables(RayHit hit)
         {
-            BoxArea area = new BoxArea(hit, BrushSize)
-            {
-                Mask = Texture2D.whiteTexture,
-            };
+            var area = new BoxArea(hit, BrushSize) { Mask = Texture2D.whiteTexture };
 
             return area;
         }

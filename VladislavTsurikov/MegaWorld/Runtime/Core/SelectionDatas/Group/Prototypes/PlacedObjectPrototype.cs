@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.UnityUtility.Runtime;
 using Object = UnityEngine.Object;
 
@@ -8,10 +7,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public abstract class PlacedObjectPrototype : Prototype
     {
-        public GameObject Prefab;
-        
-        [NonSerialized] 
+        [NonSerialized]
         public Vector3 Extents = Vector3.one;
+
+        public GameObject Prefab;
 
         public override string Name
         {
@@ -35,7 +34,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             {
                 if (Prefab != null)
                 {
-                    return TextureUtility.GetPrefabPreviewTexture(Prefab);  
+                    return TextureUtility.GetPrefabPreviewTexture(Prefab);
                 }
 
                 return null;
@@ -46,7 +45,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public override void OnCreatePrototype(Object obj)
         {
             Prefab = (GameObject)obj;
-            Extents = GameObjectUtility.CalculateBoundsInstantiate(Prefab).extents;    
+            Extents = GameObjectUtility.CalculateBoundsInstantiate(Prefab).extents;
         }
     }
 }

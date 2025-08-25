@@ -16,67 +16,65 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Runtime.Serialization;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Runtime.Serialization;
-
     /// <summary>
-    /// Minimal baseline formatter. Doesn't come with all the bells and whistles of any of the other BaseFormatter classes.
-    /// Common serialization conventions aren't automatically supported, and common deserialization callbacks are not automatically invoked.
+    ///     Minimal baseline formatter. Doesn't come with all the bells and whistles of any of the other BaseFormatter classes.
+    ///     Common serialization conventions aren't automatically supported, and common deserialization callbacks are not
+    ///     automatically invoked.
     /// </summary>
     /// <typeparam name="T">The type which can be serialized and deserialized by the formatter.</typeparam>
     public abstract class MinimalBaseFormatter<T> : IFormatter<T>
     {
         /// <summary>
-        /// Whether the serialized value is a value type.
+        ///     Whether the serialized value is a value type.
         /// </summary>
         protected static readonly bool IsValueType = typeof(T).IsValueType;
 
         /// <summary>
-        /// Gets the type that the formatter can serialize.
+        ///     Gets the type that the formatter can serialize.
         /// </summary>
         /// <value>
-        /// The type that the formatter can serialize.
+        ///     The type that the formatter can serialize.
         /// </value>
-        public Type SerializedType { get { return typeof(T); } }
+        public Type SerializedType => typeof(T);
 
         /// <summary>
-        /// Deserializes a value of type <see cref="!:T" /> using a specified <see cref="T:OdinSerializer.IDataReader" />.
+        ///     Deserializes a value of type <see cref="!:T" /> using a specified <see cref="T:OdinSerializer.IDataReader" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
         public T Deserialize(IDataReader reader)
         {
-            T result = this.GetUninitializedObject();
+            T result = GetUninitializedObject();
 
             // We allow the above method to return null (for reference types) because of special cases like arrays,
             //  where the size of the array cannot be known yet, and thus we cannot create an object instance at this time.
             //
             // Therefore, those who override GetUninitializedObject and return null must call RegisterReferenceID manually.
-            if (IsValueType == false && object.ReferenceEquals(result, null) == false)
+            if (IsValueType == false && ReferenceEquals(result, null) == false)
             {
-                this.RegisterReferenceID(result, reader);
+                RegisterReferenceID(result, reader);
             }
 
-            this.Read(ref result, reader);
+            Read(ref result, reader);
             return result;
         }
 
         /// <summary>
-        /// Serializes a value of type <see cref="!:T" /> using a specified <see cref="T:OdinSerializer.IDataWriter" />.
+        ///     Serializes a value of type <see cref="!:T" /> using a specified <see cref="T:OdinSerializer.IDataWriter" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
-        public void Serialize(T value, IDataWriter writer)
-        {
-            this.Write(ref value, writer);
-        }
+        public void Serialize(T value, IDataWriter writer) => Write(ref value, writer);
 
         /// <summary>
-        /// Serializes a value using a specified <see cref="IDataWriter" />.
+        ///     Serializes a value using a specified <see cref="IDataWriter" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
@@ -84,57 +82,55 @@ namespace OdinSerializer
         {
             if (value is T)
             {
-                this.Serialize((T)value, writer);
+                Serialize((T)value, writer);
             }
         }
 
         /// <summary>
-        /// Deserializes a value using a specified <see cref="IDataReader" />.
+        ///     Deserializes a value using a specified <see cref="IDataReader" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        object IFormatter.Deserialize(IDataReader reader)
-        {
-            return this.Deserialize(reader);
-        }
+        object IFormatter.Deserialize(IDataReader reader) => Deserialize(reader);
 
         /// <summary>
-        /// Get an uninitialized object of type <see cref="T"/>. WARNING: If you override this and return null, the object's ID will not be automatically registered.
-        /// You will have to call <see cref="MinimalBaseFormatter{T}{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)"/> immediately after creating the object yourself during deserialization.
+        ///     Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered.
+        ///     You will have to call
+        ///     <see cref="MinimalBaseFormatter{T}{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" /> immediately
+        ///     after creating the object yourself during deserialization.
         /// </summary>
-        /// <returns>An uninitialized object of type <see cref="T"/>.</returns>
+        /// <returns>An uninitialized object of type <see cref="T" />.</returns>
         protected virtual T GetUninitializedObject()
         {
             if (IsValueType)
             {
-                return default(T);
+                return default;
             }
-            else
-            {
-                return (T)FormatterServices.GetUninitializedObject(typeof(T));
-            }
+
+            return (T)FormatterServices.GetUninitializedObject(typeof(T));
         }
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
         protected abstract void Read(ref T value, IDataReader reader);
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
         protected abstract void Write(ref T value, IDataWriter writer);
 
         /// <summary>
-        /// Registers the given object reference in the deserialization context.
-        /// <para />
-        /// NOTE that this method only does anything if <see cref="T"/> is not a value type.
+        ///     Registers the given object reference in the deserialization context.
+        ///     <para />
+        ///     NOTE that this method only does anything if <see cref="T" /> is not a value type.
         /// </summary>
         /// <param name="value">The value to register.</param>
         /// <param name="reader">The reader which is currently being used.</param>
@@ -143,11 +139,12 @@ namespace OdinSerializer
             if (!IsValueType)
             {
                 // Get ID and register object reference
-                int id = reader.CurrentNodeId;
+                var id = reader.CurrentNodeId;
 
                 if (id < 0)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
                 }
                 else
                 {
@@ -159,97 +156,96 @@ namespace OdinSerializer
 
     public abstract class WeakMinimalBaseFormatter : IFormatter
     {
-        protected readonly Type SerializedType;
-
         /// <summary>
-        /// Whether the serialized value is a value type.
+        ///     Whether the serialized value is a value type.
         /// </summary>
         protected readonly bool IsValueType;
 
-        /// <summary>
-        /// Gets the type that the formatter can serialize.
-        /// </summary>
-        /// <value>
-        /// The type that the formatter can serialize.
-        /// </value>
-        Type IFormatter.SerializedType { get { return this.SerializedType; } }
+        protected readonly Type SerializedType;
 
         public WeakMinimalBaseFormatter(Type serializedType)
         {
-            this.SerializedType = serializedType;
-            this.IsValueType = this.SerializedType.IsValueType;
+            SerializedType = serializedType;
+            IsValueType = SerializedType.IsValueType;
         }
+
+        /// <summary>
+        ///     Gets the type that the formatter can serialize.
+        /// </summary>
+        /// <value>
+        ///     The type that the formatter can serialize.
+        /// </value>
+        Type IFormatter.SerializedType => SerializedType;
 
         public object Deserialize(IDataReader reader)
         {
-            object result = this.GetUninitializedObject();
+            var result = GetUninitializedObject();
 
             // We allow the above method to return null (for reference types) because of special cases like arrays,
             //  where the size of the array cannot be known yet, and thus we cannot create an object instance at this time.
             //
             // Therefore, those who override GetUninitializedObject and return null must call RegisterReferenceID manually.
-            if (this.IsValueType == false && object.ReferenceEquals(result, null) == false)
+            if (IsValueType == false && ReferenceEquals(result, null) == false)
             {
-                this.RegisterReferenceID(result, reader);
+                RegisterReferenceID(result, reader);
             }
 
-            this.Read(ref result, reader);
+            Read(ref result, reader);
             return result;
         }
 
-        public void Serialize(object value, IDataWriter writer)
-        {
-            this.Write(ref value, writer);
-        }
+        public void Serialize(object value, IDataWriter writer) => Write(ref value, writer);
 
         /// <summary>
-        /// Get an uninitialized object of type <see cref="T"/>. WARNING: If you override this and return null, the object's ID will not be automatically registered.
-        /// You will have to call <see cref="MinimalBaseFormatter{T}{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)"/> immediately after creating the object yourself during deserialization.
+        ///     Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered.
+        ///     You will have to call
+        ///     <see cref="MinimalBaseFormatter{T}{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" /> immediately
+        ///     after creating the object yourself during deserialization.
         /// </summary>
-        /// <returns>An uninitialized object of type <see cref="T"/>.</returns>
+        /// <returns>An uninitialized object of type <see cref="T" />.</returns>
         protected virtual object GetUninitializedObject()
         {
-            if (this.IsValueType)
+            if (IsValueType)
             {
-                return Activator.CreateInstance(this.SerializedType);
+                return Activator.CreateInstance(SerializedType);
             }
-            else
-            {
-                return FormatterServices.GetUninitializedObject(this.SerializedType);
-            }
+
+            return FormatterServices.GetUninitializedObject(SerializedType);
         }
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
         protected abstract void Read(ref object value, IDataReader reader);
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
         protected abstract void Write(ref object value, IDataWriter writer);
 
         /// <summary>
-        /// Registers the given object reference in the deserialization context.
-        /// <para />
-        /// NOTE that this method only does anything if the serialized type is not a value type.
+        ///     Registers the given object reference in the deserialization context.
+        ///     <para />
+        ///     NOTE that this method only does anything if the serialized type is not a value type.
         /// </summary>
         /// <param name="value">The value to register.</param>
         /// <param name="reader">The reader which is currently being used.</param>
         protected void RegisterReferenceID(object value, IDataReader reader)
         {
-            if (!this.IsValueType)
+            if (!IsValueType)
             {
                 // Get ID and register object reference
-                int id = reader.CurrentNodeId;
+                var id = reader.CurrentNodeId;
 
                 if (id < 0)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
                 }
                 else
                 {

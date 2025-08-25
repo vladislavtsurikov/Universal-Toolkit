@@ -17,16 +17,33 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
     [Serializable]
     public sealed class Sector
     {
-        [NonSerialized] 
-        private ObjectBoundsBVHTree _objectBoundsBvhTree = new ObjectBoundsBVHTree();
-        
-        //References to GameObject in another SceneReference.Scene
-        private List<GameObject> _references = new List<GameObject>();
-
         public Bounds Bounds;
+
         [OdinSerialize]
-        public SceneReference SceneReference = new SceneReference();
-        
+        public SceneReference SceneReference = new();
+
+        [NonSerialized]
+        private ObjectBoundsBVHTree _objectBoundsBvhTree = new();
+
+        //References to GameObject in another SceneReference.Scene
+        private List<GameObject> _references = new();
+
+        public Sector(Scene scene, Bounds bounds, ObjectBoundsBVHTree objectBoundsBvhTree)
+        {
+            SceneReference = new SceneReference(scene);
+            Bounds = bounds;
+            Setup(objectBoundsBvhTree);
+        }
+
+#if UNITY_EDITOR
+        public Sector(SceneAsset sceneAsset, Bounds bounds, ObjectBoundsBVHTree objectBoundsBvhTree)
+        {
+            SceneReference = new SceneReference(sceneAsset);
+            Bounds = bounds;
+            Setup(objectBoundsBvhTree);
+        }
+#endif
+
         public bool CachedScene => SceneReference.CachedScene;
 
         public SceneDataManager SceneDataManager
@@ -36,22 +53,24 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 SceneDataManager sceneDataManager = null;
 
                 _references.RemoveAll(go => go == null);
-                
-                foreach (var go in _references)
+
+                foreach (GameObject go in _references)
                 {
                     sceneDataManager = (SceneDataManager)go.GetComponentInChildren(typeof(SceneDataManager));
                 }
-                
+
                 if (sceneDataManager == null)
                 {
-                    sceneDataManager = (SceneDataManager)UnityUtility.Runtime.GameObjectUtility.FindObjectOfType(typeof(SceneDataManager), SceneReference.Scene);
+                    sceneDataManager =
+                        (SceneDataManager)GameObjectUtility.FindObjectOfType(typeof(SceneDataManager),
+                            SceneReference.Scene);
 
                     if (sceneDataManager == null)
                     {
                         return null;
                     }
-                    
-                    _references.Add(sceneDataManager.gameObject); 
+
+                    _references.Add(sceneDataManager.gameObject);
                 }
 
                 return sceneDataManager;
@@ -62,47 +81,17 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public bool IsLoaded => SceneReference.IsLoaded;
 
-        public Sector(Scene scene, Bounds bounds, ObjectBoundsBVHTree objectBoundsBvhTree)
-        {
-            SceneReference = new SceneReference(scene);
-            Bounds = bounds;
-            Setup(objectBoundsBvhTree);
-        }
-        
-#if UNITY_EDITOR
-        public Sector(SceneAsset sceneAsset, Bounds bounds, ObjectBoundsBVHTree objectBoundsBvhTree)
-        {
-            SceneReference = new SceneReference(sceneAsset);
-            Bounds = bounds;
-            Setup(objectBoundsBvhTree);
-        }
-#endif
+        public void Setup(ObjectBoundsBVHTree objectBoundsBvhTree) => _objectBoundsBvhTree = objectBoundsBvhTree;
 
-        public void Setup(ObjectBoundsBVHTree objectBoundsBvhTree)
-        {
-            _objectBoundsBvhTree = objectBoundsBvhTree;
-        }
-        
         [OnDeserializing]
-        private void OnDeserializing()
-        {
-            _references = new List<GameObject>();
-        }
+        private void OnDeserializing() => _references = new List<GameObject>();
 
-        public void LoadScene(float waitForSeconds = 0)
-        {
-            SceneReference.LoadScene(waitForSeconds).Forget();
-        }
-        
-        public void UnloadScene(float waitForSeconds = 0)
-        {
-            SceneReference.UnloadScene(waitForSeconds).Forget();
-        }
+        public void LoadScene(float waitForSeconds = 0) => SceneReference.LoadScene(waitForSeconds).Forget();
 
-        public void CacheScene(float waitForSeconds = 0, float keepScene = 0)
-        {
+        public void UnloadScene(float waitForSeconds = 0) => SceneReference.UnloadScene(waitForSeconds).Forget();
+
+        public void CacheScene(float waitForSeconds = 0, float keepScene = 0) =>
             SceneReference.CacheScene(waitForSeconds, keepScene);
-        }
 
         public void AddReference(GameObject gameObject)
         {
@@ -111,12 +100,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 _references.Add(gameObject);
             }
         }
-        
-        public List<GameObject> GetReferences()
-        {
-            return new List<GameObject>(_references);
-        }
-        
+
+        public List<GameObject> GetReferences() => new(_references);
+
         public GameObject GetReference(string gameObjectName)
         {
             List<GameObject> gameObjects = _references.FindAll(o => o.name == gameObjectName);
@@ -125,7 +111,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
             {
                 return null;
             }
-            
+
             return gameObjects[0];
         }
 
@@ -133,7 +119,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         {
             GameObject[] gameObjects = SceneReference.Scene.GetRootGameObjects();
 
-            foreach (var go in gameObjects)
+            foreach (GameObject go in gameObjects)
             {
                 go.SetActive(setActive);
             }
@@ -142,15 +128,15 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
         public void ChangeObjectBoundsNodeSize(bool markSceneDirty = true)
         {
             _objectBoundsBvhTree.ChangeNodeSize(this, SceneObjectsBounds.GetSceneObjectsBounds(this));
-            
+
 #if UNITY_EDITOR
-            if(!Application.isPlaying && markSceneDirty)
+            if (!Application.isPlaying && markSceneDirty)
             {
                 SceneReference.MarkSceneDirty();
             }
 #endif
         }
-        
+
         public bool IsValid()
         {
 #if UNITY_EDITOR

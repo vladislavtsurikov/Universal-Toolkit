@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
@@ -18,15 +17,15 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public new string Name => base.Name;
 
-        public List<EnumValue> EnumValues { get; set; } = new List<EnumValue>();
+        public List<EnumValue> EnumValues { get; set; } = new();
 
         public override string ToString()
         {
-            string result = base.ToString();
+            var result = base.ToString();
             result += Constants.NewLine + Indent + "{";
 
             result += EnumValues.Count > 0 ? Constants.NewLine : "";
-            result += String.Join("," + Constants.NewLine, EnumValues);
+            result += string.Join("," + Constants.NewLine, EnumValues);
             result += Constants.NewLine + Indent + "}";
             result += Constants.NewLine;
             return result;
@@ -36,8 +35,15 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     public class EnumValue
     {
         public int IndentLevel = 2;
+
+        public EnumValue(string name = null, int? value = null)
+        {
+            Name = name;
+            Value = value;
+        }
+
         public int IndentSize => IndentLevel * 4;
-        public string Indent => new String(' ', IndentSize);
+        public string Indent => new(' ', IndentSize);
 
         public string Name { get; set; }
 
@@ -46,14 +52,8 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public override string ToString()
         {
-            string result = Indent + Name + ValuFormated;
+            var result = Indent + Name + ValuFormated;
             return result;
-        }
-        
-        public EnumValue(string name = null, int? value = null)
-        {
-            Name = name;
-            Value = value;
         }
     }
 }

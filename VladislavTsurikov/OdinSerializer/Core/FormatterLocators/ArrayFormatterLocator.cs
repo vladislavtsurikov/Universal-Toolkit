@@ -16,17 +16,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(ArrayFormatterLocator), -80)]
 
 namespace OdinSerializer
 {
-    using System;
-
     internal class ArrayFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
             if (!type.IsArray)
             {
@@ -34,7 +34,7 @@ namespace OdinSerializer
                 return false;
             }
 
-            var elementType = type.GetElementType();
+            Type elementType = type.GetElementType();
 
             if (type.GetArrayRank() == 1)
             {
@@ -42,34 +42,48 @@ namespace OdinSerializer
                 {
                     try
                     {
-                        formatter = (IFormatter)Activator.CreateInstance(typeof(PrimitiveArrayFormatter<>).MakeGenericType(elementType));
+                        formatter = (IFormatter)Activator.CreateInstance(
+                            typeof(PrimitiveArrayFormatter<>).MakeGenericType(elementType));
                     }
                     catch (Exception ex)
                     {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                        // Type or member is obsolete
+                        if (allowWeakFallbackFormatters && (ex is ExecutionEngineException ||
+                                                            ex.GetBaseException() is ExecutionEngineException))
+#pragma warning restore CS0618
+                            // Type or member is obsolete
                         {
                             formatter = new WeakPrimitiveArrayFormatter(type, elementType);
                         }
-                        else throw;
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
                 else
                 {
                     try
                     {
-                        formatter = (IFormatter)Activator.CreateInstance(typeof(ArrayFormatter<>).MakeGenericType(elementType));
+                        formatter = (IFormatter)Activator.CreateInstance(
+                            typeof(ArrayFormatter<>).MakeGenericType(elementType));
                     }
                     catch (Exception ex)
                     {
-#pragma warning disable CS0618 // Type or member is obsolete
-                        if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                        // Type or member is obsolete
+                        if (allowWeakFallbackFormatters && (ex is ExecutionEngineException ||
+                                                            ex.GetBaseException() is ExecutionEngineException))
+#pragma warning restore CS0618
+                            // Type or member is obsolete
                         {
                             formatter = new WeakArrayFormatter(type, elementType);
                         }
-                        else throw;
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
             }
@@ -77,17 +91,22 @@ namespace OdinSerializer
             {
                 try
                 {
-                    formatter = (IFormatter)Activator.CreateInstance(typeof(MultiDimensionalArrayFormatter<,>).MakeGenericType(type, type.GetElementType()));
+                    formatter = (IFormatter)Activator.CreateInstance(
+                        typeof(MultiDimensionalArrayFormatter<,>).MakeGenericType(type, type.GetElementType()));
                 }
                 catch (Exception ex)
                 {
 #pragma warning disable CS0618 // Type or member is obsolete
-                    if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
+                    if (allowWeakFallbackFormatters && (ex is ExecutionEngineException ||
+                                                        ex.GetBaseException() is ExecutionEngineException))
 #pragma warning restore CS0618 // Type or member is obsolete
                     {
                         formatter = new WeakMultiDimensionalArrayFormatter(type, elementType);
                     }
-                    else throw;
+                    else
+                    {
+                        throw;
+                    }
                 }
             }
 

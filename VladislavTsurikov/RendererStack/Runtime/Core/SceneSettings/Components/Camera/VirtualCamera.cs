@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using System.Threading;
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.Preferences;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraSettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.Attributes;
+using Renderer = VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem.Renderer;
 #if UNITY_EDITOR
 using VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.CameraSettingsSystem;
 #endif
@@ -24,50 +26,60 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
     [Serializable]
     public class VirtualCamera
     {
-        [NonSerialized] 
-        private float _lastMaxDistance;
-        [NonSerialized] 
-        private Matrix4x4 _lastCameraTransform;
-        [NonSerialized] 
-        private float _lastFieldOfView;
-
         public UnityEngine.Camera Camera;
         public bool Active = true;
-        
-        public CameraType CameraType = CameraType.Normal;
-        public Vector3 FloatingOriginOffset = new Vector3(0,0,0);
 
-        public bool FoldoutGUI = true; 
-        public bool Ignored => !IsCameraActive();
-        
+        public CameraType CameraType = CameraType.Normal;
+        public Vector3 FloatingOriginOffset = new(0, 0, 0);
+
+        public bool FoldoutGUI = true;
+
         [NonSerialized]
-        public ComponentStackOnlyDifferentTypes<CameraTemporaryComponent> CameraTemporaryComponentStack;
-        
+        private Matrix4x4 _lastCameraTransform;
+
+        [NonSerialized]
+        private float _lastFieldOfView;
+
+        [NonSerialized]
+        private float _lastMaxDistance;
+
         [OdinSerialize]
-        public ComponentStackOnlyDifferentTypes<CameraComponent> CameraComponentStack = new ComponentStackOnlyDifferentTypes<CameraComponent>();
-        
+        public ComponentStackOnlyDifferentTypes<CameraComponent> CameraComponentStack = new();
+
 #if UNITY_EDITOR
         public CameraComponentStackEditor CameraComponentStackEditor;
 #endif
-        
-        [OnDeserializing]
-        private void OnDeserializing()
+
+        [NonSerialized]
+        public ComponentStackOnlyDifferentTypes<CameraTemporaryComponent> CameraTemporaryComponentStack;
+
+        public VirtualCamera(UnityEngine.Camera selectedCamera)
         {
-            CameraComponentStack ??= new ComponentStackOnlyDifferentTypes<CameraComponent>();
+            Camera = selectedCamera;
+            Setup();
         }
-        
+
+        public bool Ignored => !IsCameraActive();
+
+        [OnDeserializing]
+        private void OnDeserializing() =>
+            CameraComponentStack ??= new ComponentStackOnlyDifferentTypes<CameraComponent>();
+
         public void Setup()
         {
             OnDisable();
             CameraTemporaryComponentStack = new ComponentStackOnlyDifferentTypes<CameraTemporaryComponent>();
-            CameraTemporaryComponentStack.Setup(true, this);
-            
-            CameraComponentStack.Setup();
-            
-            foreach (var renderer in RendererStackManager.Instance.RendererStack.ElementList)
+            _ = CameraTemporaryComponentStack.Setup(true, new object[] { this }, CancellationToken.None);
+
+            _ = CameraComponentStack.Setup();
+
+            foreach (Renderer renderer in RendererStackManager.Instance.RendererStack.ElementList)
             {
-                AddCameraTemporaryComponentsAttribute addCameraTemporaryComponentsAttribute = (AddCameraTemporaryComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraTemporaryComponentsAttribute));
-                AddCameraComponentsAttribute addCameraComponentsAttribute = (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
+                var addCameraTemporaryComponentsAttribute =
+                    (AddCameraTemporaryComponentsAttribute)renderer.GetType()
+                        .GetAttribute(typeof(AddCameraTemporaryComponentsAttribute));
+                var addCameraComponentsAttribute =
+                    (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
 
                 if (addCameraTemporaryComponentsAttribute != null)
                 {
@@ -79,30 +91,24 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                     CameraComponentStack.CreateIfMissingType(addCameraComponentsAttribute.Types);
                 }
             }
-            
+
 #if UNITY_EDITOR
             CameraComponentStackEditor = new CameraComponentStackEditor(CameraComponentStack);
-#endif    
-        }
-
-        public VirtualCamera(UnityEngine.Camera selectedCamera)
-        {
-            Camera = selectedCamera; 
-            Setup();
+#endif
         }
 
         public UnityEngine.Camera GetRenderingCamera()
         {
 #if UNITY_EDITOR
-            if(Application.isPlaying == false)
+            if (Application.isPlaying == false)
             {
-                if(RendererStackManager.Instance.EditorPlayModeSimulation)
+                if (RendererStackManager.Instance.EditorPlayModeSimulation)
                 {
                     return null;
                 }
             }
 #endif
-            if(RendererStackSettings.Instance.RenderDirectToCamera)
+            if (RendererStackSettings.Instance.RenderDirectToCamera)
             {
                 if (CameraType == CameraType.SceneView || Application.isPlaying)
                 {
@@ -116,55 +122,51 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
                     return Camera;
                 }
             }
-                
+
             return null;
         }
-        
+
         public bool IsCameraActive()
         {
 #if UNITY_EDITOR
-            bool fitCamera = IsFitCamera();
+            var fitCamera = IsFitCamera();
 
             if (!fitCamera)
             {
                 return false;
             }
-            
+
             if (Application.isPlaying == false)
             {
-                if(RendererStackManager.Instance.EditorPlayModeSimulation)
+                if (RendererStackManager.Instance.EditorPlayModeSimulation)
                 {
-                    if(CameraType == CameraType.SceneView)
+                    if (CameraType == CameraType.SceneView)
                     {
                         return false;
-                    } 
+                    }
                 }
                 else
                 {
-                    if(CameraType == CameraType.Normal)
+                    if (CameraType == CameraType.Normal)
                     {
                         return false;
-                    } 
+                    }
                 }
 
                 return true;
             }
-            else
+
+            if (CameraType == CameraType.SceneView)
             {
-                if(CameraType == CameraType.SceneView)
+                if (RendererStackSettings.Instance.RenderSceneCameraInPlayMode)
                 {
-                    if(RendererStackSettings.Instance.RenderSceneCameraInPlayMode)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return true;
                 }
-            
-                return true;
+
+                return false;
             }
+
+            return true;
 #else
             return IsFitCamera();
 #endif
@@ -172,47 +174,44 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         public bool IsFitCamera()
         {
-            if(CameraType == CameraType.Normal)
+            if (CameraType == CameraType.Normal)
             {
-                if(Camera == null || Camera.gameObject.activeInHierarchy == false || Camera.enabled == false)
+                if (Camera == null || Camera.gameObject.activeInHierarchy == false || Camera.enabled == false)
                 {
                     return false;
                 }
 
                 return Active;
             }
-            
+
             return Camera != null;
         }
 
-        public Vector3 GetCameraPosition()
-        {
-            return Camera.transform.position - FloatingOriginOffset;
-        }
+        public Vector3 GetCameraPosition() => Camera.transform.position - FloatingOriginOffset;
 
         public float GetMaxDistance(Type rendererType)
         {
-            Quality quality = (Quality)GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), rendererType);
+            var quality = (Quality)GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), rendererType);
 
-            float maxDistance = Mathf.Min(Camera.farClipPlane, quality.MaxRenderDistance);
+            var maxDistance = Mathf.Min(Camera.farClipPlane, quality.MaxRenderDistance);
 
-            float fieldOfViewFactor = 90 / Mathf.Clamp(Camera.fieldOfView, 0, 90);
+            var fieldOfViewFactor = 90 / Mathf.Clamp(Camera.fieldOfView, 0, 90);
 
             maxDistance *= fieldOfViewFactor;
-            
+
             return maxDistance;
         }
 
         public Matrix4x4 GetMatrix4X4()
         {
-            var transform = Camera.transform;
+            Transform transform = Camera.transform;
             return Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
         }
 
         public bool IsPositionChanged()
         {
-            bool needUpdate = !_lastCameraTransform.GetPosition().Equals(Camera.transform.position);
-            
+            var needUpdate = !_lastCameraTransform.GetPosition().Equals(Camera.transform.position);
+
             _lastCameraTransform = GetMatrix4X4();
 
             return needUpdate;
@@ -220,10 +219,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         public bool IsNeedUpdateRenderData(Type rendererType)
         {
-            bool needUpdate = _lastMaxDistance != GetMaxDistance(rendererType) 
-                              || !_lastCameraTransform.Equals(GetMatrix4X4()) 
-                              || _lastFieldOfView != Camera.fieldOfView;
-            
+            var needUpdate = _lastMaxDistance != GetMaxDistance(rendererType)
+                             || !_lastCameraTransform.Equals(GetMatrix4X4())
+                             || _lastFieldOfView != Camera.fieldOfView;
+
             return needUpdate;
         }
 
@@ -234,9 +233,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
             _lastFieldOfView = Camera.fieldOfView;
         }
 
-        public void OnDisable()
-        {
-            CameraTemporaryComponentStack?.OnDisable();
-        }
+        public void OnDisable() => CameraTemporaryComponentStack?.OnDisable();
     }
 }

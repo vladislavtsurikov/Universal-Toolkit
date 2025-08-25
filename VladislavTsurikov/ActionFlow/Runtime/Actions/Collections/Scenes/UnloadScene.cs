@@ -8,7 +8,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Scenes
     [Name("Scene/Unload Scene")]
     public class UnloadScene : Action
     {
-        public SceneReference SceneReference = new SceneReference();
+        public SceneReference SceneReference = new();
 
         public override string Name
         {
@@ -18,13 +18,11 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Scenes
                 {
                     return "Unload Scene [Set Scene]";
                 }
-                else
-                {
-                    return $"Unload Scene [{SceneReference.Scene.name}]";
-                }
+
+                return $"Unload Scene [{SceneReference.Scene.name}]";
             }
         }
-        
+
         protected override async UniTask<bool> Run(CancellationToken token)
         {
             await SceneReference.UnloadScene();

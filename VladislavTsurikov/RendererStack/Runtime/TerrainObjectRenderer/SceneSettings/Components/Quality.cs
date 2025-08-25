@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings;
 using Object = UnityEngine.Object;
@@ -10,28 +11,30 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
     public class Quality : SceneComponent
     {
         public Light DirectionalLight;
-
-        public Transform TransformOfFloatingOrigin;
         public Vector3 FloatingOriginOffset;
         public Vector3 FloatingOriginStartPosition;
 
-        protected override void SetupComponent(object[] setupData)
+        public Transform TransformOfFloatingOrigin;
+
+        protected override UniTask SetupComponent(object[] setupData)
         {
             SetupFloatingOrigin();
-            
+
             if (DirectionalLight == null)
             {
                 FindDirectionalLight();
             }
+
+            return UniTask.CompletedTask;
         }
 
         public void FindDirectionalLight()
         {
             Light selectedLight = null;
-            float intensity = float.MinValue;
+            var intensity = float.MinValue;
 
             Light[] lights = Object.FindObjectsOfType<Light>();
-            for (int i = 0; i <= lights.Length - 1; i++)
+            for (var i = 0; i <= lights.Length - 1; i++)
             {
                 if (lights[i].type == LightType.Directional)
                 {
@@ -71,6 +74,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
             {
                 return TransformOfFloatingOrigin;
             }
+
             return RendererStackManager.Instance.SceneDataManager.transform;
         }
     }

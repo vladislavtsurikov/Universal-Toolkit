@@ -15,15 +15,16 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
 namespace OdinSerializer
 {
     /// <summary>
-    /// Shared config class for <see cref="SerializationNodeDataReader"/> and <see cref="SerializationNodeDataWriter"/>.
+    ///     Shared config class for <see cref="SerializationNodeDataReader" /> and <see cref="SerializationNodeDataWriter" />.
     /// </summary>
     public static class SerializationNodeDataReaderWriterConfig
     {
         /// <summary>
-        /// The string to use to separate node id's from their names.
+        ///     The string to use to separate node id's from their names.
         /// </summary>
         public const string NodeIdSeparator = "|";
     }

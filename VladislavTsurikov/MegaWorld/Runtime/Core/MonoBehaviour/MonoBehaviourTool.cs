@@ -1,28 +1,22 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using OdinSerializer;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 {
     public abstract class MonoBehaviourTool : SerializedMonoBehaviour
     {
+        public SelectionData Data = new();
+
         [OdinSerialize]
-        private ComponentStack _componentStack = new ComponentStack();
+        private ComponentStack _componentStack = new();
 
         [field: NonSerialized]
         public bool IsSetup { get; private set; }
 
         internal ComponentStack ComponentStack => _componentStack;
-
-        public SelectionDatas.SelectionData Data = new SelectionDatas.SelectionData();
-
-        private void OnEnable()
-        {
-            Setup();
-        }
 
         private void Update()
         {
@@ -31,25 +25,24 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 
             OnUpdate();
         }
-        
-        public Runtime_Core_Component GetElement(Type elementType)
-        {
-            return _componentStack.GetElement(elementType);
-        }
+
+        private void OnEnable() => Setup();
+
+        public Runtime_Core_Component GetElement(Type elementType) => _componentStack.GetElement(elementType);
 
         public void Setup()
         {
             Data.Setup();
-            _componentStack.Setup(true, new object[]{this}).Forget();
+            _componentStack.Setup(true, new object[] { this }).Forget();
             OnToolEnable();
 
-            IsSetup = true; 
+            IsSetup = true;
         }
 
         protected virtual void OnUpdate()
         {
         }
-        
+
         private protected virtual void OnToolEnable()
         {
         }

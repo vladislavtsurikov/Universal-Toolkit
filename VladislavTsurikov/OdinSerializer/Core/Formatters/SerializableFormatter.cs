@@ -16,14 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
+using System.Runtime.Serialization;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Reflection;
-    using System.Runtime.Serialization;
-
     /// <summary>
-    /// Formatter for all types that implement the ISerializable interface.
+    ///     Formatter for all types that implement the ISerializable interface.
     /// </summary>
     /// <typeparam name="T">The type which can be serialized and deserialized by the formatter.</typeparam>
     /// <seealso cref="BaseFormatter{T}" />
@@ -34,71 +34,77 @@ namespace OdinSerializer
 
         static SerializableFormatter()
         {
-            var current = typeof(T);
+            Type current = typeof(T);
 
             ConstructorInfo constructor = null;
 
             do
             {
-                constructor = current.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(SerializationInfo), typeof(StreamingContext) }, null);
+                constructor =
+                    current.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null,
+                        new[] { typeof(SerializationInfo), typeof(StreamingContext) }, null);
                 current = current.BaseType;
-            }
-            while (constructor == null && current != typeof(object) && current != null);
+            } while (constructor == null && current != typeof(object) && current != null);
 
             if (constructor != null)
             {
                 // TODO: Fancy compiled delegate
                 ISerializableConstructor = (info, context) =>
                 {
-                    T obj = (T)FormatterServices.GetUninitializedObject(typeof(T));
+                    var obj = (T)FormatterServices.GetUninitializedObject(typeof(T));
                     constructor.Invoke(obj, new object[] { info, context });
                     return obj;
                 };
             }
             else
             {
-                DefaultLoggers.DefaultLogger.LogWarning("Type " + typeof(T).Name + " implements the interface ISerializable but does not implement the required constructor with signature " + typeof(T).Name + "(SerializationInfo info, StreamingContext context). The interface declaration will be ignored, and the formatter fallbacks to reflection.");
+                DefaultLoggers.DefaultLogger.LogWarning("Type " + typeof(T).Name +
+                                                        " implements the interface ISerializable but does not implement the required constructor with signature " +
+                                                        typeof(T).Name +
+                                                        "(SerializationInfo info, StreamingContext context). The interface declaration will be ignored, and the formatter fallbacks to reflection.");
                 ReflectionFormatter = new ReflectionFormatter<T>();
             }
         }
 
         /// <summary>
-        /// Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before deserialization begins.
-        /// You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" /> and <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(T, IDataReader, DeserializationContext)" /> immediately after creating the object yourself during deserialization.
+        ///     Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before
+        ///     deserialization begins.
+        ///     You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" />
+        ///     and <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(T, IDataReader, DeserializationContext)" />
+        ///     immediately after creating the object yourself during deserialization.
         /// </summary>
         /// <returns>
-        /// An uninitialized object of type <see cref="T" />.
+        ///     An uninitialized object of type <see cref="T" />.
         /// </returns>
-        protected override T GetUninitializedObject()
-        {
-            return default(T);
-        }
+        protected override T GetUninitializedObject() => default;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref T value, IDataReader reader)
         {
-            if (SerializableFormatter<T>.ISerializableConstructor != null)
+            if (ISerializableConstructor != null)
             {
-                var info = this.ReadSerializationInfo(reader);
+                SerializationInfo info = ReadSerializationInfo(reader);
 
                 if (info != null)
                 {
                     try
                     {
-                        value = SerializableFormatter<T>.ISerializableConstructor(info, reader.Context.StreamingContext);
+                        value = ISerializableConstructor(info, reader.Context.StreamingContext);
 
-                        this.InvokeOnDeserializingCallbacks(ref value, reader.Context);
+                        InvokeOnDeserializingCallbacks(ref value, reader.Context);
 
                         if (IsValueType == false)
                         {
-                            this.RegisterReferenceID(value, reader);
+                            RegisterReferenceID(value, reader);
                         }
-
-                        return;
                     }
                     catch (Exception ex)
                     {
@@ -110,23 +116,23 @@ namespace OdinSerializer
             {
                 value = ReflectionFormatter.Deserialize(reader);
 
-                this.InvokeOnDeserializingCallbacks(ref value, reader.Context);
+                InvokeOnDeserializingCallbacks(ref value, reader.Context);
 
                 if (IsValueType == false)
                 {
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
                 }
             }
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
         protected override void SerializeImplementation(ref T value, IDataWriter writer)
         {
-            if (SerializableFormatter<T>.ISerializableConstructor != null)
+            if (ISerializableConstructor != null)
             {
                 // Don't have GetType() in the below lines as a strongly typed T value, since
                 // people can "override" (shadow) GetType() on derived classes with the "new"
@@ -136,7 +142,7 @@ namespace OdinSerializer
                 // (Yes, this has actually happened, and this was done to fix it.)
 
                 var serializable = value as ISerializable;
-                var info = new SerializationInfo((value as object).GetType(), writer.Context.FormatterConverter);
+                var info = new SerializationInfo(value.GetType(), writer.Context.FormatterConverter);
 
                 try
                 {
@@ -147,7 +153,7 @@ namespace OdinSerializer
                     writer.Context.Config.DebugContext.LogException(ex);
                 }
 
-                this.WriteSerializationInfo(info, writer);
+                WriteSerializationInfo(info, writer);
             }
             else
             {
@@ -156,11 +162,11 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Creates and reads into a <see cref="SerializationInfo" /> instance using a given reader and context.
+        ///     Creates and reads into a <see cref="SerializationInfo" /> instance using a given reader and context.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The <see cref="SerializationInfo" /> which was read.
+        ///     The <see cref="SerializationInfo" /> which was read.
         /// </returns>
         private SerializationInfo ReadSerializationInfo(IDataReader reader)
         {
@@ -174,9 +180,9 @@ namespace OdinSerializer
                     long length;
                     reader.EnterArray(out length);
 
-                    SerializationInfo info = new SerializationInfo(typeof(T), reader.Context.FormatterConverter);
+                    var info = new SerializationInfo(typeof(T), reader.Context.FormatterConverter);
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         Type type = null;
                         entry = reader.PeekEntry(out name);
@@ -197,7 +203,7 @@ namespace OdinSerializer
                         entry = reader.PeekEntry(out name);
 
                         var readerWriter = Serializer.Get(type);
-                        object value = readerWriter.ReadValueWeak(reader);
+                        var value = readerWriter.ReadValueWeak(reader);
                         info.AddValue(name, value);
                     }
 
@@ -213,7 +219,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes the given <see cref="SerializationInfo" /> using the given writer.
+        ///     Writes the given <see cref="SerializationInfo" /> using the given writer.
         /// </summary>
         /// <param name="info">The <see cref="SerializationInfo" /> to write.</param>
         /// <param name="writer">The writer to use.</param>
@@ -223,11 +229,12 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(info.MemberCount);
 
-                foreach (var entry in info)
+                foreach (SerializationEntry entry in info)
                 {
                     try
                     {
-                        writer.WriteString("type", writer.Context.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
+                        writer.WriteString("type",
+                            writer.Context.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
                         var readerWriter = Serializer.Get(entry.ObjectType);
                         readerWriter.WriteValueWeak(entry.Name, entry.Value, writer);
                     }
@@ -251,70 +258,76 @@ namespace OdinSerializer
 
         public WeakSerializableFormatter(Type serializedType) : base(serializedType)
         {
-            var current = serializedType;
+            Type current = serializedType;
             ConstructorInfo constructor = null;
 
             do
             {
-                constructor = current.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, new Type[] { typeof(SerializationInfo), typeof(StreamingContext) }, null);
+                constructor =
+                    current.GetConstructor(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null,
+                        new[] { typeof(SerializationInfo), typeof(StreamingContext) }, null);
                 current = current.BaseType;
-            }
-            while (constructor == null && current != typeof(object) && current != null);
+            } while (constructor == null && current != typeof(object) && current != null);
 
             if (constructor != null)
             {
                 // TODO: Fancy compiled delegate
                 ISerializableConstructor = (info, context) =>
                 {
-                    ISerializable obj = (ISerializable)FormatterServices.GetUninitializedObject(this.SerializedType);
+                    var obj = (ISerializable)FormatterServices.GetUninitializedObject(SerializedType);
                     constructor.Invoke(obj, new object[] { info, context });
                     return obj;
                 };
             }
             else
             {
-                DefaultLoggers.DefaultLogger.LogWarning("Type " + this.SerializedType.Name + " implements the interface ISerializable but does not implement the required constructor with signature " + this.SerializedType.Name + "(SerializationInfo info, StreamingContext context). The interface declaration will be ignored, and the formatter fallbacks to reflection.");
-                ReflectionFormatter = new WeakReflectionFormatter(this.SerializedType);
+                DefaultLoggers.DefaultLogger.LogWarning("Type " + SerializedType.Name +
+                                                        " implements the interface ISerializable but does not implement the required constructor with signature " +
+                                                        SerializedType.Name +
+                                                        "(SerializationInfo info, StreamingContext context). The interface declaration will be ignored, and the formatter fallbacks to reflection.");
+                ReflectionFormatter = new WeakReflectionFormatter(SerializedType);
             }
         }
 
         /// <summary>
-        /// Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before deserialization begins.
-        /// You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" /> and <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(T, IDataReader, DeserializationContext)" /> immediately after creating the object yourself during deserialization.
+        ///     Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before
+        ///     deserialization begins.
+        ///     You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader, DeserializationContext)" />
+        ///     and <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(T, IDataReader, DeserializationContext)" />
+        ///     immediately after creating the object yourself during deserialization.
         /// </summary>
         /// <returns>
-        /// An uninitialized object of type <see cref="T" />.
+        ///     An uninitialized object of type <see cref="T" />.
         /// </returns>
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
-            if (this.ISerializableConstructor != null)
+            if (ISerializableConstructor != null)
             {
-                var info = this.ReadSerializationInfo(reader);
+                SerializationInfo info = ReadSerializationInfo(reader);
 
                 if (info != null)
                 {
                     try
                     {
-                        value = this.ISerializableConstructor(info, reader.Context.StreamingContext);
+                        value = ISerializableConstructor(info, reader.Context.StreamingContext);
 
-                        this.InvokeOnDeserializingCallbacks(value, reader.Context);
+                        InvokeOnDeserializingCallbacks(value, reader.Context);
 
                         if (IsValueType == false)
                         {
-                            this.RegisterReferenceID(value, reader);
+                            RegisterReferenceID(value, reader);
                         }
-
-                        return;
                     }
                     catch (Exception ex)
                     {
@@ -324,25 +337,25 @@ namespace OdinSerializer
             }
             else
             {
-                value = this.ReflectionFormatter.Deserialize(reader);
+                value = ReflectionFormatter.Deserialize(reader);
 
-                this.InvokeOnDeserializingCallbacks(value, reader.Context);
+                InvokeOnDeserializingCallbacks(value, reader.Context);
 
-                if (this.IsValueType == false)
+                if (IsValueType == false)
                 {
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
                 }
             }
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
         protected override void SerializeImplementation(ref object value, IDataWriter writer)
         {
-            if (this.ISerializableConstructor != null)
+            if (ISerializableConstructor != null)
             {
                 var serializable = value as ISerializable;
                 var info = new SerializationInfo(value.GetType(), writer.Context.FormatterConverter);
@@ -356,11 +369,11 @@ namespace OdinSerializer
                     writer.Context.Config.DebugContext.LogException(ex);
                 }
 
-                this.WriteSerializationInfo(info, writer);
+                WriteSerializationInfo(info, writer);
             }
             else
             {
-                this.ReflectionFormatter.Serialize(value, writer);
+                ReflectionFormatter.Serialize(value, writer);
             }
         }
 
@@ -376,9 +389,9 @@ namespace OdinSerializer
                     long length;
                     reader.EnterArray(out length);
 
-                    SerializationInfo info = new SerializationInfo(this.SerializedType, reader.Context.FormatterConverter);
+                    var info = new SerializationInfo(SerializedType, reader.Context.FormatterConverter);
 
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         Type type = null;
                         entry = reader.PeekEntry(out name);
@@ -399,7 +412,7 @@ namespace OdinSerializer
                         entry = reader.PeekEntry(out name);
 
                         var readerWriter = Serializer.Get(type);
-                        object value = readerWriter.ReadValueWeak(reader);
+                        var value = readerWriter.ReadValueWeak(reader);
                         info.AddValue(name, value);
                     }
 
@@ -420,11 +433,12 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(info.MemberCount);
 
-                foreach (var entry in info)
+                foreach (SerializationEntry entry in info)
                 {
                     try
                     {
-                        writer.WriteString("type", writer.Context.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
+                        writer.WriteString("type",
+                            writer.Context.Binder.BindToName(entry.ObjectType, writer.Context.Config.DebugContext));
                         var readerWriter = Serializer.Get(entry.ObjectType);
                         readerWriter.WriteValueWeak(entry.Name, entry.Value, writer);
                     }

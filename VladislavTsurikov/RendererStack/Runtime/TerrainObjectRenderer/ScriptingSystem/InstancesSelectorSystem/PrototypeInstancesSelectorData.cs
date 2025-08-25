@@ -6,14 +6,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
     {
         public readonly object Object;
 
-        protected PrototypeInstancesSelectorData(object obj)
-        {
-            Object = obj;
-        }
+        protected PrototypeInstancesSelectorData(object obj) => Object = obj;
 
-        public virtual bool IsNeedUpdate(Sphere sphere)
-        {
-            return true;
-        }
+        public virtual bool IsNeedUpdate(Sphere sphere) => true;
     }
 }

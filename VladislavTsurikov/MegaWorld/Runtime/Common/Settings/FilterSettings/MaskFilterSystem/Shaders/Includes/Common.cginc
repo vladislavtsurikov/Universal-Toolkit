@@ -12,7 +12,7 @@ float InverseLerp(float a, float b, float t)
 
 float Lerp(float a, float b, float t)
 {
-    return  a + (b - a) * Clamp01(t);
+    return a + (b - a) * Clamp01(t);
 }
 
 float Remap(float height, float remapMin, float remapMax)

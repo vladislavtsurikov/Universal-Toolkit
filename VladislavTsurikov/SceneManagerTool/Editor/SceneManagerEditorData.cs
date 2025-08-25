@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 using VladislavTsurikov.SceneManagerTool.Runtime;
 
 namespace VladislavTsurikov.SceneManagerTool.Editor
@@ -8,9 +8,13 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
     [Serializable]
     internal class SceneManagerEditorData
     {
+        public SceneSetupManager SceneSetupManager = new();
+
+        public StartupScene StartupScene = new();
+
         [OdinSerialize]
         private bool _runAsRunAsBuildMode;
-        
+
         public bool RunAsBuildMode
         {
             get => _runAsRunAsBuildMode;
@@ -20,10 +24,6 @@ namespace VladislavTsurikov.SceneManagerTool.Editor
                 SceneManagerData.MaskAsDirty();
             }
         }
-
-        public SceneSetupManager SceneSetupManager = new SceneSetupManager();
-
-        public StartupScene StartupScene = new StartupScene();
 
         public void Setup()
         {

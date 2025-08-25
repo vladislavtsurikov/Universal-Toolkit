@@ -12,18 +12,17 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
     public class FadeEditor : ReorderableListComponentEditor
     {
         private FadeTransition _component;
-        
-        public override void OnEnable()
-        {
-            _component = (FadeTransition)Target;
-        }
-        
+
+        public override void OnEnable() => _component = (FadeTransition)Target;
+
         public override void OnGUI(Rect rect, int index)
         {
-            _component.SceneReference.SceneAsset = (SceneAsset)CustomEditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent(""), _component.SceneReference.SceneAsset, typeof(SceneAsset));
+            _component.SceneReference.SceneAsset = (SceneAsset)CustomEditorGUI.ObjectField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent(""),
+                _component.SceneReference.SceneAsset, typeof(SceneAsset));
             rect.y += CustomEditorGUI.SingleLineHeight;
         }
-        
+
         public override float GetElementHeight(int index)
         {
             float height = 0;

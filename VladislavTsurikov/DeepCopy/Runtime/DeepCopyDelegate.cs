@@ -1,7 +1,7 @@
 ﻿namespace VladislavTsurikov.DeepCopy.Runtime
 {
     /// <summary>
-    /// Deep copier delegate.
+    ///     Deep copier delegate.
     /// </summary>
     /// <param name="original">Original object to be deep copied.</param>
     /// <param name="context">The context.</param>

@@ -16,24 +16,25 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// A helper class for quickly and easily defining custom loggers.
+    ///     A helper class for quickly and easily defining custom loggers.
     /// </summary>
     /// <seealso cref="ILogger" />
     public class CustomLogger : ILogger
     {
-        private Action<string> logWarningDelegate;
-        private Action<string> logErrorDelegate;
-        private Action<Exception> logExceptionDelegate;
+        private readonly Action<string> logErrorDelegate;
+        private readonly Action<Exception> logExceptionDelegate;
+        private readonly Action<string> logWarningDelegate;
 
         /// <summary>
-        /// Creates a new custom logger using a set of given delegates.
+        ///     Creates a new custom logger using a set of given delegates.
         /// </summary>
-        public CustomLogger(Action<string> logWarningDelegate, Action<string> logErrorDelegate, Action<Exception> logExceptionDelegate)
+        public CustomLogger(Action<string> logWarningDelegate, Action<string> logErrorDelegate,
+            Action<Exception> logExceptionDelegate)
         {
             if (logWarningDelegate == null)
             {
@@ -56,30 +57,21 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Logs a warning.
+        ///     Logs a warning.
         /// </summary>
         /// <param name="warning">The warning to log.</param>
-        public void LogWarning(string warning)
-        {
-            this.logWarningDelegate(warning);
-        }
+        public void LogWarning(string warning) => logWarningDelegate(warning);
 
         /// <summary>
-        /// Logs an error.
+        ///     Logs an error.
         /// </summary>
         /// <param name="error">The error to log.</param>
-        public void LogError(string error)
-        {
-            this.logErrorDelegate(error);
-        }
+        public void LogError(string error) => logErrorDelegate(error);
 
         /// <summary>
-        /// Logs an exception.
+        ///     Logs an exception.
         /// </summary>
         /// <param name="exception">The exception to log.</param>
-        public void LogException(Exception exception)
-        {
-            this.logExceptionDelegate(exception);
-        }
+        public void LogException(Exception exception) => logExceptionDelegate(exception);
     }
 }

@@ -1,11 +1,11 @@
 #if UNITY_EDITOR
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
@@ -13,26 +13,20 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
     [Name("Move Up/Down")]
-	public class MoveAlongDirection : Action
+    public class MoveAlongDirection : Action
     {
         private ShortcutCombo _shortcutCombo;
 
         private Vector3 _startPosition;
         private float _surfaceOffset;
-        
-        public MouseSensitivitySettings MouseSensitivitySettings = new MouseSensitivitySettings();
-        
-        [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
-        
+        public MouseSensitivitySettings MouseSensitivitySettings = new();
+
+        [OnDeserializing]
+        private void OnDeserializing() => InitShortcutCombo();
+
+        protected override void OnCreate() => InitShortcutCombo();
+
         private void InitShortcutCombo()
         {
             _shortcutCombo = new ShortcutCombo();
@@ -50,26 +44,23 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 
         protected override void RegisterUndo()
         {
-            if(EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
+            if (EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
             {
-                GameObject go = (GameObject)EditTool.FindObject.Obj;
+                var go = (GameObject)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new GameObjectTransform(go));
             }
-            else if(EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
+            else if (EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
             }
         }
 
-        protected override void OnObjectFound()
-        {
-            SetStartValue();
-        }
+        protected override void OnObjectFound() => SetStartValue();
 
         public override bool CheckShortcutCombo()
         {
-            if(_shortcutCombo.IsActive())
+            if (_shortcutCombo.IsActive())
             {
                 return true;
             }

@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using OdinSerializer;
+using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
@@ -13,11 +13,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
         Procedural
     }
 
-    public enum SpacingEqualsType 
-    { 
-        BrushSize, 
+    public enum SpacingEqualsType
+    {
+        BrushSize,
         HalfBrushSize,
-        Custom,
+        Custom
     }
 
 
@@ -25,26 +25,27 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
     public class BrushSettings : Component
     {
         [OdinSerialize]
-        private float _customCustomSpacing = 30;
-
-        [OdinSerialize]
         private float _brushRotation;
 
         [OdinSerialize]
         private float _brushSize = 100;
 
-        public ProceduralMask ProceduralMask = new ProceduralMask();
-        public CustomMasks CustomMasks = new CustomMasks();
+        [OdinSerialize]
+        private float _customCustomSpacing = 30;
+
+        public BrushJitterSettings BrushJitterSettings = new();
+        public CustomMasks CustomMasks = new();
         public MaskType MaskType = MaskType.Procedural;
+
+        public ProceduralMask ProceduralMask = new ProceduralMask();
         public SpacingEqualsType SpacingEqualsType = SpacingEqualsType.HalfBrushSize;
-        public BrushJitterSettings BrushJitterSettings = new BrushJitterSettings();
 
         public float CustomSpacing
         {
             set => _customCustomSpacing = Mathf.Max(0.01f, value);
             get => _customCustomSpacing;
         }
-        
+
         public float Spacing
         {
             get
@@ -104,13 +105,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
 
         public void ScrollBrushRadiusEvent()
         {
-            if(Event.current.shift)
+            if (Event.current.shift)
             {
-                if (Event.current.type == EventType.ScrollWheel) 
+                if (Event.current.type == EventType.ScrollWheel)
                 {
                     BrushSize += Event.current.delta.y;
                     Event.current.Use();
-			    }
+                }
             }
         }
 
@@ -120,12 +121,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
             {
                 return null;
             }
-            
-            BoxArea area = new BoxArea(hit, BrushSize)
-            {
-                Mask = GetCurrentRaw(),
-                Rotation = BrushRotation,
-            };
+
+            var area = new BoxArea(hit, BrushSize) { Mask = GetCurrentRaw(), Rotation = BrushRotation };
 
             return area;
         }

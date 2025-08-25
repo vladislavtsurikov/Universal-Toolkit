@@ -11,17 +11,17 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         where T : Component
     {
         /// <summary>
-        /// A public link to the list is required for UnityEditorInternal.ReorderableList
+        ///     A public link to the list is required for UnityEditorInternal.ReorderableList
         /// </summary>
         public AdvancedElementList<T> ReorderableElementList => _elementList;
-        
+
         private protected override void CreateElements()
         {
             OnCreateElements();
-    
+
             GetType().GetAttribute<CreateComponentsAttribute>()?.Types
                 .ForEach(type => CreateElementIfMissingType(type));
-    
+
             AllTypesDerivedFrom<T>.Types
                 .Where(type => type.GetAttribute<PersistentComponentAttribute>() != null)
                 .ForEach(type => CreateElementIfMissingType(type));
@@ -31,11 +31,8 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         {
         }
 
-        public void CreateAllElementTypes()
-        {
-            CreateElementIfMissingType(AllTypesDerivedFrom<T>.Types);
-        }
-        
+        public void CreateAllElementTypes() => CreateElementIfMissingType(AllTypesDerivedFrom<T>.Types);
+
         protected void CreateElementIfMissingType(Type[] types)
         {
             foreach (Type type in types)
@@ -54,11 +51,11 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
             return settings;
         }
-        
+
         protected void AddElementIfMissingType(T element)
         {
             T settings = GetElement(element.GetType());
-            
+
             if (settings == null)
             {
                 Add(element);

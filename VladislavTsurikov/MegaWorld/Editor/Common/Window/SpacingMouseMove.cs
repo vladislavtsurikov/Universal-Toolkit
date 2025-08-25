@@ -15,14 +15,14 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
             {
                 Debug.LogError("Spacing cannot be 0");
             }
-            
+
             Vector3 moveVector = Raycast.Point - _prevRaycast.Point;
             Vector3 moveDirection = moveVector.normalized;
-            float moveLenght = moveVector.magnitude;
-                
+            var moveLenght = moveVector.magnitude;
+
             if (_dragDistance + moveLenght >= Spacing)
             {
-                float d = Spacing - _dragDistance;
+                var d = Spacing - _dragDistance;
                 Vector3 dragPoint = _prevRaycast.Point + moveDirection * d;
                 _dragDistance = 0;
                 moveLenght -= d;
@@ -40,11 +40,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Window
 
             _dragDistance += moveLenght;
         }
-        
-        protected override void OnStartDrag()
-        {
-            _dragDistance = 0;
-        }
+
+        protected override void OnStartDrag() => _dragDistance = 0;
     }
 }
 #endif

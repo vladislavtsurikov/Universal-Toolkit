@@ -10,24 +10,24 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
     [ElementEditor(typeof(MaskFilterComponentSettings))]
     public class MaskFilterComponentSettingsEditor : IMGUIElementEditor
     {
+        public static bool ChangedGUI;
         private MaskFilterComponentSettings _maskFilterComponentSettings;
         private MaskFilterStackEditor _maskFilterStackEditor;
-        
-        public static bool ChangedGUI;
-        
+
         public override void OnEnable()
         {
             _maskFilterComponentSettings = (MaskFilterComponentSettings)Target;
-            _maskFilterStackEditor = new MaskFilterStackEditor(new GUIContent("Mask Filters Settings"), _maskFilterComponentSettings.MaskFilterStack);
+            _maskFilterStackEditor = new MaskFilterStackEditor(new GUIContent("Mask Filters Settings"),
+                _maskFilterComponentSettings.MaskFilterStack);
         }
 
-        public override void OnGUI() 
+        public override void OnGUI()
         {
             EditorGUI.BeginChangeCheck();
 
             _maskFilterStackEditor.OnGUI();
-			
-            if(EditorGUI.EndChangeCheck())
+
+            if (EditorGUI.EndChangeCheck())
             {
                 ChangedGUI = true;
             }

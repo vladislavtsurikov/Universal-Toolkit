@@ -13,23 +13,27 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Textures
             {
                 return;
             }
-            
+
             AssetDatabase.StartAssetEditing();
 
-            foreach (string filePath in filePaths)
+            foreach (var filePath in filePaths)
             {
                 ReimportTextureToGUITexture(filePath);
             }
-            
+
             AssetDatabase.StopAssetEditing();
         }
 
         public static void ReimportTextureToGUITexture(string filePath)
         {
             var textureImporter = AssetImporter.GetAtPath(filePath) as TextureImporter;
-            if (textureImporter == null) return;
+            if (textureImporter == null)
+            {
+                return;
+            }
+
             Debug.Assert(textureImporter != null, nameof(textureImporter) + " != null");
-            bool requiresImport = false;
+            var requiresImport = false;
             if (textureImporter.textureType != TextureImporterType.GUI)
             {
                 textureImporter.textureType = TextureImporterType.GUI;
@@ -58,9 +62,9 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Textures
             {
                 return;
             }
-            
+
             Debug.Log($"Importing: {filePath}");
-            
+
             AssetDatabase.ImportAsset(filePath, ImportAssetOptions.ForceUpdate);
         }
     }

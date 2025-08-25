@@ -7,9 +7,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultC
     {
         public readonly Type[] Types;
 
-        public AddDefaultGroupComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        public AddDefaultGroupComponentsAttribute(Type[] types) => Types = types;
     }
 }

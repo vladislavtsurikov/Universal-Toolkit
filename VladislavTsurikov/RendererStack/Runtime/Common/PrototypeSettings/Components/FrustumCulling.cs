@@ -1,16 +1,16 @@
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings
 {
-    public enum GetAdditionalShadow 
+    public enum GetAdditionalShadow
     {
         None,
         MinCullingDistance,
         IncreaseBoundingSphere,
         DirectionLightShadowVisible
     }
-    
+
     [Name("Frustum Culling Settings")]
     public class FrustumCulling : PrototypeComponent
     {

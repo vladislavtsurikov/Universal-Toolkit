@@ -11,7 +11,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
         protected override void OnEnable()
         {
             base.OnEnable();
-            
+
             hideFlags = HideFlags.HideAndDontSave;
 
             SceneView.duringSceneGui += OnSceneGUI;
@@ -21,7 +21,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
         protected override void OnDisable()
         {
             base.OnDisable();
-            
+
             SceneView.duringSceneGui -= OnSceneGUI;
             EditorApplication.modifierKeysChanged -= Repaint;
 
@@ -32,7 +32,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
         }
 
         private void OnSceneGUI(SceneView sceneView)
-        { 
+        {
             WindowData.Instance.SelectionData.DeleteNullElements();
             WindowData.Instance.SelectedData.SetSelectedData();
             UpdateSceneViewEvent();
@@ -40,5 +40,5 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             WindowData.Instance.WindowToolStack.DoSelectedTool();
         }
     }
-} 
+}
 #endif

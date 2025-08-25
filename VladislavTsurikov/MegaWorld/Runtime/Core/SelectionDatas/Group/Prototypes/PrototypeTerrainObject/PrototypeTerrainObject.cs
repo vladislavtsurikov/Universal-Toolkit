@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
@@ -14,9 +13,9 @@ using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {
     [Name("Terrain Object")]
-    [DropObjects(new[]{typeof(GameObject)})]
+    [DropObjects(new[] { typeof(GameObject) })]
     [MissingIconsWarning("Drag & Drop Prefabs Here")]
-    [AddDefaultGroupComponents(new []{typeof(ContainerForGameObjects)})]
+    [AddDefaultGroupComponents(new[] { typeof(ContainerForGameObjects) })]
     public class PrototypeTerrainObject : PlacedObjectPrototype
     {
 #if RENDERER_STACK
@@ -50,10 +49,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
             AllAvailableTerrainObjectPrototypes.RemovePrototype(this);
         }
 #endif
-        
+
         public override bool IsSamePrototypeObject(Object obj)
         {
-            GameObject go = (GameObject)obj;
+            var go = (GameObject)obj;
 
             return GameObjectUtility.IsSameGameObject(go, Prefab);
         }

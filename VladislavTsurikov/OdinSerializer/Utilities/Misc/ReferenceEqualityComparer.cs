@@ -16,31 +16,29 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-
     /// <summary>
-    /// Compares objects by reference only, ignoring equality operators completely. This is used by the property tree reference dictionaries to keep track of references.
+    ///     Compares objects by reference only, ignoring equality operators completely. This is used by the property tree
+    ///     reference dictionaries to keep track of references.
     /// </summary>
     public class ReferenceEqualityComparer<T> : IEqualityComparer<T> where T : class
     {
         /// <summary>
-        /// A default, cached instance of this generic variant of the reference equality comparer.
+        ///     A default, cached instance of this generic variant of the reference equality comparer.
         /// </summary>
-        public static readonly ReferenceEqualityComparer<T> Default = new ReferenceEqualityComparer<T>();
+        public static readonly ReferenceEqualityComparer<T> Default = new();
 
         /// <summary>
-        /// Returns true if the object references are equal.
+        ///     Returns true if the object references are equal.
         /// </summary>
-        public bool Equals(T x, T y)
-        {
-            return object.ReferenceEquals(x, y);
-        }
+        public bool Equals(T x, T y) => ReferenceEquals(x, y);
 
         /// <summary>
-        /// Returns the result of the object's own GetHashCode method.
+        ///     Returns the result of the object's own GetHashCode method.
         /// </summary>
         public int GetHashCode(T obj)
         {

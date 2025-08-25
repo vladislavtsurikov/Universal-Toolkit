@@ -6,7 +6,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
     public static class AssetReferenceGameObjectExtensions
     {
-        public static async UniTask<GameObject> InstantiateWithAutoLoad(this AssetReferenceGameObject prefabRef, Transform parent = null)
+        public static async UniTask<GameObject> InstantiateWithAutoLoad(this AssetReferenceGameObject prefabRef,
+            Transform parent = null)
         {
             if (prefabRef == null)
             {
@@ -21,7 +22,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                 return await owner.InstantiateWithAutoLoad(prefabRef, parent);
             }
 
-            Debug.LogError($"[AssetReferenceGameObjectExtensions] PrefabRef '{prefabRef.AssetGUID}' has no unique owner. Cannot resolve loader.");
+            Debug.LogError(
+                $"[AssetReferenceGameObjectExtensions] PrefabRef '{prefabRef.AssetGUID}' has no unique owner. Cannot resolve loader.");
             return null;
         }
     }

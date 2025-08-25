@@ -7,33 +7,24 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
     [Serializable]
     public class Transition
     {
-        [SerializeField] 
-        private float _duration = 0f;
-        [SerializeField] 
+        [SerializeField]
+        private float _duration;
+
+        [SerializeField]
         private Ease _ease = Ease.InOutQuad;
-        [SerializeField] 
+
+        [SerializeField]
         private UpdateType _time = UpdateType.Normal;
-        [SerializeField] 
+
+        [SerializeField]
         private bool _waitToComplete = true;
-        
-        public float Duration => _duration;
-        
-        public Ease EaseType => _ease; 
-
-        public UpdateType Time => _time;
-
-        public bool WaitToComplete => _waitToComplete;
 
 
         public Transition()
         {
-            
         }
 
-        public Transition(UpdateType time)
-        {
-            _time = time;
-        }
+        public Transition(UpdateType time) => _time = time;
 
         public Transition(float duration, Ease ease, bool waitToComplete)
         {
@@ -41,7 +32,15 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
             _ease = ease;
             _waitToComplete = waitToComplete;
         }
-        
+
+        public float Duration => _duration;
+
+        public Ease EaseType => _ease;
+
+        public UpdateType Time => _time;
+
+        public bool WaitToComplete => _waitToComplete;
+
         public Tweener ApplyTweenSettings(Tweener tweener)
         {
             tweener.SetEase(_ease).SetUpdate(_time);

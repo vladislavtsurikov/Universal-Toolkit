@@ -7,7 +7,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
         Highlighted,
         Pressed,
         Selected,
-        Disabled,
+        Disabled
     }
 }
 #endif

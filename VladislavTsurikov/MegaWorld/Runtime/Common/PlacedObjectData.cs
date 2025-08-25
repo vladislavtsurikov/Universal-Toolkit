@@ -5,12 +5,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common
 {
     public class PlacedObjectData
     {
-        public readonly PlacedObjectPrototype Proto;
         public readonly GameObject GameObject;
+        public readonly PlacedObjectPrototype Proto;
 
         public PlacedObjectData(PlacedObjectPrototype proto, GameObject gameObject)
         {
-            Proto = proto; 
+            Proto = proto;
             GameObject = gameObject;
         }
     }

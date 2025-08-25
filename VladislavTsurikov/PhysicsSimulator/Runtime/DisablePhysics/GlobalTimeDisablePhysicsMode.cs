@@ -15,9 +15,7 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             }
         }
 
-        internal override void Reset()
-        {
+        internal override void Reset() =>
             _timeToFinish = Time.time + PhysicsSimulatorSettings.Instance.GlobalDisablePhysicsTime;
-        }
     }
 }

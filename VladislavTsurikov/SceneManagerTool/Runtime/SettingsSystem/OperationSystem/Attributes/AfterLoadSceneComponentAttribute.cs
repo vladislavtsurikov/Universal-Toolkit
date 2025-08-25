@@ -2,5 +2,7 @@
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSystem
 {
-    public sealed class AfterLoadSceneComponentAttribute : Attribute {}
+    public sealed class AfterLoadSceneComponentAttribute : Attribute
+    {
+    }
 }

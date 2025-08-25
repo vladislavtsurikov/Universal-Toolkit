@@ -8,7 +8,8 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
 {
     public class SceneTypeComponentStackEditor : ReorderableListStackEditor<SceneType, SceneTypeEditor>
     {
-        public SceneTypeComponentStackEditor(GUIContent reorderableListName, ComponentStackSupportSameType<SceneType> list) : base(reorderableListName, list, true)
+        public SceneTypeComponentStackEditor(GUIContent reorderableListName,
+            ComponentStackSupportSameType<SceneType> list) : base(reorderableListName, list, true)
         {
             CopySettings = true;
             ShowActiveToggle = false;

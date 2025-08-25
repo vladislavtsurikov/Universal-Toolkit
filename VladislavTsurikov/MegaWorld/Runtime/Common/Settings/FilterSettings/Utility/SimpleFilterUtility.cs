@@ -1,6 +1,6 @@
 ﻿using System;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
-using Group = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Group;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Utility
 {
@@ -10,14 +10,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Uti
         {
             foreach (Group group in selectedVariables.SelectedGroupList)
             {
-                FilterSettings filterComponent = (FilterSettings)group.GetElement(toolType, typeof(FilterSettings));
+                var filterComponent = (FilterSettings)group.GetElement(toolType, typeof(FilterSettings));
 
-                if (filterComponent == null) 
+                if (filterComponent == null)
                 {
                     continue;
                 }
-                
-                if(filterComponent.FilterType == FilterType.SimpleFilter)
+
+                if (filterComponent.FilterType == FilterType.SimpleFilter)
                 {
                     return true;
                 }

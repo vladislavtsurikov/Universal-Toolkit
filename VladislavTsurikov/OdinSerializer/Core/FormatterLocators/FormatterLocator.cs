@@ -16,90 +16,67 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+using OdinSerializer.Utilities;
+using UnityEditor;
+using UnityEngine;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using UnityEngine;
-    using Utilities;
-
     /// <summary>
-    /// Utility class for locating and caching formatters for all non-primitive types.
+    ///     Utility class for locating and caching formatters for all non-primitive types.
     /// </summary>
 #if UNITY_EDITOR
-
-    [UnityEditor.InitializeOnLoad]
+    [InitializeOnLoad]
 #endif
 
     public static class FormatterLocator
     {
-        private static readonly object StrongFormatters_LOCK = new object();
-        private static readonly object WeakFormatters_LOCK = new object();
+        private static readonly object StrongFormatters_LOCK = new();
+        private static readonly object WeakFormatters_LOCK = new();
 
-        private static readonly Dictionary<Type, IFormatter> FormatterInstances = new Dictionary<Type, IFormatter>(FastTypeComparer.Instance);
-        private static readonly DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter> StrongTypeFormatterMap = new DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter>(FastTypeComparer.Instance, ReferenceEqualityComparer<ISerializationPolicy>.Default);
-        private static readonly DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter> WeakTypeFormatterMap = new DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter>(FastTypeComparer.Instance, ReferenceEqualityComparer<ISerializationPolicy>.Default);
+        private static readonly Dictionary<Type, IFormatter> FormatterInstances = new(FastTypeComparer.Instance);
 
-        private struct FormatterInfo
-        {
-            public Type FormatterType;
-            public Type TargetType;
-            public Type WeakFallbackType;
-            public bool AskIfCanFormatTypes;
-            public int Priority;
-        }
+        private static readonly DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter> StrongTypeFormatterMap =
+            new(FastTypeComparer.Instance, ReferenceEqualityComparer<ISerializationPolicy>.Default);
 
-        private struct FormatterLocatorInfo
-        {
-            public IFormatterLocator LocatorInstance;
-            public int Priority;
-        }
+        private static readonly DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter> WeakTypeFormatterMap =
+            new(FastTypeComparer.Instance, ReferenceEqualityComparer<ISerializationPolicy>.Default);
 
-        private static readonly List<FormatterLocatorInfo> FormatterLocators = new List<FormatterLocatorInfo>();
-        private static readonly List<FormatterInfo> FormatterInfos = new List<FormatterInfo>();
-
-#if UNITY_EDITOR
-
-        /// <summary>
-        /// Editor-only event that fires whenever an emittable formatter has been located.
-        /// This event is used by the AOT formatter pre-emitter to locate types that need to have formatters pre-emitted.
-        /// </summary>
-        public static event Action<Type> OnLocatedEmittableFormatterForType;
-
-        /// <summary>
-        /// Editor-only event that fires whenever a formatter has been located.
-        /// </summary>
-        public static event Action<IFormatter> OnLocatedFormatter;
-
-#endif
+        private static readonly List<FormatterLocatorInfo> FormatterLocators = new();
+        private static readonly List<FormatterInfo> FormatterInfos = new();
 
         static FormatterLocator()
         {
-            foreach (var ass in AppDomain.CurrentDomain.GetAssemblies())
+            foreach (Assembly ass in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
                 {
                     var name = ass.GetName().Name;
 
-                    if (name.StartsWith("System.") || name.StartsWith("UnityEngine") || name.StartsWith("UnityEditor") || name == "mscorlib")
-                    {
+                    if (name.StartsWith("System.") || name.StartsWith("UnityEngine") ||
+                        name.StartsWith("UnityEditor") || name == "mscorlib")
                         // Filter out various core .NET libraries and Unity engine assemblies
+                    {
                         continue;
                     }
-                    else if (ass.GetName().Name == FormatterEmitter.PRE_EMITTED_ASSEMBLY_NAME || ass.SafeIsDefined(typeof(EmittedAssemblyAttribute), true))
+
+                    if (ass.GetName().Name == FormatterEmitter.PRE_EMITTED_ASSEMBLY_NAME ||
+                        ass.SafeIsDefined(typeof(EmittedAssemblyAttribute), true))
                     {
                         // Only include pre-emitted formatters if we are on an AOT platform.
                         // Pre-emitted formatters will not work in newer .NET runtimes due to
                         // lacking private member access privileges, but when compiled via
                         // IL2CPP they work fine.
-
 #if UNITY_EDITOR
                         continue;
 #else
                         if (EmitUtilities.CanEmit)
                         {
-                            // Never include pre-emitted formatters if we can emit on the current platform
+ // Never include pre-emitted formatters if we can emit on the current platform
                             continue;
                         }
 #endif
@@ -117,17 +94,19 @@ namespace OdinSerializer
                             continue;
                         }
 
-                        FormatterInfos.Add(new FormatterInfo()
+                        FormatterInfos.Add(new FormatterInfo
                         {
                             FormatterType = attr.FormatterType,
                             WeakFallbackType = attr.WeakFallback,
-                            TargetType = attr.FormatterType.GetArgumentsOfInheritedOpenGenericInterface(typeof(IFormatter<>))[0],
+                            TargetType =
+                                attr.FormatterType.GetArgumentsOfInheritedOpenGenericInterface(typeof(IFormatter<>))[0],
                             AskIfCanFormatTypes = typeof(IAskIfCanFormatTypes).IsAssignableFrom(attr.FormatterType),
                             Priority = attr.Priority
                         });
                     }
 
-                    foreach (var attrUncast in ass.SafeGetCustomAttributes(typeof(RegisterFormatterLocatorAttribute), true))
+                    foreach (var attrUncast in ass.SafeGetCustomAttributes(typeof(RegisterFormatterLocatorAttribute),
+                                 true))
                     {
                         var attr = (RegisterFormatterLocatorAttribute)attrUncast;
 
@@ -141,15 +120,18 @@ namespace OdinSerializer
 
                         try
                         {
-                            FormatterLocators.Add(new FormatterLocatorInfo()
+                            FormatterLocators.Add(new FormatterLocatorInfo
                             {
-                                LocatorInstance = (IFormatterLocator)Activator.CreateInstance(attr.FormatterLocatorType),
+                                LocatorInstance =
+                                    (IFormatterLocator)Activator.CreateInstance(attr.FormatterLocatorType),
                                 Priority = attr.Priority
                             });
                         }
                         catch (Exception ex)
                         {
-                            Debug.LogException(new Exception("Exception was thrown while instantiating FormatterLocator of type " + attr.FormatterLocatorType.FullName + ".", ex));
+                            Debug.LogException(new Exception(
+                                "Exception was thrown while instantiating FormatterLocator of type " +
+                                attr.FormatterLocatorType.FullName + ".", ex));
                         }
                     }
                 }
@@ -157,30 +139,39 @@ namespace OdinSerializer
                 {
                     if (ass.GetName().Name == "OdinSerializer")
                     {
-                        Debug.LogError("A TypeLoadException occurred when FormatterLocator tried to load types from assembly '" + ass.FullName + "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
+                        Debug.LogError(
+                            "A TypeLoadException occurred when FormatterLocator tried to load types from assembly '" +
+                            ass.FullName +
+                            "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
                     }
                 }
                 catch (ReflectionTypeLoadException)
                 {
                     if (ass.GetName().Name == "OdinSerializer")
                     {
-                        Debug.LogError("A ReflectionTypeLoadException occurred when FormatterLocator tried to load types from assembly '" + ass.FullName + "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
+                        Debug.LogError(
+                            "A ReflectionTypeLoadException occurred when FormatterLocator tried to load types from assembly '" +
+                            ass.FullName +
+                            "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
                     }
                 }
                 catch (MissingMemberException)
                 {
                     if (ass.GetName().Name == "OdinSerializer")
                     {
-                        Debug.LogError("A ReflectionTypeLoadException occurred when FormatterLocator tried to load types from assembly '" + ass.FullName + "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
+                        Debug.LogError(
+                            "A ReflectionTypeLoadException occurred when FormatterLocator tried to load types from assembly '" +
+                            ass.FullName +
+                            "'. No serialization formatters in this assembly will be found. Serialization will be utterly broken.");
                     }
                 }
             }
 
             // Order formatters and formatter locators by priority and then by name, to ensure consistency regardless of the order of loaded types, which is important for cross-platform cases.
-            
+
             FormatterInfos.Sort((a, b) =>
             {
-                int compare = -a.Priority.CompareTo(b.Priority);
+                var compare = -a.Priority.CompareTo(b.Priority);
 
                 if (compare == 0)
                 {
@@ -189,10 +180,10 @@ namespace OdinSerializer
 
                 return compare;
             });
-            
+
             FormatterLocators.Sort((a, b) =>
             {
-                int compare = -a.Priority.CompareTo(b.Priority);
+                var compare = -a.Priority.CompareTo(b.Priority);
 
                 if (compare == 0)
                 {
@@ -204,53 +195,65 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// This event is invoked before everything else when a formatter is being resolved for a given type. If any invoked delegate returns a valid formatter, that formatter is used and the resolve process stops there.
-        /// <para />
-        /// This can be used to hook into and extend the serialization system's formatter resolution logic.
+        ///     This event is invoked before everything else when a formatter is being resolved for a given type. If any invoked
+        ///     delegate returns a valid formatter, that formatter is used and the resolve process stops there.
+        ///     <para />
+        ///     This can be used to hook into and extend the serialization system's formatter resolution logic.
         /// </summary>
-        [Obsolete("Use the new IFormatterLocator interface instead, and register your custom locator with the RegisterFormatterLocator assembly attribute.", true)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [Obsolete(
+            "Use the new IFormatterLocator interface instead, and register your custom locator with the RegisterFormatterLocator assembly attribute.",
+            true)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public static event Func<Type, IFormatter> FormatterResolve
         {
-            add { throw new NotSupportedException(); }
-            remove { throw new NotSupportedException(); }
+            add => throw new NotSupportedException();
+            remove => throw new NotSupportedException();
         }
 
         /// <summary>
-        /// Gets a formatter for the type <see cref="T" />.
+        ///     Gets a formatter for the type <see cref="T" />.
         /// </summary>
         /// <typeparam name="T">The type to get a formatter for.</typeparam>
-        /// <param name="policy">The serialization policy to use if a formatter has to be emitted. If null, <see cref="SerializationPolicies.Strict"/> is used.</param>
+        /// <param name="policy">
+        ///     The serialization policy to use if a formatter has to be emitted. If null,
+        ///     <see cref="SerializationPolicies.Strict" /> is used.
+        /// </param>
         /// <returns>
-        /// A formatter for the type <see cref="T" />.
+        ///     A formatter for the type <see cref="T" />.
         /// </returns>
-        public static IFormatter<T> GetFormatter<T>(ISerializationPolicy policy)
-        {
-            return (IFormatter<T>)GetFormatter(typeof(T), policy, false);
-        }
+        public static IFormatter<T> GetFormatter<T>(ISerializationPolicy policy) =>
+            (IFormatter<T>)GetFormatter(typeof(T), policy, false);
 
         /// <summary>
-        /// Gets a formatter for a given type.
+        ///     Gets a formatter for a given type.
         /// </summary>
         /// <param name="type">The type to get a formatter for.</param>
-        /// <param name="policy">The serialization policy to use if a formatter has to be emitted. If null, <see cref="SerializationPolicies.Strict"/> is used.</param>
+        /// <param name="policy">
+        ///     The serialization policy to use if a formatter has to be emitted. If null,
+        ///     <see cref="SerializationPolicies.Strict" /> is used.
+        /// </param>
         /// <returns>
-        /// A formatter for the given type.
+        ///     A formatter for the given type.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The type argument is null.</exception>
-        public static IFormatter GetFormatter(Type type, ISerializationPolicy policy)
-        {
-            return GetFormatter(type, policy, true);
-        }
+        public static IFormatter GetFormatter(Type type, ISerializationPolicy policy) =>
+            GetFormatter(type, policy, true);
 
         /// <summary>
-        /// Gets a formatter for a given type.
+        ///     Gets a formatter for a given type.
         /// </summary>
         /// <param name="type">The type to get a formatter for.</param>
-        /// <param name="policy">The serialization policy to use if a formatter has to be emitted. If null, <see cref="SerializationPolicies.Strict"/> is used.</param>
-        /// <param name="allowWeakFallbackFormatters">Whether to allow the use of weak fallback formatters which do not implement the strongly typed <see cref="IFormatter{T}"/>, but which conversely do not need to have had AOT support generated.</param>
+        /// <param name="policy">
+        ///     The serialization policy to use if a formatter has to be emitted. If null,
+        ///     <see cref="SerializationPolicies.Strict" /> is used.
+        /// </param>
+        /// <param name="allowWeakFallbackFormatters">
+        ///     Whether to allow the use of weak fallback formatters which do not implement
+        ///     the strongly typed <see cref="IFormatter{T}" />, but which conversely do not need to have had AOT support
+        ///     generated.
+        /// </param>
         /// <returns>
-        /// A formatter for the given type.
+        ///     A formatter for the given type.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The type argument is null.</exception>
         public static IFormatter GetFormatter(Type type, ISerializationPolicy policy, bool allowWeakFallbackFormatters)
@@ -268,7 +271,8 @@ namespace OdinSerializer
             }
 
             var lockObj = allowWeakFallbackFormatters ? WeakFormatters_LOCK : StrongFormatters_LOCK;
-            var formatterMap = allowWeakFallbackFormatters ? WeakTypeFormatterMap : StrongTypeFormatterMap;
+            DoubleLookupDictionary<Type, ISerializationPolicy, IFormatter> formatterMap =
+                allowWeakFallbackFormatters ? WeakTypeFormatterMap : StrongTypeFormatterMap;
 
             lock (lockObj)
             {
@@ -342,24 +346,32 @@ namespace OdinSerializer
         {
             var types = new List<string>(GetAllPossibleMissingAOTTypes(type)).ToArray();
 
-            Debug.LogError("Creating a serialization formatter for the type '" + type.GetNiceFullName() + "' failed due to missing AOT support. \n\n" +
-                " Please use Odin's AOT generation feature to generate an AOT dll before building, and MAKE SURE that all of the following " +
-                "types were automatically added to the supported types list after a scan (if they were not, please REPORT AN ISSUE with the details of which exact types the scan is missing " +
-                "and ADD THEM MANUALLY): \n\n" + string.Join("\n", types) + "\n\nIF ALL THE TYPES ARE IN THE SUPPORT LIST AND YOU STILL GET THIS ERROR, PLEASE REPORT AN ISSUE." +
-                "The exception contained the following message: \n" + ex.Message);
+            Debug.LogError("Creating a serialization formatter for the type '" + type.GetNiceFullName() +
+                           "' failed due to missing AOT support. \n\n" +
+                           " Please use Odin's AOT generation feature to generate an AOT dll before building, and MAKE SURE that all of the following " +
+                           "types were automatically added to the supported types list after a scan (if they were not, please REPORT AN ISSUE with the details of which exact types the scan is missing " +
+                           "and ADD THEM MANUALLY): \n\n" + string.Join("\n", types) +
+                           "\n\nIF ALL THE TYPES ARE IN THE SUPPORT LIST AND YOU STILL GET THIS ERROR, PLEASE REPORT AN ISSUE." +
+                           "The exception contained the following message: \n" + ex.Message);
 
-            throw new SerializationAbortException("AOT formatter support was missing for type '" + type.GetNiceFullName() + "'.", ex);
+            throw new SerializationAbortException(
+                "AOT formatter support was missing for type '" + type.GetNiceFullName() + "'.", ex);
         }
 
         private static IEnumerable<string> GetAllPossibleMissingAOTTypes(Type type)
         {
-            yield return type.GetNiceFullName() + " (name string: '" + TwoWaySerializationBinder.Default.BindToName(type) + "')";
+            yield return type.GetNiceFullName() + " (name string: '" +
+                         TwoWaySerializationBinder.Default.BindToName(type) + "')";
 
-            if (!type.IsGenericType) yield break;
-
-            foreach (var arg in type.GetGenericArguments())
+            if (!type.IsGenericType)
             {
-                yield return arg.GetNiceFullName() + " (name string: '" + TwoWaySerializationBinder.Default.BindToName(arg) + "')";
+                yield break;
+            }
+
+            foreach (Type arg in type.GetGenericArguments())
+            {
+                yield return arg.GetNiceFullName() + " (name string: '" +
+                             TwoWaySerializationBinder.Default.BindToName(arg) + "')";
 
                 if (arg.IsGenericType)
                 {
@@ -378,15 +390,16 @@ namespace OdinSerializer
                 throw new ArgumentException("Cannot create formatters for a primitive type like " + type.Name);
             }
 
-            List<IFormatter> formatters = new List<IFormatter>();
+            var formatters = new List<IFormatter>();
 
             // First call formatter locators before checking for registered formatters
-            for (int i = 0; i < FormatterLocators.Count; i++)
+            for (var i = 0; i < FormatterLocators.Count; i++)
             {
                 try
                 {
                     IFormatter result;
-                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type, FormatterLocationStep.BeforeRegisteredFormatters, policy, true, out result))
+                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type,
+                            FormatterLocationStep.BeforeRegisteredFormatters, policy, true, out result))
                     {
                         formatters.Add(result);
                     }
@@ -399,22 +412,26 @@ namespace OdinSerializer
                 {
                     throw ex;
                 }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                // Type or member is obsolete
                 catch (ExecutionEngineException ex)
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
+                    // Type or member is obsolete
                 {
                     throw ex;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(new Exception("Exception was thrown while calling FormatterLocator " + FormatterLocators[i].GetType().FullName + ".", ex));
+                    Debug.LogException(new Exception(
+                        "Exception was thrown while calling FormatterLocator " +
+                        FormatterLocators[i].GetType().FullName + ".", ex));
                 }
             }
 
             // Then check for valid registered formatters
-            for (int i = 0; i < FormatterInfos.Count; i++)
+            for (var i = 0; i < FormatterInfos.Count; i++)
             {
-                var info = FormatterInfos[i];
+                FormatterInfo info = FormatterInfos[i];
 
                 Type formatterType = null;
 
@@ -431,7 +448,8 @@ namespace OdinSerializer
                         formatterType = info.FormatterType.GetGenericTypeDefinition().MakeGenericType(inferredArgs);
                     }
                 }
-                else if (type.IsGenericType && info.FormatterType.IsGenericType && info.TargetType.IsGenericType && type.GetGenericTypeDefinition() == info.TargetType.GetGenericTypeDefinition())
+                else if (type.IsGenericType && info.FormatterType.IsGenericType && info.TargetType.IsGenericType &&
+                         type.GetGenericTypeDefinition() == info.TargetType.GetGenericTypeDefinition())
                 {
                     Type[] args = type.GetGenericArguments();
 
@@ -443,9 +461,12 @@ namespace OdinSerializer
 
                 if (formatterType != null)
                 {
-                    var instance = GetFormatterInstance(formatterType);
+                    IFormatter instance = GetFormatterInstance(formatterType);
 
-                    if (instance == null) continue;
+                    if (instance == null)
+                    {
+                        continue;
+                    }
 
                     if (info.AskIfCanFormatTypes && !((IAskIfCanFormatTypes)instance).CanFormatType(type))
                     {
@@ -457,12 +478,13 @@ namespace OdinSerializer
             }
 
             // Then call formatter locators after checking for registered formatters
-            for (int i = 0; i < FormatterLocators.Count; i++)
+            for (var i = 0; i < FormatterLocators.Count; i++)
             {
                 try
                 {
                     IFormatter result;
-                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type, FormatterLocationStep.AfterRegisteredFormatters, policy, true, out result))
+                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type,
+                            FormatterLocationStep.AfterRegisteredFormatters, policy, true, out result))
                     {
                         formatters.Add(result);
                     }
@@ -475,15 +497,19 @@ namespace OdinSerializer
                 {
                     throw ex;
                 }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                // Type or member is obsolete
                 catch (ExecutionEngineException ex)
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
+                    // Type or member is obsolete
                 {
                     throw ex;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(new Exception("Exception was thrown while calling FormatterLocator " + FormatterLocators[i].GetType().FullName + ".", ex));
+                    Debug.LogException(new Exception(
+                        "Exception was thrown while calling FormatterLocator " +
+                        FormatterLocators[i].GetType().FullName + ".", ex));
                 }
             }
 
@@ -500,12 +526,14 @@ namespace OdinSerializer
             }
 
             // First call formatter locators before checking for registered formatters
-            for (int i = 0; i < FormatterLocators.Count; i++)
+            for (var i = 0; i < FormatterLocators.Count; i++)
             {
                 try
                 {
                     IFormatter result;
-                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type, FormatterLocationStep.BeforeRegisteredFormatters, policy, allowWeakFormatters, out result))
+                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type,
+                            FormatterLocationStep.BeforeRegisteredFormatters, policy, allowWeakFormatters,
+                            out result))
                     {
                         return result;
                     }
@@ -518,22 +546,26 @@ namespace OdinSerializer
                 {
                     throw ex;
                 }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                // Type or member is obsolete
                 catch (ExecutionEngineException ex)
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
+                    // Type or member is obsolete
                 {
                     throw ex;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(new Exception("Exception was thrown while calling FormatterLocator " + FormatterLocators[i].GetType().FullName + ".", ex));
+                    Debug.LogException(new Exception(
+                        "Exception was thrown while calling FormatterLocator " +
+                        FormatterLocators[i].GetType().FullName + ".", ex));
                 }
             }
 
             // Then check for valid registered formatters
-            for (int i = 0; i < FormatterInfos.Count; i++)
+            for (var i = 0; i < FormatterInfos.Count; i++)
             {
-                var info = FormatterInfos[i];
+                FormatterInfo info = FormatterInfos[i];
 
                 Type formatterType = null;
                 Type weakFallbackType = null;
@@ -552,7 +584,8 @@ namespace OdinSerializer
                         genericFormatterArgs = inferredArgs;
                     }
                 }
-                else if (type.IsGenericType && info.FormatterType.IsGenericType && info.TargetType.IsGenericType && type.GetGenericTypeDefinition() == info.TargetType.GetGenericTypeDefinition())
+                else if (type.IsGenericType && info.FormatterType.IsGenericType && info.TargetType.IsGenericType &&
+                         type.GetGenericTypeDefinition() == info.TargetType.GetGenericTypeDefinition())
                 {
                     Type[] args = type.GetGenericArguments();
 
@@ -572,7 +605,7 @@ namespace OdinSerializer
                 {
                     IFormatter instance = null;
 
-                    bool aotError = false;
+                    var aotError = false;
                     Exception aotEx = null;
 
                     try
@@ -606,20 +639,29 @@ namespace OdinSerializer
 
                         if (instance == null)
                         {
-                            string argsStr = "";
+                            var argsStr = "";
 
-                            for (int j = 0; j < genericFormatterArgs.Length; j++)
+                            for (var j = 0; j < genericFormatterArgs.Length; j++)
                             {
-                                if (j > 0) argsStr = argsStr + ", ";
+                                if (j > 0)
+                                {
+                                    argsStr = argsStr + ", ";
+                                }
+
                                 argsStr = argsStr + genericFormatterArgs[j].GetNiceFullName();
                             }
 
-                            Debug.LogError("No AOT support was generated for serialization formatter type '" + info.FormatterType.GetNiceFullName() + "' for the generic arguments <" + argsStr + ">, and no weak fallback formatter was specified.");
+                            Debug.LogError("No AOT support was generated for serialization formatter type '" +
+                                           info.FormatterType.GetNiceFullName() + "' for the generic arguments <" +
+                                           argsStr + ">, and no weak fallback formatter was specified.");
                             throw aotEx;
                         }
                     }
 
-                    if (instance == null) continue;
+                    if (instance == null)
+                    {
+                        continue;
+                    }
 
                     if (info.AskIfCanFormatTypes && !((IAskIfCanFormatTypes)instance).CanFormatType(type))
                     {
@@ -631,12 +673,14 @@ namespace OdinSerializer
             }
 
             // Then call formatter locators after checking for registered formatters
-            for (int i = 0; i < FormatterLocators.Count; i++)
+            for (var i = 0; i < FormatterLocators.Count; i++)
             {
                 try
                 {
                     IFormatter result;
-                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type, FormatterLocationStep.AfterRegisteredFormatters, policy, allowWeakFormatters, out result))
+                    if (FormatterLocators[i].LocatorInstance.TryGetFormatter(type,
+                            FormatterLocationStep.AfterRegisteredFormatters, policy, allowWeakFormatters,
+                            out result))
                     {
                         return result;
                     }
@@ -649,15 +693,19 @@ namespace OdinSerializer
                 {
                     throw ex;
                 }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                // Type or member is obsolete
                 catch (ExecutionEngineException ex)
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
+                    // Type or member is obsolete
                 {
                     throw ex;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(new Exception("Exception was thrown while calling FormatterLocator " + FormatterLocators[i].GetType().FullName + ".", ex));
+                    Debug.LogException(new Exception(
+                        "Exception was thrown while calling FormatterLocator " +
+                        FormatterLocators[i].GetType().FullName + ".", ex));
                 }
             }
 
@@ -665,14 +713,18 @@ namespace OdinSerializer
             {
                 if (EmitUtilities.CanEmit)
                 {
-                    var result = FormatterEmitter.GetEmittedFormatter(type, policy);
-                    if (result != null) return result;
+                    IFormatter result = FormatterEmitter.GetEmittedFormatter(type, policy);
+                    if (result != null)
+                    {
+                        return result;
+                    }
                 }
             }
 
             if (EmitUtilities.CanEmit)
             {
-                Debug.LogWarning("Fallback to reflection for type " + type.Name + " when emit is possible on this platform.");
+                Debug.LogWarning("Fallback to reflection for type " + type.Name +
+                                 " when emit is possible on this platform.");
             }
 
             // Finally, we fall back to a reflection-based formatter if nothing else has been found
@@ -683,19 +735,31 @@ namespace OdinSerializer
 
             catch (TargetInvocationException ex)
             {
-                if (allowWeakFormatters) return new WeakReflectionFormatter(type);
+                if (allowWeakFormatters)
+                {
+                    return new WeakReflectionFormatter(type);
+                }
+
                 throw ex;
             }
             catch (TypeInitializationException ex)
             {
-                if (allowWeakFormatters) return new WeakReflectionFormatter(type);
+                if (allowWeakFormatters)
+                {
+                    return new WeakReflectionFormatter(type);
+                }
+
                 throw ex;
             }
 #pragma warning disable CS0618 // Type or member is obsolete
             catch (ExecutionEngineException ex)
 #pragma warning restore CS0618 // Type or member is obsolete
             {
-                if (allowWeakFormatters) return new WeakReflectionFormatter(type);
+                if (allowWeakFormatters)
+                {
+                    return new WeakReflectionFormatter(type);
+                }
+
                 throw ex;
             }
         }
@@ -718,18 +782,52 @@ namespace OdinSerializer
                 {
                     throw ex;
                 }
-#pragma warning disable CS0618 // Type or member is obsolete
+#pragma warning disable CS0618
+                // Type or member is obsolete
                 catch (ExecutionEngineException ex)
-#pragma warning restore CS0618 // Type or member is obsolete
+#pragma warning restore CS0618
+                    // Type or member is obsolete
                 {
                     throw ex;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogException(new Exception("Exception was thrown while instantiating formatter '" + type.GetNiceFullName() + "'.", ex));
+                    Debug.LogException(new Exception(
+                        "Exception was thrown while instantiating formatter '" + type.GetNiceFullName() + "'.", ex));
                 }
             }
+
             return formatter;
         }
+
+        private struct FormatterInfo
+        {
+            public Type FormatterType;
+            public Type TargetType;
+            public Type WeakFallbackType;
+            public bool AskIfCanFormatTypes;
+            public int Priority;
+        }
+
+        private struct FormatterLocatorInfo
+        {
+            public IFormatterLocator LocatorInstance;
+            public int Priority;
+        }
+
+#if UNITY_EDITOR
+
+        /// <summary>
+        ///     Editor-only event that fires whenever an emittable formatter has been located.
+        ///     This event is used by the AOT formatter pre-emitter to locate types that need to have formatters pre-emitted.
+        /// </summary>
+        public static event Action<Type> OnLocatedEmittableFormatterForType;
+
+        /// <summary>
+        ///     Editor-only event that fires whenever a formatter has been located.
+        /// </summary>
+        public static event Action<IFormatter> OnLocatedFormatter;
+
+#endif
     }
 }

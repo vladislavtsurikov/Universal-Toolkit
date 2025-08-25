@@ -1,8 +1,8 @@
 using System;
+using OdinSerializer;
 using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
@@ -11,28 +11,25 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
     [TerrainHelper(typeof(Area), "Raycast Terrain")]
     public class RaycastTerrain : TerrainHelper
     {
-        [OdinSerialize] 
+        [OdinSerialize]
         private Area _area;
 
-        public override void Init()
-        {
-            _area = (Area)Target;
-        }
+        public override void Init() => _area = (Area)Target;
 
-        public override Bounds GetTerrainBounds()
-        {
-            return _area.AreaBounds;
-        }
+        public override Bounds GetTerrainBounds() => _area.AreaBounds;
 
         public override JobHandle SetCellHeight(NativeArray<Bounds> cellBoundsList, float minHeightCells,
-            Rect cellBoundsRect, JobHandle dependsOn = default(JobHandle))
+            Rect cellBoundsRect, JobHandle dependsOn = default)
         {
             Bounds bounds = GetTerrainBounds();
 
             Rect terrainRect = RectExtension.CreateRectFromBounds(bounds);
-            if (!cellBoundsRect.Overlaps(terrainRect)) return dependsOn;
+            if (!cellBoundsRect.Overlaps(terrainRect))
+            {
+                return dependsOn;
+            }
 
-            MeshCellSampleJob raycastTerranCellSampleJob = new MeshCellSampleJob
+            var raycastTerranCellSampleJob = new MeshCellSampleJob
             {
                 CellBoundsList = cellBoundsList,
                 TerrainMinHeight = bounds.center.y - bounds.extents.y,

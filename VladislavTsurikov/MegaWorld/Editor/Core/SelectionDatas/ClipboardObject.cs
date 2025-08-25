@@ -15,9 +15,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas
             ToolType = toolType;
         }
 
-        public static T GetCurrentClipboardObject<T>(Type prototypeType, Type toolType, List<T> clipboards) where T: ClipboardObject
+        public static T GetCurrentClipboardObject<T>(Type prototypeType, Type toolType, List<T> clipboards)
+            where T : ClipboardObject
         {
-            foreach (var clipboardPrototype in clipboards)
+            foreach (T clipboardPrototype in clipboards)
             {
                 if (clipboardPrototype.PrototypeType == prototypeType && clipboardPrototype.ToolType == toolType)
                 {

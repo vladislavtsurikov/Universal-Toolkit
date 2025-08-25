@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using UnityEngine;
+using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
@@ -14,28 +13,27 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
 {
     public class SceneCollection : Component
     {
-        [OdinSerialize] 
-        private int _id;
-        [OdinSerialize] 
-        private string _name;
-        
-        public int ID => _id;
-        
         [OdinSerialize]
-        public SceneTypeComponentStack SceneTypeComponentStack = new SceneTypeComponentStack();
-        
+        private string _name;
+
+        [OdinSerialize]
+        public SceneTypeComponentStack SceneTypeComponentStack = new();
+
+        [OdinSerialize]
+        public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new();
+
+        public bool Startup = true;
+
+        [field: OdinSerialize]
+        public int ID { get; private set; }
+
         public override string Name
         {
             get => _name;
             set => _name = value;
         }
 
-        public bool Startup = true;
-        
         public static SceneCollection Current { get; private set; }
-        
-        [OdinSerialize]
-        public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new ComponentStackOnlyDifferentTypes<SettingsComponent>();
 
         public float LoadingProgress
         {
@@ -43,9 +41,9 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             {
                 var sceneComponents = new List<SceneType>();
 
-                foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
+                foreach (SceneType sceneComponent in SceneTypeComponentStack.ElementList)
                 {
-                    SceneBehavior sceneBehavior = (SceneBehavior)sceneComponent.SettingsStack.GetElement(typeof(SceneBehavior));
+                    var sceneBehavior = (SceneBehavior)sceneComponent.SettingsStack.GetElement(typeof(SceneBehavior));
 
                     if (sceneBehavior != null)
                     {
@@ -54,30 +52,34 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
                             continue;
                         }
                     }
-                    
+
                     sceneComponents.Add(sceneComponent);
                 }
 
-                return !sceneComponents.Any() ? 1 : sceneComponents.Sum(a => a.LoadingProgress()) / sceneComponents.Count;
+                return !sceneComponents.Any()
+                    ? 1
+                    : sceneComponents.Sum(a => a.LoadingProgress()) / sceneComponents.Count;
             }
         }
-        
-        protected override void SetupComponent(object[] setupData = null)
+
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
             SceneTypeComponentStack.Setup(true, this);
             SettingsStack.Setup();
+
+            return UniTask.CompletedTask;
         }
 
         protected override void OnCreate()
         {
-            _id = GetHashCode();
+            ID = GetHashCode();
             _name = "Scene Collection";
         }
 
         public async UniTask Load()
         {
             SceneCollection pastSceneCollection = Current;
-            
+
             if (Current != null)
             {
                 await FadeTransition.LoadFadeIfNecessary(Current.SettingsStack);
@@ -88,28 +90,30 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             {
                 return;
             }
-            
+
             Current = this;
-                
+
             await ProgressBar.LoadProgressBarIfNecessary(SettingsStack);
-                
-            BeforeLoadOperationsSettings beforeLoadOperationsSettings = (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
+
+            var beforeLoadOperationsSettings =
+                (BeforeLoadOperationsSettings)SettingsStack.GetElement(typeof(BeforeLoadOperationsSettings));
 
             if (beforeLoadOperationsSettings != null)
             {
                 await beforeLoadOperationsSettings.DoOperations();
             }
-                
+
             await ActiveScene.LoadActiveSceneIfNecessary(SettingsStack);
 
-            foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
+            foreach (SceneType sceneComponent in SceneTypeComponentStack.ElementList)
             {
                 await sceneComponent.LoadInternal();
             }
-            
+
             await UniTask.WaitWhile(() => LoadingProgress != 1);
-            
-            AfterLoadOperationsSettings afterLoadOperationsSettings = (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
+
+            var afterLoadOperationsSettings =
+                (AfterLoadOperationsSettings)SettingsStack.GetElement(typeof(AfterLoadOperationsSettings));
 
             if (afterLoadOperationsSettings != null)
             {
@@ -127,22 +131,24 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
         public async UniTask Unload(SceneCollection nextLoadSceneCollection)
         {
             Current = null;
-            
-            BeforeUnloadOperationsSettings beforeUnloadOperationsSettings = (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
+
+            var beforeUnloadOperationsSettings =
+                (BeforeUnloadOperationsSettings)SettingsStack.GetElement(typeof(BeforeUnloadOperationsSettings));
 
             if (beforeUnloadOperationsSettings != null)
             {
                 await beforeUnloadOperationsSettings.DoOperations();
             }
 
-            foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
+            foreach (SceneType sceneComponent in SceneTypeComponentStack.ElementList)
             {
                 await sceneComponent.UnloadInternal(nextLoadSceneCollection);
             }
-            
+
             await ActiveScene.UnloadActiveSceneIfNecessary(SettingsStack);
-            
-            AfterUnloadOperationsSettings afterUnloadOperationsSettings = (AfterUnloadOperationsSettings)SettingsStack.GetElement(typeof(AfterUnloadOperationsSettings));
+
+            var afterUnloadOperationsSettings =
+                (AfterUnloadOperationsSettings)SettingsStack.GetElement(typeof(AfterUnloadOperationsSettings));
 
             if (afterUnloadOperationsSettings != null)
             {
@@ -150,28 +156,25 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             }
         }
 
-        public bool HasScene(SceneReference sceneReference)
-        {
-            return SceneTypeComponentStack.HasScene(sceneReference);
-        }
-        
+        public bool HasScene(SceneReference sceneReference) => SceneTypeComponentStack.HasScene(sceneReference);
+
         public List<SceneReference> GetSceneReferences()
         {
-            List<SceneReference> sceneReferences = new List<SceneReference>();
+            var sceneReferences = new List<SceneReference>();
 
-            foreach (var sceneComponent in SceneTypeComponentStack.ElementList)
+            foreach (SceneType sceneComponent in SceneTypeComponentStack.ElementList)
             {
-                foreach (var sceneManagerComponent in SettingsStack.ElementList)
+                foreach (SettingsComponent sceneManagerComponent in SettingsStack.ElementList)
                 {
                     sceneReferences.AddRange(sceneManagerComponent.GetSceneReferences());
                 }
-                
+
                 sceneReferences.AddRange(sceneComponent.GetSceneReferencesInternal());
             }
-            
+
             return sceneReferences;
         }
-        
+
         public bool IsLoaded() => Current == this;
     }
 }

@@ -7,19 +7,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility
     {
         private static readonly Dictionary<int, Prototype> _prototypes = new();
 
-        public static void AddPrototype(Prototype prototype)
-        {
-            _prototypes.TryAdd(prototype.ID, prototype);
-        }
-        
-        public static void RemovePrototype(Prototype prototype)
-        {
-            _prototypes.Remove(prototype.ID);
-        }
-        
-        public static Prototype GetPrototype(int id)
-        {
-            return _prototypes.TryGetValue(id, out var prototype) ? prototype : null;
-        }
+        public static void AddPrototype(Prototype prototype) => _prototypes.TryAdd(prototype.ID, prototype);
+
+        public static void RemovePrototype(Prototype prototype) => _prototypes.Remove(prototype.ID);
+
+        public static Prototype GetPrototype(int id) =>
+            _prototypes.TryGetValue(id, out Prototype prototype) ? prototype : null;
     }
 }

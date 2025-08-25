@@ -9,15 +9,13 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
     [SceneFilter("TestScene_B")]
     public class TestLoopConfigLoader : BindableResourceLoader
     {
-        public TestLoopConfig Config { get; private set; }
-
         public TestLoopConfigLoader(DiContainer container) : base(container)
         {
         }
 
-        public override async UniTask LoadResourceLoader(CancellationToken token)
-        {
-            Config = await LoadAndBind<TestLoopConfig>(token,"TestLoopConfig");
-        }
+        public TestLoopConfig Config { get; private set; }
+
+        public override async UniTask LoadResourceLoader(CancellationToken token) =>
+            Config = await LoadAndBind<TestLoopConfig>(token, "TestLoopConfig");
     }
 }

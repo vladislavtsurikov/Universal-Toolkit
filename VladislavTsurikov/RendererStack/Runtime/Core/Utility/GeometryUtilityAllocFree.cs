@@ -15,9 +15,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.Utility
                 typeof(GeometryUtility).GetMethod("Internal_ExtractPlanes",
                     BindingFlags.Static | BindingFlags.NonPublic));
 
-        public static void CalculateFrustumPlanes(Camera camera)
-        {
+        public static void CalculateFrustumPlanes(Camera camera) =>
             _internalExtractPlanes(FrustumPlanes, camera.projectionMatrix * camera.worldToCameraMatrix);
-        }
     }
 }

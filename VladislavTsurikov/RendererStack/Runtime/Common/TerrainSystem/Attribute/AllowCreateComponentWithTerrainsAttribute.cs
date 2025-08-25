@@ -7,19 +7,20 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem
     {
         public override bool Allow(SceneDataManager sceneDataManager)
         {
-            TerrainManager terrainManager = SceneDataStackUtility.InstanceSceneData<TerrainManager>(sceneDataManager.Scene);
+            TerrainManager terrainManager =
+                SceneDataStackUtility.InstanceSceneData<TerrainManager>(sceneDataManager.Scene);
 
-            if(terrainManager != null)
+            if (terrainManager != null)
             {
                 terrainManager.Setup();
 
-                if(terrainManager.TerrainHelperList.Count == 0) 
+                if (terrainManager.TerrainHelperList.Count == 0)
                 {
                     return false;
                 }
             }
 
-            return true; 
+            return true;
         }
     }
 }

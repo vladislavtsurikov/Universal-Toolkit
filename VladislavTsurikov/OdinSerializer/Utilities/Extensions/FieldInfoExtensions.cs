@@ -16,38 +16,36 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Reflection;
-
     /// <summary>
-    /// FieldInfo method extensions.
+    ///     FieldInfo method extensions.
     /// </summary>
     public static class FieldInfoExtensions
     {
         /// <summary>
-        /// Determines whether the specified field is an alias.
+        ///     Determines whether the specified field is an alias.
         /// </summary>
         /// <param name="fieldInfo">The field to check.</param>
         /// <returns>
-        ///   <c>true</c> if the specified field is an alias; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified field is an alias; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsAliasField(this FieldInfo fieldInfo)
-        {
-            return fieldInfo is MemberAliasFieldInfo;
-        }
+        public static bool IsAliasField(this FieldInfo fieldInfo) => fieldInfo is MemberAliasFieldInfo;
 
         /// <summary>
-        /// Returns the original, backing field of an alias field if the field is an alias.
+        ///     Returns the original, backing field of an alias field if the field is an alias.
         /// </summary>
         /// <param name="fieldInfo">The field to check.</param>
-        /// /// <param name="throwOnNotAliased">if set to <c>true</c> an exception will be thrown if the field is not aliased.</param>
+        /// ///
+        /// <param name="throwOnNotAliased">if set to <c>true</c> an exception will be thrown if the field is not aliased.</param>
         /// <returns></returns>
         /// <exception cref="System.ArgumentException">The field was not aliased; this only occurs if throwOnNotAliased is true.</exception>
         public static FieldInfo DeAliasField(this FieldInfo fieldInfo, bool throwOnNotAliased = false)
         {
-            MemberAliasFieldInfo aliasFieldInfo = fieldInfo as MemberAliasFieldInfo;
+            var aliasFieldInfo = fieldInfo as MemberAliasFieldInfo;
 
             if (aliasFieldInfo != null)
             {

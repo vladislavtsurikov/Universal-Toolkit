@@ -3,8 +3,20 @@ using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.SceneUtility.Runtime
 {
-    public enum CacheMemoryThreshold { Off, _1GB, _2GB, _3GB, _4GB, _5GB, _6GB, _7GB, _8GB, Custom }
-    
+    public enum CacheMemoryThreshold
+    {
+        Off,
+        _1GB,
+        _2GB,
+        _3GB,
+        _4GB,
+        _5GB,
+        _6GB,
+        _7GB,
+        _8GB,
+        Custom
+    }
+
     [LocationAsset("StreamingUtility/StreamingUtilitySettings")]
     public class StreamingUtilitySettings : SerializedScriptableObjectSingleton<StreamingUtilitySettings>
     {

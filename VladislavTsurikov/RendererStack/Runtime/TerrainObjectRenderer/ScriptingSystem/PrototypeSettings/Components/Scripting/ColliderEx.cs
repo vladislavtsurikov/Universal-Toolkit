@@ -3,14 +3,15 @@ using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSys
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.ScriptingSystem.PrototypeSettings.Scripting
 {
-    public static class ColliderEx 
+    public static class ColliderEx
     {
         public static bool TryGetScript<T>(this Collider collider, out T script) where T : Script
         {
             script = null;
-            
-            HierarchyTerrainObjectInstance hierarchyTerrainObjectInstance = (HierarchyTerrainObjectInstance)collider.GetComponentInParent(typeof(HierarchyTerrainObjectInstance));
-            
+
+            var hierarchyTerrainObjectInstance =
+                (HierarchyTerrainObjectInstance)collider.GetComponentInParent(typeof(HierarchyTerrainObjectInstance));
+
             if (hierarchyTerrainObjectInstance != null)
             {
                 script = (T)hierarchyTerrainObjectInstance.TerrainObjectInstance.GetScript(typeof(T));
@@ -22,13 +23,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Scriptin
 
             return false;
         }
-        
+
         public static bool TryGetScript<T>(this GameObject gameObject, out T script) where T : Script
         {
             script = null;
-            
-            HierarchyTerrainObjectInstance hierarchyTerrainObjectInstance = (HierarchyTerrainObjectInstance)gameObject.GetComponentInParent(typeof(HierarchyTerrainObjectInstance));
-            
+
+            var hierarchyTerrainObjectInstance =
+                (HierarchyTerrainObjectInstance)gameObject.GetComponentInParent(typeof(HierarchyTerrainObjectInstance));
+
             if (hierarchyTerrainObjectInstance != null)
             {
                 script = (T)hierarchyTerrainObjectInstance.TerrainObjectInstance.GetScript(typeof(T));

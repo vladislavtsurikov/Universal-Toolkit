@@ -1,24 +1,24 @@
 #if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.TemplatesSystem
 {
-	public static class AllTemplateTypes 
+    public static class AllTemplateTypes
     {
-        public static List<System.Type> TypeList = new List<System.Type>();
+        public static List<Type> TypeList = new();
 
         static AllTemplateTypes()
         {
-            var types = AllTypesDerivedFrom<Template>.Types
-                                .Where(
-                                    t => t.IsDefined(typeof(TemplateAttribute), false)
-                                      && !t.IsAbstract
-                                ); 
+            IEnumerable<Type> types = AllTypesDerivedFrom<Template>.Types
+                .Where(
+                    t => t.IsDefined(typeof(TemplateAttribute), false)
+                         && !t.IsAbstract
+                );
 
-            foreach (var type in types)
+            foreach (Type type in types)
             {
                 TypeList.Add(type);
             }

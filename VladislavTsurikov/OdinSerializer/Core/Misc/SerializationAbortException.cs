@@ -16,17 +16,19 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Runtime.Serialization;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// An exception thrown when the serialization system has encountered an issue so severe that serialization is being aborted. If this exception is caught in the serialization system somewhere, it should be rethrown.
+    ///     An exception thrown when the serialization system has encountered an issue so severe that serialization is being
+    ///     aborted. If this exception is caught in the serialization system somewhere, it should be rethrown.
     /// </summary>
     public class SerializationAbortException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="SerializationException"/> class.
+        ///     Initializes a new instance of the <see cref="SerializationException" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
         public SerializationAbortException(string message)
@@ -35,7 +37,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SerializationException"/> class.
+        ///     Initializes a new instance of the <see cref="SerializationException" /> class.
         /// </summary>
         /// <param name="message">The message.</param>
         /// <param name="innerException">The inner exception.</param>

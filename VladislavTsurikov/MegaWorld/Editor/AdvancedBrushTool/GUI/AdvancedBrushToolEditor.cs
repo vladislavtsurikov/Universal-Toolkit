@@ -5,13 +5,10 @@ using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 
 namespace VladislavTsurikov.MegaWorld.Editor.AdvancedBrushTool
 {
-	[ElementEditor(typeof(AdvancedBrushTool))]
+    [ElementEditor(typeof(AdvancedBrushTool))]
     public class AdvancedBrushToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-		{
-			UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-		}
+        public override void DrawButtons() => UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
     }
 }
 #endif

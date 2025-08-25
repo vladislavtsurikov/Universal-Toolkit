@@ -11,16 +11,17 @@ using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.CameraSettingsSystem
 {
-    public class CameraComponentStackEditor : ReorderableListStackEditor<CameraComponent, ReorderableListComponentEditor>
+    public class
+        CameraComponentStackEditor : ReorderableListStackEditor<CameraComponent, ReorderableListComponentEditor>
     {
-        public CameraComponentStackEditor(ComponentStackOnlyDifferentTypes<CameraComponent> list) : base(new GUIContent(""), list, false)
+        public CameraComponentStackEditor(ComponentStackOnlyDifferentTypes<CameraComponent> list) : base(
+            new GUIContent(""), list, false)
         {
-            
         }
 
         protected override void OnReorderableListStackGUI(Rect rect)
         {
-            foreach (var editor in GetCurrentEditors())
+            foreach (ReorderableListComponentEditor editor in GetCurrentEditors())
             {
                 editor.OnGUI(rect, 0);
             }
@@ -29,17 +30,18 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.Camer
         public List<ReorderableListComponentEditor> GetCurrentEditors()
         {
             Component renderer = RendererStackManager.Instance.RendererStack.SelectedElement;
-            
-            AddCameraComponentsAttribute addCameraComponentsAttribute = (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
 
-            List<ReorderableListComponentEditor> editors = new List<ReorderableListComponentEditor>();
-            
+            var addCameraComponentsAttribute =
+                (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
+
+            var editors = new List<ReorderableListComponentEditor>();
+
             if (addCameraComponentsAttribute == null)
             {
                 return editors;
             }
-            
-            foreach (var editor in Editors)
+
+            foreach (ReorderableListComponentEditor editor in Editors)
             {
                 if (addCameraComponentsAttribute.Types.Contains(editor.Target.GetType()))
                 {
@@ -53,17 +55,18 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.SceneSettings.Camera.Camer
         public override float GetElementStackHeight()
         {
             float height = 0;
-            
+
             Component renderer = RendererStackManager.Instance.RendererStack.SelectedElement;
-            
-            AddCameraComponentsAttribute addCameraComponentsAttribute = (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
+
+            var addCameraComponentsAttribute =
+                (AddCameraComponentsAttribute)renderer.GetType().GetAttribute(typeof(AddCameraComponentsAttribute));
 
             if (addCameraComponentsAttribute == null)
             {
                 return height;
             }
-            
-            foreach (var editor in Editors)
+
+            foreach (ReorderableListComponentEditor editor in Editors)
             {
                 if (addCameraComponentsAttribute.Types.Contains(editor.Target.GetType()))
                 {

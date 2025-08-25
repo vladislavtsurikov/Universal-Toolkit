@@ -16,45 +16,50 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using UnityEngine;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using UnityEngine;
-
     /// <summary>
-    /// Type method extensions.
+    ///     Type method extensions.
     /// </summary>
     public static class TypeExtensions
     {
         private static readonly Func<float, float, bool> FloatEqualityComparerFunc = FloatEqualityComparer;
         private static readonly Func<double, double, bool> DoubleEqualityComparerFunc = DoubleEqualityComparer;
-        private static readonly Func<Quaternion, Quaternion, bool> QuaternionEqualityComparerFunc = QuaternionEqualityComparer;
 
-        private static readonly object GenericConstraintsSatisfaction_LOCK = new object();
-        private static readonly Dictionary<Type, Type> GenericConstraintsSatisfactionInferredParameters = new Dictionary<Type, Type>();
-        private static readonly Dictionary<Type, Type> GenericConstraintsSatisfactionResolvedMap = new Dictionary<Type, Type>();
-        private static readonly HashSet<Type> GenericConstraintsSatisfactionProcessedParams = new HashSet<Type>();
-        private static readonly HashSet<Type> GenericConstraintsSatisfactionTypesToCheck = new HashSet<Type>();
-        private static readonly List<Type> GenericConstraintsSatisfactionTypesToCheck_ToAdd = new List<Type>();
+        private static readonly Func<Quaternion, Quaternion, bool> QuaternionEqualityComparerFunc =
+            QuaternionEqualityComparer;
+
+        private static readonly object GenericConstraintsSatisfaction_LOCK = new();
+        private static readonly Dictionary<Type, Type> GenericConstraintsSatisfactionInferredParameters = new();
+        private static readonly Dictionary<Type, Type> GenericConstraintsSatisfactionResolvedMap = new();
+        private static readonly HashSet<Type> GenericConstraintsSatisfactionProcessedParams = new();
+        private static readonly HashSet<Type> GenericConstraintsSatisfactionTypesToCheck = new();
+        private static readonly List<Type> GenericConstraintsSatisfactionTypesToCheck_ToAdd = new();
 
         private static readonly Type GenericListInterface = typeof(IList<>);
         private static readonly Type GenericCollectionInterface = typeof(ICollection<>);
 
-        private static readonly object WeaklyTypedTypeCastDelegates_LOCK = new object();
-        private static readonly object StronglyTypedTypeCastDelegates_LOCK = new object();
-        private static readonly DoubleLookupDictionary<Type, Type, Func<object, object>> WeaklyTypedTypeCastDelegates = new DoubleLookupDictionary<Type, Type, Func<object, object>>();
-        private static readonly DoubleLookupDictionary<Type, Type, Delegate> StronglyTypedTypeCastDelegates = new DoubleLookupDictionary<Type, Type, Delegate>();
+        private static readonly object WeaklyTypedTypeCastDelegates_LOCK = new();
+        private static readonly object StronglyTypedTypeCastDelegates_LOCK = new();
+
+        private static readonly DoubleLookupDictionary<Type, Type, Func<object, object>> WeaklyTypedTypeCastDelegates =
+            new();
+
+        private static readonly DoubleLookupDictionary<Type, Type, Delegate> StronglyTypedTypeCastDelegates = new();
 
         private static readonly Type[] TwoLengthTypeArray_Cached = new Type[2];
 
-        private static readonly Stack<Type> GenericArgumentsContainsTypes_ArgsToCheckCached = new Stack<Type>();
+        private static readonly Stack<Type> GenericArgumentsContainsTypes_ArgsToCheckCached = new();
 
-        private static HashSet<string> ReservedCSharpKeywords = new HashSet<string>()
+        private static readonly HashSet<string> ReservedCSharpKeywords = new()
         {
             "abstract",
             "as",
@@ -136,49 +141,154 @@ namespace OdinSerializer.Utilities
             "in",
             "get",
             "set",
-            "var",
+            "var"
             //"async", // Identifiers can be named async and await
             //"await",
         };
 
         /// <summary>
-        /// Type name alias lookup.
-        /// TypeNameAlternatives["Single"] will give you "float", "UInt16" will give you "ushort", "Boolean[]" will give you "bool[]" etc..
+        ///     Type name alias lookup.
+        ///     TypeNameAlternatives["Single"] will give you "float", "UInt16" will give you "ushort", "Boolean[]" will give you
+        ///     "bool[]" etc..
         /// </summary>
-        public static readonly Dictionary<string, string> TypeNameAlternatives = new Dictionary<string, string>()
+        public static readonly Dictionary<string, string> TypeNameAlternatives = new()
         {
-            { "Single",     "float"     },
-            { "Double",     "double"    },
-            { "SByte",      "sbyte"     },
-            { "Int16",      "short"     },
-            { "Int32",      "int"       },
-            { "Int64",      "long"      },
-            { "Byte",       "byte"      },
-            { "UInt16",     "ushort"    },
-            { "UInt32",     "uint"      },
-            { "UInt64",     "ulong"     },
-            { "Decimal",    "decimal"   },
-            { "String",     "string"    },
-            { "Char",       "char"      },
-            { "Boolean",    "bool"      },
-            { "Single[]",   "float[]"   },
-            { "Double[]",   "double[]"  },
-            { "SByte[]",    "sbyte[]"   },
-            { "Int16[]",    "short[]"   },
-            { "Int32[]",    "int[]"     },
-            { "Int64[]",    "long[]"    },
-            { "Byte[]",     "byte[]"    },
-            { "UInt16[]",   "ushort[]"  },
-            { "UInt32[]",   "uint[]"    },
-            { "UInt64[]",   "ulong[]"   },
-            { "Decimal[]",  "decimal[]" },
-            { "String[]",   "string[]"  },
-            { "Char[]",     "char[]"    },
-            { "Boolean[]",  "bool[]"    },
+            { "Single", "float" },
+            { "Double", "double" },
+            { "SByte", "sbyte" },
+            { "Int16", "short" },
+            { "Int32", "int" },
+            { "Int64", "long" },
+            { "Byte", "byte" },
+            { "UInt16", "ushort" },
+            { "UInt32", "uint" },
+            { "UInt64", "ulong" },
+            { "Decimal", "decimal" },
+            { "String", "string" },
+            { "Char", "char" },
+            { "Boolean", "bool" },
+            { "Single[]", "float[]" },
+            { "Double[]", "double[]" },
+            { "SByte[]", "sbyte[]" },
+            { "Int16[]", "short[]" },
+            { "Int32[]", "int[]" },
+            { "Int64[]", "long[]" },
+            { "Byte[]", "byte[]" },
+            { "UInt16[]", "ushort[]" },
+            { "UInt32[]", "uint[]" },
+            { "UInt64[]", "ulong[]" },
+            { "Decimal[]", "decimal[]" },
+            { "String[]", "string[]" },
+            { "Char[]", "char[]" },
+            { "Boolean[]", "bool[]" }
         };
 
-        private static readonly object CachedNiceNames_LOCK = new object();
-        private static readonly Dictionary<Type, string> CachedNiceNames = new Dictionary<Type, string>();
+        private static readonly object CachedNiceNames_LOCK = new();
+        private static readonly Dictionary<Type, string> CachedNiceNames = new();
+
+        private static readonly Type VoidPointerType = typeof(void).MakePointerType();
+
+        private static readonly Dictionary<Type, HashSet<Type>> PrimitiveImplicitCasts = new()
+        {
+            { typeof(long), new HashSet<Type> { typeof(float), typeof(double), typeof(decimal) } },
+            { typeof(int), new HashSet<Type> { typeof(long), typeof(float), typeof(double), typeof(decimal) } },
+            {
+                typeof(short), new HashSet<Type>
+                {
+                    typeof(int),
+                    typeof(long),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            {
+                typeof(sbyte), new HashSet<Type>
+                {
+                    typeof(short),
+                    typeof(int),
+                    typeof(long),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            { typeof(ulong), new HashSet<Type> { typeof(float), typeof(double), typeof(decimal) } },
+            {
+                typeof(uint), new HashSet<Type>
+                {
+                    typeof(long),
+                    typeof(ulong),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            {
+                typeof(ushort), new HashSet<Type>
+                {
+                    typeof(int),
+                    typeof(uint),
+                    typeof(long),
+                    typeof(ulong),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            {
+                typeof(byte), new HashSet<Type>
+                {
+                    typeof(short),
+                    typeof(ushort),
+                    typeof(int),
+                    typeof(uint),
+                    typeof(long),
+                    typeof(ulong),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            {
+                typeof(char), new HashSet<Type>
+                {
+                    typeof(ushort),
+                    typeof(int),
+                    typeof(uint),
+                    typeof(long),
+                    typeof(ulong),
+                    typeof(float),
+                    typeof(double),
+                    typeof(decimal)
+                }
+            },
+            { typeof(bool), new HashSet<Type>() },
+            { typeof(decimal), new HashSet<Type>() },
+            { typeof(float), new HashSet<Type> { typeof(double) } },
+            { typeof(double), new HashSet<Type>() },
+            { typeof(IntPtr), new HashSet<Type>() },
+            { typeof(UIntPtr), new HashSet<Type>() },
+            { VoidPointerType, new HashSet<Type>() }
+        };
+
+        private static readonly HashSet<Type> ExplicitCastIntegrals = new()
+        {
+            typeof(long),
+            typeof(int),
+            typeof(short),
+            typeof(sbyte),
+            typeof(ulong),
+            typeof(uint),
+            typeof(ushort),
+            typeof(byte),
+            typeof(char),
+            typeof(decimal),
+            typeof(float),
+            typeof(double),
+            typeof(IntPtr),
+            typeof(UIntPtr)
+        };
 
         private static string GetCachedNiceName(Type type)
         {
@@ -191,6 +301,7 @@ namespace OdinSerializer.Utilities
                     CachedNiceNames.Add(type, result);
                 }
             }
+
             return result;
         }
 
@@ -198,7 +309,7 @@ namespace OdinSerializer.Utilities
         {
             if (type.IsArray)
             {
-                int rank = type.GetArrayRank();
+                var rank = type.GetArrayRank();
                 return type.GetElementType().GetNiceName() + (rank == 1 ? "[]" : "[,]");
             }
 
@@ -231,11 +342,11 @@ namespace OdinSerializer.Utilities
             }
 
             builder.Append('<');
-            var args = type.GetGenericArguments();
+            Type[] args = type.GetGenericArguments();
 
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
-                var arg = args[i];
+                Type arg = args[i];
 
                 if (i != 0)
                 {
@@ -248,46 +359,6 @@ namespace OdinSerializer.Utilities
             builder.Append('>');
             return builder.ToString();
         }
-
-        private static readonly Type VoidPointerType = typeof(void).MakePointerType();
-
-        private static readonly Dictionary<Type, HashSet<Type>> PrimitiveImplicitCasts = new Dictionary<Type, HashSet<Type>>()
-        {
-            { typeof(Int64),    new HashSet<Type>() { typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(Int32),    new HashSet<Type>() { typeof(Int64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(Int16),    new HashSet<Type>() { typeof(Int32), typeof(Int64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(SByte),    new HashSet<Type>() { typeof(Int16), typeof(Int32), typeof(Int64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(UInt64),   new HashSet<Type>() { typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(UInt32),   new HashSet<Type>() { typeof(Int64), typeof(UInt64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(UInt16),   new HashSet<Type>() { typeof(Int32), typeof(UInt32), typeof(Int64), typeof(UInt64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(Byte),     new HashSet<Type>() { typeof(Int16), typeof(UInt16), typeof(Int32), typeof(UInt32), typeof(Int64), typeof(UInt64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(Char),     new HashSet<Type>() { typeof(UInt16), typeof(Int32), typeof(UInt32), typeof(Int64), typeof(UInt64), typeof(Single), typeof(Double), typeof(Decimal) } },
-            { typeof(Boolean),  new HashSet<Type>() { } },
-            { typeof(Decimal),  new HashSet<Type>() { } },
-            { typeof(Single),   new HashSet<Type>() { typeof(Double) } },
-            { typeof(Double),   new HashSet<Type>() { } },
-            { typeof(IntPtr),   new HashSet<Type>() { } },
-            { typeof(UIntPtr),  new HashSet<Type>() { } },
-            { VoidPointerType,  new HashSet<Type>() { } },
-        };
-
-        private static readonly HashSet<Type> ExplicitCastIntegrals = new HashSet<Type>()
-        {
-            { typeof(Int64) },
-            { typeof(Int32) },
-            { typeof(Int16) },
-            { typeof(SByte) },
-            { typeof(UInt64) },
-            { typeof(UInt32) },
-            { typeof(UInt16) },
-            { typeof(Byte) },
-            { typeof(Char) },
-            { typeof(Decimal) },
-            { typeof(Single) },
-            { typeof(Double) },
-            { typeof(IntPtr) },
-            { typeof(UIntPtr) }
-        };
 
         internal static bool HasCastDefined(this Type from, Type to, bool requireImplicitCast)
         {
@@ -307,40 +378,41 @@ namespace OdinSerializer.Utilities
                 {
                     return PrimitiveImplicitCasts[from].Contains(to);
                 }
-                else
+
+                if (from == typeof(IntPtr))
                 {
-                    if (from == typeof(IntPtr))
+                    if (to == typeof(UIntPtr))
                     {
-                        if (to == typeof(UIntPtr))
-                        {
-                            return false;
-                        }
-                        else if (to == VoidPointerType)
-                        {
-                            return true;
-                        }
-                    }
-                    else if (from == typeof(UIntPtr))
-                    {
-                        if (to == typeof(IntPtr))
-                        {
-                            return false;
-                        }
-                        else if (to == VoidPointerType)
-                        {
-                            return true;
-                        }
+                        return false;
                     }
 
-                    return ExplicitCastIntegrals.Contains(from) && ExplicitCastIntegrals.Contains(to);
+                    if (to == VoidPointerType)
+                    {
+                        return true;
+                    }
                 }
+                else if (from == typeof(UIntPtr))
+                {
+                    if (to == typeof(IntPtr))
+                    {
+                        return false;
+                    }
+
+                    if (to == VoidPointerType)
+                    {
+                        return true;
+                    }
+                }
+
+                return ExplicitCastIntegrals.Contains(from) && ExplicitCastIntegrals.Contains(to);
             }
 
             return from.GetCastMethod(to, requireImplicitCast) != null;
         }
 
         /// <summary>
-        /// Checks whether a given string is a valid CSharp identifier name. This also checks full type names including namespaces.
+        ///     Checks whether a given string is a valid CSharp identifier name. This also checks full type names including
+        ///     namespaces.
         /// </summary>
         /// <param name="identifier">The identifier to check.</param>
         public static bool IsValidIdentifier(string identifier)
@@ -350,13 +422,13 @@ namespace OdinSerializer.Utilities
                 return false;
             }
 
-            int dotIndex = identifier.IndexOf('.');
+            var dotIndex = identifier.IndexOf('.');
 
             if (dotIndex >= 0)
             {
-                string[] identifiers = identifier.Split('.');
+                var identifiers = identifier.Split('.');
 
-                for (int i = 0; i < identifiers.Length; i++)
+                for (var i = 0; i < identifiers.Length; i++)
                 {
                     if (!IsValidIdentifier(identifiers[i]))
                     {
@@ -377,7 +449,7 @@ namespace OdinSerializer.Utilities
                 return false;
             }
 
-            for (int i = 1; i < identifier.Length; i++)
+            for (var i = 1; i < identifier.Length; i++)
             {
                 if (!IsValidIdentifierPartCharacter(identifier[i]))
                 {
@@ -388,22 +460,23 @@ namespace OdinSerializer.Utilities
             return true;
         }
 
-        private static bool IsValidIdentifierStartCharacter(char c)
-        {
-            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '@' || char.IsLetter(c);
-        }
+        private static bool IsValidIdentifierStartCharacter(char c) => (c >= 'a' && c <= 'z') ||
+                                                                       (c >= 'A' && c <= 'Z') || c == '_' || c == '@' ||
+                                                                       char.IsLetter(c);
 
-        private static bool IsValidIdentifierPartCharacter(char c)
-        {
-            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9') || char.IsLetter(c);
-        }
+        private static bool IsValidIdentifierPartCharacter(char c) =>
+            (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || (c >= '0' && c <= '9') ||
+            char.IsLetter(c);
 
         /// <summary>
-        /// Determines whether a type can be casted to another type.
+        ///     Determines whether a type can be casted to another type.
         /// </summary>
         /// <param name="from">From.</param>
         /// <param name="to">To.</param>
-        /// <param name="requireImplicitCast">if set to <c>true</c> an implicit or explicit operator must be defined on the given type.</param>
+        /// <param name="requireImplicitCast">
+        ///     if set to <c>true</c> an implicit or explicit operator must be defined on the given
+        ///     type.
+        /// </param>
         public static bool IsCastableTo(this Type from, Type to, bool requireImplicitCast = false)
         {
             if (from == null)
@@ -425,12 +498,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// If a type can be casted to another type, this provides a function to manually convert the type.
+        ///     If a type can be casted to another type, this provides a function to manually convert the type.
         /// </summary>
         /// <param name="from">From.</param>
         /// <param name="to">To.</param>
-        /// <param name="requireImplicitCast">if set to <c>true</c> an implicit or explicit operator must be defined on the given type.</param>
-        public static Func<object, object> GetCastMethodDelegate(this Type from, Type to, bool requireImplicitCast = false)
+        /// <param name="requireImplicitCast">
+        ///     if set to <c>true</c> an implicit or explicit operator must be defined on the given
+        ///     type.
+        /// </param>
+        public static Func<object, object> GetCastMethodDelegate(this Type from, Type to,
+            bool requireImplicitCast = false)
         {
             Func<object, object> result;
 
@@ -438,11 +515,11 @@ namespace OdinSerializer.Utilities
             {
                 if (WeaklyTypedTypeCastDelegates.TryGetInnerValue(from, to, out result) == false)
                 {
-                    var method = GetCastMethod(from, to, requireImplicitCast);
+                    MethodInfo method = GetCastMethod(from, to, requireImplicitCast);
 
                     if (method != null)
                     {
-                        result = (obj) => method.Invoke(null, new object[] { obj });
+                        result = obj => method.Invoke(null, new[] { obj });
                     }
 
                     WeaklyTypedTypeCastDelegates.AddInner(from, to, result);
@@ -453,9 +530,12 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// If a type can be casted to another type, this provides a function to manually convert the type.
+        ///     If a type can be casted to another type, this provides a function to manually convert the type.
         /// </summary>
-        /// <param name="requireImplicitCast">if set to <c>true</c> an implicit or explicit operator must be defined on the given type.</param>
+        /// <param name="requireImplicitCast">
+        ///     if set to <c>true</c> an implicit or explicit operator must be defined on the given
+        ///     type.
+        /// </param>
         public static Func<TFrom, TTo> GetCastMethodDelegate<TFrom, TTo>(bool requireImplicitCast = false)
         {
             Delegate del;
@@ -464,7 +544,7 @@ namespace OdinSerializer.Utilities
             {
                 if (StronglyTypedTypeCastDelegates.TryGetInnerValue(typeof(TFrom), typeof(TTo), out del) == false)
                 {
-                    var method = GetCastMethod(typeof(TFrom), typeof(TTo), requireImplicitCast);
+                    MethodInfo method = GetCastMethod(typeof(TFrom), typeof(TTo), requireImplicitCast);
 
                     if (method != null)
                     {
@@ -479,28 +559,37 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// If a type can be casted to another type, this provides the method info of the method in charge of converting the type.
+        ///     If a type can be casted to another type, this provides the method info of the method in charge of converting the
+        ///     type.
         /// </summary>
         /// <param name="from">From.</param>
         /// <param name="to">To.</param>
-        /// <param name="requireImplicitCast">if set to <c>true</c> an implicit or explicit operator must be defined on the given type.</param>
+        /// <param name="requireImplicitCast">
+        ///     if set to <c>true</c> an implicit or explicit operator must be defined on the given
+        ///     type.
+        /// </param>
         public static MethodInfo GetCastMethod(this Type from, Type to, bool requireImplicitCast = false)
         {
-            var fromMethods = from.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
+            IEnumerable<MethodInfo> fromMethods =
+                from.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
 
-            foreach (var method in fromMethods)
+            foreach (MethodInfo method in fromMethods)
             {
-                if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) && method.GetParameters()[0].ParameterType.IsAssignableFrom(from) && to.IsAssignableFrom(method.ReturnType))
+                if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) &&
+                    method.GetParameters()[0].ParameterType.IsAssignableFrom(from) &&
+                    to.IsAssignableFrom(method.ReturnType))
                 {
                     return method;
                 }
             }
 
-            var toMethods = to.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
+            IEnumerable<MethodInfo> toMethods = to.GetAllMembers<MethodInfo>(BindingFlags.Public | BindingFlags.Static);
 
-            foreach (var method in toMethods)
+            foreach (MethodInfo method in toMethods)
             {
-                if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) && method.GetParameters()[0].ParameterType.IsAssignableFrom(from) && to.IsAssignableFrom(method.ReturnType))
+                if ((method.Name == "op_Implicit" || (requireImplicitCast == false && method.Name == "op_Explicit")) &&
+                    method.GetParameters()[0].ParameterType.IsAssignableFrom(from) &&
+                    to.IsAssignableFrom(method.ReturnType))
                 {
                     return method;
                 }
@@ -511,41 +600,63 @@ namespace OdinSerializer.Utilities
 
         private static bool FloatEqualityComparer(float a, float b)
         {
-            if (float.IsNaN(a) && float.IsNaN(b)) return true;
+            if (float.IsNaN(a) && float.IsNaN(b))
+            {
+                return true;
+            }
+
             return a == b;
         }
 
         private static bool DoubleEqualityComparer(double a, double b)
         {
-            if (double.IsNaN(a) && double.IsNaN(b)) return true;
+            if (double.IsNaN(a) && double.IsNaN(b))
+            {
+                return true;
+            }
+
             return a == b;
         }
 
-        private static bool QuaternionEqualityComparer(Quaternion a, Quaternion b)
-        {
-            return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-        }
+        private static bool QuaternionEqualityComparer(Quaternion a, Quaternion b) =>
+            a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
 
         /// <summary>
-        /// Gets an equality comparer delegate used to compare the equality of values of a given type. In order, this will be:
-        ///
-        /// 1. The == operator, if one is defined on the type.
-        /// 2. A delegate that uses <see cref="IEquatable{T}"/>, if the type implements that interface.
-        /// 3. .NET's own <see cref="EqualityComparer{T}.Default"/>
+        ///     Gets an equality comparer delegate used to compare the equality of values of a given type. In order, this will be:
+        ///     1. The == operator, if one is defined on the type.
+        ///     2. A delegate that uses <see cref="IEquatable{T}" />, if the type implements that interface.
+        ///     3. .NET's own <see cref="EqualityComparer{T}.Default" />
         /// </summary>
         /// <remarks>
-        /// <para>Note that in the special case of the type <see cref="UnityEngine.Quaternion"/>, a special equality comparer is returned that only checks whether all the Quaternion components are equal.</para>
-        /// <para>This is because, by default, Quaternion's equality operator is broken when operating on invalid quaternions; "default(Quaternion) == default(Quaternion)" evaluates to false, and this causes a multitude of problems.</para>
-        /// <para>Special delegates are also returned for float and double, that consider float.NaN to be equal to float.NaN, and double.NaN to be equal to double.NaN.</para>
+        ///     <para>
+        ///         Note that in the special case of the type <see cref="UnityEngine.Quaternion" />, a special equality comparer
+        ///         is returned that only checks whether all the Quaternion components are equal.
+        ///     </para>
+        ///     <para>
+        ///         This is because, by default, Quaternion's equality operator is broken when operating on invalid quaternions;
+        ///         "default(Quaternion) == default(Quaternion)" evaluates to false, and this causes a multitude of problems.
+        ///     </para>
+        ///     <para>
+        ///         Special delegates are also returned for float and double, that consider float.NaN to be equal to float.NaN,
+        ///         and double.NaN to be equal to double.NaN.
+        ///     </para>
         /// </remarks>
         public static Func<T, T, bool> GetEqualityComparerDelegate<T>()
         {
             if (typeof(T) == typeof(float))
+            {
                 return (Func<T, T, bool>)(object)FloatEqualityComparerFunc;
-            else if (typeof(T) == typeof(double))
+            }
+
+            if (typeof(T) == typeof(double))
+            {
                 return (Func<T, T, bool>)(object)DoubleEqualityComparerFunc;
-            else if (typeof(T) == typeof(Quaternion))
+            }
+
+            if (typeof(T) == typeof(Quaternion))
+            {
                 return (Func<T, T, bool>)(object)QuaternionEqualityComparerFunc;
+            }
 
             Func<T, T, bool> result = null;
             MethodInfo equalityMethod;
@@ -554,27 +665,23 @@ namespace OdinSerializer.Utilities
             {
                 if (typeof(T).IsValueType)
                 {
-                    result = (a, b) =>
-                    {
-                        return ((IEquatable<T>)a).Equals(b);
-                    };
+                    result = (a, b) => { return ((IEquatable<T>)a).Equals(b); };
                 }
                 else
                 {
                     result = (a, b) =>
                     {
-                        if (object.ReferenceEquals(a, b))
+                        if (ReferenceEquals(a, b))
                         {
                             return true;
                         }
-                        else if (object.ReferenceEquals(a, null))
+
+                        if (ReferenceEquals(a, null))
                         {
                             return false;
                         }
-                        else
-                        {
-                            return ((IEquatable<T>)a).Equals(b);
-                        }
+
+                        return ((IEquatable<T>)a).Equals(b);
                     };
                 }
             }
@@ -588,7 +695,8 @@ namespace OdinSerializer.Utilities
 
                     if (equalityMethod != null)
                     {
-                        result = (Func<T, T, bool>)Delegate.CreateDelegate(typeof(Func<T, T, bool>), equalityMethod, true);
+                        result = (Func<T, T, bool>)Delegate.CreateDelegate(typeof(Func<T, T, bool>), equalityMethod,
+                            true);
                         break;
                     }
 
@@ -598,7 +706,7 @@ namespace OdinSerializer.Utilities
 
             if (result == null)
             {
-                var comparer = EqualityComparer<T>.Default;
+                EqualityComparer<T> comparer = EqualityComparer<T>.Default;
                 result = comparer.Equals;
             }
 
@@ -606,7 +714,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the first attribute of type T. Returns null in the no attribute of type T was found.
+        ///     Gets the first attribute of type T. Returns null in the no attribute of type T was found.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
@@ -618,147 +726,180 @@ namespace OdinSerializer.Utilities
             {
                 return null;
             }
-            else
-            {
-                return (T)attrs[0];
-            }
+
+            return (T)attrs[0];
         }
 
         /// <summary>
-        /// Determines whether a type implements or inherits from another type.
+        ///     Determines whether a type implements or inherits from another type.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="to">To.</param>
-        public static bool ImplementsOrInherits(this Type type, Type to)
-        {
-            return to.IsAssignableFrom(type);
-        }
+        public static bool ImplementsOrInherits(this Type type, Type to) => to.IsAssignableFrom(type);
 
         /// <summary>
-        /// Determines whether a type implements an open generic interface or class such as IList&lt;&gt; or List&lt;&gt;.
+        ///     Determines whether a type implements an open generic interface or class such as IList&lt;&gt; or List&lt;&gt;.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericType">Type of the open generic type.</param>
         /// <returns></returns>
         public static bool ImplementsOpenGenericType(this Type candidateType, Type openGenericType)
         {
-            if (openGenericType.IsInterface) return candidateType.ImplementsOpenGenericInterface(openGenericType);
-            else return candidateType.ImplementsOpenGenericClass(openGenericType);
+            if (openGenericType.IsInterface)
+            {
+                return candidateType.ImplementsOpenGenericInterface(openGenericType);
+            }
+
+            return candidateType.ImplementsOpenGenericClass(openGenericType);
         }
 
         /// <summary>
-        /// Determines whether a type implements an open generic interface such as IList&lt;&gt;.
+        ///     Determines whether a type implements an open generic interface such as IList&lt;&gt;.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericInterfaceType">Type of the open generic interface.</param>
         /// <exception cref="System.ArgumentNullException"></exception>
-        /// <exception cref="System.ArgumentException">Type " + openGenericInterfaceType.Name + " is not a generic type definition and an interface.</exception>
+        /// <exception cref="System.ArgumentException">
+        ///     Type " + openGenericInterfaceType.Name + " is not a generic type definition
+        ///     and an interface.
+        /// </exception>
         public static bool ImplementsOpenGenericInterface(this Type candidateType, Type openGenericInterfaceType)
         {
             if (candidateType == openGenericInterfaceType)
+            {
                 return true;
+            }
 
             if (candidateType.IsGenericType && candidateType.GetGenericTypeDefinition() == openGenericInterfaceType)
+            {
                 return true;
+            }
 
-            var interfaces = candidateType.GetInterfaces();
+            Type[] interfaces = candidateType.GetInterfaces();
 
-            for (int i = 0; i < interfaces.Length; i++)
+            for (var i = 0; i < interfaces.Length; i++)
             {
                 if (interfaces[i].ImplementsOpenGenericInterface(openGenericInterfaceType))
+                {
                     return true;
+                }
             }
 
             return false;
         }
 
         /// <summary>
-        /// Determines whether a type implements an open generic class such as List&lt;&gt;.
+        ///     Determines whether a type implements an open generic class such as List&lt;&gt;.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericType">Type of the open generic interface.</param>
         public static bool ImplementsOpenGenericClass(this Type candidateType, Type openGenericType)
         {
             if (candidateType.IsGenericType && candidateType.GetGenericTypeDefinition() == openGenericType)
+            {
                 return true;
+            }
 
-            var baseType = candidateType.BaseType;
+            Type baseType = candidateType.BaseType;
 
             if (baseType != null && baseType.ImplementsOpenGenericClass(openGenericType))
+            {
                 return true;
+            }
 
             return false;
         }
 
         /// <summary>
-        /// Gets the generic arguments of an inherited open generic class or interface.
+        ///     Gets the generic arguments of an inherited open generic class or interface.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericType">The open generic type to get the arguments of.</param>
         public static Type[] GetArgumentsOfInheritedOpenGenericType(this Type candidateType, Type openGenericType)
         {
-            if (openGenericType.IsInterface) return candidateType.GetArgumentsOfInheritedOpenGenericInterface(openGenericType);
-            else return candidateType.GetArgumentsOfInheritedOpenGenericClass(openGenericType);
+            if (openGenericType.IsInterface)
+            {
+                return candidateType.GetArgumentsOfInheritedOpenGenericInterface(openGenericType);
+            }
+
+            return candidateType.GetArgumentsOfInheritedOpenGenericClass(openGenericType);
         }
 
         /// <summary>
-        /// Gets the generic arguments of an inherited open generic class.
+        ///     Gets the generic arguments of an inherited open generic class.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericType">Type of the open generic class.</param>
         public static Type[] GetArgumentsOfInheritedOpenGenericClass(this Type candidateType, Type openGenericType)
         {
             if (candidateType.IsGenericType && candidateType.GetGenericTypeDefinition() == openGenericType)
+            {
                 return candidateType.GetGenericArguments();
+            }
 
-            var baseType = candidateType.BaseType;
+            Type baseType = candidateType.BaseType;
 
             if (baseType != null)
+            {
                 return baseType.GetArgumentsOfInheritedOpenGenericClass(openGenericType);
+            }
 
             return null;
         }
 
         /// <summary>
-        /// Gets the generic arguments of an inherited open generic interface.
+        ///     Gets the generic arguments of an inherited open generic interface.
         /// </summary>
         /// <param name="candidateType">Type of the candidate.</param>
         /// <param name="openGenericInterfaceType">Type of the open generic interface.</param>
-        public static Type[] GetArgumentsOfInheritedOpenGenericInterface(this Type candidateType, Type openGenericInterfaceType)
+        public static Type[] GetArgumentsOfInheritedOpenGenericInterface(this Type candidateType,
+            Type openGenericInterfaceType)
         {
             // This if clause fixes an "error" in newer .NET Runtimes where enum arrays 
             //   implement interfaces like IList<int>, which will be matched on by Odin
             //   before the IList<TheEnum> interface and cause a lot of issues because
             //   you can't actually use an enum array as if it was an IList<int>.
-            if ((openGenericInterfaceType == GenericListInterface || openGenericInterfaceType == GenericCollectionInterface) && candidateType.IsArray)
+            if ((openGenericInterfaceType == GenericListInterface ||
+                 openGenericInterfaceType == GenericCollectionInterface) &&
+                candidateType.IsArray)
             {
-                return new Type[] { candidateType.GetElementType() };
+                return new[] { candidateType.GetElementType() };
             }
 
             if (candidateType == openGenericInterfaceType)
+            {
                 return candidateType.GetGenericArguments();
+            }
 
             if (candidateType.IsGenericType && candidateType.GetGenericTypeDefinition() == openGenericInterfaceType)
-                return candidateType.GetGenericArguments();
-
-            var interfaces = candidateType.GetInterfaces();
-
-            for (int i = 0; i < interfaces.Length; i++)
             {
-                var @interface = interfaces[i];
-                if (!@interface.IsGenericType) continue;
+                return candidateType.GetGenericArguments();
+            }
 
-                var result = @interface.GetArgumentsOfInheritedOpenGenericInterface(openGenericInterfaceType);
+            Type[] interfaces = candidateType.GetInterfaces();
+
+            for (var i = 0; i < interfaces.Length; i++)
+            {
+                Type @interface = interfaces[i];
+                if (!@interface.IsGenericType)
+                {
+                    continue;
+                }
+
+                Type[] result = @interface.GetArgumentsOfInheritedOpenGenericInterface(openGenericInterfaceType);
 
                 if (result != null)
+                {
                     return result;
+                }
             }
 
             return null;
         }
 
         /// <summary>
-        /// Gets the MethodInfo of a specific operator kind, with the given left and right operands. This overload is *far* faster than any of the other GetOperatorMethod implementations, and should be used whenever possible.
+        ///     Gets the MethodInfo of a specific operator kind, with the given left and right operands. This overload is *far*
+        ///     faster than any of the other GetOperatorMethod implementations, and should be used whenever possible.
         /// </summary>
         public static MethodInfo GetOperatorMethod(this Type type, Operator op, Type leftOperand, Type rightOperand)
         {
@@ -846,7 +987,7 @@ namespace OdinSerializer.Utilities
                     throw new NotImplementedException();
             }
 
-            var types = TwoLengthTypeArray_Cached;
+            Type[] types = TwoLengthTypeArray_Cached;
 
             lock (types)
             {
@@ -855,26 +996,48 @@ namespace OdinSerializer.Utilities
 
                 try
                 {
-                    var result = type.GetMethod(methodName, Flags.StaticAnyVisibility, null, types, null);
+                    MethodInfo result = type.GetMethod(methodName, Flags.StaticAnyVisibility, null, types, null);
 
-                    if (result != null && result.ReturnType != typeof(bool)) return null;
+                    if (result != null && result.ReturnType != typeof(bool))
+                    {
+                        return null;
+                    }
 
                     return result;
                 }
                 catch (AmbiguousMatchException)
                 {
                     // We fallback to manual resolution
-                    var methods = type.GetMethods(Flags.StaticAnyVisibility);
+                    MethodInfo[] methods = type.GetMethods(Flags.StaticAnyVisibility);
 
-                    for (int i = 0; i < methods.Length; i++)
+                    for (var i = 0; i < methods.Length; i++)
                     {
-                        var method = methods[i];
-                        if (method.Name != methodName) continue;
-                        if (method.ReturnType != typeof(bool)) continue;
-                        var parameters = method.GetParameters();
-                        if (parameters.Length != 2) continue;
-                        if (!parameters[0].ParameterType.IsAssignableFrom(leftOperand)) continue;
-                        if (!parameters[1].ParameterType.IsAssignableFrom(rightOperand)) continue;
+                        MethodInfo method = methods[i];
+                        if (method.Name != methodName)
+                        {
+                            continue;
+                        }
+
+                        if (method.ReturnType != typeof(bool))
+                        {
+                            continue;
+                        }
+
+                        ParameterInfo[] parameters = method.GetParameters();
+                        if (parameters.Length != 2)
+                        {
+                            continue;
+                        }
+
+                        if (!parameters[0].ParameterType.IsAssignableFrom(leftOperand))
+                        {
+                            continue;
+                        }
+
+                        if (!parameters[1].ParameterType.IsAssignableFrom(rightOperand))
+                        {
+                            continue;
+                        }
 
                         return method;
                     }
@@ -885,7 +1048,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the MethodInfo of a specific operator type.
+        ///     Gets the MethodInfo of a specific operator type.
         /// </summary>
         public static MethodInfo GetOperatorMethod(this Type type, Operator op)
         {
@@ -944,7 +1107,7 @@ namespace OdinSerializer.Utilities
                 case Operator.LeftShift:
                     methodName = "op_LeftShift";
                     break;
-                    
+
                 case Operator.BitwiseAnd:
                     methodName = "op_BitwiseAnd";
                     break;
@@ -977,7 +1140,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the MethodInfo of a specific operator type.
+        ///     Gets the MethodInfo of a specific operator type.
         /// </summary>
         public static MethodInfo[] GetOperatorMethods(this Type type, Operator op)
         {
@@ -1065,12 +1228,13 @@ namespace OdinSerializer.Utilities
                 default:
                     throw new NotImplementedException();
             }
-            
+
             return type.GetAllMembers<MethodInfo>(Flags.StaticAnyVisibility).Where(x => x.Name == methodName).ToArray();
         }
 
         /// <summary>
-        /// Gets all members from a given type, including members from all base types if the <see cref="BindingFlags.DeclaredOnly"/> flag isn't set.
+        ///     Gets all members from a given type, including members from all base types if the
+        ///     <see cref="BindingFlags.DeclaredOnly" /> flag isn't set.
         /// </summary>
         public static IEnumerable<MemberInfo> GetAllMembers(this Type type, BindingFlags flags = BindingFlags.Default)
         {
@@ -1078,7 +1242,7 @@ namespace OdinSerializer.Utilities
 
             if ((flags & BindingFlags.DeclaredOnly) == BindingFlags.DeclaredOnly)
             {
-                foreach (var member in currentType.GetMembers(flags))
+                foreach (MemberInfo member in currentType.GetMembers(flags))
                 {
                     yield return member;
                 }
@@ -1089,42 +1253,55 @@ namespace OdinSerializer.Utilities
 
                 do
                 {
-                    foreach (var member in currentType.GetMembers(flags))
+                    foreach (MemberInfo member in currentType.GetMembers(flags))
                     {
                         yield return member;
                     }
 
                     currentType = currentType.BaseType;
-                }
-                while (currentType != null);
+                } while (currentType != null);
             }
         }
 
         /// <summary>
-        /// Gets all members from a given type, including members from all base types.
+        ///     Gets all members from a given type, including members from all base types.
         /// </summary>
-        public static IEnumerable<MemberInfo> GetAllMembers(this Type type, string name, BindingFlags flags = BindingFlags.Default)
+        public static IEnumerable<MemberInfo> GetAllMembers(this Type type, string name,
+            BindingFlags flags = BindingFlags.Default)
         {
-            foreach (var member in type.GetAllMembers(flags))
+            foreach (MemberInfo member in type.GetAllMembers(flags))
             {
-                if (member.Name != name) continue;
+                if (member.Name != name)
+                {
+                    continue;
+                }
+
                 yield return member;
             }
         }
 
         /// <summary>
-        /// Gets all members of a specific type from a type, including members from all base types, if the <see cref="BindingFlags.DeclaredOnly"/> flag isn't set.
+        ///     Gets all members of a specific type from a type, including members from all base types, if the
+        ///     <see cref="BindingFlags.DeclaredOnly" /> flag isn't set.
         /// </summary>
-        public static IEnumerable<T> GetAllMembers<T>(this Type type, BindingFlags flags = BindingFlags.Default) where T : MemberInfo
+        public static IEnumerable<T> GetAllMembers<T>(this Type type, BindingFlags flags = BindingFlags.Default)
+            where T : MemberInfo
         {
-            if (type == null) throw new ArgumentNullException("type");
-            if (type == typeof(object)) yield break;
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+
+            if (type == typeof(object))
+            {
+                yield break;
+            }
 
             Type currentType = type;
 
             if ((flags & BindingFlags.DeclaredOnly) == BindingFlags.DeclaredOnly)
             {
-                foreach (var member in currentType.GetMembers(flags))
+                foreach (MemberInfo member in currentType.GetMembers(flags))
                 {
                     var found = member as T;
 
@@ -1140,7 +1317,7 @@ namespace OdinSerializer.Utilities
 
                 do
                 {
-                    foreach (var member in currentType.GetMembers(flags))
+                    foreach (MemberInfo member in currentType.GetMembers(flags))
                     {
                         var found = member as T;
 
@@ -1151,13 +1328,12 @@ namespace OdinSerializer.Utilities
                     }
 
                     currentType = currentType.BaseType;
-                }
-                while (currentType != null);
+                } while (currentType != null);
             }
         }
 
         /// <summary>
-        /// Gets the generic type definition of an open generic base type.
+        ///     Gets the generic type definition of an open generic base type.
         /// </summary>
         public static Type GetGenericBaseType(this Type type, Type baseType)
         {
@@ -1166,7 +1342,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the generic type definition of an open generic base type.
+        ///     Gets the generic type definition of an open generic base type.
         /// </summary>
         public static Type GetGenericBaseType(this Type type, Type baseType, out int depthCount)
         {
@@ -1190,7 +1366,7 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentException("Type " + type.Name + " does not inherit from " + baseType.Name + ".");
             }
 
-            var t = type;
+            Type t = type;
 
             depthCount = 0;
             while (t != null && (t.IsGenericType == false || t.GetGenericTypeDefinition() != baseType))
@@ -1201,27 +1377,29 @@ namespace OdinSerializer.Utilities
 
             if (t == null)
             {
-                throw new ArgumentException(type.Name + " is assignable from " + baseType.Name + ", but base type was not found?");
+                throw new ArgumentException(type.Name + " is assignable from " + baseType.Name +
+                                            ", but base type was not found?");
             }
 
             return t;
         }
 
         /// <summary>
-        /// Returns a lazy enumerable of all the base types of this type including interfaces and classes
+        ///     Returns a lazy enumerable of all the base types of this type including interfaces and classes
         /// </summary>
         public static IEnumerable<Type> GetBaseTypes(this Type type, bool includeSelf = false)
         {
-            var result = GetBaseClasses(type, includeSelf).Concat(type.GetInterfaces());
+            IEnumerable<Type> result = GetBaseClasses(type, includeSelf).Concat(type.GetInterfaces());
             if (includeSelf && type.IsInterface)
             {
-                result.Concat(new Type[] { type });
+                result.Concat(new[] { type });
             }
+
             return result;
         }
 
         /// <summary>
-        /// Returns a lazy enumerable of all the base classes of this type
+        ///     Returns a lazy enumerable of all the base classes of this type
         /// </summary>
         public static IEnumerable<Type> GetBaseClasses(this Type type, bool includeSelf = false)
         {
@@ -1235,7 +1413,7 @@ namespace OdinSerializer.Utilities
                 yield return type;
             }
 
-            var current = type.BaseType;
+            Type current = type.BaseType;
 
             while (current != null)
             {
@@ -1245,13 +1423,13 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Used to filter out unwanted type names. Ex "int" instead of "Int32"
+        ///     Used to filter out unwanted type names. Ex "int" instead of "Int32"
         /// </summary>
         private static string TypeNameGauntlet(this Type type)
         {
-            string typeName = type.Name;
+            var typeName = type.Name;
 
-            string altTypeName = string.Empty;
+            var altTypeName = string.Empty;
 
             if (TypeNameAlternatives.TryGetValue(typeName, out altTypeName))
             {
@@ -1262,7 +1440,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Returns a nicely formatted name of a type.
+        ///     Returns a nicely formatted name of a type.
         /// </summary>
         public static string GetNiceName(this Type type)
         {
@@ -1275,7 +1453,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Returns a nicely formatted full name of a type.
+        ///     Returns a nicely formatted full name of a type.
         /// </summary>
         public static string GetNiceFullName(this Type type)
         {
@@ -1297,54 +1475,49 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the name of the compilable nice.
+        ///     Gets the name of the compilable nice.
         /// </summary>
         /// <param name="type">The type.</param>
-        public static string GetCompilableNiceName(this Type type)
-        {
-            return type.GetNiceName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
-        }
+        public static string GetCompilableNiceName(this Type type) =>
+            type.GetNiceName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
 
         /// <summary>
-        /// Gets the full name of the compilable nice.
+        ///     Gets the full name of the compilable nice.
         /// </summary>
         /// <param name="type">The type.</param>
-        public static string GetCompilableNiceFullName(this Type type)
-        {
-            return type.GetNiceFullName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
-        }
+        public static string GetCompilableNiceFullName(this Type type) =>
+            type.GetNiceFullName().Replace('<', '_').Replace('>', '_').TrimEnd('_');
 
         /// <summary>
-        /// Returns the first found custom attribute of type T on this type
-        /// Returns null if none was found
+        ///     Returns the first found custom attribute of type T on this type
+        ///     Returns null if none was found
         /// </summary>
         public static T GetCustomAttribute<T>(this Type type, bool inherit) where T : Attribute
         {
             var attrs = type.GetCustomAttributes(typeof(T), inherit);
-            if (attrs.Length == 0) return null;
+            if (attrs.Length == 0)
+            {
+                return null;
+            }
+
             return attrs[0] as T;
         }
 
         /// <summary>
-        /// Returns the first found non-inherited custom attribute of type T on this type
-        /// Returns null if none was found
+        ///     Returns the first found non-inherited custom attribute of type T on this type
+        ///     Returns null if none was found
         /// </summary>
-        public static T GetCustomAttribute<T>(this Type type) where T : Attribute
-        {
-            return GetCustomAttribute<T>(type, false);
-        }
+        public static T GetCustomAttribute<T>(this Type type) where T : Attribute => GetCustomAttribute<T>(type, false);
 
         /// <summary>
-        /// Gets all attributes of type T.
+        ///     Gets all attributes of type T.
         /// </summary>
         /// <param name="type">The type.</param>
-        public static IEnumerable<T> GetCustomAttributes<T>(this Type type) where T : Attribute
-        {
-            return GetCustomAttributes<T>(type, false);
-        }
+        public static IEnumerable<T> GetCustomAttributes<T>(this Type type) where T : Attribute =>
+            GetCustomAttributes<T>(type, false);
 
         /// <summary>
-        /// Gets all attributes of type T.
+        ///     Gets all attributes of type T.
         /// </summary>
         /// <param name="type">The type</param>
         /// <param name="inherit">If true, specifies to also search the ancestors of element for custom attributes.</param>
@@ -1352,39 +1525,33 @@ namespace OdinSerializer.Utilities
         {
             var attrs = type.GetCustomAttributes(typeof(T), inherit);
 
-            for (int i = 0; i < attrs.Length; i++)
+            for (var i = 0; i < attrs.Length; i++)
             {
                 yield return attrs[i] as T;
             }
         }
 
         /// <summary>
-        /// Returns true if the attribute whose type is specified by the generic argument is defined on this type
+        ///     Returns true if the attribute whose type is specified by the generic argument is defined on this type
         /// </summary>
-        public static bool IsDefined<T>(this Type type) where T : Attribute
-        {
-            return type.IsDefined(typeof(T), false);
-        }
+        public static bool IsDefined<T>(this Type type) where T : Attribute => type.IsDefined(typeof(T), false);
 
         /// <summary>
-        /// Returns true if the attribute whose type is specified by the generic argument is defined on this type
+        ///     Returns true if the attribute whose type is specified by the generic argument is defined on this type
         /// </summary>
-        public static bool IsDefined<T>(this Type type, bool inherit) where T : Attribute
-        {
-            return type.IsDefined(typeof(T), inherit);
-        }
+        public static bool IsDefined<T>(this Type type, bool inherit) where T : Attribute =>
+            type.IsDefined(typeof(T), inherit);
 
         /// <summary>
-        /// Determines whether a type inherits or implements another type. Also include support for open generic base types such as List&lt;&gt;.
+        ///     Determines whether a type inherits or implements another type. Also include support for open generic base types
+        ///     such as List&lt;&gt;.
         /// </summary>
         /// <param name="type"></param>
-        public static bool InheritsFrom<TBase>(this Type type)
-        {
-            return type.InheritsFrom(typeof(TBase));
-        }
+        public static bool InheritsFrom<TBase>(this Type type) => type.InheritsFrom(typeof(TBase));
 
         /// <summary>
-        /// Determines whether a type inherits or implements another type. Also include support for open generic base types such as List&lt;&gt;.
+        ///     Determines whether a type inherits or implements another type. Also include support for open generic base types
+        ///     such as List&lt;&gt;.
         /// </summary>
         /// <param name="type"></param>
         /// <param name="baseType"></param>
@@ -1405,7 +1572,7 @@ namespace OdinSerializer.Utilities
                 return type.GetInterfaces().Contains(baseType);
             }
 
-            var t = type;
+            Type t = type;
             while (t != null)
             {
                 if (t == baseType)
@@ -1413,7 +1580,8 @@ namespace OdinSerializer.Utilities
                     return true;
                 }
 
-                if (baseType.IsGenericTypeDefinition && t.IsGenericType && t.GetGenericTypeDefinition() == baseType)
+                if (baseType.IsGenericTypeDefinition && t.IsGenericType &&
+                    t.GetGenericTypeDefinition() == baseType)
                 {
                     return true;
                 }
@@ -1425,7 +1593,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Gets the number of base types between given type and baseType.
+        ///     Gets the number of base types between given type and baseType.
         /// </summary>
         public static int GetInheritanceDistance(this Type type, Type baseType)
         {
@@ -1444,11 +1612,12 @@ namespace OdinSerializer.Utilities
             }
             else
             {
-                throw new ArgumentException("Cannot assign types '" + type.GetNiceName() + "' and '" + baseType.GetNiceName() + "' to each other.");
+                throw new ArgumentException("Cannot assign types '" + type.GetNiceName() + "' and '" +
+                                            baseType.GetNiceName() + "' to each other.");
             }
 
             Type currentType = lowerType;
-            int count = 0;
+            var count = 0;
 
             if (higherType.IsInterface)
             {
@@ -1457,9 +1626,9 @@ namespace OdinSerializer.Utilities
                     count++;
                     currentType = currentType.BaseType;
 
-                    var interfaces = currentType.GetInterfaces();
+                    Type[] interfaces = currentType.GetInterfaces();
 
-                    for (int i = 0; i < interfaces.Length; i++)
+                    for (var i = 0; i < interfaces.Length; i++)
                     {
                         if (interfaces[i] == higherType)
                         {
@@ -1482,31 +1651,35 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Determines whether a method has the specified parameter types.
+        ///     Determines whether a method has the specified parameter types.
         /// </summary>
         public static bool HasParamaters(this MethodInfo methodInfo, IList<Type> paramTypes, bool inherit = true)
         {
-            var methodParams = methodInfo.GetParameters();
+            ParameterInfo[] methodParams = methodInfo.GetParameters();
             if (methodParams.Length == paramTypes.Count)
             {
-                for (int i = 0; i < methodParams.Length; i++)
+                for (var i = 0; i < methodParams.Length; i++)
                 {
                     if (inherit && paramTypes[i].InheritsFrom(methodParams[i].ParameterType) == false)
                     {
                         return false;
                     }
-                    else if (methodParams[i].ParameterType != paramTypes[i])
+
+                    if (methodParams[i].ParameterType != paramTypes[i])
                     {
                         return false;
                     }
                 }
+
                 return true;
             }
+
             return false;
         }
 
         /// <summary>
-        /// FieldInfo will return the fieldType, propertyInfo the PropertyType, MethodInfo the return type and EventInfo will return the EventHandlerType.
+        ///     FieldInfo will return the fieldType, propertyInfo the PropertyType, MethodInfo the return type and EventInfo will
+        ///     return the EventHandlerType.
         /// </summary>
         /// <param name="memberInfo">The MemberInfo.</param>
         public static Type GetReturnType(this MemberInfo memberInfo)
@@ -1534,42 +1707,44 @@ namespace OdinSerializer.Utilities
             {
                 return eventInfo.EventHandlerType;
             }
+
             return null;
         }
 
         /// <summary>
-        /// Gets the value contained in a given <see cref="MemberInfo"/>. Currently only <see cref="FieldInfo"/> and <see cref="PropertyInfo"/> is supported.
+        ///     Gets the value contained in a given <see cref="MemberInfo" />. Currently only <see cref="FieldInfo" /> and
+        ///     <see cref="PropertyInfo" /> is supported.
         /// </summary>
-        /// <param name="member">The <see cref="MemberInfo"/> to get the value of.</param>
+        /// <param name="member">The <see cref="MemberInfo" /> to get the value of.</param>
         /// <param name="obj">The instance to get the value from.</param>
-        /// <returns>The value contained in the given <see cref="MemberInfo"/>.</returns>
-        /// <exception cref="System.ArgumentException">Can't get the value of the given <see cref="MemberInfo"/> type.</exception>
+        /// <returns>The value contained in the given <see cref="MemberInfo" />.</returns>
+        /// <exception cref="System.ArgumentException">Can't get the value of the given <see cref="MemberInfo" /> type.</exception>
         public static object GetMemberValue(this MemberInfo member, object obj)
         {
             if (member is FieldInfo)
             {
                 return (member as FieldInfo).GetValue(obj);
             }
-            else if (member is PropertyInfo)
+
+            if (member is PropertyInfo)
             {
                 return (member as PropertyInfo).GetGetMethod(true).Invoke(obj, null);
             }
-            else
-            {
-                throw new ArgumentException("Can't get the value of a " + member.GetType().Name);
-            }
+
+            throw new ArgumentException("Can't get the value of a " + member.GetType().Name);
         }
 
         /// <summary>
-        /// Sets the value of a given MemberInfo. Currently only <see cref="FieldInfo"/> and <see cref="PropertyInfo"/> is supported.
+        ///     Sets the value of a given MemberInfo. Currently only <see cref="FieldInfo" /> and <see cref="PropertyInfo" /> is
+        ///     supported.
         /// </summary>
-        /// <param name="member">The <see cref="MemberInfo"/> to set the value of.</param>
+        /// <param name="member">The <see cref="MemberInfo" /> to set the value of.</param>
         /// <param name="obj">The object to set the value on.</param>
         /// <param name="value">The value to set.</param>
         /// <exception cref="System.ArgumentException">
-        /// Property has no setter
-        /// or
-        /// Can't set the value of the given <see cref="MemberInfo"/> type.
+        ///     Property has no setter
+        ///     or
+        ///     Can't set the value of the given <see cref="MemberInfo" /> type.
         /// </exception>
         public static void SetMemberValue(this MemberInfo member, object obj, object value)
         {
@@ -1579,11 +1754,11 @@ namespace OdinSerializer.Utilities
             }
             else if (member is PropertyInfo)
             {
-                var method = (member as PropertyInfo).GetSetMethod(true);
+                MethodInfo method = (member as PropertyInfo).GetSetMethod(true);
 
                 if (method != null)
                 {
-                    method.Invoke(obj, new object[] { value });
+                    method.Invoke(obj, new[] { value });
                 }
                 else
                 {
@@ -1597,19 +1772,20 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Tries to infer a set of valid generic parameters for a generic type definition, given a subset of known parameters.
+        ///     Tries to infer a set of valid generic parameters for a generic type definition, given a subset of known parameters.
         /// </summary>
         /// <param name="genericTypeDefinition">The generic type definition to attempt to infer parameters for.</param>
         /// <param name="inferredParams">The inferred parameters, if inferral was successful.</param>
         /// <param name="knownParameters">The known parameters to infer from.</param>
         /// <returns>True if the parameters could be inferred, otherwise, false.</returns>
         /// <exception cref="System.ArgumentNullException">
-        /// genericTypeDefinition is null
-        /// or
-        /// knownParameters is null
+        ///     genericTypeDefinition is null
+        ///     or
+        ///     knownParameters is null
         /// </exception>
         /// <exception cref="System.ArgumentException">The genericTypeDefinition parameter must be a generic type definition.</exception>
-        public static bool TryInferGenericParameters(this Type genericTypeDefinition, out Type[] inferredParams, params Type[] knownParameters)
+        public static bool TryInferGenericParameters(this Type genericTypeDefinition, out Type[] inferredParams,
+            params Type[] knownParameters)
         {
             // NOTE: When modifying this method, also remember to modify Sirenix.Utilities.TypeExtensions.TryInferGenericParameters
             // and GenericParameterInferenceTypeMatcher.TryInferGenericParameters!
@@ -1640,7 +1816,7 @@ namespace OdinSerializer.Utilities
                 List<Type> typesToCheck_ToAdd = GenericConstraintsSatisfactionTypesToCheck_ToAdd;
                 typesToCheck_ToAdd.Clear();
 
-                for (int i = 0; i < knownParameters.Length; i++)
+                for (var i = 0; i < knownParameters.Length; i++)
                 {
                     typesToCheck.Add(knownParameters[i]);
                 }
@@ -1653,11 +1829,13 @@ namespace OdinSerializer.Utilities
                     genericTypeDefinition = genericTypeDefinition.GetGenericTypeDefinition();
                     definitions = genericTypeDefinition.GetGenericArguments();
 
-                    int unknownCount = 0;
+                    var unknownCount = 0;
 
-                    for (int i = 0; i < constructedParameters.Length; i++)
+                    for (var i = 0; i < constructedParameters.Length; i++)
                     {
-                        if (!constructedParameters[i].IsGenericParameter && (!constructedParameters[i].IsGenericType || constructedParameters[i].IsFullyConstructedGenericType()))
+                        if (!constructedParameters[i].IsGenericParameter && (!constructedParameters[i].IsGenericType ||
+                                                                             constructedParameters[i]
+                                                                                 .IsFullyConstructedGenericType()))
                         {
                             matches[definitions[i]] = constructedParameters[i];
                         }
@@ -1669,9 +1847,9 @@ namespace OdinSerializer.Utilities
 
                     if (unknownCount == knownParameters.Length)
                     {
-                        int count = 0;
+                        var count = 0;
 
-                        for (int i = 0; i < constructedParameters.Length; i++)
+                        for (var i = 0; i < constructedParameters.Length; i++)
                         {
                             if (constructedParameters[i].IsGenericParameter)
                             {
@@ -1687,21 +1865,22 @@ namespace OdinSerializer.Utilities
                     }
                 }
 
-                if (definitions.Length == knownParameters.Length && genericTypeDefinition.AreGenericConstraintsSatisfiedBy(knownParameters))
+                if (definitions.Length == knownParameters.Length &&
+                    genericTypeDefinition.AreGenericConstraintsSatisfiedBy(knownParameters))
                 {
                     inferredParams = knownParameters;
                     return true;
                 }
 
-                foreach (var typeArg in definitions)
+                foreach (Type typeArg in definitions)
                 {
                     //if (matches.ContainsKey(type)) continue;
 
-                    var constraints = typeArg.GetGenericParameterConstraints();
+                    Type[] constraints = typeArg.GetGenericParameterConstraints();
 
-                    foreach (var constraint in constraints)
+                    foreach (Type constraint in constraints)
                     {
-                        foreach (var parameter in typesToCheck)
+                        foreach (Type parameter in typesToCheck)
                         {
                             if (!constraint.IsGenericType)
                             {
@@ -1710,18 +1889,21 @@ namespace OdinSerializer.Utilities
 
                             Type constraintDefinition = constraint.GetGenericTypeDefinition();
 
-                            var constraintParams = constraint.GetGenericArguments();
+                            Type[] constraintParams = constraint.GetGenericArguments();
                             Type[] paramParams;
 
                             if (parameter.IsGenericType && constraintDefinition == parameter.GetGenericTypeDefinition())
                             {
                                 paramParams = parameter.GetGenericArguments();
                             }
-                            else if (constraintDefinition.IsInterface && parameter.ImplementsOpenGenericInterface(constraintDefinition))
+                            else if (constraintDefinition.IsInterface &&
+                                     parameter.ImplementsOpenGenericInterface(constraintDefinition))
                             {
-                                paramParams = parameter.GetArgumentsOfInheritedOpenGenericInterface(constraintDefinition);
+                                paramParams =
+                                    parameter.GetArgumentsOfInheritedOpenGenericInterface(constraintDefinition);
                             }
-                            else if (constraintDefinition.IsClass && parameter.ImplementsOpenGenericClass(constraintDefinition))
+                            else if (constraintDefinition.IsClass &&
+                                     parameter.ImplementsOpenGenericClass(constraintDefinition))
                             {
                                 paramParams = parameter.GetArgumentsOfInheritedOpenGenericClass(constraintDefinition);
                             }
@@ -1733,7 +1915,7 @@ namespace OdinSerializer.Utilities
                             matches[typeArg] = parameter;
                             typesToCheck_ToAdd.Add(parameter);
 
-                            for (int i = 0; i < constraintParams.Length; i++)
+                            for (var i = 0; i < constraintParams.Length; i++)
                             {
                                 if (constraintParams[i].IsGenericParameter)
                                 {
@@ -1743,7 +1925,7 @@ namespace OdinSerializer.Utilities
                             }
                         }
 
-                        foreach (var type in typesToCheck_ToAdd)
+                        foreach (Type type in typesToCheck_ToAdd)
                         {
                             typesToCheck.Add(type);
                         }
@@ -1756,7 +1938,7 @@ namespace OdinSerializer.Utilities
                 {
                     inferredParams = new Type[matches.Count];
 
-                    for (int i = 0; i < definitions.Length; i++)
+                    for (var i = 0; i < definitions.Length; i++)
                     {
                         inferredParams[i] = matches[definitions[i]];
                     }
@@ -1771,16 +1953,20 @@ namespace OdinSerializer.Utilities
                 return false;
             }
         }
+
         /// <summary>
-        /// <para>Checks whether an array of types satisfy the constraints of a given generic type definition.</para>
-        /// <para>If this method returns true, the given parameters can be safely used with <see cref="Type.MakeGenericType(Type[])"/> with the given generic type definition.</para>
+        ///     <para>Checks whether an array of types satisfy the constraints of a given generic type definition.</para>
+        ///     <para>
+        ///         If this method returns true, the given parameters can be safely used with
+        ///         <see cref="Type.MakeGenericType(Type[])" /> with the given generic type definition.
+        ///     </para>
         /// </summary>
         /// <param name="genericType">The generic type definition to check.</param>
         /// <param name="parameters">The parameters to check validity for.</param>
         /// <exception cref="System.ArgumentNullException">
-        /// genericType is null
-        /// or
-        /// types is null
+        ///     genericType is null
+        ///     or
+        ///     types is null
         /// </exception>
         /// <exception cref="System.ArgumentException">The genericType parameter must be a generic type definition.</exception>
         public static bool AreGenericConstraintsSatisfiedBy(this Type genericType, params Type[] parameters)
@@ -1804,15 +1990,18 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// <para>Checks whether an array of types satisfy the constraints of a given generic method definition.</para>
-        /// <para>If this method returns true, the given parameters can be safely used with <see cref="MethodInfo.MakeGenericMethod(Type[])"/> with the given generic method definition.</para>
+        ///     <para>Checks whether an array of types satisfy the constraints of a given generic method definition.</para>
+        ///     <para>
+        ///         If this method returns true, the given parameters can be safely used with
+        ///         <see cref="MethodInfo.MakeGenericMethod(Type[])" /> with the given generic method definition.
+        ///     </para>
         /// </summary>
         /// <param name="genericType">The generic method definition to check.</param>
         /// <param name="parameters">The parameters to check validity for.</param>
         /// <exception cref="System.ArgumentNullException">
-        /// genericType is null
-        /// or
-        /// types is null
+        ///     genericType is null
+        ///     or
+        ///     types is null
         /// </exception>
         /// <exception cref="System.ArgumentException">The genericMethod parameter must be a generic method definition.</exception>
         public static bool AreGenericConstraintsSatisfiedBy(this MethodBase genericMethod, params Type[] parameters)
@@ -1847,7 +2036,7 @@ namespace OdinSerializer.Utilities
                 Dictionary<Type, Type> resolvedMap = GenericConstraintsSatisfactionResolvedMap;
                 resolvedMap.Clear();
 
-                for (int i = 0; i < definitions.Length; i++)
+                for (var i = 0; i < definitions.Length; i++)
                 {
                     Type definition = definitions[i];
                     Type parameter = parameters[i];
@@ -1867,14 +2056,17 @@ namespace OdinSerializer.Utilities
             lock (GenericConstraintsSatisfaction_LOCK)
             {
                 GenericConstraintsSatisfactionResolvedMap.Clear();
-                return genericParameterDefinition.GenericParameterIsFulfilledBy(parameterType, GenericConstraintsSatisfactionResolvedMap);
+                return genericParameterDefinition.GenericParameterIsFulfilledBy(parameterType,
+                    GenericConstraintsSatisfactionResolvedMap);
             }
         }
 
         /// <summary>
-        /// Before calling this method we must ALWAYS hold a lock on the GenericConstraintsSatisfaction_LOCK object, as that is an implicit assumption it works with.
+        ///     Before calling this method we must ALWAYS hold a lock on the GenericConstraintsSatisfaction_LOCK object, as that is
+        ///     an implicit assumption it works with.
         /// </summary>
-        private static bool GenericParameterIsFulfilledBy(this Type genericParameterDefinition, Type parameterType, Dictionary<Type, Type> resolvedMap, HashSet<Type> processedParams = null)
+        private static bool GenericParameterIsFulfilledBy(this Type genericParameterDefinition, Type parameterType,
+            Dictionary<Type, Type> resolvedMap, HashSet<Type> processedParams = null)
         {
             if (genericParameterDefinition == null)
             {
@@ -1891,7 +2083,8 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentNullException("resolvedMap");
             }
 
-            if (genericParameterDefinition.IsGenericParameter == false && genericParameterDefinition == parameterType)
+            if (genericParameterDefinition.IsGenericParameter == false &&
+                genericParameterDefinition == parameterType)
             {
                 return true;
             }
@@ -1903,7 +2096,8 @@ namespace OdinSerializer.Utilities
 
             if (processedParams == null)
             {
-                processedParams = GenericConstraintsSatisfactionProcessedParams; // This is safe because we are currently holding the lock
+                processedParams =
+                    GenericConstraintsSatisfactionProcessedParams; // This is safe because we are currently holding the lock
                 processedParams.Clear();
             }
 
@@ -1915,15 +2109,18 @@ namespace OdinSerializer.Utilities
             if (specialConstraints != GenericParameterAttributes.None)
             {
                 // Struct constraint (must not be nullable)
-                if ((specialConstraints & GenericParameterAttributes.NotNullableValueTypeConstraint) == GenericParameterAttributes.NotNullableValueTypeConstraint)
+                if ((specialConstraints & GenericParameterAttributes.NotNullableValueTypeConstraint) ==
+                    GenericParameterAttributes.NotNullableValueTypeConstraint)
                 {
-                    if (!parameterType.IsValueType || (parameterType.IsGenericType && parameterType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+                    if (!parameterType.IsValueType || (parameterType.IsGenericType &&
+                                                       parameterType.GetGenericTypeDefinition() == typeof(Nullable<>)))
                     {
                         return false;
                     }
                 }
                 // Class constraint
-                else if ((specialConstraints & GenericParameterAttributes.ReferenceTypeConstraint) == GenericParameterAttributes.ReferenceTypeConstraint)
+                else if ((specialConstraints & GenericParameterAttributes.ReferenceTypeConstraint) ==
+                         GenericParameterAttributes.ReferenceTypeConstraint)
                 {
                     if (parameterType.IsValueType)
                     {
@@ -1932,9 +2129,11 @@ namespace OdinSerializer.Utilities
                 }
 
                 // Must have a public parameterless constructor
-                if ((specialConstraints & GenericParameterAttributes.DefaultConstructorConstraint) == GenericParameterAttributes.DefaultConstructorConstraint)
+                if ((specialConstraints & GenericParameterAttributes.DefaultConstructorConstraint) ==
+                    GenericParameterAttributes.DefaultConstructorConstraint)
                 {
-                    if (parameterType.IsAbstract || (!parameterType.IsValueType && parameterType.GetConstructor(Type.EmptyTypes) == null))
+                    if (parameterType.IsAbstract || (!parameterType.IsValueType &&
+                                                     parameterType.GetConstructor(Type.EmptyTypes) == null))
                     {
                         return false;
                     }
@@ -1954,7 +2153,7 @@ namespace OdinSerializer.Utilities
             // Type inheritance, Interface implementation and fulfillment of another generic parameter.
             Type[] constraints = genericParameterDefinition.GetGenericParameterConstraints();
 
-            for (int i = 0; i < constraints.Length; i++)
+            for (var i = 0; i < constraints.Length; i++)
             {
                 Type constraint = constraints[i];
 
@@ -1980,7 +2179,8 @@ namespace OdinSerializer.Utilities
                         Type[] constraintParams = constraint.GetGenericArguments();
                         Type[] paramParams;
 
-                        if (parameterType.IsGenericType && constraintDefinition == parameterType.GetGenericTypeDefinition())
+                        if (parameterType.IsGenericType &&
+                            constraintDefinition == parameterType.GetGenericTypeDefinition())
                         {
                             paramParams = parameterType.GetGenericArguments();
                         }
@@ -1990,7 +2190,8 @@ namespace OdinSerializer.Utilities
                             {
                                 if (parameterType.ImplementsOpenGenericClass(constraintDefinition))
                                 {
-                                    paramParams = parameterType.GetArgumentsOfInheritedOpenGenericClass(constraintDefinition);
+                                    paramParams =
+                                        parameterType.GetArgumentsOfInheritedOpenGenericClass(constraintDefinition);
                                 }
                                 else
                                 {
@@ -2001,7 +2202,8 @@ namespace OdinSerializer.Utilities
                             {
                                 if (parameterType.ImplementsOpenGenericInterface(constraintDefinition))
                                 {
-                                    paramParams = parameterType.GetArgumentsOfInheritedOpenGenericInterface(constraintDefinition);
+                                    paramParams =
+                                        parameterType.GetArgumentsOfInheritedOpenGenericInterface(constraintDefinition);
                                 }
                                 else
                                 {
@@ -2010,10 +2212,10 @@ namespace OdinSerializer.Utilities
                             }
                         }
 
-                        for (int j = 0; j < constraintParams.Length; j++)
+                        for (var j = 0; j < constraintParams.Length; j++)
                         {
-                            var c = constraintParams[j];
-                            var p = paramParams[j];
+                            Type c = constraintParams[j];
+                            Type p = paramParams[j];
 
                             // Replace resolved constraint parameters with their resolved types
                             if (c.IsGenericParameter && resolvedMap.ContainsKey(c))
@@ -2023,7 +2225,8 @@ namespace OdinSerializer.Utilities
 
                             if (c.IsGenericParameter)
                             {
-                                if (!processedParams.Contains(c) && !GenericParameterIsFulfilledBy(c, p, resolvedMap, processedParams))
+                                if (!processedParams.Contains(c) &&
+                                    !GenericParameterIsFulfilledBy(c, p, resolvedMap, processedParams))
                                 {
                                     return false;
                                 }
@@ -2050,7 +2253,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public static string GetGenericConstraintsString(this Type type, bool useFullTypeNames = false)
         {
@@ -2064,10 +2267,10 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentException("Type '" + type.GetNiceName() + "' is not a generic type definition!");
             }
 
-            var parameters = type.GetGenericArguments();
+            Type[] parameters = type.GetGenericArguments();
             var strings = new string[parameters.Length];
 
-            for (int i = 0; i < parameters.Length; i++)
+            for (var i = 0; i < parameters.Length; i++)
             {
                 strings[i] = parameters[i].GetGenericParameterConstraintsString(useFullTypeNames);
             }
@@ -2076,7 +2279,8 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Formats a string with the specified generic parameter constraints on any given type. Example output: <c>where T : class</c>
+        ///     Formats a string with the specified generic parameter constraints on any given type. Example output:
+        ///     <c>where T : class</c>
         /// </summary>
         public static string GetGenericParameterConstraintsString(this Type type, bool useFullTypeNames = false)
         {
@@ -2090,33 +2294,36 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentException("Type '" + type.GetNiceName() + "' is not a generic parameter!");
             }
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
-            bool started = false;
+            var started = false;
 
-            var specialConstraints = type.GenericParameterAttributes;
+            GenericParameterAttributes specialConstraints = type.GenericParameterAttributes;
 
             // Struct constraint (must not be nullable)
-            if ((specialConstraints & GenericParameterAttributes.NotNullableValueTypeConstraint) == GenericParameterAttributes.NotNullableValueTypeConstraint)
+            if ((specialConstraints & GenericParameterAttributes.NotNullableValueTypeConstraint) ==
+                GenericParameterAttributes.NotNullableValueTypeConstraint)
             {
                 sb.Append("where ")
-                  .Append(type.Name)
-                  .Append(" : struct");
+                    .Append(type.Name)
+                    .Append(" : struct");
 
                 started = true;
             }
             // Class constraint
-            else if ((specialConstraints & GenericParameterAttributes.ReferenceTypeConstraint) == GenericParameterAttributes.ReferenceTypeConstraint)
+            else if ((specialConstraints & GenericParameterAttributes.ReferenceTypeConstraint) ==
+                     GenericParameterAttributes.ReferenceTypeConstraint)
             {
                 sb.Append("where ")
-                  .Append(type.Name)
-                  .Append(" : class");
+                    .Append(type.Name)
+                    .Append(" : class");
 
                 started = true;
             }
 
             // Must have a public parameterless constructor
-            if ((specialConstraints & GenericParameterAttributes.DefaultConstructorConstraint) == GenericParameterAttributes.DefaultConstructorConstraint)
+            if ((specialConstraints & GenericParameterAttributes.DefaultConstructorConstraint) ==
+                GenericParameterAttributes.DefaultConstructorConstraint)
             {
                 if (started)
                 {
@@ -2125,41 +2332,49 @@ namespace OdinSerializer.Utilities
                 else
                 {
                     sb.Append("where ")
-                      .Append(type.Name)
-                      .Append(" : new()");
+                        .Append(type.Name)
+                        .Append(" : new()");
 
                     started = true;
                 }
             }
 
             // Then add type constraints
-            var constraints = type.GetGenericParameterConstraints();
+            Type[] constraints = type.GetGenericParameterConstraints();
 
             if (constraints.Length > 0)
             {
-                for (int j = 0; j < constraints.Length; j++)
+                for (var j = 0; j < constraints.Length; j++)
                 {
-                    var constraint = constraints[j];
+                    Type constraint = constraints[j];
 
                     if (started)
                     {
                         sb.Append(", ");
 
                         if (useFullTypeNames)
+                        {
                             sb.Append(constraint.GetNiceFullName());
+                        }
                         else
+                        {
                             sb.Append(constraint.GetNiceName());
+                        }
                     }
                     else
                     {
                         sb.Append("where ")
-                          .Append(type.Name)
-                          .Append(" : ");
+                            .Append(type.Name)
+                            .Append(" : ");
 
                         if (useFullTypeNames)
+                        {
                             sb.Append(constraint.GetNiceFullName());
+                        }
                         else
+                        {
                             sb.Append(constraint.GetNiceName());
+                        }
 
                         started = true;
                     }
@@ -2168,8 +2383,9 @@ namespace OdinSerializer.Utilities
 
             return sb.ToString();
         }
+
         /// <summary>
-        /// Determines whether a generic type contains the specified generic argument constraints.
+        ///     Determines whether a generic type contains the specified generic argument constraints.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="types">The generic argument types.</param>
@@ -2185,26 +2401,26 @@ namespace OdinSerializer.Utilities
                 return false;
             }
 
-            bool[] typesSeen = new bool[types.Length];
-            var args = type.GetGenericArguments();
+            var typesSeen = new bool[types.Length];
+            Type[] args = type.GetGenericArguments();
 
-            var argsToCheck = GenericArgumentsContainsTypes_ArgsToCheckCached;
+            Stack<Type> argsToCheck = GenericArgumentsContainsTypes_ArgsToCheckCached;
 
             lock (argsToCheck)
             {
                 argsToCheck.Clear();
 
-                for (int i = 0; i < args.Length; i++)
+                for (var i = 0; i < args.Length; i++)
                 {
                     argsToCheck.Push(args[i]);
                 }
 
                 while (argsToCheck.Count > 0)
                 {
-                    var arg = argsToCheck.Pop();
+                    Type arg = argsToCheck.Pop();
 
                     // Check if it's one of the types we're looking for, and if so, mark that as seen
-                    for (int i = 0; i < types.Length; i++)
+                    for (var i = 0; i < types.Length; i++)
                     {
                         Type lookingForType = types[i];
 
@@ -2212,7 +2428,9 @@ namespace OdinSerializer.Utilities
                         {
                             typesSeen[i] = true;
                         }
-                        else if (lookingForType.IsGenericTypeDefinition && arg.IsGenericType && !arg.IsGenericTypeDefinition && arg.GetGenericTypeDefinition() == lookingForType)
+                        else if (lookingForType.IsGenericTypeDefinition && arg.IsGenericType &&
+                                 !arg.IsGenericTypeDefinition &&
+                                 arg.GetGenericTypeDefinition() == lookingForType)
                         {
                             typesSeen[i] = true;
                         }
@@ -2220,9 +2438,9 @@ namespace OdinSerializer.Utilities
 
                     // Check if all types we're looking for have been seen
                     {
-                        bool allSeen = true;
+                        var allSeen = true;
 
-                        for (int i = 0; i < typesSeen.Length; i++)
+                        for (var i = 0; i < typesSeen.Length; i++)
                         {
                             if (typesSeen[i] == false)
                             {
@@ -2240,7 +2458,7 @@ namespace OdinSerializer.Utilities
                     // If argument is a generic type, we have to also check its arguments
                     if (arg.IsGenericType)
                     {
-                        foreach (var innerArg in arg.GetGenericArguments())
+                        foreach (Type innerArg in arg.GetGenericArguments())
                         {
                             argsToCheck.Push(innerArg);
                         }
@@ -2252,7 +2470,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Determines whether a type is a fully constructed generic type.
+        ///     Determines whether a type is a fully constructed generic type.
         /// </summary>
         public static bool IsFullyConstructedGenericType(this Type type)
         {
@@ -2268,24 +2486,25 @@ namespace OdinSerializer.Utilities
 
             if (type.HasElementType)
             {
-                var element = type.GetElementType();
+                Type element = type.GetElementType();
                 if (element.IsGenericParameter || element.IsFullyConstructedGenericType() == false)
                 {
                     return false;
                 }
             }
 
-            var args = type.GetGenericArguments();
+            Type[] args = type.GetGenericArguments();
 
-            for (int i = 0; i < args.Length; i++)
+            for (var i = 0; i < args.Length; i++)
             {
-                var arg = args[i];
+                Type arg = args[i];
 
                 if (arg.IsGenericParameter)
                 {
                     return false;
                 }
-                else if (!arg.IsFullyConstructedGenericType())
+
+                if (!arg.IsFullyConstructedGenericType())
                 {
                     return false;
                 }
@@ -2318,15 +2537,12 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Determines whether a type is nullable by ensuring the type is neither a PrimitiveType, ValueType or an Enum.
+        ///     Determines whether a type is nullable by ensuring the type is neither a PrimitiveType, ValueType or an Enum.
         /// </summary>
-        public static bool IsNullableType(this Type type)
-        {
-            return !(type.IsPrimitive || type.IsValueType || type.IsEnum);
-        }
+        public static bool IsNullableType(this Type type) => !(type.IsPrimitive || type.IsValueType || type.IsEnum);
 
         /// <summary>
-        /// Gets the enum bitmask in a ulong.
+        ///     Gets the enum bitmask in a ulong.
         /// </summary>
         /// <exception cref="System.ArgumentException">enumType</exception>
         public static ulong GetEnumBitmask(object value, Type enumType)

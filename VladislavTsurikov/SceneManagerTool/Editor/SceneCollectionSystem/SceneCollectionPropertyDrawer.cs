@@ -3,6 +3,7 @@ using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.SceneManagerTool.Runtime;
+using VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.UnityUtility.Editor;
 
@@ -15,46 +16,48 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneCollectionSystem
         {
             EditorGUI.BeginProperty(position, GUIContent.none, property);
             {
-                SceneCollectionReferenceField(position, new GUIContent("SceneCollection"), property.GetTarget<SceneCollectionReference>());
+                SceneCollectionReferenceField(position, new GUIContent("SceneCollection"),
+                    property.GetTarget<SceneCollectionReference>());
             }
             EditorGUI.EndProperty();
         }
-        
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-        {
-            return EditorGUIUtility.singleLineHeight;
-        }
 
-        public static void SceneCollectionReferenceField(Rect totalRect, GUIContent text, SceneCollectionReference sceneCollectionReference)
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label) =>
+            EditorGUIUtility.singleLineHeight;
+
+        public static void SceneCollectionReferenceField(Rect totalRect, GUIContent text,
+            SceneCollectionReference sceneCollectionReference)
         {
             Rect rectField = CustomEditorGUI.PrefixLabel(totalRect, text);
 
-            var clickButtonText = sceneCollectionReference.IsValid() ? sceneCollectionReference.SceneCollection.Name : "Click to set value";
-            
+            var clickButtonText = sceneCollectionReference.IsValid()
+                ? sceneCollectionReference.SceneCollection.Name
+                : "Click to set value";
+
             if (CustomEditorGUI.ClickButton(rectField, clickButtonText))
             {
                 ShowClickManu(sceneCollectionReference);
             }
         }
-        
+
         private static void ShowClickManu(SceneCollectionReference sceneCollectionReference)
         {
             SceneManagerEditorUtility.SetAllScenesToDirty();
 
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
-            foreach (var buildSceneCollection in SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList)
+            foreach (BuildSceneCollection buildSceneCollection in
+                     SceneManagerData.Instance.Profile.BuildSceneCollectionStack.ElementList)
+            foreach (SceneCollection sceneCollection in buildSceneCollection.GetAllSceneCollections())
             {
-                foreach (var sceneCollection in buildSceneCollection.GetAllSceneCollections())
+                if (sceneCollectionReference.SceneCollection != sceneCollection)
                 {
-                    if (sceneCollectionReference.SceneCollection != sceneCollection)
-                    {
-                        menu.AddItem(new GUIContent(buildSceneCollection.Name + "/" + sceneCollection.Name), false, () => sceneCollectionReference.SceneCollection = sceneCollection); 
-                    }
-                    else
-                    {
-                        menu.AddDisabledItem(new GUIContent(buildSceneCollection.Name + "/" + sceneCollection.Name)); 
-                    }
+                    menu.AddItem(new GUIContent(buildSceneCollection.Name + "/" + sceneCollection.Name), false,
+                        () => sceneCollectionReference.SceneCollection = sceneCollection);
+                }
+                else
+                {
+                    menu.AddDisabledItem(new GUIContent(buildSceneCollection.Name + "/" + sceneCollection.Name));
                 }
             }
 

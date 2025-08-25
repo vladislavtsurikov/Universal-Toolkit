@@ -2,15 +2,43 @@
 #if !DISABLE_VISUAL_ELEMENTS
 using UnityEngine;
 using UnityEngine.UIElements;
-using VladislavTsurikov.UIElementsUtility;
-using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 using VladislavTsurikov.UIElementsUtility.Runtime;
+using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 using VisualElementExtensions = VladislavTsurikov.UIElementsUtility.Runtime.Utility.VisualElementExtensions;
 
 namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 {
     public abstract class ListViewItem : VisualElement
     {
+        protected ListViewItem()
+        {
+            this.SetStyleJustifyContent(Justify.Center);
+
+            Add(TemplateContainer = GetLayout.VisualElements.ListViewItem.CloneTree());
+            TemplateContainer
+                .AddStyle(GetStyle.VisualElements.ListViewItem);
+
+            //REFERENCES
+            LayoutContainer = TemplateContainer.Q<VisualElement>("LayoutContainer");
+            ItemIndexLabel = LayoutContainer.Q<Label>("ItemIndex");
+            ItemContentContainer = LayoutContainer.Q<VisualElement>("ItemContentContainer");
+            ItemRemoveButtonContainer = LayoutContainer.Q<VisualElement>("ItemRemoveButtonContainer");
+
+            //TEXT COLORS
+            ItemIndexLabel.SetStyleColor(ItemIndexTextColor);
+
+            //TEXT FONTS
+            ItemIndexLabel.SetStyleUnityFont(IndexLabelFont);
+        }
+
+        protected ListViewItem(ListView listView) : this()
+        {
+            this.SetListView(listView);
+            ItemRemoveButtonContainer.Clear();
+            ItemRemoveButton = ListView.Buttons.RemoveButton;
+            ItemRemoveButtonContainer.Add(ItemRemoveButton);
+        }
+
         //REFERENCES
         public TemplateContainer TemplateContainer { get; }
         public VisualElement LayoutContainer { get; }
@@ -30,35 +58,6 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         private static Font IndexLabelFont => GetFont.Ubuntu.Light;
 
-        protected ListViewItem()
-        {
-            this.SetStyleJustifyContent(Justify.Center);
-            
-            Add(TemplateContainer = GetLayout.VisualElements.ListViewItem.CloneTree());
-            TemplateContainer
-                .AddStyle(GetStyle.VisualElements.ListViewItem);
-            
-            //REFERENCES
-            LayoutContainer = TemplateContainer.Q<VisualElement>("LayoutContainer");
-            ItemIndexLabel = LayoutContainer.Q<Label>("ItemIndex");
-            ItemContentContainer = LayoutContainer.Q<VisualElement>("ItemContentContainer");
-            ItemRemoveButtonContainer = LayoutContainer.Q<VisualElement>("ItemRemoveButtonContainer");
-
-            //TEXT COLORS
-            ItemIndexLabel.SetStyleColor(ItemIndexTextColor);
-            
-            //TEXT FONTS
-            ItemIndexLabel.SetStyleUnityFont(IndexLabelFont);
-        }
-        
-        protected ListViewItem(ListView listView) : this()
-        {
-            this.SetListView(listView);
-            ItemRemoveButtonContainer.Clear();
-            ItemRemoveButton = ListView.Buttons.RemoveButton;
-            ItemRemoveButtonContainer.Add(ItemRemoveButton);
-        }
-
         internal virtual void UpdateItemIndex(int value)
         {
             ItemIndexLabel.SetStyleDisplay(ShowItemIndex ? DisplayStyle.Flex : DisplayStyle.None);
@@ -75,7 +74,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.ListView = value;
             return target;
         }
-        
+
         public static T SetItemIndex<T>(this T target, int value) where T : ListViewItem
         {
             target.UpdateItemIndex(value);
@@ -84,22 +83,20 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 
         public static T EnableItemRemoveButton<T>(this T target) where T : ListViewItem
         {
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.EnableElement(target.ItemRemoveButton);
+            VisualElementExtensions.EnableElement(target.ItemRemoveButton);
             return target;
         }
 
         public static T DisableItemRemoveButton<T>(this T target) where T : ListViewItem
         {
-            UIElementsUtility.Runtime.Utility.VisualElementExtensions.DisableElement(target.ItemRemoveButton);
+            VisualElementExtensions.DisableElement(target.ItemRemoveButton);
             return target;
         }
 
-        public static T ToggleItemRemoveButton<T>(this T target, bool enabled) where T : ListViewItem
-        {
-            return enabled
+        public static T ToggleItemRemoveButton<T>(this T target, bool enabled) where T : ListViewItem =>
+            enabled
                 ? target.EnableItemRemoveButton()
                 : target.DisableItemRemoveButton();
-        }
     }
 }
 #endif

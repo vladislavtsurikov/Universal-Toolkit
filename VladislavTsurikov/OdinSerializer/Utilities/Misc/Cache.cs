@@ -16,82 +16,86 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Threading;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Threading;
-
     public interface ICache : IDisposable
     {
         object Value { get; }
     }
 
     /// <summary>
-    /// Provides an easy way of claiming and freeing cached values of any non-abstract reference type with a public parameterless constructor.
-    /// <para />
-    /// Cached types which implement the <see cref="ICacheNotificationReceiver"/> interface will receive notifications when they are claimed and freed.
-    /// <para />
-    /// Only one thread should be holding a given cache instance at a time if <see cref="ICacheNotificationReceiver"/> is implemented, since the invocation of 
-    /// <see cref="ICacheNotificationReceiver.OnFreed()"/> is not thread safe, IE, weird stuff might happen if multiple different threads are trying to free
-    /// the same cache instance at the same time. This will practically never happen unless you're doing really strange stuff, but the case is documented here.
+    ///     Provides an easy way of claiming and freeing cached values of any non-abstract reference type with a public
+    ///     parameterless constructor.
+    ///     <para />
+    ///     Cached types which implement the <see cref="ICacheNotificationReceiver" /> interface will receive notifications
+    ///     when they are claimed and freed.
+    ///     <para />
+    ///     Only one thread should be holding a given cache instance at a time if <see cref="ICacheNotificationReceiver" /> is
+    ///     implemented, since the invocation of
+    ///     <see cref="ICacheNotificationReceiver.OnFreed()" /> is not thread safe, IE, weird stuff might happen if multiple
+    ///     different threads are trying to free
+    ///     the same cache instance at the same time. This will practically never happen unless you're doing really strange
+    ///     stuff, but the case is documented here.
     /// </summary>
     /// <typeparam name="T">The type which is cached.</typeparam>
     /// <seealso cref="System.IDisposable" />
     public sealed class Cache<T> : ICache where T : class, new()
     {
-        private static readonly bool IsNotificationReceiver = typeof(ICacheNotificationReceiver).IsAssignableFrom(typeof(T));
+        private static readonly bool IsNotificationReceiver =
+            typeof(ICacheNotificationReceiver).IsAssignableFrom(typeof(T));
+
         private static object[] FreeValues = new object[4];
 
-        private bool isFree;
-
-        private static volatile int THREAD_LOCK_TOKEN = 0;
+        private static volatile int THREAD_LOCK_TOKEN;
 
         private static int maxCacheSize = 5;
 
         /// <summary>
-        /// Gets or sets the maximum size of the cache. This value can never go beneath 1.
-        /// </summary>
-        /// <value>
-        /// The maximum size of the cache.
-        /// </value>
-        public static int MaxCacheSize
-        {
-            get
-            {
-                return Cache<T>.maxCacheSize;
-            }
-
-            set
-            {
-                Cache<T>.maxCacheSize = Math.Max(1, value);
-            }
-        }
-
-        private Cache()
-        {
-            this.Value = new T();
-            this.isFree = false;
-        }
-
-        /// <summary>
-        /// The cached value.
+        ///     The cached value.
         /// </summary>
         public T Value;
 
+        private Cache()
+        {
+            Value = new T();
+            IsFree = false;
+        }
+
         /// <summary>
-        /// Gets a value indicating whether this cached value is free.
+        ///     Gets or sets the maximum size of the cache. This value can never go beneath 1.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this cached value is free; otherwise, <c>false</c>.
+        ///     The maximum size of the cache.
         /// </value>
-        public bool IsFree { get { return this.isFree; } }
+        public static int MaxCacheSize
+        {
+            get => maxCacheSize;
 
-        object ICache.Value { get { return this.Value; } }
+            set => maxCacheSize = Math.Max(1, value);
+        }
 
         /// <summary>
-        /// Claims a cached value of type <see cref="T"/>.
+        ///     Gets a value indicating whether this cached value is free.
         /// </summary>
-        /// <returns>A cached value of type <see cref="T"/>.</returns>
+        /// <value>
+        ///     <c>true</c> if this cached value is free; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsFree { get; private set; }
+
+        object ICache.Value => Value;
+
+        /// <summary>
+        ///     Releases this cached value.
+        /// </summary>
+        void IDisposable.Dispose() => Release(this);
+
+        /// <summary>
+        ///     Claims a cached value of type <see cref="T" />.
+        /// </summary>
+        /// <returns>A cached value of type <see cref="T" />.</returns>
         public static Cache<T> Claim()
         {
             Cache<T> result = null;
@@ -114,20 +118,20 @@ namespace OdinSerializer.Utilities
             var freeValues = FreeValues;
             var length = freeValues.Length;
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 result = (Cache<T>)freeValues[i];
-                if (!object.ReferenceEquals(result, null))
+                if (!ReferenceEquals(result, null))
                 {
                     freeValues[i] = null;
-                    result.isFree = false;
+                    result.IsFree = false;
                     break;
                 }
             }
 
             // Release the lock
-            THREAD_LOCK_TOKEN = 0; 
-            
+            THREAD_LOCK_TOKEN = 0;
+
             if (result == null)
             {
                 result = new Cache<T>();
@@ -142,7 +146,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Releases a cached value.
+        ///     Releases a cached value.
         /// </summary>
         /// <param name="cache">The cached value to release.</param>
         /// <exception cref="System.ArgumentNullException">The cached value to release is null.</exception>
@@ -153,7 +157,10 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentNullException("cache");
             }
 
-            if (cache.isFree) return;
+            if (cache.IsFree)
+            {
+                return;
+            }
 
             // No need to call this method inside the lock, which might do heavy work
             //  there is a thread safety hole here, actually - if several different threads
@@ -174,7 +181,7 @@ namespace OdinSerializer.Utilities
 
             // We now hold the lock
 
-            if (cache.isFree)
+            if (cache.IsFree)
             {
                 // Release the lock and leave - job's done already
                 THREAD_LOCK_TOKEN = 0;
@@ -182,16 +189,16 @@ namespace OdinSerializer.Utilities
             }
 
 
-            cache.isFree = true;
+            cache.IsFree = true;
 
             var freeValues = FreeValues;
             var length = freeValues.Length;
 
-            bool added = false;
+            var added = false;
 
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
-                if (object.ReferenceEquals(freeValues[i], null))
+                if (ReferenceEquals(freeValues[i], null))
                 {
                     freeValues[i] = cache;
                     added = true;
@@ -203,7 +210,7 @@ namespace OdinSerializer.Utilities
             {
                 var newArr = new object[length * 2];
 
-                for (int i = 0; i < length; i++)
+                for (var i = 0; i < length; i++)
                 {
                     newArr[i] = freeValues[i];
                 }
@@ -215,40 +222,28 @@ namespace OdinSerializer.Utilities
 
             // Release the lock
             THREAD_LOCK_TOKEN = 0;
-
         }
 
         /// <summary>
-        /// Performs an implicit conversion from <see cref="Cache{T}"/> to <see cref="T"/>.
+        ///     Performs an implicit conversion from <see cref="Cache{T}" /> to <see cref="T" />.
         /// </summary>
         /// <param name="cache">The cache to convert.</param>
         /// <returns>
-        /// The result of the conversion.
+        ///     The result of the conversion.
         /// </returns>
         public static implicit operator T(Cache<T> cache)
         {
             if (cache == null)
             {
-                return default(T);
+                return default;
             }
 
             return cache.Value;
         }
 
         /// <summary>
-        /// Releases this cached value.
+        ///     Releases this cached value.
         /// </summary>
-        public void Release()
-        {
-            Release(this);
-        }
-
-        /// <summary>
-        /// Releases this cached value.
-        /// </summary>
-        void IDisposable.Dispose()
-        {
-            Cache<T>.Release(this);
-        }
+        public void Release() => Release(this);
     }
 }

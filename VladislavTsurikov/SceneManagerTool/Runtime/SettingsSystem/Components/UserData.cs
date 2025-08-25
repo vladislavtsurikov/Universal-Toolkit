@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {

@@ -1,5 +1,5 @@
 ﻿using System;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 using VladislavTsurikov.SceneManagerTool.Runtime.Utility;
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
@@ -8,9 +8,19 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
     public class SceneCollectionReference
     {
         private SceneCollection _sceneCollection;
-        
+
         [OdinSerialize]
         private int _sceneCollectionID;
+
+        public SceneCollectionReference()
+        {
+        }
+
+        public SceneCollectionReference(SceneCollection sceneCollection)
+        {
+            _sceneCollectionID = sceneCollection.ID;
+            _sceneCollection = sceneCollection;
+        }
 
         public SceneCollection SceneCollection
         {
@@ -33,20 +43,6 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             }
         }
 
-        public bool IsValid()
-        {
-            return SceneCollection != null;
-        }
-
-        public SceneCollectionReference()
-        {
-            
-        }
-
-        public SceneCollectionReference(SceneCollection sceneCollection)
-        {
-            _sceneCollectionID = sceneCollection.ID;
-            _sceneCollection = sceneCollection;
-        }
+        public bool IsValid() => SceneCollection != null;
     }
 }

@@ -16,49 +16,47 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using OdinSerializer.Utilities;
+using UnityEngine;
 #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
 #define CAN_EMIT
 #endif
 
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using UnityEngine;
-
 #if CAN_EMIT
-
     using System.Reflection.Emit;
 
 #endif
 
     /// <summary>
-    /// Utility class for emitting formatters using the <see cref="System.Reflection.Emit"/> namespace.
-    /// <para />
-    /// NOTE: Some platforms do not support emitting. Check whether you can emit on the current platform using <see cref="EmitUtilities.CanEmit"/>.
+    ///     Utility class for emitting formatters using the <see cref="System.Reflection.Emit" /> namespace.
+    ///     <para />
+    ///     NOTE: Some platforms do not support emitting. Check whether you can emit on the current platform using
+    ///     <see cref="EmitUtilities.CanEmit" />.
     /// </summary>
     public static class FormatterEmitter
     {
         /// <summary>
-        /// Used for generating unique formatter helper type names.
+        ///     Used for generating unique formatter helper type names.
         /// </summary>
         private static int helperFormatterNameId;
 
         /// <summary>
-        /// The name of the pre-generated assembly that contains pre-emitted formatters for use on AOT platforms where emitting is not supported. Note that this assembly is not always present.
+        ///     The name of the pre-generated assembly that contains pre-emitted formatters for use on AOT platforms where emitting
+        ///     is not supported. Note that this assembly is not always present.
         /// </summary>
         public const string PRE_EMITTED_ASSEMBLY_NAME = "OdinSerializer.AOTGenerated";
 
         /// <summary>
-        /// The name of the runtime-generated assembly that contains runtime-emitted formatters for use on non-AOT platforms where emitting is supported. Note that this assembly is not always present.
+        ///     The name of the runtime-generated assembly that contains runtime-emitted formatters for use on non-AOT platforms
+        ///     where emitting is supported. Note that this assembly is not always present.
         /// </summary>
         public const string RUNTIME_EMITTED_ASSEMBLY_NAME = "OdinSerializer.RuntimeEmitted";
 
         /// <summary>
-        /// Base type for all AOT-emitted formatters.
+        ///     Base type for all AOT-emitted formatters.
         /// </summary>
         [EmittedFormatter]
         public abstract class AOTEmittedFormatter<T> : EasyBaseFormatter<T>
@@ -66,20 +64,19 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Shortcut class that makes it easier to emit empty AOT formatters.
+        ///     Shortcut class that makes it easier to emit empty AOT formatters.
         /// </summary>
         public abstract class EmptyAOTEmittedFormatter<T> : AOTEmittedFormatter<T>
         {
             /// <summary>
-            /// Skips the entry to read.
+            ///     Skips the entry to read.
             /// </summary>
-            protected override void ReadDataEntry(ref T value, string entryName, EntryType entryType, IDataReader reader)
-            {
+            protected override void ReadDataEntry(ref T value, string entryName, EntryType entryType,
+                IDataReader reader) =>
                 reader.SkipEntry();
-            }
 
             /// <summary>
-            /// Does nothing at all.
+            ///     Does nothing at all.
             /// </summary>
             protected override void WriteDataEntries(ref T value, IDataWriter writer)
             {
@@ -87,9 +84,9 @@ namespace OdinSerializer
         }
 
 #if CAN_EMIT
-
         private static readonly object LOCK = new object();
-        private static readonly DoubleLookupDictionary<ISerializationPolicy, Type, IFormatter> Formatters = new DoubleLookupDictionary<ISerializationPolicy, Type, IFormatter>();
+        private static readonly DoubleLookupDictionary<ISerializationPolicy, Type, IFormatter> Formatters =
+ new DoubleLookupDictionary<ISerializationPolicy, Type, IFormatter>();
 
         private static AssemblyBuilder runtimeEmittedAssembly;
         private static ModuleBuilder runtimeEmittedModule;
@@ -124,19 +121,24 @@ namespace OdinSerializer
 #endif
 
         /// <summary>
-        /// Gets an emitted formatter for a given type.
-        /// <para />
-        /// NOTE: Some platforms do not support emitting. On such platforms, this method logs an error and returns null. Check whether you can emit on the current platform using <see cref="EmitUtilities.CanEmit"/>.
+        ///     Gets an emitted formatter for a given type.
+        ///     <para />
+        ///     NOTE: Some platforms do not support emitting. On such platforms, this method logs an error and returns null. Check
+        ///     whether you can emit on the current platform using <see cref="EmitUtilities.CanEmit" />.
         /// </summary>
         /// <param name="type">The type to emit a formatter for.</param>
-        /// <param name="policy">The serialization policy to use to determine which members the emitted formatter should serialize. If null, <see cref="SerializationPolicies.Strict"/> is used.</param>
+        /// <param name="policy">
+        ///     The serialization policy to use to determine which members the emitted formatter should serialize.
+        ///     If null, <see cref="SerializationPolicies.Strict" /> is used.
+        /// </param>
         /// <returns>The type of the emitted formatter.</returns>
         /// <exception cref="System.ArgumentNullException">The type argument is null.</exception>
         public static IFormatter GetEmittedFormatter(Type type, ISerializationPolicy policy)
         {
 #if !CAN_EMIT
-        Debug.LogError("Cannot use Reflection.Emit on the current platform. The FormatterEmitter class is currently disabled. Check whether emitting is currently possible with EmitUtilities.CanEmit.");
-        return null;
+            Debug.LogError(
+                "Cannot use Reflection.Emit on the current platform. The FormatterEmitter class is currently disabled. Check whether emitting is currently possible with EmitUtilities.CanEmit.");
+            return null;
 #else
             if (type == null)
             {
@@ -178,7 +180,6 @@ namespace OdinSerializer
         }
 
 #if CAN_EMIT
-
         private static void EnsureRuntimeAssembly()
         {
             // We always hold the lock in this method
@@ -190,9 +191,11 @@ namespace OdinSerializer
                 assemblyName.CultureInfo = System.Globalization.CultureInfo.InvariantCulture;
                 assemblyName.Flags = AssemblyNameFlags.None;
                 assemblyName.ProcessorArchitecture = ProcessorArchitecture.MSIL;
-                assemblyName.VersionCompatibility = System.Configuration.Assemblies.AssemblyVersionCompatibility.SameDomain;
+                assemblyName.VersionCompatibility =
+ System.Configuration.Assemblies.AssemblyVersionCompatibility.SameDomain;
 
-                runtimeEmittedAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+                runtimeEmittedAssembly =
+ AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
             }
 
             if (runtimeEmittedModule == null)
@@ -206,7 +209,8 @@ namespace OdinSerializer
                 emitSymbolInfo = false;
 #endif
 
-                runtimeEmittedModule = runtimeEmittedAssembly.DefineDynamicModule(RUNTIME_EMITTED_ASSEMBLY_NAME, emitSymbolInfo);
+                runtimeEmittedModule =
+ runtimeEmittedAssembly.DefineDynamicModule(RUNTIME_EMITTED_ASSEMBLY_NAME, emitSymbolInfo);
             }
         }
 
@@ -219,10 +223,13 @@ namespace OdinSerializer
         /// <returns>The fully constructed, emitted formatter type.</returns>
         public static Type EmitAOTFormatter(Type formattedType, ModuleBuilder moduleBuilder, ISerializationPolicy policy)
         {
-            Dictionary<string, MemberInfo> serializableMembers = FormatterUtilities.GetSerializableMembersMap(formattedType, policy);
+            Dictionary<string, MemberInfo> serializableMembers =
+ FormatterUtilities.GetSerializableMembersMap(formattedType, policy);
 
-            string formatterName = moduleBuilder.Name + "." + formattedType.GetCompilableNiceFullName() + "__AOTFormatter";
-            string formatterHelperName = moduleBuilder.Name + "." + formattedType.GetCompilableNiceFullName() + "__FormatterHelper";
+            string formatterName =
+ moduleBuilder.Name + "." + formattedType.GetCompilableNiceFullName() + "__AOTFormatter";
+            string formatterHelperName =
+ moduleBuilder.Name + "." + formattedType.GetCompilableNiceFullName() + "__FormatterHelper";
 
             if (serializableMembers.Count == 0)
             {
@@ -259,7 +266,8 @@ namespace OdinSerializer
 
             // Read
             {
-                MethodInfo readBaseMethod = formatterType.BaseType.GetMethod("ReadDataEntry", Flags.InstanceAnyVisibility);
+                MethodInfo readBaseMethod =
+ formatterType.BaseType.GetMethod("ReadDataEntry", Flags.InstanceAnyVisibility);
 
                 MethodBuilder readMethod = formatterType.DefineMethod(
                     readBaseMethod.Name,
@@ -274,7 +282,8 @@ namespace OdinSerializer
 
             // Write
             {
-                MethodInfo writeBaseMethod = formatterType.BaseType.GetMethod("WriteDataEntries", Flags.InstanceAnyVisibility);
+                MethodInfo writeBaseMethod =
+ formatterType.BaseType.GetMethod("WriteDataEntries", Flags.InstanceAnyVisibility);
 
                 MethodBuilder dynamicWriteMethod = formatterType.DefineMethod(
                     writeBaseMethod.Name,
@@ -298,7 +307,8 @@ namespace OdinSerializer
 
         private static IFormatter CreateGenericFormatter(Type formattedType, ModuleBuilder moduleBuilder, ISerializationPolicy policy)
         {
-            Dictionary<string, MemberInfo> serializableMembers = FormatterUtilities.GetSerializableMembersMap(formattedType, policy);
+            Dictionary<string, MemberInfo> serializableMembers =
+ FormatterUtilities.GetSerializableMembersMap(formattedType, policy);
 
             if (serializableMembers.Count == 0)
             {
@@ -335,7 +345,8 @@ namespace OdinSerializer
             {
                 Type readDelegateType = typeof(ReadDataEntryMethodDelegate<>).MakeGenericType(formattedType);
                 MethodInfo readDataEntryMethod = formatterType.GetMethod("ReadDataEntry", Flags.InstanceAnyVisibility);
-                DynamicMethod dynamicReadMethod = new DynamicMethod("Dynamic_" + formattedType.GetCompilableNiceFullName(), null, readDataEntryMethod.GetParameters().Select(n => n.ParameterType).ToArray(), true);
+                DynamicMethod dynamicReadMethod =
+ new DynamicMethod("Dynamic_" + formattedType.GetCompilableNiceFullName(), null, readDataEntryMethod.GetParameters().Select(n => n.ParameterType).ToArray(), true);
                 readDataEntryMethod.GetParameters().ForEach(n => dynamicReadMethod.DefineParameter(n.Position, n.Attributes, n.Name));
                 EmitReadMethodContents(dynamicReadMethod.GetILGenerator(), formattedType, dictField, serializerFields, memberNames, serializerReadMethods);
                 del1 = dynamicReadMethod.CreateDelegate(readDelegateType);
@@ -344,8 +355,10 @@ namespace OdinSerializer
             // Write
             {
                 Type writeDelegateType = typeof(WriteDataEntriesMethodDelegate<>).MakeGenericType(formattedType);
-                MethodInfo writeDataEntriesMethod = formatterType.GetMethod("WriteDataEntries", Flags.InstanceAnyVisibility);
-                DynamicMethod dynamicWriteMethod = new DynamicMethod("Dynamic_Write_" + formattedType.GetCompilableNiceFullName(), null, writeDataEntriesMethod.GetParameters().Select(n => n.ParameterType).ToArray(), true);
+                MethodInfo writeDataEntriesMethod =
+ formatterType.GetMethod("WriteDataEntries", Flags.InstanceAnyVisibility);
+                DynamicMethod dynamicWriteMethod =
+ new DynamicMethod("Dynamic_Write_" + formattedType.GetCompilableNiceFullName(), null, writeDataEntriesMethod.GetParameters().Select(n => n.ParameterType).ToArray(), true);
                 writeDataEntriesMethod.GetParameters().ForEach(n => dynamicWriteMethod.DefineParameter(n.Position + 1, n.Attributes, n.Name));
                 EmitWriteMethodContents(dynamicWriteMethod.GetILGenerator(), formattedType, serializerFields, memberNames, serializerWriteMethods);
                 del2 = dynamicWriteMethod.CreateDelegate(writeDelegateType);
@@ -365,7 +378,8 @@ namespace OdinSerializer
             out FieldBuilder dictField,
             out Dictionary<MemberInfo, List<string>> memberNames)
         {
-            TypeBuilder helperTypeBuilder = moduleBuilder.DefineType(helperTypeName, TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Class);
+            TypeBuilder helperTypeBuilder =
+ moduleBuilder.DefineType(helperTypeName, TypeAttributes.Public | TypeAttributes.Sealed | TypeAttributes.Class);
 
             memberNames = new Dictionary<MemberInfo, List<string>>();
 
@@ -382,9 +396,11 @@ namespace OdinSerializer
                 list.Add(entry.Key);
             }
 
-            dictField = helperTypeBuilder.DefineField("SwitchLookup", typeof(Dictionary<string, int>), FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly);
+            dictField =
+ helperTypeBuilder.DefineField("SwitchLookup", typeof(Dictionary<string, int>), FieldAttributes.Public | FieldAttributes.Static | FieldAttributes.InitOnly);
 
-            List<Type> neededSerializers = memberNames.Keys.Select(n => FormatterUtilities.GetContainedType(n)).Distinct().ToList();
+            List<Type> neededSerializers =
+ memberNames.Keys.Select(n => FormatterUtilities.GetContainedType(n)).Distinct().ToList();
 
             serializerReadMethods = new Dictionary<Type, MethodInfo>(neededSerializers.Count);
             serializerWriteMethods = new Dictionary<Type, MethodInfo>(neededSerializers.Count);
@@ -415,8 +431,10 @@ namespace OdinSerializer
             {
                 var addMethod = typeof(Dictionary<string, int>).GetMethod("Add", Flags.InstancePublic);
                 var dictionaryConstructor = typeof(Dictionary<string, int>).GetConstructor(Type.EmptyTypes);
-                var serializerGetMethod = typeof(Serializer).GetMethod("Get", Flags.StaticPublic, null, new[] { typeof(Type) }, null);
-                var typeOfMethod = typeof(Type).GetMethod("GetTypeFromHandle", Flags.StaticPublic, null, new Type[] { typeof(RuntimeTypeHandle) }, null);
+                var serializerGetMethod =
+ typeof(Serializer).GetMethod("Get", Flags.StaticPublic, null, new[] { typeof(Type) }, null);
+                var typeOfMethod =
+ typeof(Type).GetMethod("GetTypeFromHandle", Flags.StaticPublic, null, new Type[] { typeof(RuntimeTypeHandle) }, null);
 
                 ConstructorBuilder staticConstructor = helperTypeBuilder.DefineTypeInitializer();
                 ILGenerator gen = staticConstructor.GetILGenerator();
@@ -464,7 +482,8 @@ namespace OdinSerializer
             Dictionary<Type, MethodInfo> serializerReadMethods)
         {
             MethodInfo skipMethod = typeof(IDataReader).GetMethod("SkipEntry", Flags.InstancePublic);
-            MethodInfo tryGetValueMethod = typeof(Dictionary<string, int>).GetMethod("TryGetValue", Flags.InstancePublic);
+            MethodInfo tryGetValueMethod =
+ typeof(Dictionary<string, int>).GetMethod("TryGetValue", Flags.InstancePublic);
 
             //methodBuilder.DefineParameter(5, ParameterAttributes.None, "switchLookup");
 
@@ -606,6 +625,5 @@ namespace OdinSerializer
         }
 
 #endif
-
     }
 }

@@ -21,40 +21,43 @@ namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 {
     public class GravitySpawnerVisualisation
     {
-        public readonly StamperMaskFilterVisualisation StamperMaskFilterVisualisation = new StamperMaskFilterVisualisation();
-        
+        public readonly StamperMaskFilterVisualisation StamperMaskFilterVisualisation = new();
+
         [DrawGizmo(GizmoType.InSelectionHierarchy | GizmoType.Selected)]
         private static void DrawGizmoForArea(Runtime.GravitySpawner.GravitySpawner stamper, GizmoType gizmoType)
         {
-            bool isFaded = (int)gizmoType == (int)GizmoType.NonSelected || (int)gizmoType == (int)GizmoType.NotInSelectionHierarchy || (int)gizmoType == (int)GizmoType.NonSelected + (int)GizmoType.NotInSelectionHierarchy;
-            
-            if(stamper.Area.DrawHandleIfNotSelected == false)
+            var isFaded = (int)gizmoType == (int)GizmoType.NonSelected ||
+                          (int)gizmoType == (int)GizmoType.NotInSelectionHierarchy || (int)gizmoType ==
+                          (int)GizmoType.NonSelected + (int)GizmoType.NotInSelectionHierarchy;
+
+            if (stamper.Area.DrawHandleIfNotSelected == false)
             {
-                if(isFaded)
+                if (isFaded)
                 {
                     return;
                 }
             }
-            
-            float opacity = isFaded ? 0.5f : 1.0f;
-            
+
+            var opacity = isFaded ? 0.5f : 1.0f;
+
             stamper.StamperVisualisation.DrawStamperVisualisationIfNecessary(stamper, opacity);
 
             AreaVisualisation.DrawBox(stamper.Area, opacity);
         }
 
-        private void DrawStamperVisualisationIfNecessary(Runtime.GravitySpawner.GravitySpawner stamper, float multiplyAlpha)
+        private void DrawStamperVisualisationIfNecessary(Runtime.GravitySpawner.GravitySpawner stamper,
+            float multiplyAlpha)
         {
-            if(stamper.StamperControllerSettings.Visualisation == false)
+            if (stamper.StamperControllerSettings.Visualisation == false)
             {
                 return;
             }
 
-            if(stamper.Data.SelectedData.HasOneSelectedGroup() == false)
+            if (stamper.Data.SelectedData.HasOneSelectedGroup() == false)
             {
                 return;
             }
-            
+
             if (!ToolUtility.IsToolSupportSelectedResourcesType(stamper.GetType(), stamper.Data))
             {
                 return;
@@ -64,10 +67,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(stamper.Area.Bounds.center), 
+            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(stamper.Area.Bounds.center),
                 layerSettings.GetCurrentPaintLayers(group.PrototypeType));
-            
-            if(rayHit != null)
+
+            if (rayHit != null)
             {
                 BoxArea area = stamper.Area.GetAreaVariables(rayHit);
                 Draw(area, stamper.Data, GlobalCommonComponentSingleton<LayerSettings>.Instance, multiplyAlpha);
@@ -76,31 +79,35 @@ namespace VladislavTsurikov.MegaWorld.Editor.GravitySpawner
 
         private void Draw(BoxArea area, SelectionData data, LayerSettings layerSettings, float multiplyAlpha)
         {
-            if(area == null || area.RayHit == null)
+            if (area == null || area.RayHit == null)
             {
                 return;
             }
 
             Group group = data.SelectedData.SelectedGroup;
 
-            if (group.PrototypeType == typeof(PrototypeGameObject) || group.PrototypeType == typeof(PrototypeTerrainObject))
+            if (group.PrototypeType == typeof(PrototypeGameObject) ||
+                group.PrototypeType == typeof(PrototypeTerrainObject))
             {
-                FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(Runtime.GravitySpawner.GravitySpawner), typeof(FilterSettings));
-                        
-                if(filterSettings.FilterType != FilterType.MaskFilter)
+                var filterSettings = (FilterSettings)group.GetElement(typeof(Runtime.GravitySpawner.GravitySpawner),
+                    typeof(FilterSettings));
+
+                if (filterSettings.FilterType != FilterType.MaskFilter)
                 {
                     SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter, layerSettings);
                 }
                 else
                 {
-                    StamperMaskFilterVisualisation.DrawMaskFilterVisualization(filterSettings.MaskFilterComponentSettings.MaskFilterStack, area, multiplyAlpha);
+                    StamperMaskFilterVisualisation.DrawMaskFilterVisualization(
+                        filterSettings.MaskFilterComponentSettings.MaskFilterStack, area, multiplyAlpha);
                 }
             }
             else
             {
-                if(data.SelectedData.HasOneSelectedPrototype())
+                if (data.SelectedData.HasOneSelectedPrototype())
                 {
-                    StamperMaskFilterVisualisation.DrawMaskFilterVisualization(MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area, multiplyAlpha);
+                    StamperMaskFilterVisualisation.DrawMaskFilterVisualization(
+                        MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area, multiplyAlpha);
                 }
                 else
                 {

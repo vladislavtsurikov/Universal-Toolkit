@@ -16,13 +16,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 
         protected AddComponentsAttribute(Type prototypeType, Type[] types)
         {
-            PrototypeTypes = new []{prototypeType};
+            PrototypeTypes = new[] { prototypeType };
             Types = types;
         }
 
-        protected AddComponentsAttribute(Type[] types)
-        {
-            Types = types;
-        }
+        protected AddComponentsAttribute(Type[] types) => Types = types;
     }
 }

@@ -8,10 +8,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
     [ElementEditor(typeof(BrushEraseTool))]
     public class BrushEraseToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-		{
-			UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-		}
+        public override void DrawButtons() => UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
     }
 }
 #endif

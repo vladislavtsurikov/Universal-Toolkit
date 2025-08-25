@@ -16,17 +16,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Serializer for all enums.
+    ///     Serializer for all enums.
     /// </summary>
     /// <typeparam name="T">The type of the enum to serialize and deserialize.</typeparam>
     /// <seealso cref="Serializer{T}" />
 #if CSHARP_7_3_OR_NEWER
-    public unsafe sealed class EnumSerializer<T> : Serializer<T> where T : unmanaged, Enum
+    public sealed unsafe class EnumSerializer<T> : Serializer<T> where T : unmanaged, Enum
     {
         private static readonly int SizeOf_T = sizeof(T);
 #else
@@ -42,23 +42,24 @@ namespace OdinSerializer
 #endif
 
         /// <summary>
-        /// Reads an enum value of type <see cref="T" />.
+        ///     Reads an enum value of type <see cref="T" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The value which has been read.
+        ///     The value which has been read.
         /// </returns>
         public override T ReadValue(IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.Integer)
             {
                 ulong value;
                 if (reader.ReadUInt64(out value) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Failed to read entry '" + name + "' of type " + entry.ToString());
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Failed to read entry '" + name + "' of type " + entry);
                 }
 
 #if CSHARP_7_3_OR_NEWER
@@ -67,16 +68,15 @@ namespace OdinSerializer
                 return (T)Enum.ToObject(typeof(T), value);
 #endif
             }
-            else
-            {
-                reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.Integer.ToString() + ", but got entry '" + name + "' of type " + entry.ToString());
-                reader.SkipEntry();
-                return default(T);
-            }
+
+            reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.Integer +
+                                                          ", but got entry '" + name + "' of type " + entry);
+            reader.SkipEntry();
+            return default;
         }
 
         /// <summary>
-        /// Writes an enum value of type <see cref="T" />.
+        ///     Writes an enum value of type <see cref="T" />.
         /// </summary>
         /// <param name="name">The name of the value to write.</param>
         /// <param name="value">The value to write.</param>
@@ -88,10 +88,10 @@ namespace OdinSerializer
             FireOnSerializedType();
 
 #if CSHARP_7_3_OR_NEWER
-            byte* toPtr = (byte*)&ul;
-            byte* fromPtr = (byte*)&value;
+            var toPtr = (byte*)&ul;
+            var fromPtr = (byte*)&value;
 
-            for (int i = 0; i < SizeOf_T; i++)
+            for (var i = 0; i < SizeOf_T; i++)
             {
                 *toPtr++ = *fromPtr++;
             }

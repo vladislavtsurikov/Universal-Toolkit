@@ -13,10 +13,8 @@ namespace VladislavTsurikov.Math.Runtime
             return new Ray(origin, direction);
         }
 
-        public static Matrix4x4 GetRelativeTransform(this Matrix4x4 matrix, Matrix4x4 referenceTransform)
-        {
-            return referenceTransform.inverse * matrix;
-        }
+        public static Matrix4x4 GetRelativeTransform(this Matrix4x4 matrix, Matrix4x4 referenceTransform) =>
+            referenceTransform.inverse * matrix;
 
         public static Matrix4x4 RotationFromRightUp(Vector3 right, Vector3 up)
         {
@@ -40,12 +38,9 @@ namespace VladislavTsurikov.Math.Runtime
 
             return matrix;
         }
-        
 
-        public static Vector3 GetTranslation(this Matrix4x4 matrix)
-        {
-            return matrix.GetColumn(3);
-        }
+
+        public static Vector3 GetTranslation(this Matrix4x4 matrix) => matrix.GetColumn(3);
 
         public static Vector3 GetNormalizedAxis(this Matrix4x4 matrix, int axisIndex)
         {
@@ -53,30 +48,25 @@ namespace VladislavTsurikov.Math.Runtime
             return Vector3.Normalize(axis);
         }
 
-        public static Vector3[] GetNormalizedAxes(this Matrix4x4 matrix)
-        {
-            return new Vector3[]
-            {
-                matrix.GetNormalizedAxis(0),
-                matrix.GetNormalizedAxis(1),
-                matrix.GetNormalizedAxis(2)
-            };
-        }
+        public static Vector3[] GetNormalizedAxes(this Matrix4x4 matrix) =>
+            new[] { matrix.GetNormalizedAxis(0), matrix.GetNormalizedAxis(1), matrix.GetNormalizedAxis(2) };
 
         public static List<Vector3> TransformPoints(this Matrix4x4 matrix, List<Vector3> points)
         {
-            if (points.Count == 0) return new List<Vector3>();
+            if (points.Count == 0)
+            {
+                return new List<Vector3>();
+            }
 
             var transformedPts = new List<Vector3>(points.Count);
-            foreach (var pt in points)
+            foreach (Vector3 pt in points)
+            {
                 transformedPts.Add(matrix.MultiplyPoint(pt));
+            }
 
             return transformedPts;
         }
 
-        public static Vector3 TransformPoint(this Matrix4x4 matrix, Vector3 point)
-        {
-            return matrix.MultiplyPoint(point);
-        }
+        public static Vector3 TransformPoint(this Matrix4x4 matrix, Vector3 point) => matrix.MultiplyPoint(point);
     }
 }

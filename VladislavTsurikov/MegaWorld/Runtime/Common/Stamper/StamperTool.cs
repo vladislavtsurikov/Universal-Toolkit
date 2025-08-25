@@ -13,6 +13,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
     {
         public float SpawnProgress;
 
+#if UNITY_EDITOR
+        public AutoRespawnController AutoRespawnController = new();
+#endif
+
         [field: NonSerialized]
         public bool DisplayProgressBar { get; private set; }
 
@@ -20,25 +24,18 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         public CancellationTokenSource SpawnCancellationTokenSource { get; protected set; }
 
-#if UNITY_EDITOR
-        public AutoRespawnController AutoRespawnController = new AutoRespawnController();
-#endif
-        
-        private protected override void OnToolEnable()
-        {
-            OnStamperEnable();
-        }
-        
+        private protected override void OnToolEnable() => OnStamperEnable();
+
         public void CancelSpawn()
         {
             SpawnProgress = 0f;
-            
+
             SpawnCancellationTokenSource?.Cancel();
             SpawnCancellationTokenSource = null;
 
 #if UNITY_EDITOR
             EditorUtility.ClearProgressBar();
-#endif 
+#endif
             OnCancelSpawn();
         }
 
@@ -53,9 +50,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         {
             SpawnProgress = 0;
             DisplayProgressBar = displayProgressBar;
-            
+
             await Spawn(token, DisplayProgressBar);
-            
+
             SpawnProgress = 1;
             SpawnCancellationTokenSource = null;
 
@@ -73,10 +70,17 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
             }
         }
 #endif
-        
-        public virtual void OnCancelSpawn(){}
-        private protected virtual void OnStamperEnable(){}
-        
-        protected virtual async UniTask Spawn(CancellationToken token, bool displayProgressBar){}
+
+        public virtual void OnCancelSpawn()
+        {
+        }
+
+        private protected virtual void OnStamperEnable()
+        {
+        }
+
+        protected virtual async UniTask Spawn(CancellationToken token, bool displayProgressBar)
+        {
+        }
     }
 }

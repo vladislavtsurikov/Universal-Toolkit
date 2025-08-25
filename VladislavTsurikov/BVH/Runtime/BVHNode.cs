@@ -6,7 +6,13 @@ namespace VladislavTsurikov.BVH.Runtime
     public abstract class BVHNode<TData>
         where TData : class
     {
-        private List<BVHNode<TData>> _children = new List<BVHNode<TData>>();
+        private readonly List<BVHNode<TData>> _children = new();
+
+        public BVHNode()
+        {
+        }
+
+        public BVHNode(TData data) => Data = data;
 
         public TData Data { get; }
 
@@ -18,25 +24,9 @@ namespace VladislavTsurikov.BVH.Runtime
 
         public int NumChildren => _children.Count;
 
-        public BVHNode()
-        {
+        public BVHNode<TData> GetChild(int index) => _children[index];
 
-        }
-
-        public BVHNode(TData data)
-        {
-            Data = data;
-        }
-
-        public BVHNode<TData> GetChild(int index)
-        {
-            return _children[index];
-        }
-
-        public void MakeLeaf()
-        {
-            IsLeaf = true;
-        }
+        public void MakeLeaf() => IsLeaf = true;
 
         public void SetParent(BVHNode<TData> parent)
         {
@@ -55,10 +45,10 @@ namespace VladislavTsurikov.BVH.Runtime
         public BVHNode<TData> FindClosestChild(BVHNode<TData> node)
         {
             BVHNode<TData> closestChild = null;
-            float minDistSqr = float.MaxValue;
-            foreach (var child in _children)
+            var minDistSqr = float.MaxValue;
+            foreach (BVHNode<TData> child in _children)
             {
-                float distSqr = (node.Position - child.Position).sqrMagnitude;
+                var distSqr = (node.Position - child.Position).sqrMagnitude;
                 if (distSqr < minDistSqr)
                 {
                     minDistSqr = distSqr;
@@ -82,7 +72,7 @@ namespace VladislavTsurikov.BVH.Runtime
                 currentParent.Position = currentParent._children[0].Position;
                 currentParent.Size = currentParent._children[0].Size;
 
-                for (int childIndex = 1; childIndex < currentParent.NumChildren; ++childIndex)
+                for (var childIndex = 1; childIndex < currentParent.NumChildren; ++childIndex)
                 {
                     currentParent.EncapsulateNode(currentParent._children[childIndex]);
                 }

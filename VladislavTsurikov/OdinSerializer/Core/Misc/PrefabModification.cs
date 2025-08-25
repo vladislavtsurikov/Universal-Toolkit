@@ -15,118 +15,123 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using OdinSerializer.Utilities;
+using Object = UnityEngine.Object;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using Utilities;
-
     /// <summary>
-    /// An Odin-serialized prefab modification, containing all the information necessary to apply the modification.
+    ///     An Odin-serialized prefab modification, containing all the information necessary to apply the modification.
     /// </summary>
     public sealed class PrefabModification
     {
         /// <summary>
-        /// The type of modification to be made.
-        /// </summary>
-        public PrefabModificationType ModificationType;
-
-        /// <summary>
-        /// The deep reflection path at which to make the modification.
-        /// </summary>
-        public string Path;
-
-        /// <summary>
-        /// A list of all deep reflection paths in the target object where the value referenced by this modification was also located.
-        /// </summary>
-        public List<string> ReferencePaths;
-
-        /// <summary>
-        /// The modified value to set.
-        /// </summary>
-        public object ModifiedValue;
-
-        /// <summary>
-        /// The new list length to set.
-        /// </summary>
-        public int NewLength;
-
-        /// <summary>
-        /// The dictionary keys to add.
+        ///     The dictionary keys to add.
         /// </summary>
         public object[] DictionaryKeysAdded;
 
         /// <summary>
-        /// The dictionary keys to remove.
+        ///     The dictionary keys to remove.
         /// </summary>
         public object[] DictionaryKeysRemoved;
 
         /// <summary>
-        /// Applies the modification to the given Object.
+        ///     The type of modification to be made.
         /// </summary>
-        public void Apply(UnityEngine.Object unityObject)
+        public PrefabModificationType ModificationType;
+
+        /// <summary>
+        ///     The modified value to set.
+        /// </summary>
+        public object ModifiedValue;
+
+        /// <summary>
+        ///     The new list length to set.
+        /// </summary>
+        public int NewLength;
+
+        /// <summary>
+        ///     The deep reflection path at which to make the modification.
+        /// </summary>
+        public string Path;
+
+        /// <summary>
+        ///     A list of all deep reflection paths in the target object where the value referenced by this modification was also
+        ///     located.
+        /// </summary>
+        public List<string> ReferencePaths;
+
+        /// <summary>
+        ///     Applies the modification to the given Object.
+        /// </summary>
+        public void Apply(Object unityObject)
         {
-            if (this.ModificationType == PrefabModificationType.Value)
+            if (ModificationType == PrefabModificationType.Value)
             {
-                this.ApplyValue(unityObject);
+                ApplyValue(unityObject);
             }
-            else if (this.ModificationType == PrefabModificationType.ListLength)
+            else if (ModificationType == PrefabModificationType.ListLength)
             {
-                this.ApplyListLength(unityObject);
+                ApplyListLength(unityObject);
             }
-            else if (this.ModificationType == PrefabModificationType.Dictionary)
+            else if (ModificationType == PrefabModificationType.Dictionary)
             {
-                this.ApplyDictionaryModifications(unityObject);
+                ApplyDictionaryModifications(unityObject);
             }
             else
             {
-                throw new NotImplementedException(this.ModificationType.ToString());
+                throw new NotImplementedException(ModificationType.ToString());
             }
         }
 
-        private void ApplyValue(UnityEngine.Object unityObject)
+        private void ApplyValue(Object unityObject)
         {
             Type valueType = null;
 
-            if (!object.ReferenceEquals(this.ModifiedValue, null))
+            if (!ReferenceEquals(ModifiedValue, null))
             {
-                valueType = this.ModifiedValue.GetType();
+                valueType = ModifiedValue.GetType();
             }
 
-            if (valueType != null && this.ReferencePaths != null && this.ReferencePaths.Count > 0)
+            if (valueType != null && ReferencePaths != null && ReferencePaths.Count > 0)
             {
-                for (int i = 0; i < this.ReferencePaths.Count; i++)
+                for (var i = 0; i < ReferencePaths.Count; i++)
                 {
-                    var path = this.ReferencePaths[i];
+                    var path = ReferencePaths[i];
 
                     try
                     {
                         var refValue = GetInstanceFromPath(path, unityObject);
 
-                        if (!object.ReferenceEquals(refValue, null) && refValue.GetType() == valueType)
+                        if (!ReferenceEquals(refValue, null) && refValue.GetType() == valueType)
                         {
-                            this.ModifiedValue = refValue;
+                            ModifiedValue = refValue;
                             break;
                         }
                     }
-                    catch (Exception) { }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
 
-            SetInstanceToPath(this.Path, unityObject, this.ModifiedValue);
+            SetInstanceToPath(Path, unityObject, ModifiedValue);
         }
 
-        private void ApplyListLength(UnityEngine.Object unityObject)
+        private void ApplyListLength(Object unityObject)
         {
-            object listObj = GetInstanceFromPath(this.Path, unityObject);
+            var listObj = GetInstanceFromPath(Path, unityObject);
 
             if (listObj == null)
-            {
                 // The list has been deleted on the prefab;
                 // that supersedes our length change.
+            {
                 return;
             }
 
@@ -134,11 +139,11 @@ namespace OdinSerializer
 
             if (listType.IsArray)
             {
-                Array array = (Array)listObj;
+                var array = (Array)listObj;
 
-                if (this.NewLength == array.Length)
-                {
+                if (NewLength == array.Length)
                     // If this happens, for some weird reason, then we can actually just not do anything
+                {
                     return;
                 }
 
@@ -146,9 +151,9 @@ namespace OdinSerializer
                 // Ridiculous, we know - but there's no choice...
 
                 // Let's create a new, modified array
-                Array newArray = Array.CreateInstance(listType.GetElementType(), this.NewLength);
+                var newArray = Array.CreateInstance(listType.GetElementType(), NewLength);
 
-                if (this.NewLength > array.Length)
+                if (NewLength > array.Length)
                 {
                     Array.Copy(array, 0, newArray, 0, array.Length);
                     ReplaceAllReferencesInGraph(unityObject, array, newArray);
@@ -161,13 +166,15 @@ namespace OdinSerializer
             }
             else if (typeof(IList).IsAssignableFrom(listType))
             {
-                IList list = (IList)listObj;
-                Type listElementType = listType.ImplementsOpenGenericInterface(typeof(IList<>)) ? listType.GetArgumentsOfInheritedOpenGenericInterface(typeof(IList<>))[0] : null;
-                bool elementIsValueType = listElementType != null ? listElementType.IsValueType : false;
+                var list = (IList)listObj;
+                Type listElementType = listType.ImplementsOpenGenericInterface(typeof(IList<>))
+                    ? listType.GetArgumentsOfInheritedOpenGenericInterface(typeof(IList<>))[0]
+                    : null;
+                var elementIsValueType = listElementType != null ? listElementType.IsValueType : false;
 
-                int count = 0;
+                var count = 0;
 
-                while (list.Count < this.NewLength)
+                while (list.Count < NewLength)
                 {
                     if (elementIsValueType)
                     {
@@ -181,7 +188,7 @@ namespace OdinSerializer
                     count++;
                 }
 
-                while (list.Count > this.NewLength)
+                while (list.Count > NewLength)
                 {
                     list.RemoveAt(list.Count - 1);
                 }
@@ -190,39 +197,40 @@ namespace OdinSerializer
             {
                 Type elementType = listType.GetArgumentsOfInheritedOpenGenericInterface(typeof(IList<>))[0];
                 Type collectionType = typeof(ICollection<>).MakeGenericType(elementType);
-                bool elementIsValueType = elementType.IsValueType;
+                var elementIsValueType = elementType.IsValueType;
 
                 PropertyInfo countProp = collectionType.GetProperty("Count");
 
-                int count = (int)countProp.GetValue(listObj, null);
+                var count = (int)countProp.GetValue(listObj, null);
 
-                if (count < this.NewLength)
+                if (count < NewLength)
                 {
-                    int add = this.NewLength - count;
+                    var add = NewLength - count;
 
                     MethodInfo addMethod = collectionType.GetMethod("Add");
 
-                    for (int i = 0; i < add; i++)
+                    for (var i = 0; i < add; i++)
                     {
                         if (elementIsValueType)
                         {
-                            addMethod.Invoke(listObj, new object[] { Activator.CreateInstance(elementType) });
+                            addMethod.Invoke(listObj, new[] { Activator.CreateInstance(elementType) });
                         }
                         else
                         {
                             addMethod.Invoke(listObj, new object[] { null });
                         }
+
                         count++;
                     }
                 }
-                else if (count > this.NewLength)
+                else if (count > NewLength)
                 {
-                    int remove = count - this.NewLength;
+                    var remove = count - NewLength;
 
                     Type listInterfaceType = typeof(IList<>).MakeGenericType(elementType);
                     MethodInfo removeAtMethod = listInterfaceType.GetMethod("RemoveAt");
 
-                    for (int i = 0; i < remove; i++)
+                    for (var i = 0; i < remove; i++)
                     {
                         removeAtMethod.Invoke(listObj, new object[] { count - (remove + 1) });
                     }
@@ -230,46 +238,48 @@ namespace OdinSerializer
             }
         }
 
-        private void ApplyDictionaryModifications(UnityEngine.Object unityObject)
+        private void ApplyDictionaryModifications(Object unityObject)
         {
-            object dictionaryObj = GetInstanceFromPath(this.Path, unityObject);
+            var dictionaryObj = GetInstanceFromPath(Path, unityObject);
 
             if (dictionaryObj == null)
-            {
                 // The dictionary has been deleted on the prefab;
                 // that supersedes our dictionary modifications.
+            {
                 return;
             }
 
-            var type = dictionaryObj.GetType();
+            Type type = dictionaryObj.GetType();
 
             if (!type.ImplementsOpenGenericInterface(typeof(IDictionary<,>)))
-            {
                 // A value change has changed the target modified value to
                 // not be a dictionary - that also supersedes this modification.
+            {
                 return;
             }
 
-            var typeArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
+            Type[] typeArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
 
-            var iType = typeof(IDictionary<,>).MakeGenericType(typeArgs);
+            Type iType = typeof(IDictionary<,>).MakeGenericType(typeArgs);
 
             //
             // First, remove keys
             //
 
-            if (this.DictionaryKeysRemoved != null && this.DictionaryKeysRemoved.Length > 0)
+            if (DictionaryKeysRemoved != null && DictionaryKeysRemoved.Length > 0)
             {
-                MethodInfo method = iType.GetMethod("Remove", new Type[] { typeArgs[0] });
-                object[] parameters = new object[1];
+                MethodInfo method = iType.GetMethod("Remove", new[] { typeArgs[0] });
+                var parameters = new object[1];
 
-                for (int i = 0; i < this.DictionaryKeysRemoved.Length; i++)
+                for (var i = 0; i < DictionaryKeysRemoved.Length; i++)
                 {
-                    parameters[0] = this.DictionaryKeysRemoved[i];
+                    parameters[0] = DictionaryKeysRemoved[i];
 
                     // Ensure the key value is safe to add
-                    if (object.ReferenceEquals(parameters[0], null) || !typeArgs[0].IsAssignableFrom(parameters[0].GetType()))
+                    if (ReferenceEquals(parameters[0], null) || !typeArgs[0].IsAssignableFrom(parameters[0].GetType()))
+                    {
                         continue;
+                    }
 
                     method.Invoke(dictionaryObj, parameters);
                 }
@@ -279,28 +289,31 @@ namespace OdinSerializer
             // Then, add keys
             //
 
-            if (this.DictionaryKeysAdded != null && this.DictionaryKeysAdded.Length > 0)
+            if (DictionaryKeysAdded != null && DictionaryKeysAdded.Length > 0)
             {
                 MethodInfo method = iType.GetMethod("set_Item", typeArgs);
-                object[] parameters = new object[2];
+                var parameters = new object[2];
 
                 // Get default value to set key to
                 parameters[1] = typeArgs[1].IsValueType ? Activator.CreateInstance(typeArgs[1]) : null;
 
-                for (int i = 0; i < this.DictionaryKeysAdded.Length; i++)
+                for (var i = 0; i < DictionaryKeysAdded.Length; i++)
                 {
-                    parameters[0] = this.DictionaryKeysAdded[i];
+                    parameters[0] = DictionaryKeysAdded[i];
 
                     // Ensure the key value is safe to add
-                    if (object.ReferenceEquals(parameters[0], null) || !typeArgs[0].IsAssignableFrom(parameters[0].GetType()))
+                    if (ReferenceEquals(parameters[0], null) || !typeArgs[0].IsAssignableFrom(parameters[0].GetType()))
+                    {
                         continue;
+                    }
 
                     method.Invoke(dictionaryObj, parameters);
                 }
             }
         }
 
-        private static void ReplaceAllReferencesInGraph(object graph, object oldReference, object newReference, HashSet<object> processedReferences = null)
+        private static void ReplaceAllReferencesInGraph(object graph, object oldReference, object newReference,
+            HashSet<object> processedReferences = null)
         {
             if (processedReferences == null)
             {
@@ -311,18 +324,18 @@ namespace OdinSerializer
 
             if (graph.GetType().IsArray)
             {
-                Array array = (Array)graph;
+                var array = (Array)graph;
 
-                for (int i = 0; i < array.Length; i++)
+                for (var i = 0; i < array.Length; i++)
                 {
                     var value = array.GetValue(i);
 
-                    if (object.ReferenceEquals(value, null))
+                    if (ReferenceEquals(value, null))
                     {
                         continue;
                     }
 
-                    if (object.ReferenceEquals(value, oldReference))
+                    if (ReferenceEquals(value, oldReference))
                     {
                         array.SetValue(newReference, i);
                         value = newReference;
@@ -336,18 +349,22 @@ namespace OdinSerializer
             }
             else
             {
-                var members = FormatterUtilities.GetSerializableMembers(graph.GetType(), SerializationPolicies.Everything);
+                MemberInfo[] members =
+                    FormatterUtilities.GetSerializableMembers(graph.GetType(), SerializationPolicies.Everything);
 
-                for (int i = 0; i < members.Length; i++)
+                for (var i = 0; i < members.Length; i++)
                 {
-                    FieldInfo field = (FieldInfo)members[i];
+                    var field = (FieldInfo)members[i];
 
-                    if (field.FieldType.IsPrimitive || field.FieldType == typeof(SerializationData) || field.FieldType == typeof(string))
+                    if (field.FieldType.IsPrimitive || field.FieldType == typeof(SerializationData) ||
+                        field.FieldType == typeof(string))
+                    {
                         continue;
+                    }
 
-                    object value = field.GetValue(graph);
+                    var value = field.GetValue(graph);
 
-                    if (object.ReferenceEquals(value, null))
+                    if (ReferenceEquals(value, null))
                     {
                         continue;
                     }
@@ -355,9 +372,11 @@ namespace OdinSerializer
                     Type valueType = value.GetType();
 
                     if (valueType.IsPrimitive || valueType == typeof(SerializationData) || valueType == typeof(string))
+                    {
                         continue;
+                    }
 
-                    if (object.ReferenceEquals(value, oldReference))
+                    if (ReferenceEquals(value, oldReference))
                     {
                         field.SetValue(graph, newReference);
                         value = newReference;
@@ -373,17 +392,17 @@ namespace OdinSerializer
 
         private static object GetInstanceFromPath(string path, object instance)
         {
-            string[] steps = path.Split('.');
+            var steps = path.Split('.');
 
-            object currentInstance = instance;
+            var currentInstance = instance;
 
-            for (int i = 0; i < steps.Length; i++)
+            for (var i = 0; i < steps.Length; i++)
             {
                 currentInstance = GetInstanceOfStep(steps[i], currentInstance);
 
-                if (object.ReferenceEquals(currentInstance, null))
-                {
+                if (ReferenceEquals(currentInstance, null))
                     //Debug.LogWarning("Failed to resolve modification path '" + path + "' at step '" + steps[i] + "'.");
+                {
                     return null;
                 }
             }
@@ -395,10 +414,11 @@ namespace OdinSerializer
         {
             Type type = instance.GetType();
 
-            if (step.StartsWith("[", StringComparison.InvariantCulture) && step.EndsWith("]", StringComparison.InvariantCulture))
+            if (step.StartsWith("[", StringComparison.InvariantCulture) &&
+                step.EndsWith("]", StringComparison.InvariantCulture))
             {
                 int index;
-                string indexStr = step.Substring(1, step.Length - 2);
+                var indexStr = step.Substring(1, step.Length - 2);
 
                 if (!int.TryParse(indexStr, out index))
                 {
@@ -409,7 +429,7 @@ namespace OdinSerializer
 
                 if (type.IsArray)
                 {
-                    Array array = (Array)instance;
+                    var array = (Array)instance;
 
                     if (index < 0 || index >= array.Length)
                     {
@@ -418,9 +438,10 @@ namespace OdinSerializer
 
                     return array.GetValue(index);
                 }
-                else if (typeof(IList).IsAssignableFrom(type))
+
+                if (typeof(IList).IsAssignableFrom(type))
                 {
-                    IList list = (IList)instance;
+                    var list = (IList)instance;
 
                     if (index < 0 || index >= list.Count)
                     {
@@ -429,11 +450,13 @@ namespace OdinSerializer
 
                     return list[index];
                 }
-                else if (type.ImplementsOpenGenericInterface(typeof(IList<>)))
+
+                if (type.ImplementsOpenGenericInterface(typeof(IList<>)))
                 {
                     Type elementType = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IList<>))[0];
                     Type listType = typeof(IList<>).MakeGenericType(elementType);
-                    MethodInfo getItemMethod = listType.GetMethod("get_Item", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo getItemMethod = listType.GetMethod("get_Item",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                     try
                     {
@@ -445,20 +468,22 @@ namespace OdinSerializer
                     }
                 }
             }
-            else if (step.StartsWith("{", StringComparison.InvariantCultureIgnoreCase) && step.EndsWith("}", StringComparison.InvariantCultureIgnoreCase))
+            else if (step.StartsWith("{", StringComparison.InvariantCultureIgnoreCase) &&
+                     step.EndsWith("}", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (type.ImplementsOpenGenericInterface(typeof(IDictionary<,>)))
                 {
-                    var dictArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
+                    Type[] dictArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
 
-                    object key = DictionaryKeyUtility.GetDictionaryKeyValue(step, dictArgs[0]);
+                    var key = DictionaryKeyUtility.GetDictionaryKeyValue(step, dictArgs[0]);
 
                     Type dictType = typeof(IDictionary<,>).MakeGenericType(dictArgs);
-                    MethodInfo getItemMethod = dictType.GetMethod("get_Item", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                    MethodInfo getItemMethod = dictType.GetMethod("get_Item",
+                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
                     try
                     {
-                        return getItemMethod.Invoke(instance, new object[] { key });
+                        return getItemMethod.Invoke(instance, new[] { key });
                     }
                     catch (Exception)
                     {
@@ -469,7 +494,7 @@ namespace OdinSerializer
             else
             {
                 string privateTypeName = null;
-                int plusIndex = step.IndexOf('+');
+                var plusIndex = step.IndexOf('+');
 
                 if (plusIndex >= 0)
                 {
@@ -477,9 +502,11 @@ namespace OdinSerializer
                     step = step.Substring(plusIndex + 1);
                 }
 
-                var possibleMembers = type.GetAllMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(n => n is FieldInfo || n is PropertyInfo);
+                IEnumerable<MemberInfo> possibleMembers =
+                    type.GetAllMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                        .Where(n => n is FieldInfo || n is PropertyInfo);
 
-                foreach (var member in possibleMembers)
+                foreach (MemberInfo member in possibleMembers)
                 {
                     if (member.Name == step)
                     {
@@ -499,31 +526,32 @@ namespace OdinSerializer
         private static void SetInstanceToPath(string path, object instance, object value)
         {
             bool setParentInstance;
-            string[] steps = path.Split('.');
+            var steps = path.Split('.');
             SetInstanceToPath(path, steps, 0, instance, value, out setParentInstance);
         }
 
-        private static void SetInstanceToPath(string path, string[] steps, int index, object instance, object value, out bool setParentInstance)
+        private static void SetInstanceToPath(string path, string[] steps, int index, object instance, object value,
+            out bool setParentInstance)
         {
             setParentInstance = false;
 
             if (index < steps.Length - 1)
             {
-                object currentInstance = GetInstanceOfStep(steps[index], instance);
+                var currentInstance = GetInstanceOfStep(steps[index], instance);
 
-                if (object.ReferenceEquals(currentInstance, null))
-                {
+                if (ReferenceEquals(currentInstance, null))
                     //Debug.LogWarning("Failed to resolve prefab modification path '" + path + "' at step '" + steps[index] + "'.");
+                {
                     return;
                 }
 
                 SetInstanceToPath(path, steps, index + 1, currentInstance, value, out setParentInstance);
 
                 if (setParentInstance)
-                {
                     // We need to set the current instance to the parent instance member,
                     // because the current instance is a value type, and thus it may have
                     // been boxed. If we don't do this, the value set might be lost.
+                {
                     TrySetInstanceOfStep(steps[index], instance, currentInstance, out setParentInstance);
                 }
             }
@@ -541,10 +569,11 @@ namespace OdinSerializer
             {
                 Type type = instance.GetType();
 
-                if (step.StartsWith("[", StringComparison.InvariantCulture) && step.EndsWith("]", StringComparison.InvariantCulture))
+                if (step.StartsWith("[", StringComparison.InvariantCulture) &&
+                    step.EndsWith("]", StringComparison.InvariantCulture))
                 {
                     int index;
-                    string indexStr = step.Substring(1, step.Length - 2);
+                    var indexStr = step.Substring(1, step.Length - 2);
 
                     if (!int.TryParse(indexStr, out index))
                     {
@@ -555,7 +584,7 @@ namespace OdinSerializer
 
                     if (type.IsArray)
                     {
-                        Array array = (Array)instance;
+                        var array = (Array)instance;
 
                         if (index < 0 || index >= array.Length)
                         {
@@ -565,9 +594,10 @@ namespace OdinSerializer
                         array.SetValue(value, index);
                         return true;
                     }
-                    else if (typeof(IList).IsAssignableFrom(type))
+
+                    if (typeof(IList).IsAssignableFrom(type))
                     {
-                        IList list = (IList)instance;
+                        var list = (IList)instance;
 
                         if (index < 0 || index >= list.Count)
                         {
@@ -577,44 +607,49 @@ namespace OdinSerializer
                         list[index] = value;
                         return true;
                     }
-                    else if (type.ImplementsOpenGenericInterface(typeof(IList<>)))
+
+                    if (type.ImplementsOpenGenericInterface(typeof(IList<>)))
                     {
                         Type elementType = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IList<>))[0];
                         Type listType = typeof(IList<>).MakeGenericType(elementType);
-                        MethodInfo setItemMethod = listType.GetMethod("set_Item", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        MethodInfo setItemMethod = listType.GetMethod("set_Item",
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                        setItemMethod.Invoke(instance, new object[] { index, value });
+                        setItemMethod.Invoke(instance, new[] { index, value });
                         return true;
                     }
                 }
-                else if (step.StartsWith("{", StringComparison.InvariantCulture) && step.EndsWith("}", StringComparison.InvariantCulture))
+                else if (step.StartsWith("{", StringComparison.InvariantCulture) &&
+                         step.EndsWith("}", StringComparison.InvariantCulture))
                 {
                     if (type.ImplementsOpenGenericInterface(typeof(IDictionary<,>)))
                     {
-                        var dictArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
+                        Type[] dictArgs = type.GetArgumentsOfInheritedOpenGenericInterface(typeof(IDictionary<,>));
 
-                        object key = DictionaryKeyUtility.GetDictionaryKeyValue(step, dictArgs[0]);
+                        var key = DictionaryKeyUtility.GetDictionaryKeyValue(step, dictArgs[0]);
 
                         Type dictType = typeof(IDictionary<,>).MakeGenericType(dictArgs);
 
-                        MethodInfo containsKeyMethod = dictType.GetMethod("ContainsKey", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-                        MethodInfo setItemMethod = dictType.GetMethod("set_Item", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        MethodInfo containsKeyMethod = dictType.GetMethod("ContainsKey",
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+                        MethodInfo setItemMethod = dictType.GetMethod("set_Item",
+                            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-                        bool containsKey = (bool)containsKeyMethod.Invoke(instance, new object[] { key });
+                        var containsKey = (bool)containsKeyMethod.Invoke(instance, new[] { key });
 
                         if (!containsKey)
-                        {
                             // We are *not* allowed to add new keys during this step
+                        {
                             return false;
                         }
 
-                        setItemMethod.Invoke(instance, new object[] { key, value });
+                        setItemMethod.Invoke(instance, new[] { key, value });
                     }
                 }
                 else
                 {
                     string privateTypeName = null;
-                    int plusIndex = step.IndexOf('+');
+                    var plusIndex = step.IndexOf('+');
 
                     if (plusIndex >= 0)
                     {
@@ -622,9 +657,11 @@ namespace OdinSerializer
                         step = step.Substring(plusIndex + 1);
                     }
 
-                    var possibleMembers = type.GetAllMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(n => n is FieldInfo || n is PropertyInfo);
+                    IEnumerable<MemberInfo> possibleMembers =
+                        type.GetAllMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+                            .Where(n => n is FieldInfo || n is PropertyInfo);
 
-                    foreach (var member in possibleMembers)
+                    foreach (MemberInfo member in possibleMembers)
                     {
                         if (member.Name == step)
                         {

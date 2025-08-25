@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 
@@ -8,11 +8,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
 {
     public static class AllPrototypeTypes
     {
-        public static readonly List<System.Type> TypeList;
+        public static readonly List<Type> TypeList;
 
         static AllPrototypeTypes()
         {
-            var types = AllTypesDerivedFrom<Prototype>.Types
+            IEnumerable<Type> types = AllTypesDerivedFrom<Prototype>.Types
                 .Where(
                     t => t.IsDefined(typeof(NameAttribute), false) && !t.IsAbstract
                 );

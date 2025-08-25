@@ -17,23 +17,22 @@
 //-----------------------------------------------------------------------
 
 using OdinSerializer;
+using UnityEngine;
 
 [assembly: RegisterFormatter(typeof(BoundsFormatter))]
 
 namespace OdinSerializer
 {
-    using UnityEngine;
-
     /// <summary>
-    /// Custom formatter for the <see cref="Bounds"/> type.
+    ///     Custom formatter for the <see cref="Bounds" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Bounds}" />
+    /// <seealso cref="Bounds" />
     public class BoundsFormatter : MinimalBaseFormatter<Bounds>
     {
         private static readonly Serializer<Vector3> Vector3Serializer = Serializer.Get<Vector3>();
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -44,7 +43,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>

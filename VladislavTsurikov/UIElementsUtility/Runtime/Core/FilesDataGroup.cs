@@ -8,29 +8,28 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Core
     public abstract class FilesDataGroup<T, N> : DataGroup<T, N> where T : ScriptableObject
     {
 #if UNITY_EDITOR
-        internal override void SetupDataGroup()
-        {
-            LoadFilesFromFolderInternal();
-        }
-        
+        internal override void SetupDataGroup() => LoadFilesFromFolderInternal();
+
         internal void LoadFilesFromFolderInternal()
         {
             _items ??= new List<N>();
-            
+
             _items.Clear();
 
             AddItems(GetFiles());
         }
-        
+
         public string[] GetFiles()
         {
-            string assetPath = AssetDatabase.GetAssetPath(this);
-            string assetParentFolderPath = assetPath.Replace($"{name}.asset", "");
+            var assetPath = AssetDatabase.GetAssetPath(this);
+            var assetParentFolderPath = assetPath.Replace($"{name}.asset", "");
             return Directory.GetFiles(assetParentFolderPath, "*." + GetFileFormat(), SearchOption.AllDirectories);
         }
-        
-        protected virtual void AddItems(string[] files){}
-        
+
+        protected virtual void AddItems(string[] files)
+        {
+        }
+
         public abstract string GetFileFormat();
 #endif
     }

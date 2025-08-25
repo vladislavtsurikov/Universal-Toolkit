@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace VladislavTsurikov.ShaderVariantCollection.Editor
 {
-    public static class ShaderVariantCollectionUtility 
+    public static class ShaderVariantCollectionUtility
     {
         public static void AddShaderVariantToCollection(Shader shader, string[] shaderKeywords)
         {
             if (shader != null)
             {
-                UnityEngine.ShaderVariantCollection.ShaderVariant shaderVariant = new UnityEngine.ShaderVariantCollection.ShaderVariant();
+                var shaderVariant = new UnityEngine.ShaderVariantCollection.ShaderVariant();
                 shaderVariant.shader = shader;
                 shaderVariant.keywords = shaderKeywords;
                 ShaderVariantCollectionPath.ShaderVariantCollection.Add(shaderVariant);
@@ -21,9 +21,9 @@ namespace VladislavTsurikov.ShaderVariantCollection.Editor
             if (!Application.isPlaying && !string.IsNullOrEmpty(material.shader.name) && material)
             {
                 Shader shader = material.shader;
-                if (shader != null) 
+                if (shader != null)
                 {
-                    UnityEngine.ShaderVariantCollection.ShaderVariant shaderVariant = new UnityEngine.ShaderVariantCollection.ShaderVariant();
+                    var shaderVariant = new UnityEngine.ShaderVariantCollection.ShaderVariant();
                     shaderVariant.shader = shader;
                     shaderVariant.keywords = material.shaderKeywords;
                     ShaderVariantCollectionPath.ShaderVariantCollection.Add(shaderVariant);

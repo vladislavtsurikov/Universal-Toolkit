@@ -16,45 +16,47 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
 using OdinSerializer;
+using UnityEngine;
 
 [assembly: RegisterFormatter(typeof(GradientFormatter))]
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Reflection;
-    using UnityEngine;
-
     /// <summary>
-    /// Custom formatter for the <see cref="Gradient"/> type.
+    ///     Custom formatter for the <see cref="Gradient" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Gradient}" />
+    /// <seealso cref="Gradient" />
     public class GradientFormatter : MinimalBaseFormatter<Gradient>
     {
-        private static readonly Serializer<GradientAlphaKey[]> AlphaKeysSerializer = Serializer.Get<GradientAlphaKey[]>();
-        private static readonly Serializer<GradientColorKey[]> ColorKeysSerializer = Serializer.Get<GradientColorKey[]>();
+        private static readonly Serializer<GradientAlphaKey[]> AlphaKeysSerializer =
+            Serializer.Get<GradientAlphaKey[]>();
+
+        private static readonly Serializer<GradientColorKey[]> ColorKeysSerializer =
+            Serializer.Get<GradientColorKey[]>();
 
         // The Gradient.mode member of type UnityEngine.GradientMode was added in a later version of Unity
         // Therefore we need to handle it using reflection, as it might not be there if Odin is running in an early version
 
-        private static readonly PropertyInfo ModeProperty = typeof(Gradient).GetProperty("mode", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        private static readonly Serializer<object> EnumSerializer = ModeProperty != null ? Serializer.Get<object>() : null;
+        private static readonly PropertyInfo ModeProperty = typeof(Gradient).GetProperty("mode",
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-        protected override Gradient GetUninitializedObject()
-        {
-            return new Gradient();
-        }
+        private static readonly Serializer<object> EnumSerializer =
+            ModeProperty != null ? Serializer.Get<object>() : null;
+
+        protected override Gradient GetUninitializedObject() => new();
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
         protected override void Read(ref Gradient value, IDataReader reader)
         {
-            value.alphaKeys = GradientFormatter.AlphaKeysSerializer.ReadValue(reader);
-            value.colorKeys = GradientFormatter.ColorKeysSerializer.ReadValue(reader);
+            value.alphaKeys = AlphaKeysSerializer.ReadValue(reader);
+            value.colorKeys = ColorKeysSerializer.ReadValue(reader);
 
             string name;
             reader.PeekEntry(out name);
@@ -74,20 +76,21 @@ namespace OdinSerializer
                 }
                 catch (Exception)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Failed to read Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode value will have been lost.");
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Failed to read Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode value will have been lost.");
                 }
             }
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
         protected override void Write(ref Gradient value, IDataWriter writer)
         {
-            GradientFormatter.AlphaKeysSerializer.WriteValue(value.alphaKeys, writer);
-            GradientFormatter.ColorKeysSerializer.WriteValue(value.colorKeys, writer);
+            AlphaKeysSerializer.WriteValue(value.alphaKeys, writer);
+            ColorKeysSerializer.WriteValue(value.colorKeys, writer);
 
             if (ModeProperty != null)
             {
@@ -97,9 +100,9 @@ namespace OdinSerializer
                 }
                 catch (Exception)
                 {
-                    writer.Context.Config.DebugContext.LogWarning("Failed to write Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode will have been lost upon deserialization.");
+                    writer.Context.Config.DebugContext.LogWarning(
+                        "Failed to write Gradient.mode, due to Unity's API disallowing setting of this member on other threads than the main thread. Gradient.mode will have been lost upon deserialization.");
                 }
-
             }
         }
     }

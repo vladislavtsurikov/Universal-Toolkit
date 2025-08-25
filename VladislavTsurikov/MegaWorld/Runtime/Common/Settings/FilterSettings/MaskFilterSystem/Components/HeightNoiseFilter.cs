@@ -1,14 +1,14 @@
 ﻿using System;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
+using VladislavTsurikov.ReflectionUtility;
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     [Serializable]
     [Name("Height Noise")]
-    public class HeightNoiseFilter : MaskFilter 
+    public class HeightNoiseFilter : MaskFilter
     {
 #if UNITY_EDITOR
         public NoiseSettings NoiseSettings;
@@ -20,12 +20,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         [SerializeField]
         private float _maxRangeNoise = 5f;
+
         public float MaxRangeNoise
         {
             get => _maxRangeNoise;
             set
             {
-                if(value < 0.1)
+                if (value < 0.1)
                 {
                     _maxRangeNoise = 0.1f;
                 }
@@ -38,12 +39,13 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         [SerializeField]
         private float _minRangeNoise = 5f;
+
         public float MinRangeNoise
         {
             get => _minRangeNoise;
             set
             {
-                if(value < 0.1)
+                if (value < 0.1)
                 {
                     _minRangeNoise = 0.1f;
                 }
@@ -55,12 +57,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         }
 
         private Material _heightNoiseMat;
-        public Material GetMaterial() 
+
+        public Material GetMaterial()
         {
-            if (_heightNoiseMat == null) 
+            if (_heightNoiseMat == null)
             {
-                _heightNoiseMat = new Material( Shader.Find( "Hidden/MegaWorld/HeightNoise"));
+                _heightNoiseMat = new Material(Shader.Find("Hidden/MegaWorld/HeightNoise"));
             }
+
             return _heightNoiseMat;
         }
 
@@ -69,44 +73,45 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             CreateNoiseSettingsIfNecessary();
 
             Vector3 brushPosWs = maskFilterContext.BrushPos;
-            float brushSize = maskFilterContext.BoxArea.BoxSize;
-            float brushRotation = maskFilterContext.BoxArea.Rotation;
+            var brushSize = maskFilterContext.BoxArea.BoxSize;
+            var brushRotation = maskFilterContext.BoxArea.Rotation;
 
             // TODO(wyatt): remove magic number and tie it into NoiseSettingsGUI preview size somehow
-            float previewSize = 1 / 512f;
+            var previewSize = 1 / 512f;
 
             // get proper noise material from current noise settings
             Material mat = NoiseUtils.GetDefaultBlitMaterial(NoiseSettings);
 
             // setup the noise material with values in noise settings
-            NoiseSettings.SetupMaterial( mat );
+            NoiseSettings.SetupMaterial(mat);
 
             // convert brushRotation to radians
             brushRotation *= Mathf.PI / 180;
 
             // change pos and scale so they match the noiseSettings preview
-            bool isWorldSpace = true;
+            var isWorldSpace = true;
             //brushSize = isWorldSpace ? brushSize * previewSize : 1;
             brushSize = brushSize * previewSize;
             brushPosWs = isWorldSpace ? brushPosWs * previewSize : Vector3.zero;
 
             // // override noise transform
-            Quaternion rotQ             = Quaternion.AngleAxis( -brushRotation, Vector3.up );
-            Matrix4x4 translation       = Matrix4x4.Translate( brushPosWs );
-            Matrix4x4 rotation          = Matrix4x4.Rotate( rotQ );
-            Matrix4x4 scale             = Matrix4x4.Scale( Vector3.one * brushSize );
-            Matrix4x4 noiseToWorld      = translation * scale;
+            var rotQ = Quaternion.AngleAxis(-brushRotation, Vector3.up);
+            var translation = Matrix4x4.Translate(brushPosWs);
+            var rotation = Matrix4x4.Rotate(rotQ);
+            var scale = Matrix4x4.Scale(Vector3.one * brushSize);
+            Matrix4x4 noiseToWorld = translation * scale;
 
-            mat.SetMatrix( NoiseSettings.ShaderStrings.Transform, NoiseSettings.trs * noiseToWorld );
+            mat.SetMatrix(NoiseSettings.ShaderStrings.Transform, NoiseSettings.trs * noiseToWorld);
 
-            int pass = NoiseUtils.KNumBlitPasses * NoiseLib.GetNoiseIndex( NoiseSettings.DomainSettings.NoiseTypeName );
+            var pass = NoiseUtils.KNumBlitPasses * NoiseLib.GetNoiseIndex(NoiseSettings.DomainSettings.NoiseTypeName);
 
-            RenderTextureDescriptor desc = new RenderTextureDescriptor(maskFilterContext.DestinationRenderTexture.width, maskFilterContext.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
-            RenderTexture rt = RenderTexture.GetTemporary( desc );
+            var desc = new RenderTextureDescriptor(maskFilterContext.DestinationRenderTexture.width,
+                maskFilterContext.DestinationRenderTexture.height, RenderTextureFormat.RFloat);
+            var rt = RenderTexture.GetTemporary(desc);
 
             Graphics.Blit(maskFilterContext.SourceRenderTexture, rt, mat, pass);
 
-            Material matFinal = GetMaterial(); 
+            Material matFinal = GetMaterial();
 
             matFinal.SetTexture("_NoiseTex", rt);
             matFinal.SetTexture("_BaseMaskTex", maskFilterContext.SourceRenderTexture);
@@ -114,7 +119,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             SetMaterial(matFinal, maskFilterContext, index);
 
-            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, matFinal, 0);
+            Graphics.Blit(maskFilterContext.SourceRenderTexture, maskFilterContext.DestinationRenderTexture, matFinal,
+                0);
 
             RenderTexture.ReleaseTemporary(rt);
         }
@@ -122,8 +128,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         public void SetMaterial(Material cs, MaskFilterContext fc, int index)
         {
             Terrain terrain = fc.BoxArea.TerrainUnder;
-            
-            if(index == 0)
+
+            if (index == 0)
             {
                 cs.SetInt("_BlendMode", (int)BlendMode.Multiply);
             }
@@ -135,8 +141,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             cs.SetFloat("_MinHeight", MinHeight);
             cs.SetFloat("_MaxHeight", MaxHeight);
 
-            var position = terrain.transform.position;
-            cs.SetFloat("_ClampMinHeight",position.y);
+            Vector3 position = terrain.transform.position;
+            cs.SetFloat("_ClampMinHeight", position.y);
             cs.SetFloat("_ClampMaxHeight", terrain.terrainData.size.y + position.y);
 
             cs.SetFloat("_MaxRangeNoise", MaxRangeNoise);
@@ -145,7 +151,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         private void CreateNoiseSettingsIfNecessary()
         {
-            if(NoiseSettings == null)
+            if (NoiseSettings == null)
             {
                 NoiseSettings = new NoiseSettings();
             }

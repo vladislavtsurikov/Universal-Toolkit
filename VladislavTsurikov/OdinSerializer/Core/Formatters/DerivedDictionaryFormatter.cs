@@ -16,62 +16,57 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using OdinSerializer;
 
-[assembly: RegisterFormatter(typeof(DerivedDictionaryFormatter<,,>), weakFallback: typeof(WeakDictionaryFormatter), priority: -1)]
+[assembly: RegisterFormatter(typeof(DerivedDictionaryFormatter<,,>), typeof(WeakDictionaryFormatter), -1)]
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-
     /// <summary>
-    /// Emergency hack class to support serialization of types derived from dictionary
+    ///     Emergency hack class to support serialization of types derived from dictionary
     /// </summary>
     internal sealed class DerivedDictionaryFormatter<TDictionary, TKey, TValue> : BaseFormatter<TDictionary>
         where TDictionary : Dictionary<TKey, TValue>, new()
     {
         private static readonly bool KeyIsValueType = typeof(TKey).IsValueType;
 
-        private static readonly Serializer<IEqualityComparer<TKey>> EqualityComparerSerializer = Serializer.Get<IEqualityComparer<TKey>>();
+        private static readonly Serializer<IEqualityComparer<TKey>> EqualityComparerSerializer =
+            Serializer.Get<IEqualityComparer<TKey>>();
+
         private static readonly Serializer<TKey> KeyReaderWriter = Serializer.Get<TKey>();
         private static readonly Serializer<TValue> ValueReaderWriter = Serializer.Get<TValue>();
 
-        private static readonly ConstructorInfo ComparerConstructor = typeof(TDictionary).GetConstructor(new Type[] { typeof(IEqualityComparer<TKey>) });
+        private static readonly ConstructorInfo ComparerConstructor =
+            typeof(TDictionary).GetConstructor(new[] { typeof(IEqualityComparer<TKey>) });
 
-        static DerivedDictionaryFormatter()
-        {
+        static DerivedDictionaryFormatter() =>
             // This exists solely to prevent IL2CPP code stripping from removing the generic type's instance constructor
             // which it otherwise seems prone to do, regardless of what might be defined in any link.xml file.
-
             new DerivedDictionaryFormatter<Dictionary<int, string>, int, string>();
-        }
-
-        public DerivedDictionaryFormatter()
-        {
-        }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A value of null.
+        ///     A value of null.
         /// </returns>
-        protected override TDictionary GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override TDictionary GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref TDictionary value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             IEqualityComparer<TKey> comparer = null;
 
@@ -90,7 +85,7 @@ namespace OdinSerializer
                     reader.EnterArray(out length);
                     Type type;
 
-                    if (!object.ReferenceEquals(comparer, null) && ComparerConstructor != null)
+                    if (!ReferenceEquals(comparer, null) && ComparerConstructor != null)
                     {
                         value = (TDictionary)ComparerConstructor.Invoke(new object[] { comparer });
                     }
@@ -100,19 +95,21 @@ namespace OdinSerializer
                     }
 
                     // We must remember to register the dictionary reference ourselves, since we returned null in GetUninitializedObject
-                    this.RegisterReferenceID(value, reader);
+                    RegisterReferenceID(value, reader);
 
                     // There aren't any OnDeserializing callbacks on dictionaries that we're interested in.
                     // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                    for (int i = 0; i < length; i++)
+                    for (var i = 0; i < length; i++)
                     {
                         if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i + " elements, when " + length + " elements were expected.");
+                            reader.Context.Config.DebugContext.LogError("Reached end of array after " + i +
+                                                                        " elements, when " + length +
+                                                                        " elements were expected.");
                             break;
                         }
 
-                        bool exitNode = true;
+                        var exitNode = true;
 
                         try
                         {
@@ -120,9 +117,11 @@ namespace OdinSerializer
                             TKey key = KeyReaderWriter.ReadValue(reader);
                             TValue val = ValueReaderWriter.ReadValue(reader);
 
-                            if (!KeyIsValueType && object.ReferenceEquals(key, null))
+                            if (!KeyIsValueType && ReferenceEquals(key, null))
                             {
-                                reader.Context.Config.DebugContext.LogWarning("Dictionary key of type '" + typeof(TKey).FullName + "' was null upon deserialization. A key has gone missing.");
+                                reader.Context.Config.DebugContext.LogWarning("Dictionary key of type '" +
+                                                                              typeof(TKey).FullName +
+                                                                              "' was null upon deserialization. A key has gone missing.");
                                 continue;
                             }
 
@@ -147,7 +146,8 @@ namespace OdinSerializer
 
                         if (reader.IsInArrayNode == false)
                         {
-                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                            reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                        reader.GetDataDump());
                             break;
                         }
                     }
@@ -164,7 +164,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -179,9 +179,9 @@ namespace OdinSerializer
 
                 writer.BeginArrayNode(value.Count);
 
-                foreach (var pair in value)
+                foreach (KeyValuePair<TKey, TValue> pair in value)
                 {
-                    bool endNode = true;
+                    var endNode = true;
 
                     try
                     {

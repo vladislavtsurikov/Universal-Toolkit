@@ -6,9 +6,9 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.TerrainTools;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 
 #if UNITY_2021_2_OR_NEWER
@@ -16,15 +16,15 @@ using VladislavTsurikov.UnityUtility.Runtime;
 using UnityEngine.Experimental.TerrainAPI;
 #endif
 
-namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem 
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem
 {
     [Serializable]
     [Name("Textures")]
-    public class TexturesFilter : MaskFilter 
+    public class TexturesFilter : MaskFilter
     {
         public BlendMode BlendMode = BlendMode.Multiply;
-        public List<TerrainTexture> TerrainTextureList = new List<TerrainTexture>();
-        
+        public List<TerrainTexture> TerrainTextureList = new();
+
         [OnDeserializing]
         public void Init()
         {
@@ -34,30 +34,31 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             }
         }
 
-        public override void Eval(MaskFilterContext maskFilterContext, int index) 
+        public override void Eval(MaskFilterContext maskFilterContext, int index)
         {
             if (Terrain.activeTerrain == null)
             {
                 return;
             }
-            
+
             Terrain terrain = maskFilterContext.BoxArea.TerrainUnder;
 
             Vector2 currUV = UnityTerrainUtility.WorldPointToUV(maskFilterContext.BoxArea.Center, terrain);
 
-            BrushTransform brushTransform = TerrainPaintUtility.CalculateBrushTransform(terrain, currUV, maskFilterContext.BoxArea.BoxSize, 0.0f);
+            BrushTransform brushTransform =
+                TerrainPaintUtility.CalculateBrushTransform(terrain, currUV, maskFilterContext.BoxArea.BoxSize, 0.0f);
             Rect brushRect = brushTransform.GetBrushXYBounds();
 
-            List<TerrainTexture> addTexturesToRenderTextureList = new List<TerrainTexture>();
+            var addTexturesToRenderTextureList = new List<TerrainTexture>();
 
-            if(IsSyncTerrain(Terrain.activeTerrain) == false)
-			{
-				UpdateCheckTerrainTextures(Terrain.activeTerrain);
-			}
-
-            for (int i = 0; i < TerrainTextureList.Count; i++)
+            if (IsSyncTerrain(Terrain.activeTerrain) == false)
             {
-                if(TerrainTextureList[i].Selected)
+                UpdateCheckTerrainTextures(Terrain.activeTerrain);
+            }
+
+            for (var i = 0; i < TerrainTextureList.Count; i++)
+            {
+                if (TerrainTextureList[i].Selected)
                 {
                     addTexturesToRenderTextureList.Add(TerrainTextureList[i]);
                 }
@@ -65,15 +66,19 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
             Material blendMat = MaskFilterUtility.blendModesMaterial;
 
-            RenderTexture output = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, maskFilterContext.SourceRenderTexture.depth, GraphicsFormat.R16_SFloat);
+            var output = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width,
+                maskFilterContext.SourceRenderTexture.height, maskFilterContext.SourceRenderTexture.depth,
+                GraphicsFormat.R16_SFloat);
             output.enableRandomWrite = true;
 
-            foreach (var terrainTexture in addTexturesToRenderTextureList)
+            foreach (TerrainTexture terrainTexture in addTexturesToRenderTextureList)
             {
-                RenderTexture localSourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
+                var localSourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width,
+                    maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
                 localSourceRender.enableRandomWrite = true;
 
-                PaintContext localTextureContext = TerrainPaintUtility.BeginPaintTexture(terrain, brushRect, Terrain.activeTerrain.terrainData.terrainLayers[terrainTexture.TerrainProtoId]);
+                PaintContext localTextureContext = TerrainPaintUtility.BeginPaintTexture(terrain, brushRect,
+                    Terrain.activeTerrain.terrainData.terrainLayers[terrainTexture.TerrainProtoId]);
 
                 blendMat.SetInt("_BlendMode", (int)BlendMode.Add);
                 blendMat.SetTexture("_MainTex", output);
@@ -82,15 +87,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 Graphics.Blit(output, localSourceRender, blendMat, 0);
                 Graphics.Blit(localSourceRender, output);
 
-                TerrainPaintUtility.ReleaseContextResources(localTextureContext); 
+                TerrainPaintUtility.ReleaseContextResources(localTextureContext);
 
                 RenderTexture.ReleaseTemporary(localSourceRender);
             }
 
-            RenderTexture sourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width, maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
+            var sourceRender = RenderTexture.GetTemporary(maskFilterContext.SourceRenderTexture.width,
+                maskFilterContext.SourceRenderTexture.height, 1, RenderTextureFormat.ARGB32);
             sourceRender.enableRandomWrite = true;
 
-            if(index == 0)
+            if (index == 0)
             {
                 blendMat.SetInt("_BlendMode", (int)BlendMode.Multiply);
             }
@@ -110,25 +116,25 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         public bool IsSyncTerrain(Terrain terrain)
         {
-            foreach (var layer in terrain.terrainData.terrainLayers)
+            foreach (TerrainLayer layer in terrain.terrainData.terrainLayers)
             {
                 if (layer == null)
                 {
                     continue;
                 }
-                
-                bool find = false;
 
-                for (int i = 0; i < TerrainTextureList.Count; i++)
+                var find = false;
+
+                for (var i = 0; i < TerrainTextureList.Count; i++)
                 {
-                    if (TextureUtility.IsSameTexture(layer.diffuseTexture, TerrainTextureList[i].Texture, false))
+                    if (TextureUtility.IsSameTexture(layer.diffuseTexture, TerrainTextureList[i].Texture))
                     {
                         find = true;
                         break;
                     }
                 }
 
-                if(find == false)
+                if (find == false)
                 {
                     return false;
                 }
@@ -141,14 +147,15 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
         {
             if (activeTerrain == null)
             {
-                Debug.LogWarning("Can not update prototypes from the terrain as there is no terrain currently active in this scene.");
+                Debug.LogWarning(
+                    "Can not update prototypes from the terrain as there is no terrain currently active in this scene.");
                 return;
             }
 
             int idx;
 
             TerrainTextureList.Clear();
-            
+
             TerrainLayer[] terrainLayers = activeTerrain.terrainData.terrainLayers;
 
             for (idx = 0; idx < terrainLayers.Length; idx++)
@@ -157,11 +164,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 {
                     continue;
                 }
-                
+
                 var checkTerrainTextures = new TerrainTexture
                 {
-                    Texture = terrainLayers[idx].diffuseTexture,
-                    TerrainProtoId = idx
+                    Texture = terrainLayers[idx].diffuseTexture, TerrainProtoId = idx
                 };
 
                 TerrainTextureList.Add(checkTerrainTextures);

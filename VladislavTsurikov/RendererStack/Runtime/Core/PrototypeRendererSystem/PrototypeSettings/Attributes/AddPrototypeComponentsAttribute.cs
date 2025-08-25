@@ -4,12 +4,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class AddPrototypeComponentsAttribute : Attribute
-    { 
+    {
         public readonly Type[] PrototypeSettings;
 
-        public AddPrototypeComponentsAttribute(Type[] prototypeSettings)
-        {
-            PrototypeSettings = prototypeSettings;
-        }
+        public AddPrototypeComponentsAttribute(Type[] prototypeSettings) => PrototypeSettings = prototypeSettings;
     }
 }

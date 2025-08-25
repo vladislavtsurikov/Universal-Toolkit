@@ -8,9 +8,6 @@ namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Styles
     {
         public StyleSheet UssReference;
 
-        public StyleInfo()
-        {
-            UssReference = null;
-        }
+        public StyleInfo() => UssReference = null;
     }
 }

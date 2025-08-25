@@ -16,35 +16,42 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
 using OdinSerializer;
+using UnityEngine;
+using UnityEngine.UI;
 
 [assembly: RegisterFormatterLocator(typeof(ColorBlockFormatterLocator))]
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Reflection;
-    using UnityEngine;
-
     public class ColorBlockFormatterLocator : IFormatterLocator
     {
-        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)
+        public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy,
+            bool allowWeakFallbackFormatters, out IFormatter formatter)
         {
-            if (step == FormatterLocationStep.BeforeRegisteredFormatters && type.FullName == "UnityEngine.UI.ColorBlock")
+            if (step == FormatterLocationStep.BeforeRegisteredFormatters &&
+                type.FullName == "UnityEngine.UI.ColorBlock")
             {
                 try
                 {
-                    formatter = (IFormatter)Activator.CreateInstance(typeof(ColorBlockFormatter<>).MakeGenericType(type));
+                    formatter = (IFormatter)Activator.CreateInstance(
+                        typeof(ColorBlockFormatter<>).MakeGenericType(type));
                 }
                 catch (Exception ex)
                 {
 #pragma warning disable CS0618 // Type or member is obsolete
-                    if (allowWeakFallbackFormatters && (ex is ExecutionEngineException || ex.GetBaseException() is ExecutionEngineException))
+                    if (allowWeakFallbackFormatters && (ex is ExecutionEngineException ||
+                                                        ex.GetBaseException() is ExecutionEngineException))
 #pragma warning restore CS0618 // Type or member is obsolete
                     {
                         formatter = new WeakColorBlockFormatter(type);
                     }
-                    else throw;
+                    else
+                    {
+                        throw;
+                    }
                 }
 
                 return true;
@@ -56,9 +63,9 @@ namespace OdinSerializer
     }
 
     /// <summary>
-    /// Custom formatter for the <see cref="ColorBlock"/> type.
+    ///     Custom formatter for the <see cref="ColorBlock" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{UnityEngine.UI.ColorBlock}" />
+    /// <seealso cref="ColorBlock" />
     public class ColorBlockFormatter<T> : MinimalBaseFormatter<T>
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();
@@ -70,9 +77,9 @@ namespace OdinSerializer
         private static readonly PropertyInfo disabledColor = typeof(T).GetProperty("disabledColor");
         private static readonly PropertyInfo colorMultiplier = typeof(T).GetProperty("colorMultiplier");
         private static readonly PropertyInfo fadeDuration = typeof(T).GetProperty("fadeDuration");
-        
+
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -91,7 +98,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
@@ -110,13 +117,13 @@ namespace OdinSerializer
     {
         private static readonly Serializer<float> FloatSerializer = Serializer.Get<float>();
         private static readonly Serializer<Color> ColorSerializer = Serializer.Get<Color>();
+        private readonly PropertyInfo colorMultiplier;
+        private readonly PropertyInfo disabledColor;
+        private readonly PropertyInfo fadeDuration;
+        private readonly PropertyInfo highlightedColor;
 
         private readonly PropertyInfo normalColor;
-        private readonly PropertyInfo highlightedColor;
         private readonly PropertyInfo pressedColor;
-        private readonly PropertyInfo disabledColor;
-        private readonly PropertyInfo colorMultiplier;
-        private readonly PropertyInfo fadeDuration;
 
         public WeakColorBlockFormatter(Type colorBlockType)
             : base(colorBlockType)

@@ -3,19 +3,15 @@ using UnityEngine;
 using UnityEngine.Profiling;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
-using PrototypeRenderData = VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender.PrototypeRenderData;
+using PrototypeRenderData =
+    VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera.CameraTemporarySettingsSystem.ObjectCameraRender.
+    PrototypeRenderData;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInstancedIndirect
 {
     public static class MergeInstancedIndirectBuffersID
     {
-        private struct BatchAdd
-        {
-            public ComputeBuffer Instances;
-            public int Count;
-        }
-
-        private static readonly ComputeBufferProperty _dummyComputeBuffer = new ComputeBufferProperty();
+        private static readonly ComputeBufferProperty _dummyComputeBuffer = new();
 
         private static ComputeShader _mergeBufferShader;
 
@@ -38,130 +34,107 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GPUInsta
 
             _mergeBufferShader = (ComputeShader)Resources.Load("RendererStackMergeInstancedIndirectBuffers");
 
-            for (int index = 0; index < _count.Length; ++index)
+            for (var index = 0; index < _count.Length; ++index)
             {
                 _count[index] = Shader.PropertyToID("Count" + index);
             }
-            
-            for (int index = 0; index < _instances.Length; ++index)
+
+            for (var index = 0; index < _instances.Length; ++index)
             {
                 _instances[index] = Shader.PropertyToID("Instances" + index);
             }
 
-            _maxNumberCellsKernel = new int[]
-            {
-                1,
-                2, 
-                4,
-                8,
-                16,
-                32
-            };
+            _maxNumberCellsKernel = new[] { 1, 2, 4, 8, 16, 32 };
 
-            _threads = new int[]
-            {
-                64,
-                64,
-                64,
-                64,
-                64,
-                128
-            };
+            _threads = new[] { 64, 64, 64, 64, 64, 128 };
 
             _addInstances1 = _mergeBufferShader.FindKernel("AddInstances1");
             _addInstances2 = _mergeBufferShader.FindKernel("AddInstances2");
             _addInstances4 = _mergeBufferShader.FindKernel("AddInstances4");
             _addInstances8 = _mergeBufferShader.FindKernel("AddInstances8");
             _addInstances16 = _mergeBufferShader.FindKernel("AddInstances16");
-            _addInstances = new int[]
+            _addInstances = new[]
             {
-                _addInstances1,
-                _addInstances2,
-                _addInstances4,
-                _addInstances4,
-                _addInstances8,
-                _addInstances8,
-                _addInstances8,
-                _addInstances8,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16,
-                _addInstances16
+                _addInstances1, _addInstances2, _addInstances4, _addInstances4, _addInstances8, _addInstances8,
+                _addInstances8, _addInstances8, _addInstances16, _addInstances16, _addInstances16, _addInstances16,
+                _addInstances16, _addInstances16, _addInstances16, _addInstances16
             };
         }
 
-        public static void MergeBuffer(List<Cell> instancedIndirectCellList, PrototypeRenderData prototypeRenderData, int protoID)
+        public static void MergeBuffer(List<Cell> instancedIndirectCellList, PrototypeRenderData prototypeRenderData,
+            int protoID)
         {
             Profiler.BeginSample("Merge Buffer");
-            
+
             prototypeRenderData.MergeBuffer.ComputeBuffer.SetCounterValue(0);
 
-            List<BatchAdd> batchAddList = new List<BatchAdd>();
-            for (int cellIndex = 0; cellIndex < instancedIndirectCellList.Count; cellIndex++)
+            var batchAddList = new List<BatchAdd>();
+            for (var cellIndex = 0; cellIndex < instancedIndirectCellList.Count; cellIndex++)
             {
                 Cell cell = instancedIndirectCellList[cellIndex];
 
-                int instanceCount = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).InstanceList.Count;
+                var instanceCount = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).InstanceList.Count;
 
-                BatchAdd batch = new BatchAdd()
+                var batch = new BatchAdd
                 {
-                    Instances = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).TemporaryInstances.ComputeBufferRenderData.ComputeBufferProperty.ComputeBuffer,
-                    Count = instanceCount,
+                    Instances = cell.PrototypeRenderDataStack.GetPrototypeRenderData(protoID).TemporaryInstances
+                        .ComputeBufferRenderData.ComputeBufferProperty.ComputeBuffer,
+                    Count = instanceCount
                 };
 
                 batchAddList.Add(batch);
 
-                if(batchAddList.Count == 16)
+                if (batchAddList.Count == 16)
                 {
                     MergeBuffer(batchAddList, prototypeRenderData);
                     batchAddList.Clear();
                 }
             }
 
-            if(batchAddList.Count != 0)
+            if (batchAddList.Count != 0)
             {
                 MergeBuffer(batchAddList, prototypeRenderData);
             }
-            
+
             Profiler.EndSample();
         }
 
         private static void MergeBuffer(IReadOnlyList<BatchAdd> batches, PrototypeRenderData prototypeRenderData)
         {
-            int addInstance = _addInstances[batches.Count - 1];
-            int instanceCount = 0;
-            for (int index = 0; index < batches.Count; index++)
+            var addInstance = _addInstances[batches.Count - 1];
+            var instanceCount = 0;
+            for (var index = 0; index < batches.Count; index++)
             {
                 instanceCount = Mathf.Max(instanceCount, batches[index].Count);
-                
+
                 _mergeBufferShader.SetInt(_count[index], batches[index].Count);
                 _mergeBufferShader.SetBuffer(addInstance, _instances[index], batches[index].Instances);
             }
-            
-            for (int length = batches.Count; length < _maxNumberCellsKernel[addInstance]; length++)
+
+            for (var length = batches.Count; length < _maxNumberCellsKernel[addInstance]; length++)
             {
                 _mergeBufferShader.SetInt(_count[length], 0);
                 _mergeBufferShader.SetBuffer(addInstance, _instances[length], _dummyComputeBuffer.ComputeBuffer);
             }
 
-            int threadGroups = Mathf.CeilToInt((float)instanceCount / _threads[addInstance]);
-            if (threadGroups == 0) 
+            var threadGroups = Mathf.CeilToInt((float)instanceCount / _threads[addInstance]);
+            if (threadGroups == 0)
             {
                 return;
             }
 
-            _mergeBufferShader.SetBuffer(addInstance, GPUFrustumCullingID.MergeBufferID, prototypeRenderData.MergeBuffer.ComputeBuffer);
+            _mergeBufferShader.SetBuffer(addInstance, GPUFrustumCullingID.MergeBufferID,
+                prototypeRenderData.MergeBuffer.ComputeBuffer);
 
-            _mergeBufferShader.Dispatch(addInstance, threadGroups, 1, 1); 
+            _mergeBufferShader.Dispatch(addInstance, threadGroups, 1, 1);
         }
 
-        public static void Dispose()
+        public static void Dispose() => _dummyComputeBuffer.DisposeUnmanagedMemory();
+
+        private struct BatchAdd
         {
-            _dummyComputeBuffer.DisposeUnmanagedMemory();
+            public ComputeBuffer Instances;
+            public int Count;
         }
     }
 }

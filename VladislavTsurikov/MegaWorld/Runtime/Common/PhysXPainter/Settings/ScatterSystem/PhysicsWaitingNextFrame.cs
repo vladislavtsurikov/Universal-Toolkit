@@ -7,11 +7,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.PhysXPainter.Settings.Scatt
     {
         private readonly int _maxSimulatedBodyCount;
 
-        public PhysicsWaitingNextFrame(int maxSimulatedBodyCount)
-        {
-            _maxSimulatedBodyCount = maxSimulatedBodyCount;
-        }
-        
+        public PhysicsWaitingNextFrame(int maxSimulatedBodyCount) => _maxSimulatedBodyCount = maxSimulatedBodyCount;
+
         public override bool IsWaitForNextFrame()
         {
             if (SimulatedBodyStack.Count < _maxSimulatedBodyCount)

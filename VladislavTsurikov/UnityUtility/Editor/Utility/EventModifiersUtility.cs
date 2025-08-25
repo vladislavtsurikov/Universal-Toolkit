@@ -13,10 +13,11 @@ namespace VladislavTsurikov.UnityUtility.Editor
                 return false;
             }
 
-            EventModifiers mask = EventModifiers.Alt | EventModifiers.Control | EventModifiers.Shift | EventModifiers.Command;
+            EventModifiers mask = EventModifiers.Alt | EventModifiers.Control | EventModifiers.Shift |
+                                  EventModifiers.Command;
             modifiers &= mask;
 
-            if (modifiers == 0 && (e.modifiers & (mask & ~modifiers)) == 0)
+            if (modifiers == 0 && (e.modifiers & mask & ~modifiers) == 0)
             {
                 return true;
             }

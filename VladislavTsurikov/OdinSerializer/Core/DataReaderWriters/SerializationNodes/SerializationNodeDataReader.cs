@@ -15,66 +15,162 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Text;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public class SerializationNodeDataReader : BaseDataReader
     {
-        private string peekedEntryName;
-        private EntryType? peekedEntryType;
-        private string peekedEntryData;
-
+        private readonly Dictionary<Type, Delegate> primitiveTypeReaders;
         private int currentIndex = -1;
         private List<SerializationNode> nodes;
-        private Dictionary<Type, Delegate> primitiveTypeReaders;
+        private string peekedEntryData;
+        private string peekedEntryName;
+        private EntryType? peekedEntryType;
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public SerializationNodeDataReader(DeserializationContext context) : base(null, context)
-        {
-            this.primitiveTypeReaders = new Dictionary<Type, Delegate>()
-        {
-            { typeof(char), (Func<char>)(() => { char v; this.ReadChar(out v); return v; }) },
-            { typeof(sbyte), (Func<sbyte>)(() => { sbyte v; this.ReadSByte(out v); return v; }) },
-            { typeof(short), (Func<short>)(() => { short v; this.ReadInt16(out v); return v; }) },
-            { typeof(int), (Func<int>)(() => { int v; this.ReadInt32(out v); return v; })  },
-            { typeof(long), (Func<long>)(() => { long v; this.ReadInt64(out v); return v; })  },
-            { typeof(byte), (Func<byte>)(() => { byte v; this.ReadByte(out v); return v; })  },
-            { typeof(ushort), (Func<ushort>)(() => { ushort v; this.ReadUInt16(out v); return v; })  },
-            { typeof(uint),   (Func<uint>)(() => { uint v; this.ReadUInt32(out v); return v; })  },
-            { typeof(ulong),  (Func<ulong>)(() => { ulong v; this.ReadUInt64(out v); return v; })  },
-            { typeof(decimal),   (Func<decimal>)(() => { decimal v; this.ReadDecimal(out v); return v; })  },
-            { typeof(bool),  (Func<bool>)(() => { bool v; this.ReadBoolean(out v); return v; })  },
-            { typeof(float),  (Func<float>)(() => { float v; this.ReadSingle(out v); return v; })  },
-            { typeof(double),  (Func<double>)(() => { double v; this.ReadDouble(out v); return v; })  },
-            { typeof(Guid),  (Func<Guid>)(() => { Guid v; this.ReadGuid(out v); return v; })  }
-        };
-        }
+        public SerializationNodeDataReader(DeserializationContext context) : base(null, context) =>
+            primitiveTypeReaders = new Dictionary<Type, Delegate>
+            {
+                {
+                    typeof(char), (Func<char>)(() =>
+                    {
+                        char v;
+                        ReadChar(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(sbyte), (Func<sbyte>)(() =>
+                    {
+                        sbyte v;
+                        ReadSByte(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(short), (Func<short>)(() =>
+                    {
+                        short v;
+                        ReadInt16(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(int), (Func<int>)(() =>
+                    {
+                        int v;
+                        ReadInt32(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(long), (Func<long>)(() =>
+                    {
+                        long v;
+                        ReadInt64(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(byte), (Func<byte>)(() =>
+                    {
+                        byte v;
+                        ReadByte(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(ushort), (Func<ushort>)(() =>
+                    {
+                        ushort v;
+                        ReadUInt16(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(uint), (Func<uint>)(() =>
+                    {
+                        uint v;
+                        ReadUInt32(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(ulong), (Func<ulong>)(() =>
+                    {
+                        ulong v;
+                        ReadUInt64(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(decimal), (Func<decimal>)(() =>
+                    {
+                        decimal v;
+                        ReadDecimal(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(bool), (Func<bool>)(() =>
+                    {
+                        bool v;
+                        ReadBoolean(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(float), (Func<float>)(() =>
+                    {
+                        float v;
+                        ReadSingle(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(double), (Func<double>)(() =>
+                    {
+                        double v;
+                        ReadDouble(out v);
+                        return v;
+                    })
+                },
+                {
+                    typeof(Guid), (Func<Guid>)(() =>
+                    {
+                        Guid v;
+                        ReadGuid(out v);
+                        return v;
+                    })
+                }
+            };
 
-        private bool IndexIsValid { get { return this.nodes != null && this.currentIndex >= 0 && this.currentIndex < this.nodes.Count; } }
+        private bool IndexIsValid => nodes != null && currentIndex >= 0 && currentIndex < nodes.Count;
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public List<SerializationNode> Nodes
         {
             get
             {
-                if (this.nodes == null)
+                if (nodes == null)
                 {
-                    this.nodes = new List<SerializationNode>();
+                    nodes = new List<SerializationNode>();
                 }
 
-                return this.nodes;
+                return nodes;
             }
 
             set
@@ -84,128 +180,132 @@ namespace OdinSerializer
                     throw new ArgumentNullException();
                 }
 
-                this.nodes = value;
+                nodes = value;
             }
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override Stream Stream
         {
-            get { throw new NotSupportedException("This data reader has no stream."); }
-            set { throw new NotSupportedException("This data reader has no stream."); }
+            get => throw new NotSupportedException("This data reader has no stream.");
+            set => throw new NotSupportedException("This data reader has no stream.");
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void Dispose()
         {
-            this.nodes = null;
-            this.currentIndex = -1;
+            nodes = null;
+            currentIndex = -1;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override void PrepareNewSerializationSession()
         {
             base.PrepareNewSerializationSession();
-            this.currentIndex = -1;
+            currentIndex = -1;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override EntryType PeekEntry(out string name)
         {
-            if (this.peekedEntryType != null)
+            if (peekedEntryType != null)
             {
-                name = this.peekedEntryName;
-                return this.peekedEntryType.Value;
+                name = peekedEntryName;
+                return peekedEntryType.Value;
             }
 
-            this.currentIndex++;
+            currentIndex++;
 
-            if (this.IndexIsValid)
+            if (IndexIsValid)
             {
-                var node = this.nodes[this.currentIndex];
+                SerializationNode node = nodes[currentIndex];
 
-                this.peekedEntryName = node.Name;
-                this.peekedEntryType = node.Entry;
-                this.peekedEntryData = node.Data;
+                peekedEntryName = node.Name;
+                peekedEntryType = node.Entry;
+                peekedEntryData = node.Data;
             }
             else
             {
-                this.peekedEntryName = null;
-                this.peekedEntryType = EntryType.EndOfStream;
-                this.peekedEntryData = null;
+                peekedEntryName = null;
+                peekedEntryType = EntryType.EndOfStream;
+                peekedEntryData = null;
             }
 
-            name = this.peekedEntryName;
-            return this.peekedEntryType.Value;
+            name = peekedEntryName;
+            return peekedEntryType.Value;
         }
 
         /// <summary>
-        /// Tries to enters an array node. This will succeed if the next entry is an <see cref="EntryType.StartOfArray" />.
-        /// <para />
-        /// This call MUST (eventually) be followed by a corresponding call to <see cref="IDataReader.ExitArray(DeserializationContext)" /><para />
-        /// This call will change the values of the <see cref="IDataReader.IsInArrayNode" />, <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current array node.
+        ///     Tries to enters an array node. This will succeed if the next entry is an <see cref="EntryType.StartOfArray" />.
+        ///     <para />
+        ///     This call MUST (eventually) be followed by a corresponding call to
+        ///     <see cref="IDataReader.ExitArray(DeserializationContext)" />
+        ///     <para />
+        ///     This call will change the values of the <see cref="IDataReader.IsInArrayNode" />,
+        ///     <see cref="IDataReader.CurrentNodeName" />, <see cref="IDataReader.CurrentNodeId" /> and
+        ///     <see cref="IDataReader.CurrentNodeDepth" /> properties to the correct values for the current array node.
         /// </summary>
         /// <param name="length">The length of the array that was entered.</param>
         /// <returns>
-        ///   <c>true</c> if an array was entered, otherwise <c>false</c>
+        ///     <c>true</c> if an array was entered, otherwise <c>false</c>
         /// </returns>
         public override bool EnterArray(out long length)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.StartOfArray)
+            if (peekedEntryType == EntryType.StartOfArray)
             {
-                this.PushArray();
+                PushArray();
 
-                if (!long.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out length))
+                if (!long.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out length))
                 {
                     length = 0;
-                    this.Context.Config.DebugContext.LogError("Failed to parse array length from data '" + this.peekedEntryData + "'.");
+                    Context.Config.DebugContext.LogError("Failed to parse array length from data '" + peekedEntryData +
+                                                         "'.");
                 }
 
-                this.ConsumeCurrentEntry();
+                ConsumeCurrentEntry();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                length = 0;
-                return false;
-            }
+
+            SkipEntry();
+            length = 0;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool EnterNode(out Type type)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.StartOfNode)
+            if (peekedEntryType == EntryType.StartOfNode)
             {
-                string data = this.peekedEntryData;
-                int id = -1;
+                var data = peekedEntryData;
+                var id = -1;
                 type = null;
 
                 if (!string.IsNullOrEmpty(data))
                 {
                     string typeName = null;
-                    int separator = data.IndexOf(SerializationNodeDataReaderWriterConfig.NodeIdSeparator, StringComparison.InvariantCulture);
+                    var separator = data.IndexOf(SerializationNodeDataReaderWriterConfig.NodeIdSeparator,
+                        StringComparison.InvariantCulture);
                     int parsedId;
 
                     if (separator >= 0)
                     {
                         typeName = data.Substring(separator + 1);
 
-                        string idStr = data.Substring(0, separator);
+                        var idStr = data.Substring(0, separator);
 
                         if (int.TryParse(idStr, NumberStyles.Any, CultureInfo.InvariantCulture, out parsedId))
                         {
@@ -213,7 +313,8 @@ namespace OdinSerializer
                         }
                         else
                         {
-                            this.Context.Config.DebugContext.LogError("Failed to parse id string '" + idStr + "' from data '" + data + "'.");
+                            Context.Config.DebugContext.LogError("Failed to parse id string '" + idStr +
+                                                                 "' from data '" + data + "'.");
                         }
                     }
                     else if (int.TryParse(data, out parsedId))
@@ -227,46 +328,45 @@ namespace OdinSerializer
 
                     if (typeName != null)
                     {
-                        type = this.Context.Binder.BindToType(typeName, this.Context.Config.DebugContext);
+                        type = Context.Binder.BindToType(typeName, Context.Config.DebugContext);
                     }
                 }
 
-                this.ConsumeCurrentEntry();
-                this.PushNode(this.peekedEntryName, id, type);
+                ConsumeCurrentEntry();
+                PushNode(peekedEntryName, id, type);
 
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                type = null;
-                return false;
-            }
+
+            SkipEntry();
+            type = null;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ExitArray()
         {
-            this.PeekEntry();
+            PeekEntry();
 
             // Read to next end of array
-            while (this.peekedEntryType != EntryType.EndOfArray && this.peekedEntryType != EntryType.EndOfStream)
+            while (peekedEntryType != EntryType.EndOfArray && peekedEntryType != EntryType.EndOfStream)
             {
-                if (this.peekedEntryType == EntryType.EndOfNode)
+                if (peekedEntryType == EntryType.EndOfNode)
                 {
-                    this.Context.Config.DebugContext.LogError("Data layout mismatch; skipping past node boundary when exiting array.");
-                    this.ConsumeCurrentEntry();
+                    Context.Config.DebugContext.LogError(
+                        "Data layout mismatch; skipping past node boundary when exiting array.");
+                    ConsumeCurrentEntry();
                 }
 
-                this.SkipEntry();
+                SkipEntry();
             }
 
-            if (this.peekedEntryType == EntryType.EndOfArray)
+            if (peekedEntryType == EntryType.EndOfArray)
             {
-                this.ConsumeCurrentEntry();
-                this.PopArray();
+                ConsumeCurrentEntry();
+                PopArray();
                 return true;
             }
 
@@ -274,28 +374,29 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ExitNode()
         {
-            this.PeekEntry();
+            PeekEntry();
 
             // Read to next end of node
-            while (this.peekedEntryType != EntryType.EndOfNode && this.peekedEntryType != EntryType.EndOfStream)
+            while (peekedEntryType != EntryType.EndOfNode && peekedEntryType != EntryType.EndOfStream)
             {
-                if (this.peekedEntryType == EntryType.EndOfArray)
+                if (peekedEntryType == EntryType.EndOfArray)
                 {
-                    this.Context.Config.DebugContext.LogError("Data layout mismatch; skipping past array boundary when exiting node.");
-                    this.ConsumeCurrentEntry();
+                    Context.Config.DebugContext.LogError(
+                        "Data layout mismatch; skipping past array boundary when exiting node.");
+                    ConsumeCurrentEntry();
                 }
 
-                this.SkipEntry();
+                SkipEntry();
             }
 
-            if (this.peekedEntryType == EntryType.EndOfNode)
+            if (peekedEntryType == EntryType.EndOfNode)
             {
-                this.ConsumeCurrentEntry();
-                this.PopNode(this.CurrentNodeName);
+                ConsumeCurrentEntry();
+                PopNode(CurrentNodeName);
                 return true;
             }
 
@@ -303,17 +404,17 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadBoolean(out bool value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
             try
             {
-                if (this.peekedEntryType == EntryType.Boolean)
+                if (peekedEntryType == EntryType.Boolean)
                 {
-                    value = this.peekedEntryData == "true";
+                    value = peekedEntryData == "true";
                     return true;
                 }
 
@@ -322,18 +423,18 @@ namespace OdinSerializer
             }
             finally
             {
-                this.ConsumeCurrentEntry();
+                ConsumeCurrentEntry();
             }
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadByte(out byte value)
         {
             ulong ulongValue;
 
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -343,67 +444,66 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(byte);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(byte);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadChar(out char value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.String)
+            if (peekedEntryType == EntryType.String)
             {
                 try
                 {
-                    if (this.peekedEntryData.Length == 1)
+                    if (peekedEntryData.Length == 1)
                     {
-                        value = this.peekedEntryData[0];
+                        value = peekedEntryData[0];
                         return true;
                     }
                     else
                     {
-                        this.Context.Config.DebugContext.LogWarning("Expected string of length 1 for char entry.");
-                        value = default(char);
+                        Context.Config.DebugContext.LogWarning("Expected string of length 1 for char entry.");
+                        value = default;
                         return false;
                     }
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(char);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadDecimal(out decimal value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.FloatingPoint || this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.FloatingPoint || peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    if (!decimal.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!decimal.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse decimal value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError("Failed to parse decimal value from entry data '" +
+                                                             peekedEntryData + "'.");
                         return false;
                     }
 
@@ -411,31 +511,30 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(decimal);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadDouble(out double value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.FloatingPoint || this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.FloatingPoint || peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    if (!double.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!double.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse double value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError("Failed to parse double value from entry data '" +
+                                                             peekedEntryData + "'.");
                         return false;
                     }
 
@@ -443,29 +542,27 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(double);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadExternalReference(out Guid guid)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.ExternalReferenceByGuid)
+            if (peekedEntryType == EntryType.ExternalReferenceByGuid)
             {
                 try
                 {
-                    if ((guid = new Guid(this.peekedEntryData)) != Guid.Empty)
+                    if ((guid = new Guid(peekedEntryData)) != Guid.Empty)
                     {
                         return true;
                     }
@@ -485,52 +582,50 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                guid = Guid.Empty;
-                return false;
-            }
+
+            SkipEntry();
+            guid = Guid.Empty;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadExternalReference(out string id)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.ExternalReferenceByString)
+            if (peekedEntryType == EntryType.ExternalReferenceByString)
             {
-                id = this.peekedEntryData;
-                this.ConsumeCurrentEntry();
+                id = peekedEntryData;
+                ConsumeCurrentEntry();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                id = null;
-                return false;
-            }
+
+            SkipEntry();
+            id = null;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadExternalReference(out int index)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.ExternalReferenceByIndex)
+            if (peekedEntryType == EntryType.ExternalReferenceByIndex)
             {
                 try
                 {
-                    if (!int.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out index))
+                    if (!int.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out index))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse external index reference integer value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError(
+                            "Failed to parse external index reference integer value from entry data '" +
+                            peekedEntryData + "'.");
                         return false;
                     }
 
@@ -538,29 +633,27 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                index = default(int);
-                return false;
-            }
+
+            SkipEntry();
+            index = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadGuid(out Guid value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.Guid)
+            if (peekedEntryType == EntryType.Guid)
             {
                 try
                 {
-                    if ((value = new Guid(this.peekedEntryData)) != Guid.Empty)
+                    if ((value = new Guid(peekedEntryData)) != Guid.Empty)
                     {
                         return true;
                     }
@@ -580,25 +673,23 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = Guid.Empty;
-                return false;
-            }
+
+            SkipEntry();
+            value = Guid.Empty;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadInt16(out short value)
         {
             long longValue;
 
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -608,25 +699,25 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(short);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(short);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadInt32(out int value)
         {
             long longValue;
 
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -636,31 +727,32 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(int);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(int);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadInt64(out long value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    if (!long.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!long.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse integer value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError("Failed to parse integer value from entry data '" +
+                                                             peekedEntryData + "'.");
                         return false;
                     }
 
@@ -668,31 +760,31 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(long);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadInternalReference(out int id)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.InternalReference)
+            if (peekedEntryType == EntryType.InternalReference)
             {
                 try
                 {
-                    if (!int.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out id))
+                    if (!int.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out id))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse internal reference id integer value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError(
+                            "Failed to parse internal reference id integer value from entry data '" + peekedEntryData +
+                            "'.");
                         return false;
                     }
 
@@ -700,45 +792,46 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                id = default(int);
-                return false;
-            }
+
+            SkipEntry();
+            id = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadNull()
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.Null)
+            if (peekedEntryType == EntryType.Null)
             {
-                this.ConsumeCurrentEntry();
+                ConsumeCurrentEntry();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                return false;
-            }
+
+            SkipEntry();
+            return false;
         }
 
         /// <summary>
-        /// Reads a primitive array value. This call will succeed if the next entry is an <see cref="EntryType.PrimitiveArray" />.
-        /// <para />
-        /// If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
+        ///     Reads a primitive array value. This call will succeed if the next entry is an
+        ///     <see cref="EntryType.PrimitiveArray" />.
+        ///     <para />
+        ///     If the call fails (and returns <c>false</c>), it will skip the current entry value, unless that entry is an
+        ///     <see cref="EntryType.EndOfNode" /> or an <see cref="EntryType.EndOfArray" />.
         /// </summary>
-        /// <typeparam name="T">The element type of the primitive array. Valid element types can be determined using <see cref="FormatterUtilities.IsPrimitiveArrayType(Type)" />.</typeparam>
+        /// <typeparam name="T">
+        ///     The element type of the primitive array. Valid element types can be determined using
+        ///     <see cref="FormatterUtilities.IsPrimitiveArrayType(Type)" />.
+        /// </typeparam>
         /// <param name="array">The resulting primitive array.</param>
         /// <returns>
-        ///   <c>true</c> if reading a primitive array succeeded, otherwise <c>false</c>
+        ///     <c>true</c> if reading a primitive array succeeded, otherwise <c>false</c>
         /// </returns>
         /// <exception cref="System.ArgumentException">Type  + typeof(T).Name +  is not a valid primitive array type.</exception>
         public override bool ReadPrimitiveArray<T>(out T[] array)
@@ -748,65 +841,66 @@ namespace OdinSerializer
                 throw new ArgumentException("Type " + typeof(T).Name + " is not a valid primitive array type.");
             }
 
-            if (this.peekedEntryType != EntryType.PrimitiveArray)
+            if (peekedEntryType != EntryType.PrimitiveArray)
             {
-                this.SkipEntry();
+                SkipEntry();
                 array = null;
                 return false;
             }
 
             if (typeof(T) == typeof(byte))
             {
-                array = (T[])(object)ProperBitConverter.HexStringToBytes(this.peekedEntryData);
+                array = (T[])(object)ProperBitConverter.HexStringToBytes(peekedEntryData);
                 return true;
             }
-            else
+
+            PeekEntry();
+
+            long length;
+
+            if (peekedEntryType != EntryType.PrimitiveArray)
             {
-                this.PeekEntry();
-
-                long length;
-
-                if (this.peekedEntryType != EntryType.PrimitiveArray)
-                {
-                    this.Context.Config.DebugContext.LogError("Expected entry of type '" + EntryType.StartOfArray + "' when reading primitive array but got entry of type '" + this.peekedEntryType + "'.");
-                    this.SkipEntry();
-                    array = new T[0];
-                    return false;
-                }
-
-                if (!long.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out length))
-                {
-                    this.Context.Config.DebugContext.LogError("Failed to parse primitive array length from entry data '" + this.peekedEntryData + "'.");
-                    this.SkipEntry();
-                    array = new T[0];
-                    return false;
-                }
-
-                this.ConsumeCurrentEntry();
-                this.PushArray();
-
-                array = new T[length];
-
-                Func<T> reader = (Func<T>)this.primitiveTypeReaders[typeof(T)];
-
-                for (int i = 0; i < length; i++)
-                {
-                    array[i] = reader();
-                }
-
-                this.ExitArray();
-                return true;
+                Context.Config.DebugContext.LogError("Expected entry of type '" + EntryType.StartOfArray +
+                                                     "' when reading primitive array but got entry of type '" +
+                                                     peekedEntryType + "'.");
+                SkipEntry();
+                array = new T[0];
+                return false;
             }
+
+            if (!long.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out length))
+            {
+                Context.Config.DebugContext.LogError("Failed to parse primitive array length from entry data '" +
+                                                     peekedEntryData + "'.");
+                SkipEntry();
+                array = new T[0];
+                return false;
+            }
+
+            ConsumeCurrentEntry();
+            PushArray();
+
+            array = new T[length];
+
+            var reader = (Func<T>)primitiveTypeReaders[typeof(T)];
+
+            for (var i = 0; i < length; i++)
+            {
+                array[i] = reader();
+            }
+
+            ExitArray();
+            return true;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadSByte(out sbyte value)
         {
             long longValue;
 
-            if (this.ReadInt64(out longValue))
+            if (ReadInt64(out longValue))
             {
                 checked
                 {
@@ -816,31 +910,32 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(sbyte);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(sbyte);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadSingle(out float value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.FloatingPoint || this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.FloatingPoint || peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    if (!float.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!float.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse float value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError("Failed to parse float value from entry data '" +
+                                                             peekedEntryData + "'.");
                         return false;
                     }
 
@@ -848,46 +943,42 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(float);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadString(out string value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.String)
+            if (peekedEntryType == EntryType.String)
             {
-                value = this.peekedEntryData;
-                this.ConsumeCurrentEntry();
+                value = peekedEntryData;
+                ConsumeCurrentEntry();
                 return true;
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(string);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadUInt16(out ushort value)
         {
             ulong ulongValue;
 
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -897,25 +988,25 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(ushort);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(ushort);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadUInt32(out uint value)
         {
             ulong ulongValue;
 
-            if (this.ReadUInt64(out ulongValue))
+            if (ReadUInt64(out ulongValue))
             {
                 checked
                 {
@@ -925,31 +1016,32 @@ namespace OdinSerializer
                     }
                     catch (OverflowException)
                     {
-                        value = default(uint);
+                        value = default;
                     }
                 }
 
                 return true;
             }
 
-            value = default(uint);
+            value = default;
             return false;
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public override bool ReadUInt64(out ulong value)
         {
-            this.PeekEntry();
+            PeekEntry();
 
-            if (this.peekedEntryType == EntryType.Integer)
+            if (peekedEntryType == EntryType.Integer)
             {
                 try
                 {
-                    if (!ulong.TryParse(this.peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    if (!ulong.TryParse(peekedEntryData, NumberStyles.Any, CultureInfo.InvariantCulture, out value))
                     {
-                        this.Context.Config.DebugContext.LogError("Failed to parse integer value from entry data '" + this.peekedEntryData + "'.");
+                        Context.Config.DebugContext.LogError("Failed to parse integer value from entry data '" +
+                                                             peekedEntryData + "'.");
                         return false;
                     }
 
@@ -957,30 +1049,28 @@ namespace OdinSerializer
                 }
                 finally
                 {
-                    this.ConsumeCurrentEntry();
+                    ConsumeCurrentEntry();
                 }
             }
-            else
-            {
-                this.SkipEntry();
-                value = default(ulong);
-                return false;
-            }
+
+            SkipEntry();
+            value = default;
+            return false;
         }
 
         public override string GetDataDump()
         {
-            var sb = new System.Text.StringBuilder();
+            var sb = new StringBuilder();
 
             sb.Append("Nodes: \n\n");
 
-            for (int i = 0; i < this.nodes.Count; i++)
+            for (var i = 0; i < nodes.Count; i++)
             {
-                var node = this.nodes[i];
+                SerializationNode node = nodes[i];
 
                 sb.Append("    - Name: " + node.Name);
 
-                if (i == this.currentIndex)
+                if (i == currentIndex)
                 {
                     sb.AppendLine("    <<<< READ POSITION");
                 }
@@ -998,31 +1088,31 @@ namespace OdinSerializer
 
         private void ConsumeCurrentEntry()
         {
-            if (this.peekedEntryType != null && this.peekedEntryType != EntryType.EndOfStream)
+            if (peekedEntryType != null && peekedEntryType != EntryType.EndOfStream)
             {
-                this.peekedEntryType = null;
+                peekedEntryType = null;
             }
         }
 
         /// <summary>
-        /// Peeks the current entry.
+        ///     Peeks the current entry.
         /// </summary>
         /// <returns>The peeked entry.</returns>
         protected override EntryType PeekEntry()
         {
             string name;
-            return this.PeekEntry(out name);
+            return PeekEntry(out name);
         }
 
         /// <summary>
-        /// Consumes the current entry, and reads to the next one.
+        ///     Consumes the current entry, and reads to the next one.
         /// </summary>
         /// <returns>The next entry.</returns>
         protected override EntryType ReadToNextEntry()
         {
             string name;
-            this.ConsumeCurrentEntry();
-            return this.PeekEntry(out name);
+            ConsumeCurrentEntry();
+            return PeekEntry(out name);
         }
     }
 }

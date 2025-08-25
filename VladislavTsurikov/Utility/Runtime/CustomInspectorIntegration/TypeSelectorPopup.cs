@@ -12,43 +12,19 @@ namespace VladislavTsurikov.Utility.Runtime.CustomInspectorIntegration
     {
         private const int FontSize = 12;
         private const int Padding = 10;
-
-        private string _title;
-        private Action<object> _onSelect;
-        private List<object> _items = new();
         private Func<object, string> _displayNameFunc;
-
-        private TextField _searchField;
-        private Label _titleLabel;
+        private List<object> _items = new();
+        private Action<object> _onSelect;
         private ScrollView _scrollView;
 
-        public static void Open<T>(
-            Rect rectActivator,
-            string title,
-            IEnumerable<T> items,
-            Func<T, string> displayNameFunc,
-            Action<T> onSelect)
-        {
-            Rect screenRect = GUIUtility.GUIToScreenRect(rectActivator);
+        private TextField _searchField;
 
-            Vector2 windowSize = new Vector2(
-                Mathf.Max(screenRect.width, 300),
-                400
-            );
-
-            var popup = CreateInstance<TypeSelectorPopup>();
-            popup._title = title;
-            popup._onSelect = obj => onSelect((T)obj);
-            popup._items = new List<object>(items.Cast<object>());
-            popup._displayNameFunc = obj => displayNameFunc((T)obj);
-
-            popup.position = new Rect(screenRect.x, screenRect.y + screenRect.height, windowSize.x, windowSize.y);
-            popup.ShowAsDropDown(screenRect, windowSize);
-        }
+        private string _title;
+        private Label _titleLabel;
 
         private void CreateGUI()
         {
-            var root = rootVisualElement;
+            VisualElement root = rootVisualElement;
             root.style.flexDirection = FlexDirection.Column;
             root.style.paddingLeft = Padding;
             root.style.paddingRight = Padding;
@@ -68,33 +44,43 @@ namespace VladislavTsurikov.Utility.Runtime.CustomInspectorIntegration
             };
             root.Add(_titleLabel);
 
-            _searchField = new TextField
-            {
-                style =
-                {
-                    fontSize = FontSize
-                }
-            };
+            _searchField = new TextField { style = { fontSize = FontSize } };
             _searchField.RegisterValueChangedCallback(evt => { UpdateFilteredItems(evt.newValue); });
             root.Add(_searchField);
 
-            _scrollView = new ScrollView
-            {
-                style =
-                {
-                    flexGrow = 1,
-                    borderTopWidth = 1,
-                    borderBottomWidth = 1,
-                }
-            };
+            _scrollView = new ScrollView { style = { flexGrow = 1, borderTopWidth = 1, borderBottomWidth = 1 } };
             root.Add(_scrollView);
 
             UpdateItemList(_items);
         }
 
+        public static void Open<T>(
+            Rect rectActivator,
+            string title,
+            IEnumerable<T> items,
+            Func<T, string> displayNameFunc,
+            Action<T> onSelect)
+        {
+            Rect screenRect = GUIUtility.GUIToScreenRect(rectActivator);
+
+            var windowSize = new Vector2(
+                Mathf.Max(screenRect.width, 300),
+                400
+            );
+
+            TypeSelectorPopup popup = CreateInstance<TypeSelectorPopup>();
+            popup._title = title;
+            popup._onSelect = obj => onSelect((T)obj);
+            popup._items = new List<object>(items.Cast<object>());
+            popup._displayNameFunc = obj => displayNameFunc((T)obj);
+
+            popup.position = new Rect(screenRect.x, screenRect.y + screenRect.height, windowSize.x, windowSize.y);
+            popup.ShowAsDropDown(screenRect, windowSize);
+        }
+
         private void UpdateFilteredItems(string searchTerm)
         {
-            var filteredItems = string.IsNullOrWhiteSpace(searchTerm)
+            List<object> filteredItems = string.IsNullOrWhiteSpace(searchTerm)
                 ? _items
                 : _items.FindAll(item =>
                     _displayNameFunc(item).IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0);

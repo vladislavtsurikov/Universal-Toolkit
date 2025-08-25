@@ -8,13 +8,9 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 
         public NativeArrayProperty()
         {
-            
         }
 
-        public NativeArrayProperty(NativeArray<T> nativeArray)
-        {
-            NativeArray = nativeArray;
-        }
+        public NativeArrayProperty(NativeArray<T> nativeArray) => NativeArray = nativeArray;
 
         public void ChangeNativeArray(NativeArray<T> nativeArray)
         {
@@ -25,9 +21,9 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
 
         protected override void InternalDisposeUnmanagedMemory()
         {
-            if(NativeArray.IsCreated)
+            if (NativeArray.IsCreated)
             {
-                NativeArray.Dispose();  
+                NativeArray.Dispose();
             }
         }
     }

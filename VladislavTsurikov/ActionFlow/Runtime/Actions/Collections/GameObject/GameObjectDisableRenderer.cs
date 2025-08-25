@@ -1,7 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
 {
@@ -17,6 +17,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.GameObject
             {
                 renderer.enabled = false;
             }
+
             return UniTask.FromResult(true);
         }
     }

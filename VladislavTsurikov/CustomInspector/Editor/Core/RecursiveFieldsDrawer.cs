@@ -4,8 +4,8 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
 {
     public abstract class RecursiveFieldsDrawer
     {
-        private readonly Dictionary<object, bool> _foldoutStates = new Dictionary<object, bool>();
-        
+        private readonly Dictionary<object, bool> _foldoutStates = new();
+
         protected bool GetFoldoutState(object value)
         {
             if (value == null)
@@ -13,7 +13,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
                 return false;
             }
 
-            if (!_foldoutStates.TryGetValue(value, out bool state))
+            if (!_foldoutStates.TryGetValue(value, out var state))
             {
                 _foldoutStates[value] = false;
                 return false;

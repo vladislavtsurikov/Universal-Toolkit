@@ -29,7 +29,8 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
         
         protected override async UniTask LoadScene()
         {
-            _loadSceneAsyncOperation = UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(SceneReference.ScenePath, LoadSceneMode.Additive);
+            _loadSceneAsyncOperation =
+ UnityEngine.AddressableAssets.Addressables.LoadSceneAsync(SceneReference.ScenePath, LoadSceneMode.Additive);
             await _loadSceneAsyncOperation;
         }
         
@@ -40,7 +41,8 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
                 return;
             }
             
-            _unloadSceneAsyncOperation = UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
+            _unloadSceneAsyncOperation =
+ UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
             await _unloadSceneAsyncOperation;
         }
 

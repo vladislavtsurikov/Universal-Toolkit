@@ -2,9 +2,6 @@
 {
     public static class LayerEx
     {
-        public static bool IsLayerBitSet(int layerBits, int layerNumber)
-        {
-            return (layerBits & (1 << layerNumber)) != 0;
-        }
+        public static bool IsLayerBitSet(int layerBits, int layerNumber) => (layerBits & (1 << layerNumber)) != 0;
     }
 }

@@ -9,11 +9,8 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
     {
         private static readonly List<TDrawer> _fieldDrawers = new();
 
-        static FieldDrawerResolver()
-        {
-            RegisterDrawers();
-        }
-        
+        static FieldDrawerResolver() => RegisterDrawers();
+
         private static void RegisterDrawers()
         {
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -26,15 +23,13 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
 
                 foreach (Type drawerType in drawerTypes)
                 {
-                    TDrawer instance = (TDrawer)Activator.CreateInstance(drawerType);
+                    var instance = (TDrawer)Activator.CreateInstance(drawerType);
                     _fieldDrawers.Add(instance);
                 }
             }
         }
-        
-        public static TDrawer GetFieldDrawer(Type fieldType)
-        {
-            return _fieldDrawers.FirstOrDefault(drawer => drawer.CanDraw(fieldType));
-        }
+
+        public static TDrawer GetFieldDrawer(Type fieldType) =>
+            _fieldDrawers.FirstOrDefault(drawer => drawer.CanDraw(fieldType));
     }
 }

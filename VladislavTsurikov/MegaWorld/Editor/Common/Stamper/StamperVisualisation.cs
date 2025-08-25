@@ -14,37 +14,41 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Stamper
 {
     public class StamperVisualisation
     {
-        public StamperMaskFilterVisualisation StamperMaskFilterVisualisation = new StamperMaskFilterVisualisation();
-        
+        public StamperMaskFilterVisualisation StamperMaskFilterVisualisation = new();
+
         public void Draw(BoxArea area, SelectionData data, LayerSettings layerSettings, float multiplyAlpha)
         {
-            if(area == null || area.RayHit == null)
+            if (area == null || area.RayHit == null)
             {
                 return;
             }
 
-            if(data.SelectedData.HasOneSelectedGroup())
+            if (data.SelectedData.HasOneSelectedGroup())
             {
                 Group group = data.SelectedData.SelectedGroup;
 
-                if (group.PrototypeType == typeof(PrototypeGameObject) || group.PrototypeType == typeof(PrototypeTerrainObject))
+                if (group.PrototypeType == typeof(PrototypeGameObject) ||
+                    group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
-                        
-                    if(filterSettings.FilterType != FilterType.MaskFilter)
+                    var filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
+
+                    if (filterSettings.FilterType != FilterType.MaskFilter)
                     {
-                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter, layerSettings);
+                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter,
+                            layerSettings);
                     }
                     else
                     {
-                        StamperMaskFilterVisualisation.DrawMaskFilterVisualization(filterSettings.MaskFilterComponentSettings.MaskFilterStack, area, multiplyAlpha);
+                        StamperMaskFilterVisualisation.DrawMaskFilterVisualization(
+                            filterSettings.MaskFilterComponentSettings.MaskFilterStack, area, multiplyAlpha);
                     }
                 }
                 else
                 {
-                    if(data.SelectedData.HasOneSelectedPrototype())
+                    if (data.SelectedData.HasOneSelectedPrototype())
                     {
-                        StamperMaskFilterVisualisation.DrawMaskFilterVisualization(MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area, multiplyAlpha);
+                        StamperMaskFilterVisualisation.DrawMaskFilterVisualization(
+                            MaskFilterUtility.GetMaskFilterFromSelectedPrototype(data), area, multiplyAlpha);
                     }
                     else
                     {

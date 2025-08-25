@@ -6,23 +6,19 @@ using UnityEngine.SceneManagement;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.RendererStack.Runtime.Common.TerrainSystem;
-using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 {
-    public static class AllVirtualTerrainTypes 
+    public static class AllVirtualTerrainTypes
     {
         private static readonly Type[] _types;
 
-        static AllVirtualTerrainTypes()
-        {
-            _types = AllTypesDerivedFrom<VirtualTerrain>.Types;
-        }
-        
+        static AllVirtualTerrainTypes() => _types = AllTypesDerivedFrom<VirtualTerrain>.Types;
+
         public static List<VirtualTerrain> FindAll(Scene scene)
         {
-            List<VirtualTerrain> virtualTerrains = new List<VirtualTerrain>();
-            
+            var virtualTerrains = new List<VirtualTerrain>();
+
             foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
@@ -31,7 +27,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
                 {
                     VirtualTerrain virtualTerrain = CreateTerrainHelper(go);
 
-                    if(virtualTerrain != null)
+                    if (virtualTerrain != null)
                     {
                         virtualTerrains.Add(virtualTerrain);
                     }
@@ -43,8 +39,8 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 
         public static List<VirtualTerrain> FindAll(Type terrainType)
         {
-            List<VirtualTerrain> virtualTerrains = new List<VirtualTerrain>();
-            
+            var virtualTerrains = new List<VirtualTerrain>();
+
             foreach (Type type in AllTerrainHelperTypes.Types)
             {
                 TerrainHelperAttribute terrainHelperAttribute = type.GetAttribute<TerrainHelperAttribute>();
@@ -55,7 +51,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
                     {
                         VirtualTerrain virtualTerrain = CreateTerrainHelper(go);
 
-                        if(virtualTerrain != null)
+                        if (virtualTerrain != null)
                         {
                             virtualTerrains.Add(virtualTerrain);
                         }
@@ -68,17 +64,20 @@ namespace VladislavTsurikov.RendererStack.Editor.Sectorize.TerrainSystem
 
         private static VirtualTerrain CreateTerrainHelper(GameObject go)
         {
-            if (go == null) return null;
+            if (go == null)
+            {
+                return null;
+            }
 
             Behaviour[] list = go.GetComponents<Behaviour>();
             foreach (Behaviour component in list)
             {
-                if(component == null)
+                if (component == null)
                 {
                     continue;
                 }
 
-                foreach (var type in _types)
+                foreach (Type type in _types)
                 {
                     Type terrainMonoBehaviourType = type.GetAttribute<TerrainHelperAttribute>().RequiredСomponent;
 

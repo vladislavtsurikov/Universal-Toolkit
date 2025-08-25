@@ -9,21 +9,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Styles
     public class StyleGroupEditor : UnityEditor.Editor
     {
         private StyleGroup _styleGroup => (StyleGroup)target;
-        
+
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("Setup"))
             {
                 Setup();
             }
-            
+
             base.OnInspectorGUI();
         }
 
-        private void Setup()
-        {
-            _styleGroup.Setup();
-        }
+        private void Setup() => _styleGroup.Setup();
     }
 }
 #endif

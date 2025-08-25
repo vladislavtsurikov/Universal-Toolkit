@@ -7,9 +7,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
     public class MaskFilterVisualisation
     {
         protected MaskFilterContext _filterContext;
-        protected MaskFilterStack PastMaskFilterStack;
-        
+
         public bool NeedUpdateMask = true;
+        protected MaskFilterStack PastMaskFilterStack;
 
         protected virtual bool IsNeedUpdateMask(MaskFilterStack maskFilterStack, BoxArea boxArea)
         {
@@ -19,7 +19,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         public void DrawMaskFilterVisualization(MaskFilterStack maskFilterStack, BoxArea area, float multiplyAlpha = 1)
         {
-            if(area.TerrainUnder == null)
+            if (area.TerrainUnder == null)
             {
                 return;
             }
@@ -41,7 +41,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
 
         private void UpdateMask(MaskFilterStack maskFilterStack, BoxArea boxArea)
         {
-            if(_filterContext == null)
+            if (_filterContext == null)
             {
                 _filterContext = new MaskFilterContext(boxArea);
             }
@@ -49,11 +49,11 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
             {
                 _filterContext.Dispose();
             }
-            
+
             FilterMaskOperation.UpdateFilterContext(ref _filterContext, maskFilterStack, boxArea);
-            
+
             PastMaskFilterStack = maskFilterStack;
-            
+
             NeedUpdateMask = false;
         }
     }

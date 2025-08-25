@@ -13,18 +13,21 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
             .GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic, null,
                 new[] { typeof(string), typeof(string), typeof(AddressableAssetGroup), typeof(bool) }, null);
 
-        private readonly AddressableAssetGroup _group;
         private readonly Dictionary<string, AddressableAssetEntry> _entryMap;
-        private readonly List<AddressableAssetEntry> _serializeEntries;
         private readonly FieldInfo _entryMapField;
+
+        private readonly AddressableAssetGroup _group;
+        private readonly List<AddressableAssetEntry> _serializeEntries;
         private readonly FieldInfo _serializeEntriesField;
 
         public FastAddressableEntryCreator(AddressableAssetGroup group)
         {
             _group = group;
 
-            _entryMapField = typeof(AddressableAssetGroup).GetField("m_EntryMap", BindingFlags.Instance | BindingFlags.NonPublic);
-            _serializeEntriesField = typeof(AddressableAssetGroup).GetField("m_SerializeEntries", BindingFlags.Instance | BindingFlags.NonPublic);
+            _entryMapField =
+                typeof(AddressableAssetGroup).GetField("m_EntryMap", BindingFlags.Instance | BindingFlags.NonPublic);
+            _serializeEntriesField = typeof(AddressableAssetGroup).GetField("m_SerializeEntries",
+                BindingFlags.Instance | BindingFlags.NonPublic);
 
             _entryMap = (Dictionary<string, AddressableAssetEntry>)_entryMapField.GetValue(group);
             _serializeEntries = (List<AddressableAssetEntry>)_serializeEntriesField.GetValue(group);
@@ -44,7 +47,7 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
             }
 
             Profiler.BeginSample("AddressableEntry - Create AddressableAssetEntry");
-            AddressableAssetEntry entry = (AddressableAssetEntry)EntryConstructor.Invoke(new object[] { guid, address, _group, false });
+            var entry = (AddressableAssetEntry)EntryConstructor.Invoke(new object[] { guid, address, _group, false });
             entry.IsSubAsset = false;
             entry.parentGroup = _group;
 

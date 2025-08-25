@@ -12,14 +12,14 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.Callbacks
             {
                 return;
             }
- #if UNITY_EDITOR
+#if UNITY_EDITOR
             if (!SceneManagerData.Instance.SceneManagerEditorData.RunAsBuildMode)
             {
                 return;
             }
- #endif
-            
-             RuntimeUtility.Start();
+#endif
+
+            RuntimeUtility.Start();
         }
     }
 }

@@ -16,198 +16,145 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.Serialization;
+using OdinSerializer.Utilities;
+using UnityEngine;
+using Object = UnityEngine.Object;
 #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
 #define CAN_EMIT
 #endif
 
 namespace OdinSerializer
 {
-    using OdinSerializer.Utilities;
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Runtime.Serialization;
-
     /// <summary>
-    /// Provides common functionality for serializing and deserializing values of type <see cref="T"/>, and provides automatic support for the following common serialization conventions:
-    /// <para />
-    /// <see cref="IObjectReference"/>, <see cref="ISerializationCallbackReceiver"/>, <see cref="OnSerializingAttribute"/>, <see cref="OnSerializedAttribute"/>, <see cref="OnDeserializingAttribute"/> and <see cref="OnDeserializedAttribute"/>.
+    ///     Provides common functionality for serializing and deserializing values of type <see cref="T" />, and provides
+    ///     automatic support for the following common serialization conventions:
+    ///     <para />
+    ///     <see cref="IObjectReference" />, <see cref="ISerializationCallbackReceiver" />,
+    ///     <see cref="OnSerializingAttribute" />, <see cref="OnSerializedAttribute" />,
+    ///     <see cref="OnDeserializingAttribute" /> and <see cref="OnDeserializedAttribute" />.
     /// </summary>
     /// <typeparam name="T">The type which can be serialized and deserialized by the formatter.</typeparam>
     /// <seealso cref="IFormatter{T}" />
     public abstract class BaseFormatter<T> : IFormatter<T>
     {
-        protected delegate void SerializationCallback(ref T value, StreamingContext context);
-
         /// <summary>
-        /// The on serializing callbacks for type <see cref="T"/>.
+        ///     The on serializing callbacks for type <see cref="T" />.
         /// </summary>
         protected static readonly SerializationCallback[] OnSerializingCallbacks;
 
         /// <summary>
-        /// The on serialized callbacks for type <see cref="T"/>.
+        ///     The on serialized callbacks for type <see cref="T" />.
         /// </summary>
         protected static readonly SerializationCallback[] OnSerializedCallbacks;
 
         /// <summary>
-        /// The on deserializing callbacks for type <see cref="T"/>.
+        ///     The on deserializing callbacks for type <see cref="T" />.
         /// </summary>
         protected static readonly SerializationCallback[] OnDeserializingCallbacks;
 
         /// <summary>
-        /// The on deserialized callbacks for type <see cref="T"/>.
+        ///     The on deserialized callbacks for type <see cref="T" />.
         /// </summary>
         protected static readonly SerializationCallback[] OnDeserializedCallbacks;
 
         /// <summary>
-        /// Whether the serialized value is a value type.
+        ///     Whether the serialized value is a value type.
         /// </summary>
         protected static readonly bool IsValueType = typeof(T).IsValueType;
 
-        protected static readonly bool ImplementsISerializationCallbackReceiver = typeof(T).ImplementsOrInherits(typeof(UnityEngine.ISerializationCallbackReceiver));
-        protected static readonly bool ImplementsIDeserializationCallback = typeof(T).ImplementsOrInherits(typeof(IDeserializationCallback));
-        protected static readonly bool ImplementsIObjectReference = typeof(T).ImplementsOrInherits(typeof(IObjectReference));
+        protected static readonly bool ImplementsISerializationCallbackReceiver =
+            typeof(T).ImplementsOrInherits(typeof(ISerializationCallbackReceiver));
+
+        protected static readonly bool ImplementsIDeserializationCallback =
+            typeof(T).ImplementsOrInherits(typeof(IDeserializationCallback));
+
+        protected static readonly bool ImplementsIObjectReference =
+            typeof(T).ImplementsOrInherits(typeof(IObjectReference));
 
         static BaseFormatter()
         {
-            if (typeof(T).ImplementsOrInherits(typeof(UnityEngine.Object)))
+            if (typeof(T).ImplementsOrInherits(typeof(Object)))
             {
-                DefaultLoggers.DefaultLogger.LogWarning("A formatter has been created for the UnityEngine.Object type " + typeof(T).Name + " - this is *strongly* discouraged. Unity should be allowed to handle serialization and deserialization of its own weird objects. Remember to serialize with a UnityReferenceResolver as the external index reference resolver in the serialization context.\n\n Stacktrace: " + new System.Diagnostics.StackTrace().ToString());
+                DefaultLoggers.DefaultLogger.LogWarning(
+                    "A formatter has been created for the UnityEngine.Object type " + typeof(T).Name +
+                    " - this is *strongly* discouraged. Unity should be allowed to handle serialization and deserialization of its own weird objects. Remember to serialize with a UnityReferenceResolver as the external index reference resolver in the serialization context.\n\n Stacktrace: " +
+                    new StackTrace());
             }
 
-            MethodInfo[] methods = typeof(T).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            
-            List<SerializationCallback> callbacks = new List<SerializationCallback>();
-            
+            MethodInfo[] methods =
+                typeof(T).GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            var callbacks = new List<SerializationCallback>();
+
             OnSerializingCallbacks = GetCallbacks(methods, typeof(OnSerializingAttribute), ref callbacks);
             OnSerializedCallbacks = GetCallbacks(methods, typeof(OnSerializedAttribute), ref callbacks);
             OnDeserializingCallbacks = GetCallbacks(methods, typeof(OnDeserializingAttribute), ref callbacks);
             OnDeserializedCallbacks = GetCallbacks(methods, typeof(OnDeserializedAttribute), ref callbacks);
         }
 
-        private static SerializationCallback[] GetCallbacks(MethodInfo[] methods, Type callbackAttribute, ref List<SerializationCallback> list)
-        {
-            for (int i = 0; i < methods.Length; i++)
-            {
-                var method = methods[i];
-
-                if (method.IsDefined(callbackAttribute, true))
-                {
-                    var callback = CreateCallback(method);
-
-                    if (callback != null)
-                    {
-                        list.Add(callback);
-                    }
-                }
-            }
-
-            var result = list.ToArray();
-            list.Clear();
-            return result;
-        }
-
-        private static SerializationCallback CreateCallback(MethodInfo info)
-        {
-            var parameters = info.GetParameters();
-            if (parameters.Length == 0)
-            {
-#if CAN_EMIT
-                var action = EmitUtilities.CreateInstanceRefMethodCaller<T>(info);
-                return (ref T value, StreamingContext context) => action(ref value);
-#else
-                return (ref T value, StreamingContext context) =>
-                {
-                    object obj = value;
-                    info.Invoke(obj, null);
-                    value = (T)obj;
-                };
-#endif
-            }
-            else if (parameters.Length == 1 && parameters[0].ParameterType == typeof(StreamingContext) && parameters[0].ParameterType.IsByRef == false)
-            {
-#if CAN_EMIT
-                var action = EmitUtilities.CreateInstanceRefMethodCaller<T, StreamingContext>(info);
-                return (ref T value, StreamingContext context) => action(ref value, context);
-#else
-                return (ref T value, StreamingContext context) =>
-                {
-                    object obj = value;
-                    info.Invoke(obj, new object[] { context });
-                    value = (T)obj;
-                };
-#endif
-            }
-            else
-            {
-                DefaultLoggers.DefaultLogger.LogWarning("The method " + info.GetNiceName() + " has an invalid signature and will be ignored by the serialization system.");
-                return null;
-            }
-        }
-
         /// <summary>
-        /// Gets the type that the formatter can serialize.
+        ///     Gets the type that the formatter can serialize.
         /// </summary>
         /// <value>
-        /// The type that the formatter can serialize.
+        ///     The type that the formatter can serialize.
         /// </value>
-        public Type SerializedType { get { return typeof(T); } }
+        public Type SerializedType => typeof(T);
 
         /// <summary>
-        /// Serializes a value using a specified <see cref="IDataWriter" />.
+        ///     Serializes a value using a specified <see cref="IDataWriter" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
-        void IFormatter.Serialize(object value, IDataWriter writer)
-        {
-            this.Serialize((T)value, writer);
-        }
+        void IFormatter.Serialize(object value, IDataWriter writer) => Serialize((T)value, writer);
 
         /// <summary>
-        /// Deserializes a value using a specified <see cref="IDataReader" />.
+        ///     Deserializes a value using a specified <see cref="IDataReader" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
-        object IFormatter.Deserialize(IDataReader reader)
-        {
-            return this.Deserialize(reader);
-        }
+        object IFormatter.Deserialize(IDataReader reader) => Deserialize(reader);
 
         /// <summary>
-        /// Deserializes a value of type <see cref="T" /> using a specified <see cref="IDataReader" />.
+        ///     Deserializes a value of type <see cref="T" /> using a specified <see cref="IDataReader" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
         public T Deserialize(IDataReader reader)
         {
-            var context = reader.Context;
-            T value = this.GetUninitializedObject();
+            DeserializationContext context = reader.Context;
+            T value = GetUninitializedObject();
 
             // We allow the above method to return null (for reference types) because of special cases like arrays,
             //  where the size of the array cannot be known yet, and thus we cannot create an object instance at this time.
             //
             // Therefore, those who override GetUninitializedObject and return null must call RegisterReferenceID and InvokeOnDeserializingCallbacks manually.
-            if (BaseFormatter<T>.IsValueType)
+            if (IsValueType)
             {
-                this.InvokeOnDeserializingCallbacks(ref value, context);
+                InvokeOnDeserializingCallbacks(ref value, context);
             }
             else
             {
-                if (object.ReferenceEquals(value, null) == false)
+                if (ReferenceEquals(value, null) == false)
                 {
-                    this.RegisterReferenceID(value, reader);
-                    this.InvokeOnDeserializingCallbacks(ref value, context);
+                    RegisterReferenceID(value, reader);
+                    InvokeOnDeserializingCallbacks(ref value, context);
 
                     if (ImplementsIObjectReference)
                     {
                         try
                         {
                             value = (T)(value as IObjectReference).GetRealObject(context.StreamingContext);
-                            this.RegisterReferenceID(value, reader);
+                            RegisterReferenceID(value, reader);
                         }
                         catch (Exception ex)
                         {
@@ -219,7 +166,7 @@ namespace OdinSerializer
 
             try
             {
-                this.DeserializeImplementation(ref value, reader);
+                DeserializeImplementation(ref value, reader);
             }
             catch (Exception ex)
             {
@@ -227,9 +174,9 @@ namespace OdinSerializer
             }
 
             // The deserialized value might be null, so check for that
-            if (BaseFormatter<T>.IsValueType || object.ReferenceEquals(value, null) == false)
+            if (IsValueType || ReferenceEquals(value, null) == false)
             {
-                for (int i = 0; i < OnDeserializedCallbacks.Length; i++)
+                for (var i = 0; i < OnDeserializedCallbacks.Length; i++)
                 {
                     try
                     {
@@ -243,7 +190,7 @@ namespace OdinSerializer
 
                 if (ImplementsIDeserializationCallback)
                 {
-                    IDeserializationCallback v = value as IDeserializationCallback;
+                    var v = value as IDeserializationCallback;
                     v.OnDeserialization(this);
                     value = (T)v;
                 }
@@ -252,7 +199,7 @@ namespace OdinSerializer
                 {
                     try
                     {
-                        UnityEngine.ISerializationCallbackReceiver v = value as UnityEngine.ISerializationCallbackReceiver;
+                        var v = value as ISerializationCallbackReceiver;
                         v.OnAfterDeserialize();
                         value = (T)v;
                     }
@@ -267,15 +214,15 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Serializes a value of type <see cref="T" /> using a specified <see cref="IDataWriter" />.
+        ///     Serializes a value of type <see cref="T" /> using a specified <see cref="IDataWriter" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
         public void Serialize(T value, IDataWriter writer)
         {
-            var context = writer.Context;
+            SerializationContext context = writer.Context;
 
-            for (int i = 0; i < OnSerializingCallbacks.Length; i++)
+            for (var i = 0; i < OnSerializingCallbacks.Length; i++)
             {
                 try
                 {
@@ -291,8 +238,7 @@ namespace OdinSerializer
             {
                 try
                 {
-
-                    UnityEngine.ISerializationCallbackReceiver v = value as UnityEngine.ISerializationCallbackReceiver;
+                    var v = value as ISerializationCallbackReceiver;
                     v.OnBeforeSerialize();
                     value = (T)v;
                 }
@@ -304,14 +250,14 @@ namespace OdinSerializer
 
             try
             {
-                this.SerializeImplementation(ref value, writer);
+                SerializeImplementation(ref value, writer);
             }
             catch (Exception ex)
             {
                 context.Config.DebugContext.LogException(ex);
             }
 
-            for (int i = 0; i < OnSerializedCallbacks.Length; i++)
+            for (var i = 0; i < OnSerializedCallbacks.Length; i++)
             {
                 try
                 {
@@ -324,39 +270,104 @@ namespace OdinSerializer
             }
         }
 
-        /// <summary>
-        /// Get an uninitialized object of type <see cref="T"/>. WARNING: If you override this and return null, the object's ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before deserialization begins.
-        /// You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader)"/> and <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(ref T, DeserializationContext)"/> immediately after creating the object yourself during deserialization.
-        /// </summary>
-        /// <returns>An uninitialized object of type <see cref="T"/>.</returns>
-        protected virtual T GetUninitializedObject()
+        private static SerializationCallback[] GetCallbacks(MethodInfo[] methods, Type callbackAttribute,
+            ref List<SerializationCallback> list)
         {
-            if (BaseFormatter<T>.IsValueType)
+            for (var i = 0; i < methods.Length; i++)
             {
-                return default(T);
+                MethodInfo method = methods[i];
+
+                if (method.IsDefined(callbackAttribute, true))
+                {
+                    SerializationCallback callback = CreateCallback(method);
+
+                    if (callback != null)
+                    {
+                        list.Add(callback);
+                    }
+                }
             }
-            else
+
+            SerializationCallback[] result = list.ToArray();
+            list.Clear();
+            return result;
+        }
+
+        private static SerializationCallback CreateCallback(MethodInfo info)
+        {
+            ParameterInfo[] parameters = info.GetParameters();
+            if (parameters.Length == 0)
             {
-                return (T)FormatterServices.GetUninitializedObject(typeof(T));
+#if CAN_EMIT
+                var action = EmitUtilities.CreateInstanceRefMethodCaller<T>(info);
+                return (ref T value, StreamingContext context) => action(ref value);
+#else
+                return (ref T value, StreamingContext context) =>
+                {
+                    object obj = value;
+                    info.Invoke(obj, null);
+                    value = (T)obj;
+                };
+#endif
             }
+
+            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(StreamingContext) &&
+                parameters[0].ParameterType.IsByRef == false)
+            {
+#if CAN_EMIT
+                var action = EmitUtilities.CreateInstanceRefMethodCaller<T, StreamingContext>(info);
+                return (ref T value, StreamingContext context) => action(ref value, context);
+#else
+                return (ref T value, StreamingContext context) =>
+                {
+                    object obj = value;
+                    info.Invoke(obj, new object[] { context });
+                    value = (T)obj;
+                };
+#endif
+            }
+
+            DefaultLoggers.DefaultLogger.LogWarning("The method " + info.GetNiceName() +
+                                                    " has an invalid signature and will be ignored by the serialization system.");
+            return null;
         }
 
         /// <summary>
-        /// Registers the given object reference in the deserialization context.
-        /// <para />
-        /// NOTE that this method only does anything if <see cref="T"/> is not a value type.
+        ///     Get an uninitialized object of type <see cref="T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before
+        ///     deserialization begins.
+        ///     You will have to call <see cref="BaseFormatter{T}.RegisterReferenceID(T, IDataReader)" /> and
+        ///     <see cref="BaseFormatter{T}.InvokeOnDeserializingCallbacks(ref T, DeserializationContext)" /> immediately after
+        ///     creating the object yourself during deserialization.
+        /// </summary>
+        /// <returns>An uninitialized object of type <see cref="T" />.</returns>
+        protected virtual T GetUninitializedObject()
+        {
+            if (IsValueType)
+            {
+                return default;
+            }
+
+            return (T)FormatterServices.GetUninitializedObject(typeof(T));
+        }
+
+        /// <summary>
+        ///     Registers the given object reference in the deserialization context.
+        ///     <para />
+        ///     NOTE that this method only does anything if <see cref="T" /> is not a value type.
         /// </summary>
         /// <param name="value">The value to register.</param>
         /// <param name="reader">The reader which is currently being used.</param>
         protected void RegisterReferenceID(T value, IDataReader reader)
         {
-            if (!BaseFormatter<T>.IsValueType)
+            if (!IsValueType)
             {
-                int id = reader.CurrentNodeId;
+                var id = reader.CurrentNodeId;
 
                 if (id < 0)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
                 }
                 else
                 {
@@ -366,29 +377,31 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Invokes all methods on the object with the [OnDeserializing] attribute.
-        /// <para />
-        /// WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You will have to call it manually after having created the object instance during deserialization.
+        ///     Invokes all methods on the object with the [OnDeserializing] attribute.
+        ///     <para />
+        ///     WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You
+        ///     will have to call it manually after having created the object instance during deserialization.
         /// </summary>
         /// <param name="value">The value to invoke the callbacks on.</param>
         /// <param name="context">The deserialization context.</param>
-        [Obsolete("Use the InvokeOnDeserializingCallbacks variant that takes a ref T value instead. This is for struct compatibility reasons.", false)]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        protected void InvokeOnDeserializingCallbacks(T value, DeserializationContext context)
-        {
-            this.InvokeOnDeserializingCallbacks(ref value, context);
-        }
+        [Obsolete(
+            "Use the InvokeOnDeserializingCallbacks variant that takes a ref T value instead. This is for struct compatibility reasons.",
+            false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected void InvokeOnDeserializingCallbacks(T value, DeserializationContext context) =>
+            InvokeOnDeserializingCallbacks(ref value, context);
 
         /// <summary>
-        /// Invokes all methods on the object with the [OnDeserializing] attribute.
-        /// <para />
-        /// WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You will have to call it manually after having created the object instance during deserialization.
+        ///     Invokes all methods on the object with the [OnDeserializing] attribute.
+        ///     <para />
+        ///     WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You
+        ///     will have to call it manually after having created the object instance during deserialization.
         /// </summary>
         /// <param name="value">The value to invoke the callbacks on.</param>
         /// <param name="context">The deserialization context.</param>
         protected void InvokeOnDeserializingCallbacks(ref T value, DeserializationContext context)
         {
-            for (int i = 0; i < OnDeserializingCallbacks.Length; i++)
+            for (var i = 0; i < OnDeserializingCallbacks.Length; i++)
             {
                 try
                 {
@@ -402,58 +415,68 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected abstract void DeserializeImplementation(ref T value, IDataReader reader);
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
         protected abstract void SerializeImplementation(ref T value, IDataWriter writer);
+
+        protected delegate void SerializationCallback(ref T value, StreamingContext context);
     }
 
     /// <summary>
-    /// Provides common functionality for serializing and deserializing weakly typed values of a given type, and provides automatic support for the following common serialization conventions:
-    /// <para />
-    /// <see cref="IObjectReference"/>, <see cref="ISerializationCallbackReceiver"/>, <see cref="OnSerializingAttribute"/>, <see cref="OnSerializedAttribute"/>, <see cref="OnDeserializingAttribute"/> and <see cref="OnDeserializedAttribute"/>.
+    ///     Provides common functionality for serializing and deserializing weakly typed values of a given type, and provides
+    ///     automatic support for the following common serialization conventions:
+    ///     <para />
+    ///     <see cref="IObjectReference" />, <see cref="ISerializationCallbackReceiver" />,
+    ///     <see cref="OnSerializingAttribute" />, <see cref="OnSerializedAttribute" />,
+    ///     <see cref="OnDeserializingAttribute" /> and <see cref="OnDeserializedAttribute" />.
     /// </summary>
     /// <seealso cref="IFormatter" />
     public abstract class WeakBaseFormatter : IFormatter
     {
-        protected delegate void SerializationCallback(object value, StreamingContext context);
-        protected readonly Type SerializedType;
-
-        protected readonly SerializationCallback[] OnSerializingCallbacks;
-        protected readonly SerializationCallback[] OnSerializedCallbacks;
-        protected readonly SerializationCallback[] OnDeserializingCallbacks;
-        protected readonly SerializationCallback[] OnDeserializedCallbacks;
-        protected readonly bool IsValueType;
-
-        protected readonly bool ImplementsISerializationCallbackReceiver;
         protected readonly bool ImplementsIDeserializationCallback;
         protected readonly bool ImplementsIObjectReference;
 
-        Type IFormatter.SerializedType { get { return this.SerializedType; } }
+        protected readonly bool ImplementsISerializationCallbackReceiver;
+        protected readonly bool IsValueType;
+        protected readonly SerializationCallback[] OnDeserializedCallbacks;
+        protected readonly SerializationCallback[] OnDeserializingCallbacks;
+        protected readonly SerializationCallback[] OnSerializedCallbacks;
+
+        protected readonly SerializationCallback[] OnSerializingCallbacks;
+        protected readonly Type SerializedType;
 
         public WeakBaseFormatter(Type serializedType)
         {
-            this.SerializedType = serializedType;
-            this.ImplementsISerializationCallbackReceiver = this.SerializedType.ImplementsOrInherits(typeof(UnityEngine.ISerializationCallbackReceiver));
-            this.ImplementsIDeserializationCallback = this.SerializedType.ImplementsOrInherits(typeof(IDeserializationCallback));
-            this.ImplementsIObjectReference = this.SerializedType.ImplementsOrInherits(typeof(IObjectReference));
+            SerializedType = serializedType;
+            ImplementsISerializationCallbackReceiver =
+                SerializedType.ImplementsOrInherits(typeof(ISerializationCallbackReceiver));
+            ImplementsIDeserializationCallback = SerializedType.ImplementsOrInherits(typeof(IDeserializationCallback));
+            ImplementsIObjectReference = SerializedType.ImplementsOrInherits(typeof(IObjectReference));
 
-            if (this.SerializedType.ImplementsOrInherits(typeof(UnityEngine.Object)))
+            if (SerializedType.ImplementsOrInherits(typeof(Object)))
             {
-                DefaultLoggers.DefaultLogger.LogWarning("A formatter has been created for the UnityEngine.Object type " + this.SerializedType.Name + " - this is *strongly* discouraged. Unity should be allowed to handle serialization and deserialization of its own weird objects. Remember to serialize with a UnityReferenceResolver as the external index reference resolver in the serialization context.\n\n Stacktrace: " + new System.Diagnostics.StackTrace().ToString());
+                DefaultLoggers.DefaultLogger.LogWarning(
+                    "A formatter has been created for the UnityEngine.Object type " + SerializedType.Name +
+                    " - this is *strongly* discouraged. Unity should be allowed to handle serialization and deserialization of its own weird objects. Remember to serialize with a UnityReferenceResolver as the external index reference resolver in the serialization context.\n\n Stacktrace: " +
+                    new StackTrace());
             }
 
-            MethodInfo[] methods = this.SerializedType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            MethodInfo[] methods =
+                SerializedType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-            List<SerializationCallback> callbacks = new List<SerializationCallback>();
+            var callbacks = new List<SerializationCallback>();
 
             OnSerializingCallbacks = GetCallbacks(methods, typeof(OnSerializingAttribute), ref callbacks);
             OnSerializedCallbacks = GetCallbacks(methods, typeof(OnSerializedAttribute), ref callbacks);
@@ -461,62 +484,18 @@ namespace OdinSerializer
             OnDeserializedCallbacks = GetCallbacks(methods, typeof(OnDeserializedAttribute), ref callbacks);
         }
 
-        private static SerializationCallback[] GetCallbacks(MethodInfo[] methods, Type callbackAttribute, ref List<SerializationCallback> list)
-        {
-            for (int i = 0; i < methods.Length; i++)
-            {
-                var method = methods[i];
-
-                if (method.IsDefined(callbackAttribute, true))
-                {
-                    var callback = CreateCallback(method);
-
-                    if (callback != null)
-                    {
-                        list.Add(callback);
-                    }
-                }
-            }
-
-            var result = list.ToArray();
-            list.Clear();
-            return result;
-        }
-
-        private static SerializationCallback CreateCallback(MethodInfo info)
-        {
-            var parameters = info.GetParameters();
-            if (parameters.Length == 0)
-            {
-                return (object value, StreamingContext context) =>
-                {
-                    info.Invoke(value, null);
-                };
-            }
-            else if (parameters.Length == 1 && parameters[0].ParameterType == typeof(StreamingContext) && parameters[0].ParameterType.IsByRef == false)
-            {
-                return (object value, StreamingContext context) =>
-                {
-                    info.Invoke(value, new object[] { context });
-                };
-            }
-            else
-            {
-                DefaultLoggers.DefaultLogger.LogWarning("The method " + info.GetNiceName() + " has an invalid signature and will be ignored by the serialization system.");
-                return null;
-            }
-        }
+        Type IFormatter.SerializedType => SerializedType;
 
         /// <summary>
-        /// Serializes a value using a specified <see cref="IDataWriter" />.
+        ///     Serializes a value using a specified <see cref="IDataWriter" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to use.</param>
         public void Serialize(object value, IDataWriter writer)
         {
-            var context = writer.Context;
+            SerializationContext context = writer.Context;
 
-            for (int i = 0; i < OnSerializingCallbacks.Length; i++)
+            for (var i = 0; i < OnSerializingCallbacks.Length; i++)
             {
                 try
                 {
@@ -532,8 +511,7 @@ namespace OdinSerializer
             {
                 try
                 {
-
-                    UnityEngine.ISerializationCallbackReceiver v = value as UnityEngine.ISerializationCallbackReceiver;
+                    var v = value as ISerializationCallbackReceiver;
                     v.OnBeforeSerialize();
                     value = v;
                 }
@@ -545,14 +523,14 @@ namespace OdinSerializer
 
             try
             {
-                this.SerializeImplementation(ref value, writer);
+                SerializeImplementation(ref value, writer);
             }
             catch (Exception ex)
             {
                 context.Config.DebugContext.LogException(ex);
             }
 
-            for (int i = 0; i < OnSerializedCallbacks.Length; i++)
+            for (var i = 0; i < OnSerializedCallbacks.Length; i++)
             {
                 try
                 {
@@ -566,43 +544,43 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Deserializes a value using a specified <see cref="IDataReader" />.
+        ///     Deserializes a value using a specified <see cref="IDataReader" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The deserialized value.
+        ///     The deserialized value.
         /// </returns>
         public object Deserialize(IDataReader reader)
         {
-            var context = reader.Context;
-            object value = this.GetUninitializedObject();
+            DeserializationContext context = reader.Context;
+            var value = GetUninitializedObject();
 
             // We allow the above method to return null (for reference types) because of special cases like arrays,
             //  where the size of the array cannot be known yet, and thus we cannot create an object instance at this time.
             //
             // Therefore, those who override GetUninitializedObject and return null must call RegisterReferenceID and InvokeOnDeserializingCallbacks manually.
-            if (this.IsValueType)
+            if (IsValueType)
             {
-                if (object.ReferenceEquals(null, value))
+                if (ReferenceEquals(null, value))
                 {
-                    value = Activator.CreateInstance(this.SerializedType);
+                    value = Activator.CreateInstance(SerializedType);
                 }
 
-                this.InvokeOnDeserializingCallbacks(value, context);
+                InvokeOnDeserializingCallbacks(value, context);
             }
             else
             {
-                if (object.ReferenceEquals(value, null) == false)
+                if (ReferenceEquals(value, null) == false)
                 {
-                    this.RegisterReferenceID(value, reader);
-                    this.InvokeOnDeserializingCallbacks(value, context);
+                    RegisterReferenceID(value, reader);
+                    InvokeOnDeserializingCallbacks(value, context);
 
                     if (ImplementsIObjectReference)
                     {
                         try
                         {
                             value = (value as IObjectReference).GetRealObject(context.StreamingContext);
-                            this.RegisterReferenceID(value, reader);
+                            RegisterReferenceID(value, reader);
                         }
                         catch (Exception ex)
                         {
@@ -614,7 +592,7 @@ namespace OdinSerializer
 
             try
             {
-                this.DeserializeImplementation(ref value, reader);
+                DeserializeImplementation(ref value, reader);
             }
             catch (Exception ex)
             {
@@ -622,9 +600,9 @@ namespace OdinSerializer
             }
 
             // The deserialized value might be null, so check for that
-            if (this.IsValueType || object.ReferenceEquals(value, null) == false)
+            if (IsValueType || ReferenceEquals(value, null) == false)
             {
-                for (int i = 0; i < OnDeserializedCallbacks.Length; i++)
+                for (var i = 0; i < OnDeserializedCallbacks.Length; i++)
                 {
                     try
                     {
@@ -638,7 +616,7 @@ namespace OdinSerializer
 
                 if (ImplementsIDeserializationCallback)
                 {
-                    IDeserializationCallback v = value as IDeserializationCallback;
+                    var v = value as IDeserializationCallback;
                     v.OnDeserialization(this);
                     value = v;
                 }
@@ -647,7 +625,7 @@ namespace OdinSerializer
                 {
                     try
                     {
-                        UnityEngine.ISerializationCallbackReceiver v = value as UnityEngine.ISerializationCallbackReceiver;
+                        var v = value as ISerializationCallbackReceiver;
                         v.OnAfterDeserialize();
                         value = v;
                     }
@@ -661,22 +639,65 @@ namespace OdinSerializer
             return value;
         }
 
+        private static SerializationCallback[] GetCallbacks(MethodInfo[] methods, Type callbackAttribute,
+            ref List<SerializationCallback> list)
+        {
+            for (var i = 0; i < methods.Length; i++)
+            {
+                MethodInfo method = methods[i];
+
+                if (method.IsDefined(callbackAttribute, true))
+                {
+                    SerializationCallback callback = CreateCallback(method);
+
+                    if (callback != null)
+                    {
+                        list.Add(callback);
+                    }
+                }
+            }
+
+            SerializationCallback[] result = list.ToArray();
+            list.Clear();
+            return result;
+        }
+
+        private static SerializationCallback CreateCallback(MethodInfo info)
+        {
+            ParameterInfo[] parameters = info.GetParameters();
+            if (parameters.Length == 0)
+            {
+                return (value, context) => { info.Invoke(value, null); };
+            }
+
+            if (parameters.Length == 1 && parameters[0].ParameterType == typeof(StreamingContext) &&
+                parameters[0].ParameterType.IsByRef == false)
+            {
+                return (value, context) => { info.Invoke(value, new object[] { context }); };
+            }
+
+            DefaultLoggers.DefaultLogger.LogWarning("The method " + info.GetNiceName() +
+                                                    " has an invalid signature and will be ignored by the serialization system.");
+            return null;
+        }
+
         /// <summary>
-        /// Registers the given object reference in the deserialization context.
-        /// <para />
-        /// NOTE that this method only does anything if <see cref="T"/> is not a value type.
+        ///     Registers the given object reference in the deserialization context.
+        ///     <para />
+        ///     NOTE that this method only does anything if <see cref="T" /> is not a value type.
         /// </summary>
         /// <param name="value">The value to register.</param>
         /// <param name="reader">The reader which is currently being used.</param>
         protected void RegisterReferenceID(object value, IDataReader reader)
         {
-            if (!this.IsValueType)
+            if (!IsValueType)
             {
-                int id = reader.CurrentNodeId;
+                var id = reader.CurrentNodeId;
 
                 if (id < 0)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Reference type node is missing id upon deserialization. Some references may be broken. This tends to happen if a value type has changed to a reference type (IE, struct to class) since serialization took place.");
                 }
                 else
                 {
@@ -686,15 +707,16 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Invokes all methods on the object with the [OnDeserializing] attribute.
-        /// <para />
-        /// WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You will have to call it manually after having created the object instance during deserialization.
+        ///     Invokes all methods on the object with the [OnDeserializing] attribute.
+        ///     <para />
+        ///     WARNING: This method will not be called automatically if you override GetUninitializedObject and return null! You
+        ///     will have to call it manually after having created the object instance during deserialization.
         /// </summary>
         /// <param name="value">The value to invoke the callbacks on.</param>
         /// <param name="context">The deserialization context.</param>
         protected void InvokeOnDeserializingCallbacks(object value, DeserializationContext context)
         {
-            for (int i = 0; i < OnDeserializingCallbacks.Length; i++)
+            for (var i = 0; i < OnDeserializingCallbacks.Length; i++)
             {
                 try
                 {
@@ -707,23 +729,28 @@ namespace OdinSerializer
             }
         }
 
-        protected virtual object GetUninitializedObject()
-        {
-            return this.IsValueType ? Activator.CreateInstance(this.SerializedType) : FormatterServices.GetUninitializedObject(this.SerializedType);
-        }
+        protected virtual object GetUninitializedObject() =>
+            IsValueType
+                ? Activator.CreateInstance(SerializedType)
+                : FormatterServices.GetUninitializedObject(SerializedType);
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected abstract void DeserializeImplementation(ref object value, IDataReader reader);
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
         protected abstract void SerializeImplementation(ref object value, IDataWriter writer);
+
+        protected delegate void SerializationCallback(object value, StreamingContext context);
     }
 }

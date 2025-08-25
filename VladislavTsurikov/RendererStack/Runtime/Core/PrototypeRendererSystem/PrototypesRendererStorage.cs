@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using OdinSerializer;
 using UnityEditor;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 {
     [Serializable]
     public class PrototypesRendererStorage
     {
-        public Type RendererType;
-            
         [OdinSerialize]
-        private List<Prototype> _prototypeList = new List<Prototype>();
+        private List<Prototype> _prototypeList = new();
 
-        public PrototypesRendererStorage(Type rendererType)
-        {
-            RendererType = rendererType;
-        }
+        public Type RendererType;
+
+        public PrototypesRendererStorage(Type rendererType) => RendererType = rendererType;
 
         public void DeleteInvalidPrototypes()
         {
-            List<Prototype> removePrototypeList = new List<Prototype>();
-            
+            var removePrototypeList = new List<Prototype>();
+
             foreach (Prototype prototype in _prototypeList)
             {
                 if (prototype == null || prototype.PrototypeObject == null)
@@ -29,24 +27,25 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
                     removePrototypeList.Add(prototype);
                 }
             }
+
             if (removePrototypeList.Count != 0)
             {
                 Remove(removePrototypeList);
             }
         }
 
-        public Prototype GeneratePrototypeIfNecessary(UnityEngine.Object obj, Type prototypeType)
+        public Prototype GeneratePrototypeIfNecessary(Object obj, Type prototypeType)
         {
             Prototype prototype = GetPrototype(obj);
-                
-            int id = obj.GetInstanceID();
+
+            var id = obj.GetInstanceID();
 
             if (prototype == null)
             {
                 prototype = (Prototype)Activator.CreateInstance(prototypeType);
                 prototype.Init(id, obj, RendererType);
                 _prototypeList.Add(prototype);
-                
+
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(PrototypesStorage.Instance);
 #endif
@@ -54,7 +53,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return prototype;
         }
-        
+
         public void Remove(List<Prototype> protoList)
         {
             if (_prototypeList.RemoveAll(protoList.Contains) != 0)
@@ -65,11 +64,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
             }
         }
 
-        public Prototype GetPrototype(UnityEngine.Object obj)
+        public Prototype GetPrototype(Object obj)
         {
             foreach (Prototype proto in _prototypeList)
             {
-                if(proto.IsSamePrototypeObject(obj))
+                if (proto.IsSamePrototypeObject(obj))
                 {
                     return proto;
                 }
@@ -77,12 +76,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return null;
         }
-        
+
         public Prototype GetPrototype(int id)
         {
             foreach (Prototype proto in _prototypeList)
             {
-                if(proto.ID == id)
+                if (proto.ID == id)
                 {
                     return proto;
                 }
@@ -90,12 +89,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
 
             return null;
         }
-        
+
         public bool HasPrototype(Prototype findProto)
         {
             foreach (Prototype proto in _prototypeList)
             {
-                if(proto.ID == findProto.ID)
+                if (proto.ID == findProto.ID)
                 {
                     return true;
                 }

@@ -14,7 +14,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             TerrainObjectRendererAPI.OverlapSphere(sphereCenter, sphereRadius, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
             {
-                List<PrototypeTerrainObject> prototypes = AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
+                List<PrototypeTerrainObject> prototypes =
+ AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
                 
                 if(prototypes.Count == 0)
                 {
@@ -41,7 +42,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         {
             TerrainObjectRendererAPI.OverlapBox(boxCenter, boxSize, boxRotation, objectFilter, quadTree, checkObbIntersection, largeObjectInstance =>
             {
-                List<PrototypeTerrainObject> prototypes = AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
+                List<PrototypeTerrainObject> prototypes =
+ AllAvailableTerrainObjectPrototypes.GetPrototypes(largeObjectInstance.PrototypeID);
 
                 if(prototypes == null || prototypes.Count == 0)
                 {

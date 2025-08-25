@@ -2,7 +2,7 @@
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public abstract class FilterAttribute : Attribute
     {
     }

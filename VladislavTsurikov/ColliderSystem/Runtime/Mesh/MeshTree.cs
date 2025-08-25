@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using VladislavTsurikov.BVH.Runtime;
 using VladislavTsurikov.Math.Runtime;
@@ -6,19 +7,11 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
 {
     public class MeshTree
     {
-        private class NodeData
-        {
-            public int TriangleIndex;
-        }
-
-        private Mesh _mesh;
+        private readonly Mesh _mesh;
+        private readonly BVHTree<BVHNodeAABB<NodeData>, NodeData> _tree = new();
         private bool _isReady;
-        private BVHTree<BVHNodeAABB<NodeData>, NodeData> _tree = new BVHTree<BVHNodeAABB<NodeData>, NodeData>();
 
-        public MeshTree(Mesh mesh)
-        {
-            _mesh = mesh;
-        }
+        public MeshTree(Mesh mesh) => _mesh = mesh;
 
         public MeshRayHit Raycast(Ray ray, Matrix4x4 transformMtx)
         {
@@ -27,27 +20,28 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
                 Build();
             }
 
-            var nodeHits = _tree.RaycastAll(transformMtx.inverse.TransformRay(ray), false);
+            List<BVHNodeRayHit<NodeData>> nodeHits = _tree.RaycastAll(transformMtx.inverse.TransformRay(ray), false);
             if (nodeHits.Count != 0)
             {
-                float minT = float.MaxValue;
+                var minT = float.MaxValue;
                 Vector3 hitTriNormal = Vector3.zero;
-                int hitTriIndex = -1;
-                foreach (var nodeHit in nodeHits)
+                var hitTriIndex = -1;
+                foreach (BVHNodeRayHit<NodeData> nodeHit in nodeHits)
                 {
-                    int triangleIndex = nodeHit.HitNode.Data.TriangleIndex;
-                    var triangleVerts = _mesh.GetTriangleVerts(triangleIndex);
+                    var triangleIndex = nodeHit.HitNode.Data.TriangleIndex;
+                    Vector3[] triangleVerts = _mesh.GetTriangleVerts(triangleIndex);
 
                     triangleVerts[0] = transformMtx.MultiplyPoint(triangleVerts[0]);
                     triangleVerts[1] = transformMtx.MultiplyPoint(triangleVerts[1]);
                     triangleVerts[2] = transformMtx.MultiplyPoint(triangleVerts[2]);
 
-                    Vector3 e0 = (triangleVerts[1] - triangleVerts[0]);
-                    Vector3 e1 = (triangleVerts[2] - triangleVerts[0]);
+                    Vector3 e0 = triangleVerts[1] - triangleVerts[0];
+                    Vector3 e1 = triangleVerts[2] - triangleVerts[0];
                     Vector3 triNormal = Vector3.Cross(e0, e1).normalized;
 
                     float t;
-                    if (TriangleMath.Raycast(ray, out t, triangleVerts[0], triangleVerts[1], triangleVerts[2], triNormal))
+                    if (TriangleMath.Raycast(ray, out t, triangleVerts[0], triangleVerts[1], triangleVerts[2],
+                            triNormal))
                     {
                         if (t < minT)
                         {
@@ -74,10 +68,10 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
                 return;
             }
 
-            var meshVerts = _mesh.Vertices;
-            for (int triIndex = 0; triIndex < _mesh.NumTriangles; ++triIndex)
+            Vector3[] meshVerts = _mesh.Vertices;
+            for (var triIndex = 0; triIndex < _mesh.NumTriangles; ++triIndex)
             {
-                var triangle = _mesh.GetTriangle(triIndex);
+                MeshTriangle triangle = _mesh.GetTriangle(triIndex);
 
                 Vector3 min = meshVerts[triangle.Index0];
                 min = Vector3.Min(min, meshVerts[triangle.Index1]);
@@ -87,16 +81,20 @@ namespace VladislavTsurikov.ColliderSystem.Runtime
                 max = Vector3.Max(max, meshVerts[triangle.Index1]);
                 max = Vector3.Max(max, meshVerts[triangle.Index2]);
 
-                var node = new BVHNodeAABB<NodeData>(new NodeData() { TriangleIndex = triIndex })
+                var node = new BVHNodeAABB<NodeData>(new NodeData { TriangleIndex = triIndex })
                 {
-                    Size = (max - min),
-                    Position = (min + max) * 0.5f
+                    Size = max - min, Position = (min + max) * 0.5f
                 };
 
                 _tree.InsertLeafNode(node);
             }
 
             _isReady = true;
+        }
+
+        private class NodeData
+        {
+            public int TriangleIndex;
         }
 
 #if UNITY_EDITOR

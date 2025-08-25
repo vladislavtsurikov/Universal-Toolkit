@@ -8,7 +8,6 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
 {
     public class PropertyListViewItem : ListViewItem
     {
-        public PropertyField PropertyField { get; private set; }
         public UnityAction<SerializedProperty> OnRemoveButtonClick;
 
         public PropertyListViewItem(ListView listView) : base(listView)
@@ -16,6 +15,8 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             ItemContentContainer.Clear();
             ItemContentContainer.Add(PropertyField = new PropertyField());
         }
+
+        public PropertyField PropertyField { get; }
 
         public void Update(int index, SerializedProperty property)
         {

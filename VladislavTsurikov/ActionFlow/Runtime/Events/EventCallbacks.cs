@@ -7,10 +7,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
     {
         [OdinSerialize]
         protected Event TriggerEvent;
-        
-        public void Setup(Event triggerEvent)
-        {
-            TriggerEvent = triggerEvent;
-        }
+
+        public void Setup(Event triggerEvent) => TriggerEvent = triggerEvent;
     }
 }

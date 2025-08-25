@@ -6,26 +6,26 @@ using VladislavTsurikov.MegaWorld.Runtime.Common.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
 using VladislavTsurikov.UnityUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.MegaWorld.Runtime.Core.Utility.GameObjectUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PinTool
 {
-    public static class PlaceObject 
+    public static class PlaceObject
     {
         public static PlacedObjectData Place(Group group, RayHit rayHit)
         {
             PlacedObjectPrototype proto = GetRandomPrototype.GetRandomSelectedPrototype(group);
 
-            if(proto == null)
+            if (proto == null)
             {
                 return null;
             }
 
-            Instance instance = new Instance(rayHit.Point, Vector3.one, Quaternion.identity);
+            var instance = new Instance(rayHit.Point, Vector3.one, Quaternion.identity);
 
-            GameObject gameObject = GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
+            GameObject gameObject =
+                GameObjectUtility.Instantiate(proto.Prefab, instance.Position, instance.Scale, instance.Rotation);
 
             if (group.PrototypeType == typeof(PrototypeGameObject))
             {

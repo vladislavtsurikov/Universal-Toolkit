@@ -2,7 +2,7 @@
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Class)]
     public sealed class DontDrawFoldoutAttribute : Attribute
     {
     }

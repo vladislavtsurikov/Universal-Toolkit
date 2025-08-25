@@ -16,22 +16,21 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(TimeSpanFormatter))]
 
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Custom formatter for the <see cref="TimeSpan"/> type.
+    ///     Custom formatter for the <see cref="TimeSpan" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{System.TimeSpan}" />
+    /// <seealso cref="TimeSpan" />
     public sealed class TimeSpanFormatter : MinimalBaseFormatter<TimeSpan>
     {
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
@@ -48,13 +47,10 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>
-        protected override void Write(ref TimeSpan value, IDataWriter writer)
-        {
-            writer.WriteInt64(null, value.Ticks);
-        }
+        protected override void Write(ref TimeSpan value, IDataWriter writer) => writer.WriteInt64(null, value.Ticks);
     }
 }

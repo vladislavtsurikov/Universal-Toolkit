@@ -12,14 +12,18 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
     {
         public bool FilterSettingsFoldout = true;
 
+        private GUIContent _checkHeight = new("Check Height");
+        private GUIContent _checkSlope = new("Check Slope");
+        private GUIContent _slope = new("Slope");
+
         public void OnGUI(SimpleFilter element, string text)
         {
             FilterSettingsFoldout = CustomEditorGUILayout.Foldout(FilterSettingsFoldout, text);
 
-            if(FilterSettingsFoldout)
+            if (FilterSettingsFoldout)
             {
                 EditorGUI.indentLevel++;
-				
+
                 DrawCheckHeight(element);
                 DrawCheckSlope(element);
 
@@ -33,7 +37,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 
             EditorGUI.indentLevel++;
 
-            if(filter.CheckHeight)
+            if (filter.CheckHeight)
             {
                 filter.MinHeight = CustomEditorGUILayout.FloatField(new GUIContent("Min Height"), filter.MinHeight);
                 filter.MaxHeight = CustomEditorGUILayout.FloatField(new GUIContent("Max Height"), filter.MaxHeight);
@@ -48,17 +52,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings
 
             EditorGUI.indentLevel++;
 
-            if(filter.CheckSlope)
+            if (filter.CheckSlope)
             {
                 CustomEditorGUILayout.MinMaxSlider(_slope, ref filter.MinSlope, ref filter.MaxSlope, 0f, 90);
             }
 
             EditorGUI.indentLevel--;
         }
-
-        private GUIContent _checkHeight = new GUIContent("Check Height");
-        private GUIContent _checkSlope = new GUIContent("Check Slope");
-        private GUIContent _slope = new GUIContent("Slope");
     }
 }
 #endif

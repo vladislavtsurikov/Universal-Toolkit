@@ -16,20 +16,20 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class RegisterFormatterLocatorAttribute : Attribute
     {
-        public Type FormatterLocatorType { get; private set; }
-        public int Priority { get; private set; }
-
         public RegisterFormatterLocatorAttribute(Type formatterLocatorType, int priority = 0)
         {
-            this.FormatterLocatorType = formatterLocatorType;
-            this.Priority = priority;
+            FormatterLocatorType = formatterLocatorType;
+            Priority = priority;
         }
+
+        public Type FormatterLocatorType { get; private set; }
+        public int Priority { get; private set; }
     }
 }

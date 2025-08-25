@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using OdinSerializer;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem;
 using VladislavTsurikov.SceneUtility.Runtime;
 
@@ -31,14 +30,13 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
             }
         }
 
-        public abstract List<SceneReference> GetSceneReferences();  
+        public abstract List<SceneReference> GetSceneReferences();
         public abstract List<SceneCollection> GetStartupSceneCollections();
-        
+
         public abstract List<SceneCollection> GetAllSceneCollections();
 
         public virtual void DoBuild()
         {
-
         }
     }
 }

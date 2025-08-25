@@ -6,15 +6,14 @@ using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.Proto
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.PrototypeSettings
 {
-    public class PrototypeComponentStackEditor : ReorderableListStackEditor<PrototypeComponent, PrototypeComponentEditor>
+    public class
+        PrototypeComponentStackEditor : ReorderableListStackEditor<PrototypeComponent, PrototypeComponentEditor>
     {
         private readonly ComponentStackOnlyDifferentTypes<PrototypeComponent> _componentStackOnlyDifferentTypes;
-        
-        public PrototypeComponentStackEditor(ComponentStackOnlyDifferentTypes<PrototypeComponent> stack) : 
-            base(new GUIContent(""), stack, true)
-        {
+
+        public PrototypeComponentStackEditor(ComponentStackOnlyDifferentTypes<PrototypeComponent> stack) :
+            base(new GUIContent(""), stack, true) =>
             _componentStackOnlyDifferentTypes = stack;
-        }
     }
 }
 #endif

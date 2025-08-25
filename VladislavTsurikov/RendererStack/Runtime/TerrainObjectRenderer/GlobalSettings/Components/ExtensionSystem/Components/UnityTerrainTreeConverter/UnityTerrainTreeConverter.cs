@@ -1,33 +1,36 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.ColliderSystem;
 using VladislavTsurikov.SceneDataSystem.Runtime.Utility;
 using VladislavTsurikov.UnityUtility.Runtime;
 
-namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.UnityTerrainTreeConverter
+namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSettings.ExtensionSystem.
+    UnityTerrainTreeConverter
 {
     [Name("Unity Terrain Tree Converter")]
     public class UnityTerrainTreeConverter : Extension
     {
         public void ConvertAllUnityTerrainTreeToTerrainObjectRenderer()
         {
-            if(Terrain.activeTerrain != null)
+            if (Terrain.activeTerrain != null)
             {
                 foreach (Terrain terrain in Terrain.activeTerrains)
                 {
-                    var terrainData = terrain.terrainData;
-                    
+                    TerrainData terrainData = terrain.terrainData;
+
                     TreePrototype[] treePrototypeArray = terrainData.treePrototypes;
                     TreeInstance[] treeInstances = terrainData.treeInstances;
 
-                    foreach (var tree in treeInstances)
+                    foreach (TreeInstance tree in treeInstances)
                     {
-                        Vector3 scale = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
-                        
-                        TerrainObjectRendererAPI.AddInstance(treePrototypeArray[tree.prototypeIndex].prefab, GetWorldPosFromTerrain(terrain, tree.position), scale, Quaternion.Euler(0, tree.rotation, 0));
+                        var scale = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
+
+                        TerrainObjectRendererAPI.AddInstance(treePrototypeArray[tree.prototypeIndex].prefab,
+                            GetWorldPosFromTerrain(terrain, tree.position), scale,
+                            Quaternion.Euler(0, tree.rotation, 0));
                     }
 
                     terrain.drawTreesAndFoliage = false;
@@ -37,25 +40,26 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
 
         public void ConvertUnityTerrainTreeToTerrainObjectRenderer()
         {
-            if(Terrain.activeTerrain != null)
+            if (Terrain.activeTerrain != null)
             {
                 foreach (Terrain terrain in Terrain.activeTerrains)
                 {
-                    var terrainData = terrain.terrainData;
-                    
+                    TerrainData terrainData = terrain.terrainData;
+
                     TreePrototype[] treePrototypeArray = terrainData.treePrototypes;
                     TreeInstance[] treeInstances = terrainData.treeInstances;
-                    
-                    foreach (var tree in treeInstances)
+
+                    foreach (TreeInstance tree in treeInstances)
                     {
-                        PrototypeTerrainObject proto = (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(
+                        var proto = (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(
                             treePrototypeArray[tree.prototypeIndex].prefab);
 
-                        if(proto != null)
+                        if (proto != null)
                         {
-                            Vector3 scale = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
-                            
-                            TerrainObjectRendererAPI.AddInstance(proto, GetWorldPosFromTerrain(terrain, tree.position), scale, Quaternion.Euler(0, tree.rotation, 0));
+                            var scale = new Vector3(tree.widthScale, tree.heightScale, tree.widthScale);
+
+                            TerrainObjectRendererAPI.AddInstance(proto, GetWorldPosFromTerrain(terrain, tree.position),
+                                scale, Quaternion.Euler(0, tree.rotation, 0));
                         }
                     }
 
@@ -66,7 +70,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
 
         public void ConvertTerrainObjectRendererToUnityTerrainTree()
         {
-            if(Terrain.activeTerrain != null)
+            if (Terrain.activeTerrain != null)
             {
                 foreach (Terrain terrain in Terrain.activeTerrains)
                 {
@@ -76,43 +80,48 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
                 }
 
                 UnspawnTerrainTree(TerrainObjectRenderer.Instance.SelectionData.PrototypeList);
-                
-                List<TerrainObjectCollider> largeObjectInstances = new List<TerrainObjectCollider>();
 
-                foreach (TerrainObjectRendererData item in SceneDataStackUtility.GetAllSceneData<TerrainObjectRendererData>())
+                var largeObjectInstances = new List<TerrainObjectCollider>();
+
+                foreach (TerrainObjectRendererData item in SceneDataStackUtility
+                             .GetAllSceneData<TerrainObjectRendererData>())
                 {
                     largeObjectInstances.AddRange(item.GetAllInstances());
                 }
-                
-                foreach (var largeObjectCollider in largeObjectInstances)
+
+                foreach (TerrainObjectCollider largeObjectCollider in largeObjectInstances)
                 {
                     Terrain terrain = GetTerrain(largeObjectCollider.Instance.Position);
 
-                    if(terrain == null)
+                    if (terrain == null)
                     {
                         continue;
                     }
 
-                    TreeInstance treeInstance = new TreeInstance();
+                    var treeInstance = new TreeInstance();
 
-                    Vector3 normalizedLocalPos = GetNormalizedLocalPosFromTerrain(terrain, largeObjectCollider.Instance.Position);
-                    
-                    SetTreeInstanceInfo(ref treeInstance, GetUnityTerrainIndexFromInstantID(terrain, largeObjectCollider.Instance.Proto), normalizedLocalPos, largeObjectCollider.Instance);
+                    Vector3 normalizedLocalPos =
+                        GetNormalizedLocalPosFromTerrain(terrain, largeObjectCollider.Instance.Position);
+
+                    SetTreeInstanceInfo(ref treeInstance,
+                        GetUnityTerrainIndexFromInstantID(terrain, largeObjectCollider.Instance.Proto),
+                        normalizedLocalPos, largeObjectCollider.Instance);
 
                     terrain.AddTreeInstance(treeInstance);
                 }
             }
         }
 
-        private void SetTreeInstanceInfo(ref TreeInstance treeInstance, int terrainProtoIdx, Vector3 normalizedLocalPos, TerrainObjectInstance instance)
+        private void SetTreeInstanceInfo(ref TreeInstance treeInstance, int terrainProtoIdx, Vector3 normalizedLocalPos,
+            TerrainObjectInstance instance)
         {
             treeInstance.prototypeIndex = terrainProtoIdx;
             treeInstance.position = normalizedLocalPos;
-            
-            float rotationY = instance.Rotation.eulerAngles.y;
+
+            var rotationY = instance.Rotation.eulerAngles.y;
 
             treeInstance.widthScale = instance.Scale.x;
-            treeInstance.heightScale = instance.Scale.y;  
+            treeInstance.heightScale = instance.Scale.y;
 
             treeInstance.rotation = rotationY * (Mathf.PI / 180f);
 
@@ -122,11 +131,12 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
 
         private int GetUnityTerrainIndexFromInstantID(Terrain terrain, PrototypeTerrainObject proto)
         {
-            if(proto != null)
+            if (proto != null)
             {
-                for (int treeIndex = 0; treeIndex < terrain.terrainData.treePrototypes.Length; treeIndex++)
+                for (var treeIndex = 0; treeIndex < terrain.terrainData.treePrototypes.Length; treeIndex++)
                 {
-                    if (GameObjectUtility.IsSameGameObject(terrain.terrainData.treePrototypes[treeIndex].prefab, proto.Prefab))
+                    if (GameObjectUtility.IsSameGameObject(terrain.terrainData.treePrototypes[treeIndex].prefab,
+                            proto.Prefab))
                     {
                         return treeIndex;
                     }
@@ -141,7 +151,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
             bool found;
 
             TreePrototype newTree;
-            List<TreePrototype> terrainTrees = new List<TreePrototype>(terrain.terrainData.treePrototypes);
+            var terrainTrees = new List<TreePrototype>(terrain.terrainData.treePrototypes);
             foreach (PrototypeTerrainObject tree in prototypeList)
             {
                 found = false;
@@ -160,7 +170,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
                     terrainTrees.Add(newTree);
                 }
             }
-            
+
             terrain.terrainData.treePrototypes = terrainTrees.ToArray();
         }
 
@@ -168,7 +178,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         {
             foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                List<TreePrototype> terrainTrees = new List<TreePrototype>();
+                var terrainTrees = new List<TreePrototype>();
 
                 terrain.terrainData.treePrototypes = terrainTrees.ToArray();
 
@@ -180,8 +190,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         {
             foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                List<TreeInstance> newTrees = new List<TreeInstance>();
-                  
+                var newTrees = new List<TreeInstance>();
+
                 terrain.terrainData.treeInstances = newTrees.ToArray();
             }
         }
@@ -190,16 +200,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         {
             foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                List<TreeInstance> treeInstances = new List<TreeInstance>();
-                
-                foreach (var treeInstance in terrain.terrainData.treeInstances)
+                var treeInstances = new List<TreeInstance>();
+
+                foreach (TreeInstance treeInstance in terrain.terrainData.treeInstances)
                 {
-                    bool found = false;
-                    foreach (var prototype in prototypeList)
+                    var found = false;
+                    foreach (Prototype prototype in prototypeList)
                     {
-                        PrototypeTerrainObject prototypeTerrainObject = (PrototypeTerrainObject)prototype;
-                            
-                        if (GameObjectUtility.IsSameGameObject( terrain.terrainData.treePrototypes[treeInstance.prototypeIndex].prefab, prototypeTerrainObject.Prefab))
+                        var prototypeTerrainObject = (PrototypeTerrainObject)prototype;
+
+                        if (GameObjectUtility.IsSameGameObject(
+                                terrain.terrainData.treePrototypes[treeInstance.prototypeIndex].prefab,
+                                prototypeTerrainObject.Prefab))
                         {
                             found = true;
                         }
@@ -210,14 +222,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
                         treeInstances.Add(treeInstance);
                     }
                 }
-                
+
                 terrain.terrainData.treeInstances = treeInstances.ToArray();
             }
         }
 
         private Vector3 GetWorldPosFromTerrain(Terrain terrain, Vector3 localPosition)
         {
-            Vector3 worldPosition = new Vector3(Mathf.Lerp(0f, terrain.terrainData.size.x, localPosition.x),
+            var worldPosition = new Vector3(Mathf.Lerp(0f, terrain.terrainData.size.x, localPosition.x),
                 Mathf.Lerp(0f, terrain.terrainData.size.y, localPosition.y),
                 Mathf.Lerp(0f, terrain.terrainData.size.z, localPosition.z));
 
@@ -230,16 +242,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         {
             Vector3 terrainLocalPos = terrain.transform.InverseTransformPoint(worldPosition);
             return new Vector3(Mathf.InverseLerp(0f, terrain.terrainData.size.x, terrainLocalPos.x),
-                        Mathf.InverseLerp(0f, terrain.terrainData.size.y, terrainLocalPos.y),
-                        Mathf.InverseLerp(0f, terrain.terrainData.size.z, terrainLocalPos.z));
+                Mathf.InverseLerp(0f, terrain.terrainData.size.y, terrainLocalPos.y),
+                Mathf.InverseLerp(0f, terrain.terrainData.size.z, terrainLocalPos.z));
         }
-        
+
         public static Terrain GetTerrain(Vector3 location)
         {
-            foreach (var terrain in Terrain.activeTerrains)
+            foreach (Terrain terrain in Terrain.activeTerrains)
             {
-                var terrainMin = terrain.GetPosition();
-                var terrainMax = terrainMin + terrain.terrainData.size;
+                Vector3 terrainMin = terrain.GetPosition();
+                Vector3 terrainMax = terrainMin + terrain.terrainData.size;
                 if (location.x >= terrainMin.x && location.x <= terrainMax.x)
                 {
                     if (location.z >= terrainMin.z && location.z <= terrainMax.z)

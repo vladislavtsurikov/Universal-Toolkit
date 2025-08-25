@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
@@ -10,26 +9,26 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
             base.CustomDataType = Constants.Interface;
             base.Name = name;
         }
-        
+
         public new BuiltInDataType? BuiltInDataType { get; }
 
         public new string CustomDataType => base.CustomDataType;
 
         public new string Name => base.Name;
 
-        public virtual List<Property> Properties { get; set; } = new List<Property>();
+        public virtual List<Property> Properties { get; set; } = new();
 
-        public virtual List<Method> Methods { get; set; } = new List<Method>();
+        public virtual List<Method> Methods { get; set; } = new();
 
         public override string ToString()
         {
-            string result = base.ToString();
+            var result = base.ToString();
             result += Constants.NewLine + Indent + "{";
 
-            result += String.Join("", Properties);
-            bool hasPropertiesAndMethods = Properties.Count > 0 && Methods.Count > 0;
+            result += string.Join("", Properties);
+            var hasPropertiesAndMethods = Properties.Count > 0 && Methods.Count > 0;
             result += hasPropertiesAndMethods ? Constants.NewLine : "";
-            result += String.Join(Constants.NewLine, Methods);
+            result += string.Join(Constants.NewLine, Methods);
 
             result += Constants.NewLine + Indent + "}";
             result = result.Replace(AccessModifier.Public.ToTextLower() + " ", "");

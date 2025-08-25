@@ -11,14 +11,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultC
         [OdinSerialize]
         private Group _group;
 
-        protected override void OnSetup()
-        {
-            _group = (Group)SetupData[0];
-        }
+        protected override void OnSetup() => _group = (Group)SetupData[0];
 
         protected override void OnCreateElements()
         {
-            AddDefaultGroupComponentsAttribute addDefaultGroupComponentsAttribute = _group.PrototypeType.GetAttribute<AddDefaultGroupComponentsAttribute>();
+            AddDefaultGroupComponentsAttribute addDefaultGroupComponentsAttribute =
+                _group.PrototypeType.GetAttribute<AddDefaultGroupComponentsAttribute>();
 
             if (addDefaultGroupComponentsAttribute == null)
             {
@@ -30,15 +28,16 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultC
 
         public override void OnRemoveInvalidElements()
         {
-            AddDefaultGroupComponentsAttribute addDefaultGroupComponentsAttribute = _group.PrototypeType.GetAttribute<AddDefaultGroupComponentsAttribute>();
+            AddDefaultGroupComponentsAttribute addDefaultGroupComponentsAttribute =
+                _group.PrototypeType.GetAttribute<AddDefaultGroupComponentsAttribute>();
 
             if (addDefaultGroupComponentsAttribute == null)
             {
                 RemoveAll();
                 return;
             }
-            
-            for (int i = ElementList.Count - 1; i >= 0; i--)
+
+            for (var i = ElementList.Count - 1; i >= 0; i--)
             {
                 if (!addDefaultGroupComponentsAttribute.Types.Contains(ElementList[i].GetType()))
                 {

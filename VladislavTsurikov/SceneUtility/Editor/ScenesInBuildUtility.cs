@@ -10,16 +10,17 @@ namespace VladislavTsurikov.SceneUtility.Editor
     public static class ScenesInBuildUtility
     {
         public delegate void SetupScenesInBuildOverrideDelegate(List<string> scenePaths);
+
         internal static SetupScenesInBuildOverrideDelegate SetupScenesInBuildOverride;
-        
+
         public static void Setup(List<string> scenePaths)
         {
             if (Application.isPlaying)
             {
                 return;
             }
-            
-            if(SetupScenesInBuildOverride != null)
+
+            if (SetupScenesInBuildOverride != null)
             {
                 SetupScenesInBuildOverride.Invoke(scenePaths);
             }
@@ -28,7 +29,7 @@ namespace VladislavTsurikov.SceneUtility.Editor
                 SetupScenesInBuildSettings(scenePaths);
             }
         }
-        
+
         private static void SetupScenesInBuildSettings(List<string> scenePaths)
         {
             ClearAllBuildScene();
@@ -38,20 +39,16 @@ namespace VladislavTsurikov.SceneUtility.Editor
                 AddBuildScene(path);
             }
         }
-        
-        public static void ClearAllBuildScene()
-        {
-            EditorBuildSettings.scenes = Array.Empty<EditorBuildSettingsScene>();
-        }
 
-        public static bool HasSceneInBuild(string pathToScene)
-        {
-            return EditorBuildSettings.scenes.Any(editorBuildSettingsScene => editorBuildSettingsScene.path == pathToScene);
-        }
+        public static void ClearAllBuildScene() => EditorBuildSettings.scenes = Array.Empty<EditorBuildSettingsScene>();
+
+        public static bool HasSceneInBuild(string pathToScene) =>
+            EditorBuildSettings.scenes.Any(editorBuildSettingsScene =>
+                editorBuildSettingsScene.path == pathToScene);
 
         public static void AddBuildScene(string pathToScene)
         {
-            if(HasSceneInBuild(pathToScene))
+            if (HasSceneInBuild(pathToScene))
             {
                 return;
             }
@@ -61,10 +58,10 @@ namespace VladislavTsurikov.SceneUtility.Editor
             tempScenes.Add(newScene);
             EditorBuildSettings.scenes = tempScenes.ToArray();
         }
-        
+
         public static void RemoveBuildScene(string pathToScene)
         {
-            if(HasSceneInBuild(pathToScene))
+            if (HasSceneInBuild(pathToScene))
             {
                 return;
             }

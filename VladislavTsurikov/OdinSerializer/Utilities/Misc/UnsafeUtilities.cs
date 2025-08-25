@@ -15,28 +15,27 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
+using System;
+using System.Runtime.InteropServices;
+
 namespace OdinSerializer.Utilities.Unsafe
 {
-    using System;
-    using System.Runtime.InteropServices;
-
     /// <summary>
-    /// Contains utilities for performing common unsafe operations.
+    ///     Contains utilities for performing common unsafe operations.
     /// </summary>
     public static class UnsafeUtilities
     {
         /// <summary>
-        /// Blindly creates an array of structs from an array of bytes via direct memory copy/blit.
+        ///     Blindly creates an array of structs from an array of bytes via direct memory copy/blit.
         /// </summary>
-        public static unsafe T[] StructArrayFromBytes<T>(byte[] bytes, int byteLength) where T : struct
-        {
-            return StructArrayFromBytes<T>(bytes, 0, 0);
-        }
+        public static T[] StructArrayFromBytes<T>(byte[] bytes, int byteLength) where T : struct =>
+            StructArrayFromBytes<T>(bytes, 0, 0);
 
         /// <summary>
-        /// Blindly creates an array of structs from an array of bytes via direct memory copy/blit.
+        ///     Blindly creates an array of structs from an array of bytes via direct memory copy/blit.
         /// </summary>
-        public static unsafe T[] StructArrayFromBytes<T>(byte[] bytes, int byteLength, int byteOffset) where T : struct
+        public static T[] StructArrayFromBytes<T>(byte[] bytes, int byteLength, int byteOffset) where T : struct
         {
             if (bytes == null)
             {
@@ -53,42 +52,49 @@ namespace OdinSerializer.Utilities.Unsafe
                 throw new ArgumentException("Byte offset must be larger than or equal to zero.");
             }
 
-            int typeSize = Marshal.SizeOf(typeof(T));
+            var typeSize = Marshal.SizeOf(typeof(T));
 
             if (byteOffset % sizeof(ulong) != 0)
             {
-                throw new ArgumentException("Byte offset must be divisible by " + sizeof(ulong) + " (IE, sizeof(ulong))");
+                throw new ArgumentException(
+                    "Byte offset must be divisible by " + sizeof(ulong) + " (IE, sizeof(ulong))");
             }
 
             if (byteLength + byteOffset >= bytes.Length)
             {
-                throw new ArgumentException("Given byte array of size " + bytes.Length + " is not large enough to copy requested number of bytes " + byteLength + ".");
+                throw new ArgumentException("Given byte array of size " + bytes.Length +
+                                            " is not large enough to copy requested number of bytes " + byteLength +
+                                            ".");
             }
 
             if ((byteLength - byteOffset) % typeSize != 0)
             {
-                throw new ArgumentException("The length in the given byte array (" + bytes.Length + ", and " + (bytes.Length - byteOffset) + " minus byteOffset " + byteOffset + ") to convert to type " + typeof(T).Name + " is not divisible by the size of " + typeof(T).Name + " (" + typeSize + ").");
+                throw new ArgumentException("The length in the given byte array (" + bytes.Length + ", and " +
+                                            (bytes.Length - byteOffset) + " minus byteOffset " + byteOffset +
+                                            ") to convert to type " + typeof(T).Name +
+                                            " is not divisible by the size of " + typeof(T).Name + " (" + typeSize +
+                                            ").");
             }
 
-            int elementCount = (bytes.Length - byteOffset) / typeSize;
-            T[] array = new T[elementCount];
+            var elementCount = (bytes.Length - byteOffset) / typeSize;
+            var array = new T[elementCount];
             MemoryCopy(bytes, array, byteLength, byteOffset, 0);
             return array;
         }
 
         /// <summary>
-        /// Blindly copies an array of structs into an array of bytes via direct memory copy/blit.
+        ///     Blindly copies an array of structs into an array of bytes via direct memory copy/blit.
         /// </summary>
-        public static unsafe byte[] StructArrayToBytes<T>(T[] array) where T : struct
+        public static byte[] StructArrayToBytes<T>(T[] array) where T : struct
         {
             byte[] bytes = null;
             return StructArrayToBytes(array, ref bytes, 0);
         }
 
         /// <summary>
-        /// Blindly copies an array of structs into an array of bytes via direct memory copy/blit.
+        ///     Blindly copies an array of structs into an array of bytes via direct memory copy/blit.
         /// </summary>
-        public static unsafe byte[] StructArrayToBytes<T>(T[] array, ref byte[] bytes, int byteOffset) where T : struct
+        public static byte[] StructArrayToBytes<T>(T[] array, ref byte[] bytes, int byteOffset) where T : struct
         {
             if (array == null)
             {
@@ -100,8 +106,8 @@ namespace OdinSerializer.Utilities.Unsafe
                 throw new ArgumentException("Byte offset must be larger than or equal to zero.");
             }
 
-            int typeSize = Marshal.SizeOf(typeof(T));
-            int byteCount = typeSize * array.Length;
+            var typeSize = Marshal.SizeOf(typeof(T));
+            var byteCount = typeSize * array.Length;
 
             if (bytes == null)
             {
@@ -109,7 +115,8 @@ namespace OdinSerializer.Utilities.Unsafe
             }
             else if (bytes.Length + byteOffset > byteCount)
             {
-                throw new ArgumentException("Byte array must be at least " + (bytes.Length + byteOffset) + " long with the given byteOffset.");
+                throw new ArgumentException("Byte array must be at least " + (bytes.Length + byteOffset) +
+                                            " long with the given byteOffset.");
             }
 
             MemoryCopy(array, bytes, byteCount, 0, byteOffset);
@@ -117,19 +124,21 @@ namespace OdinSerializer.Utilities.Unsafe
         }
 
         /// <summary>
-        /// Creates a new string from the contents of a given byte buffer.
+        ///     Creates a new string from the contents of a given byte buffer.
         /// </summary>
         public static unsafe string StringFromBytes(byte[] buffer, int charLength, bool needs16BitSupport)
         {
-            int byteCount = needs16BitSupport ? charLength * 2 : charLength;
+            var byteCount = needs16BitSupport ? charLength * 2 : charLength;
 
             if (buffer.Length < byteCount)
             {
-                throw new ArgumentException("Buffer is not large enough to contain the given string; a size of at least " + byteCount + " is required.");
+                throw new ArgumentException(
+                    "Buffer is not large enough to contain the given string; a size of at least " + byteCount +
+                    " is required.");
             }
 
-            GCHandle toHandle = default(GCHandle);
-            string result = new string(' ', charLength); // Creaty empty string of required length
+            var toHandle = default(GCHandle);
+            var result = new string(' ', charLength); // Creaty empty string of required length
 
             try
             {
@@ -141,10 +150,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr1 = result)
                         {
-                            ushort* fromPtr1 = (ushort*)toHandle.AddrOfPinnedObject().ToPointer();
-                            ushort* toPtr1 = (ushort*)charPtr1;
+                            var fromPtr1 = (ushort*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var toPtr1 = (ushort*)charPtr1;
 
-                            for (int i = 0; i < byteCount; i += sizeof(ushort))
+                            for (var i = 0; i < byteCount; i += sizeof(ushort))
                             {
                                 *toPtr1++ = *fromPtr1++;
                             }
@@ -154,10 +163,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr2 = result)
                         {
-                            byte* fromPtr2 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
-                            byte* toPtr2 = (byte*)charPtr2;
+                            var fromPtr2 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var toPtr2 = (byte*)charPtr2;
 
-                            for (int i = 0; i < byteCount; i += sizeof(ushort))
+                            for (var i = 0; i < byteCount; i += sizeof(ushort))
                             {
                                 *toPtr2 = *(fromPtr2 + 1);
                                 *(toPtr2 + 1) = *fromPtr2;
@@ -174,10 +183,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr3 = result)
                         {
-                            byte* fromPtr3 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
-                            byte* toPtr3 = (byte*)charPtr3;
+                            var fromPtr3 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var toPtr3 = (byte*)charPtr3;
 
-                            for (int i = 0; i < byteCount; i += sizeof(byte))
+                            for (var i = 0; i < byteCount; i += sizeof(byte))
                             {
                                 *toPtr3++ = *fromPtr3++;
                                 toPtr3++; // Skip every other string byte
@@ -188,10 +197,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr4 = result)
                         {
-                            byte* fromPtr4 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
-                            byte* toPtr4 = (byte*)charPtr4;
+                            var fromPtr4 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var toPtr4 = (byte*)charPtr4;
 
-                            for (int i = 0; i < byteCount; i += sizeof(byte))
+                            for (var i = 0; i < byteCount; i += sizeof(byte))
                             {
                                 toPtr4++; // Skip every other string byte
                                 *toPtr4++ = *fromPtr4++;
@@ -217,18 +226,20 @@ namespace OdinSerializer.Utilities.Unsafe
         }
 
         /// <summary>
-        /// Writes the contents of a string into a given byte buffer.
+        ///     Writes the contents of a string into a given byte buffer.
         /// </summary>
         public static unsafe int StringToBytes(byte[] buffer, string value, bool needs16BitSupport)
         {
-            int byteCount = needs16BitSupport ? value.Length * 2 : value.Length;
+            var byteCount = needs16BitSupport ? value.Length * 2 : value.Length;
 
             if (buffer.Length < byteCount)
             {
-                throw new ArgumentException("Buffer is not large enough to contain the given string; a size of at least " + byteCount + " is required.");
+                throw new ArgumentException(
+                    "Buffer is not large enough to contain the given string; a size of at least " + byteCount +
+                    " is required.");
             }
 
-            GCHandle toHandle = default(GCHandle);
+            var toHandle = default(GCHandle);
 
             try
             {
@@ -240,10 +251,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr1 = value)
                         {
-                            ushort* fromPtr1 = (ushort*)charPtr1;
-                            ushort* toPtr1 = (ushort*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var fromPtr1 = (ushort*)charPtr1;
+                            var toPtr1 = (ushort*)toHandle.AddrOfPinnedObject().ToPointer();
 
-                            for (int i = 0; i < byteCount; i += sizeof(ushort))
+                            for (var i = 0; i < byteCount; i += sizeof(ushort))
                             {
                                 *toPtr1++ = *fromPtr1++;
                             }
@@ -253,10 +264,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr2 = value)
                         {
-                            byte* fromPtr2 = (byte*)charPtr2;
-                            byte* toPtr2 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var fromPtr2 = (byte*)charPtr2;
+                            var toPtr2 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
 
-                            for (int i = 0; i < byteCount; i += sizeof(ushort))
+                            for (var i = 0; i < byteCount; i += sizeof(ushort))
                             {
                                 *toPtr2 = *(fromPtr2 + 1);
                                 *(toPtr2 + 1) = *fromPtr2;
@@ -273,10 +284,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr3 = value)
                         {
-                            byte* fromPtr3 = (byte*)charPtr3;
-                            byte* toPtr3 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var fromPtr3 = (byte*)charPtr3;
+                            var toPtr3 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
 
-                            for (int i = 0; i < byteCount; i += sizeof(byte))
+                            for (var i = 0; i < byteCount; i += sizeof(byte))
                             {
                                 fromPtr3++; // Skip every other string byte
                                 *toPtr3++ = *fromPtr3++;
@@ -287,10 +298,10 @@ namespace OdinSerializer.Utilities.Unsafe
                     {
                         fixed (char* charPtr4 = value)
                         {
-                            byte* fromPtr4 = (byte*)charPtr4;
-                            byte* toPtr4 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
+                            var fromPtr4 = (byte*)charPtr4;
+                            var toPtr4 = (byte*)toHandle.AddrOfPinnedObject().ToPointer();
 
-                            for (int i = 0; i < byteCount; i += sizeof(byte))
+                            for (var i = 0; i < byteCount; i += sizeof(byte))
                             {
                                 *toPtr4++ = *fromPtr4++;
                                 fromPtr4++; // Skip every other string byte
@@ -310,26 +321,20 @@ namespace OdinSerializer.Utilities.Unsafe
             return byteCount;
         }
 
-        private struct Struct256Bit
-        {
-            public decimal d1;
-            public decimal d2;
-        }
-
         public static unsafe void MemoryCopy(void* from, void* to, int bytes)
         {
-            byte* end = (byte*)to + bytes;
+            var end = (byte*)to + bytes;
 
-            Struct256Bit* fromBigPtr = (Struct256Bit*)from;
-            Struct256Bit* toBigPtr = (Struct256Bit*)to;
+            var fromBigPtr = (Struct256Bit*)from;
+            var toBigPtr = (Struct256Bit*)to;
 
-            while ((toBigPtr + 1) <= end)
+            while (toBigPtr + 1 <= end)
             {
                 *toBigPtr++ = *fromBigPtr++;
             }
 
-            byte* fromSmallPtr = (byte*)fromBigPtr;
-            byte* toSmallPtr = (byte*)toBigPtr;
+            var fromSmallPtr = (byte*)fromBigPtr;
+            var toSmallPtr = (byte*)toBigPtr;
 
             while (toSmallPtr < end)
             {
@@ -338,30 +343,33 @@ namespace OdinSerializer.Utilities.Unsafe
         }
 
         /// <summary>
-        /// Blindly mem-copies a given number of bytes from the memory location of one object to another. WARNING: This method is ridiculously dangerous. Only use if you know what you're doing.
+        ///     Blindly mem-copies a given number of bytes from the memory location of one object to another. WARNING: This method
+        ///     is ridiculously dangerous. Only use if you know what you're doing.
         /// </summary>
-        public static unsafe void MemoryCopy(object from, object to, int byteCount, int fromByteOffset, int toByteOffset)
+        public static unsafe void MemoryCopy(object from, object to, int byteCount, int fromByteOffset,
+            int toByteOffset)
         {
-            GCHandle fromHandle = default(GCHandle);
-            GCHandle toHandle = default(GCHandle);
+            var fromHandle = default(GCHandle);
+            var toHandle = default(GCHandle);
 
             if (fromByteOffset % sizeof(ulong) != 0 || toByteOffset % sizeof(ulong) != 0)
             {
-                throw new ArgumentException("Byte offset must be divisible by " + sizeof(ulong) + " (IE, sizeof(ulong))");
+                throw new ArgumentException(
+                    "Byte offset must be divisible by " + sizeof(ulong) + " (IE, sizeof(ulong))");
             }
 
             try
             {
-                int restBytes = byteCount % sizeof(ulong);
-                int ulongCount = (byteCount - restBytes) / sizeof(ulong);
-                int fromOffsetCount = fromByteOffset / sizeof(ulong);
-                int toOffsetCount = toByteOffset / sizeof(ulong);
+                var restBytes = byteCount % sizeof(ulong);
+                var ulongCount = (byteCount - restBytes) / sizeof(ulong);
+                var fromOffsetCount = fromByteOffset / sizeof(ulong);
+                var toOffsetCount = toByteOffset / sizeof(ulong);
 
                 fromHandle = GCHandle.Alloc(from, GCHandleType.Pinned);
                 toHandle = GCHandle.Alloc(to, GCHandleType.Pinned);
 
-                ulong* fromUlongPtr = (ulong*)fromHandle.AddrOfPinnedObject().ToPointer();
-                ulong* toUlongPtr = (ulong*)toHandle.AddrOfPinnedObject().ToPointer();
+                var fromUlongPtr = (ulong*)fromHandle.AddrOfPinnedObject().ToPointer();
+                var toUlongPtr = (ulong*)toHandle.AddrOfPinnedObject().ToPointer();
 
                 if (fromOffsetCount > 0)
                 {
@@ -373,17 +381,17 @@ namespace OdinSerializer.Utilities.Unsafe
                     toUlongPtr += toOffsetCount;
                 }
 
-                for (int i = 0; i < ulongCount; i++)
+                for (var i = 0; i < ulongCount; i++)
                 {
                     *toUlongPtr++ = *fromUlongPtr++;
                 }
 
                 if (restBytes > 0)
                 {
-                    byte* fromBytePtr = (byte*)fromUlongPtr;
-                    byte* toBytePtr = (byte*)toUlongPtr;
+                    var fromBytePtr = (byte*)fromUlongPtr;
+                    var toBytePtr = (byte*)toUlongPtr;
 
-                    for (int i = 0; i < restBytes; i++)
+                    for (var i = 0; i < restBytes; i++)
                     {
                         *toBytePtr++ = *fromBytePtr++;
                     }
@@ -401,6 +409,12 @@ namespace OdinSerializer.Utilities.Unsafe
                     toHandle.Free();
                 }
             }
+        }
+
+        private struct Struct256Bit
+        {
+            public decimal d1;
+            public decimal d2;
         }
     }
 }

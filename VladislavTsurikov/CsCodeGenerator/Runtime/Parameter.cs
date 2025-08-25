@@ -6,12 +6,11 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 {
     public class Parameter
     {
-        public Parameter() { }
-
-        public Parameter(string value)
+        public Parameter()
         {
-            Value = value;
         }
+
+        public Parameter(string value) => Value = value;
 
         public Parameter(BuiltInDataType builtInDataType, string name)
         {
@@ -21,16 +20,17 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public Parameter(Type type, string name)
         {
-            CustomDataType = type.ToString().Split('.').Last();;
+            CustomDataType = type.ToString().Split('.').Last();
+            ;
             Name = name;
         }
-        
+
         public Parameter(string type, string name)
         {
             CustomDataType = type;
             Name = name;
         }
-        
+
         public KeyWord? KeyWord { get; set; }
 
         public BuiltInDataType? BuiltInDataType { get; set; }
@@ -43,9 +43,12 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
         public string KeyWordFormated => KeyWord?.ToTextLower(" ");
 
-        public string DataTypeFormated => CustomDataType == null ? BuiltInDataType?.ToTextLower(" ") : CustomDataType + " ";
+        public string DataTypeFormated =>
+            CustomDataType == null ? BuiltInDataType?.ToTextLower(" ") : CustomDataType + " ";
 
-        public string NameValueFormated => (String.IsNullOrEmpty(Name) || String.IsNullOrEmpty(Value)) ? Name + Value : Name + " = " + Value;
+        public string NameValueFormated => string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Value)
+            ? Name + Value
+            : Name + " = " + Value;
 
         public override string ToString() => KeyWordFormated + DataTypeFormated + NameValueFormated;
     }
@@ -54,8 +57,8 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     {
         public static string ToStringList(this List<Parameter> parameters)
         {
-            string parametersString = String.Join(", ", parameters);
-            string result = $"({parametersString})";
+            var parametersString = string.Join(", ", parameters);
+            var result = $"({parametersString})";
             return result;
         }
     }

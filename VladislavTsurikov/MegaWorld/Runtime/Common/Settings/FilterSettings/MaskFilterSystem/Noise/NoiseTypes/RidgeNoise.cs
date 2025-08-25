@@ -1,15 +1,25 @@
-﻿using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
+﻿using System;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Shaders;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.NoiseTypes
 {
     /// <summary>
-    /// A NoiseType implementation for Ridge noise
+    ///     A NoiseType implementation for Ridge noise
     /// </summary>
-    [System.Serializable]
+    [Serializable]
     public class RidgeNoise : NoiseType<RidgeNoise>
     {
         private static RidgeNoise _sInstance;
+
+        private static NoiseTypeDescriptor _desc = new()
+        {
+            Name = "Ridge",
+            OutputDir = MaskFilterShadersPath.Path + "/NoiseLib/",
+            SourcePath = MaskFilterShadersPath.Path + "/NoiseLib/Implementation/RidgeImpl.hlsl",
+            SupportedDimensions = NoiseDimensionFlags._1D | NoiseDimensionFlags._2D | NoiseDimensionFlags._3D,
+            InputStructDefinition = null
+        };
 
         public static RidgeNoise Instance
         {
@@ -23,15 +33,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.Mas
                 return _sInstance;
             }
         }
-        
-        private static NoiseTypeDescriptor _desc = new NoiseTypeDescriptor
-        {
-            Name = "Ridge",
-            OutputDir = MaskFilterShadersPath.Path + "/NoiseLib/",
-            SourcePath = MaskFilterShadersPath.Path + "/NoiseLib/Implementation/RidgeImpl.hlsl",
-            SupportedDimensions = NoiseDimensionFlags._1D | NoiseDimensionFlags._2D | NoiseDimensionFlags._3D,
-            InputStructDefinition = null
-        };
 
         public override NoiseTypeDescriptor GetDescription() => _desc;
     }

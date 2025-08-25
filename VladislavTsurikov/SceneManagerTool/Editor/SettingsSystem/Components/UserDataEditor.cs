@@ -13,17 +13,13 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SettingsSystem
     {
         private UserData _userData;
 
-        public override void OnEnable()
-        {
-            _userData = (UserData)Target;
-        }
+        public override void OnEnable() => _userData = (UserData)Target;
 
-        public override void OnGUI(Rect rect, int index)
-        {
-            _userData.ScriptableObject = (ScriptableObject)CustomEditorGUI.ObjectField(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+        public override void OnGUI(Rect rect, int index) =>
+            _userData.ScriptableObject = (ScriptableObject)CustomEditorGUI.ObjectField(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
                 null, _userData.ScriptableObject, typeof(ScriptableObject));
-        }
-        
+
         public override float GetElementHeight(int index)
         {
             float height = 0;

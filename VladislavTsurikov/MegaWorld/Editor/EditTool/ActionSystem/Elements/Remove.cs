@@ -1,10 +1,10 @@
 #if UNITY_EDITOR
 using System.Runtime.Serialization;
 using UnityEngine;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data;
 using VladislavTsurikov.Undo.Editor.GameObject;
 using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
@@ -12,21 +12,15 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
     [Name("Remove")]
-	public class Remove : Action
+    public class Remove : Action
     {
         private ShortcutCombo _shortcutCombo;
 
         [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
+        private void OnDeserializing() => InitShortcutCombo();
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
-        
+        protected override void OnCreate() => InitShortcutCombo();
+
         private void InitShortcutCombo()
         {
             _shortcutCombo = new ShortcutCombo();
@@ -34,36 +28,36 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
         }
 
         protected override void OnObjectFound()
-        {            
+        {
             EditTool.FindObject.DestroyObject();
             EditTool.FindObject = null;
         }
 
         protected override void RegisterUndo()
         {
-            if(EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
+            if (EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
             {
-                GameObject go = (GameObject)EditTool.FindObject.Obj;
+                var go = (GameObject)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedGameObject(go));
             }
-            else if(EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
+            else if (EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedTerrainObject(instance));
             }
         }
 
-        protected override Color GetColorHandleButton(){return new Color(1f, 0f, 0f, 0.7f);}
+        protected override Color GetColorHandleButton() => new(1f, 0f, 0f, 0.7f);
 
         public override bool CheckShortcutCombo()
         {
-            if(_shortcutCombo.IsActive())
+            if (_shortcutCombo.IsActive())
             {
                 return true;
             }
 
             return false;
         }
-	}
+    }
 }
 #endif

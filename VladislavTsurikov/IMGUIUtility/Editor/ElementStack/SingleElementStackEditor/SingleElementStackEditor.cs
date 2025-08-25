@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using System;
 using System.Linq;
 using Assemblies.VladislavTsurikov.ComponentStack.Runtime.SingleElementStack;
 using UnityEditor;
@@ -15,35 +16,32 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
         where T : Component
         where N : IMGUIElementEditor
     {
+        private readonly SingleElementStack<T> _singleElementStack;
         private GUIStyle _darkBackgroundStyle;
 
-        private readonly SingleElementStack<T> _singleElementStack;
-        
-        public SingleElementStackEditor(SingleElementStack<T> stack) : base(stack)
-        {
-            _singleElementStack = stack;
-        }
+        public SingleElementStackEditor(SingleElementStack<T> stack) : base(stack) => _singleElementStack = stack;
 
         public void OnGUI()
         {
-            if(Stack.IsDirty)
+            if (Stack.IsDirty)
             {
                 Stack.RemoveInvalidElements();
                 RefreshEditors();
                 InitializeStyles();
                 Stack.IsDirty = false;
             }
-            
+
             Component component = _singleElementStack.GetElement();
-            string clickButtonText = component == null ? "Select" : component.Name;
-            
+            var clickButtonText = component == null ? "Select" : component.Name;
+
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Space(CustomEditorGUILayout.GetCurrentSpace());
-                if(CustomEditorGUILayout.ClickButton(clickButtonText))
+                if (CustomEditorGUILayout.ClickButton(clickButtonText))
                 {
                     ShowAddMenu();
                 }
+
                 GUILayout.Space(3);
             }
             GUILayout.EndHorizontal();
@@ -51,26 +49,27 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
             if (component != null)
             {
                 IMGUIElementEditor editor = GetElement();
-                            
+
                 editor.OnGUI();
             }
         }
-        
+
         private void ShowAddMenu()
         {
-            GenericMenu menu = new GenericMenu();
-            
+            var menu = new GenericMenu();
+
             Component component = _singleElementStack.GetElement();
 
-            foreach (var settingsType in AllTypesDerivedFrom<T>.Types.ToList())
+            foreach (Type settingsType in AllTypesDerivedFrom<T>.Types.ToList())
             {
-                string context = settingsType.GetAttribute<NameAttribute>().Name;
+                var context = settingsType.GetAttribute<NameAttribute>().Name;
 
-                bool exists = component != null && component.GetType() == settingsType;
+                var exists = component != null && component.GetType() == settingsType;
 
                 if (!exists)
                 {
-                    menu.AddItem(new GUIContent(context), false, () => _singleElementStack.ReplaceElement(settingsType));
+                    menu.AddItem(new GUIContent(context), false,
+                        () => _singleElementStack.ReplaceElement(settingsType));
                 }
                 else
                 {
@@ -80,7 +79,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
 
             menu.ShowAsContext();
         }
-        
+
         private void InitializeStyles()
         {
             if (_darkBackgroundStyle == null)
@@ -91,20 +90,17 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.SingleElementStackE
             }
         }
 
-        private IMGUIElementEditor GetElement()
-        {
-            return Editors.Count > 0 ? Editors[0] : null;
-        }
+        private IMGUIElementEditor GetElement() => Editors.Count > 0 ? Editors[0] : null;
 
         private Texture2D MakeBackgroundTexture(int width, int height, Color color)
         {
-            Color[] pix = new Color[width * height];
-            for (int i = 0; i < pix.Length; i++)
+            var pix = new Color[width * height];
+            for (var i = 0; i < pix.Length; i++)
             {
                 pix[i] = color;
             }
 
-            Texture2D result = new Texture2D(width, height);
+            var result = new Texture2D(width, height);
             result.SetPixels(pix);
             result.Apply();
 

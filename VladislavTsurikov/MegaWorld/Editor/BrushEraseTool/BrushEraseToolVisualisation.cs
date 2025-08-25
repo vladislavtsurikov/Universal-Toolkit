@@ -17,44 +17,52 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
-    public static class BrushEraseToolVisualisation 
+    public static class BrushEraseToolVisualisation
     {
-        private static MaskFilterVisualisation _maskFilterVisualisation = new MaskFilterVisualisation();
-        
+        private static readonly MaskFilterVisualisation _maskFilterVisualisation = new();
+
         public static void Draw(BoxArea area, SelectionData data, LayerSettings layerSettings)
         {
-            if(area == null || area.RayHit == null)
+            if (area == null || area.RayHit == null)
             {
                 return;
             }
 
-            if(data.SelectedData.HasOneSelectedGroup())
+            if (data.SelectedData.HasOneSelectedGroup())
             {
                 Group group = data.SelectedData.SelectedGroup;
-                
-                if (group.PrototypeType == typeof(PrototypeGameObject) || group.PrototypeType == typeof(PrototypeTerrainObject))
+
+                if (group.PrototypeType == typeof(PrototypeGameObject) ||
+                    group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
-                        
-                    if(filterSettings.FilterType != FilterType.MaskFilter)
+                    var filterSettings =
+                        (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
+
+                    if (filterSettings.FilterType != FilterType.MaskFilter)
                     {
-                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter, layerSettings);
+                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter,
+                            layerSettings);
                         VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                     }
                     else
                     {
-                        _maskFilterVisualisation.DrawMaskFilterVisualization(filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
+                        _maskFilterVisualisation.DrawMaskFilterVisualization(
+                            filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
                     }
                 }
-                else if(group.PrototypeType == typeof(PrototypeTerrainDetail))
+                else if (group.PrototypeType == typeof(PrototypeTerrainDetail))
                 {
-                    MaskFilterComponentSettings maskFilterComponentSettings = (MaskFilterComponentSettings)group.GetElement(typeof(BrushEraseTool), typeof(MaskFilterComponentSettings));
-                    _maskFilterVisualisation.DrawMaskFilterVisualization(maskFilterComponentSettings.MaskFilterStack, area);
+                    var maskFilterComponentSettings =
+                        (MaskFilterComponentSettings)group.GetElement(typeof(BrushEraseTool),
+                            typeof(MaskFilterComponentSettings));
+                    _maskFilterVisualisation.DrawMaskFilterVisualization(maskFilterComponentSettings.MaskFilterStack,
+                        area);
                 }
             }
             else
             {
-                if(SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(BrushEraseTool), WindowData.Instance.SelectedData))
+                if (SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(BrushEraseTool),
+                        WindowData.Instance.SelectedData))
                 {
                     VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                 }

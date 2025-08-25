@@ -1,39 +1,43 @@
 ﻿#if UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.ComponentStack.Editor;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.ModifyTransformComponents
 {
-    public class ModifyTransformStackEditor : ReorderableListStackEditor<ModifyTransformComponent, ReorderableListComponentEditor>
+    public class
+        ModifyTransformStackEditor : ReorderableListStackEditor<ModifyTransformComponent,
+        ReorderableListComponentEditor>
     {
-        private ComponentStackOnlyDifferentTypes<ModifyTransformComponent> ComponentStackOnlyDifferentTypes => (ComponentStackOnlyDifferentTypes<ModifyTransformComponent>)Stack;
-        
-        public ModifyTransformStackEditor(GUIContent label, ComponentStackOnlyDifferentTypes<ModifyTransformComponent> stack) : base(label, stack, true)
-        {
+        public ModifyTransformStackEditor(GUIContent label,
+            ComponentStackOnlyDifferentTypes<ModifyTransformComponent> stack) : base(label, stack, true) =>
             DisplayHeaderText = false;
-        }
+
+        private ComponentStackOnlyDifferentTypes<ModifyTransformComponent> ComponentStackOnlyDifferentTypes =>
+            (ComponentStackOnlyDifferentTypes<ModifyTransformComponent>)Stack;
 
         protected override void ShowAddMenu()
         {
-            GenericMenu menu = new GenericMenu();
+            var menu = new GenericMenu();
 
-            foreach (var type in AllEditorTypes<ModifyTransformComponent>.Types)
+            foreach (KeyValuePair<Type, Type> type in AllEditorTypes<ModifyTransformComponent>.Types)
             {
                 Type modifyTransformComponentType = type.Key;
-                
-                string context = modifyTransformComponentType.GetAttribute<NameAttribute>().Name;
 
-                bool exists = ComponentStackOnlyDifferentTypes.HasType(modifyTransformComponentType);
+                var context = modifyTransformComponentType.GetAttribute<NameAttribute>().Name;
+
+                var exists = ComponentStackOnlyDifferentTypes.HasType(modifyTransformComponentType);
 
                 if (!exists)
                 {
-                    menu.AddItem(new GUIContent(context), false, () => ComponentStackOnlyDifferentTypes.CreateIfMissingType(modifyTransformComponentType));
+                    menu.AddItem(new GUIContent(context), false,
+                        () => ComponentStackOnlyDifferentTypes.CreateIfMissingType(modifyTransformComponentType));
                 }
                 else
                 {

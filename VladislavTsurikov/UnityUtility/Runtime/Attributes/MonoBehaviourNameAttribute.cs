@@ -7,9 +7,6 @@ namespace VladislavTsurikov.UnityUtility.Runtime
     {
         public readonly string Name;
 
-        public MonoBehaviourNameAttribute(string name)
-        {
-            Name = name;
-        }
+        public MonoBehaviourNameAttribute(string name) => Name = name;
     }
 }

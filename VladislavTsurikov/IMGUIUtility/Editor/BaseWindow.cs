@@ -8,7 +8,9 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
     public abstract class BaseWindow<T> : EditorWindow where T : EditorWindow
     {
         private static T s_instance;
-        
+
+        protected double LastRepaintTime;
+
         private static T Window
         {
             get
@@ -20,13 +22,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
         protected VisualElement Root => rootVisualElement;
         protected VisualElement windowLayout { get; set; }
-        
-        protected double LastRepaintTime;
-        
-        protected virtual bool UseCustomRepaintInterval { get { return false; } }
-        protected virtual double CustomRepaintIntervalDuringPlayMode { get { return 0.4f; } }
-        protected virtual double CustomRepaintIntervalWhileIdle { get { return 0.6f; } }
-        protected virtual bool RepaintOnInspectorUpdate { get { return true; } }
+
+        protected virtual bool UseCustomRepaintInterval => false;
+        protected virtual double CustomRepaintIntervalDuringPlayMode => 0.4f;
+        protected virtual double CustomRepaintIntervalWhileIdle => 0.6f;
+        protected virtual bool RepaintOnInspectorUpdate => true;
 
         public static bool IsOpen { get; private set; }
 
@@ -34,28 +34,54 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
         {
             get
             {
-                if (s_instance != null) return s_instance;
+                if (s_instance != null)
+                {
+                    return s_instance;
+                }
+
                 s_instance = Window;
-                if (s_instance != null) return s_instance;
+                if (s_instance != null)
+                {
+                    return s_instance;
+                }
+
                 s_instance = GetWindow<T>();
                 return s_instance;
             }
         }
-        
-        public static void OpenWindow(string windowTitle)
+
+        protected virtual void Update()
         {
-            Instance.Show();
-            Instance.titleContent.text = windowTitle;
+            if (!UseCustomRepaintInterval)
+            {
+                return;
+            }
+
+            if ((EditorApplication.isPlaying && EditorApplication.timeSinceStartup - LastRepaintTime <
+                    CustomRepaintIntervalDuringPlayMode) ||
+                (!EditorApplication.isPlayingOrWillChangePlaymode &&
+                 EditorApplication.timeSinceStartup - LastRepaintTime < CustomRepaintIntervalWhileIdle))
+            {
+                Repaint();
+            }
         }
-        
+
+        protected virtual void OnEnable() => IsOpen = true;
+
+        protected virtual void OnDisable() => IsOpen = false;
+
+        protected virtual void OnDestroy()
+        {
+        }
+
         protected virtual void OnGUI()
         {
             CustomEditorGUILayout.ScreenRect = position;
-            
+
             EditorGUI.indentLevel = 0;
 
             CustomEditorGUILayout.IsInspector = false;
-            
+
             Event current = Event.current;
 
             if (current.type == EventType.Repaint)
@@ -63,33 +89,21 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 LastRepaintTime = EditorApplication.timeSinceStartup;
             }
         }
-        
-        protected virtual void Update()
-        {
-            if (!UseCustomRepaintInterval) return;
 
-            if (EditorApplication.isPlaying && EditorApplication.timeSinceStartup - LastRepaintTime < CustomRepaintIntervalDuringPlayMode ||
-                !EditorApplication.isPlayingOrWillChangePlaymode && EditorApplication.timeSinceStartup - LastRepaintTime < CustomRepaintIntervalWhileIdle)
-                Repaint();
-        }
-        
         /// <summary> Called 10 frames per second to give the inspector a chance to update </summary>
         protected virtual void OnInspectorUpdate()
         {
-            if (RepaintOnInspectorUpdate) Repaint();
-        }
-        
-        protected virtual void OnEnable()
-        {
-            IsOpen = true;
+            if (RepaintOnInspectorUpdate)
+            {
+                Repaint();
+            }
         }
 
-        protected virtual void OnDisable()
+        public static void OpenWindow(string windowTitle)
         {
-            IsOpen = false;
+            Instance.Show();
+            Instance.titleContent.text = windowTitle;
         }
-
-        protected virtual void OnDestroy() {}
     }
 }
 #endif

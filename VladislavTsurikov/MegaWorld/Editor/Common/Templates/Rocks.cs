@@ -15,69 +15,81 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Templates
 {
-	[Template("Rocks", new[]{typeof(AdvancedBrushTool.AdvancedBrushTool), typeof(Runtime.TerrainSpawner.TerrainSpawner)},
-		new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)})]
-	public class Rocks : Template
-	{
-		protected override void Apply(Group group)
-    	{
-	        FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
-			ScatterComponentSettings scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
+    [Template("Rocks",
+        new[] { typeof(AdvancedBrushTool.AdvancedBrushTool), typeof(Runtime.TerrainSpawner.TerrainSpawner) },
+        new[] { typeof(PrototypeTerrainObject), typeof(PrototypeGameObject) })]
+    public class Rocks : Template
+    {
+        protected override void Apply(Group group)
+        {
+            var filterSettings = (FilterSettings)group.GetElement(typeof(FilterSettings));
+            var scatterComponentSettings = (ScatterComponentSettings)group.GetElement(typeof(ScatterComponentSettings));
 
-			#region Scatter Settings
-			scatterComponentSettings.ScatterStack.Clear();
+            #region Scatter Settings
 
-            RandomGrid randomGrid = (RandomGrid)scatterComponentSettings.ScatterStack.CreateIfMissingType(typeof(RandomGrid));
+            scatterComponentSettings.ScatterStack.Clear();
+
+            var randomGrid = (RandomGrid)scatterComponentSettings.ScatterStack.CreateIfMissingType(typeof(RandomGrid));
             randomGrid.RandomisationType = RandomisationType.Square;
-    		randomGrid.Vastness = 1;
-    		randomGrid.GridStep = new Vector2(2.7f, 2.7f);
+            randomGrid.Vastness = 1;
+            randomGrid.GridStep = new Vector2(2.7f, 2.7f);
             randomGrid.FailureRate = 90;
+
             #endregion
 
-    		#region Mask Filters
+            #region Mask Filters
+
             filterSettings.FilterType = FilterType.MaskFilter;
             filterSettings.MaskFilterComponentSettings.MaskFilterStack.Clear();
 
-    		NoiseFilter noiseFilter = (NoiseFilter)filterSettings.MaskFilterComponentSettings.MaskFilterStack.CreateComponent(typeof(NoiseFilter));
+            var noiseFilter =
+                (NoiseFilter)filterSettings.MaskFilterComponentSettings.MaskFilterStack.CreateComponent(
+                    typeof(NoiseFilter));
             noiseFilter.NoiseSettings = new NoiseSettings
             {
-	            TransformSettings = new NoiseSettings.NoiseTransformSettings
-	            {
-		            Scale = new Vector3(37, 40, 37)
-	            }
+                TransformSettings = new NoiseSettings.NoiseTransformSettings { Scale = new Vector3(37, 40, 37) }
             };
 
-            MaskOperationsFilter remapFilter = (MaskOperationsFilter)filterSettings.MaskFilterComponentSettings.MaskFilterStack.CreateComponent(typeof(MaskOperationsFilter));
-			remapFilter.MaskOperations = MaskOperations.Remap;
-    		remapFilter.RemapRange.x = 0.44f;
-    		remapFilter.RemapRange.y = 0.47f;
-    		#endregion
-		}
+            var remapFilter =
+                (MaskOperationsFilter)filterSettings.MaskFilterComponentSettings.MaskFilterStack.CreateComponent(
+                    typeof(MaskOperationsFilter));
+            remapFilter.MaskOperations = MaskOperations.Remap;
+            remapFilter.RemapRange.x = 0.44f;
+            remapFilter.RemapRange.y = 0.47f;
 
-		protected override void Apply(Prototype proto)
-    	{
-			TransformComponentSettings transformComponentSettings = (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
-            OverlapCheckSettings overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
+            #endregion
+        }
 
-			#region Transform Components
-    		transformComponentSettings.TransformComponentStack.Clear();
+        protected override void Apply(Prototype proto)
+        {
+            var transformComponentSettings =
+                (TransformComponentSettings)proto.GetElement(typeof(TransformComponentSettings));
+            var overlapCheckSettings = (OverlapCheckSettings)proto.GetElement(typeof(OverlapCheckSettings));
 
-    		Rotation rotation = (Rotation)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Rotation));
-    		rotation.RandomizeOrientationX = 100;
-    		rotation.RandomizeOrientationY = 100;
-    		rotation.RandomizeOrientationZ = 100;
+            #region Transform Components
 
-    		Scale scale = (Scale)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Scale));
-    		scale.MinScale = new Vector3(0.8f, 0.8f, 0.8f);
-    		scale.MaxScale = new Vector3(1.2f, 1.2f, 1.2f);
-    		#endregion
+            transformComponentSettings.TransformComponentStack.Clear();
 
-    		#region OverlapCheckSettings
-    		overlapCheckSettings.OverlapShapeEnum = OverlapShapeEnum.OBB;
-    		overlapCheckSettings.ObbCheck.BoundsType = BoundsCheckType.BoundsPrefab;
-    		overlapCheckSettings.ObbCheck.MultiplyBoundsSize = 1;
-    		#endregion
-		}
-	}
+            var rotation =
+                (Rotation)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Rotation));
+            rotation.RandomizeOrientationX = 100;
+            rotation.RandomizeOrientationY = 100;
+            rotation.RandomizeOrientationZ = 100;
+
+            var scale = (Scale)transformComponentSettings.TransformComponentStack.CreateIfMissingType(typeof(Scale));
+            scale.MinScale = new Vector3(0.8f, 0.8f, 0.8f);
+            scale.MaxScale = new Vector3(1.2f, 1.2f, 1.2f);
+
+            #endregion
+
+            #region OverlapCheckSettings
+
+            overlapCheckSettings.OverlapShapeEnum = OverlapShapeEnum.OBB;
+            overlapCheckSettings.ObbCheck.BoundsType = BoundsCheckType.BoundsPrefab;
+            overlapCheckSettings.ObbCheck.MultiplyBoundsSize = 1;
+
+            #endregion
+        }
+    }
 }
 #endif

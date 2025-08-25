@@ -8,6 +8,7 @@ using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
@@ -25,40 +26,34 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         Direction,
         Offset
     }
-    
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Rotation")]
+
+    [Name("Rotation")]
     public class Rotation : MouseAction
     {
-        private RotationMode _rotationMode;
-        private ShortcutCombo _mouseRotateAroundY;
-        private ShortcutCombo _mouseRotateAroundX;
-        private ShortcutCombo _mouseRotateAroundZ;
+        private Quaternion _сurrentRotation;
+        private float _angle;
+        private Vector3 _forward;
         private ShortcutCombo _mouseFreeRotate;
         private ShortcutCombo _mouseFreeScreen;
-        private float _rotationDist;
-        private Quaternion _startRotation;
-        private Quaternion _сurrentRotation;
-        private Vector3 _rotationAxis;
+        private ShortcutCombo _mouseRotateAroundX;
+        private ShortcutCombo _mouseRotateAroundY;
+        private ShortcutCombo _mouseRotateAroundZ;
         private Vector3 _right;
+        private Vector3 _rotationAxis;
+        private float _rotationDist;
+        private RotationMode _rotationMode;
+        private Quaternion _startRotation;
         private Vector3 _upwards;
-        private Vector3 _forward;
-        private float _angle;
-        
-        public MouseSensitivitySettings MouseRotationSettings = new MouseSensitivitySettings();
         public bool EnableSnapRotate = false;
+
+        public MouseSensitivitySettings MouseRotationSettings = new();
         public float SnapRotate = 15f;
         public WayRotateY WayRotateY = WayRotateY.Offset;
-        
-        [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
+        [OnDeserializing]
+        private void OnDeserializing() => InitShortcutCombo();
+
+        protected override void OnCreate() => InitShortcutCombo();
 
         private void InitShortcutCombo()
         {
@@ -82,56 +77,56 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             _mouseFreeScreen.AddShortcutCombo(_mouseRotateAroundY);
         }
 
-        public Rotation()
-        {
-            
-        }
-
         public override void CheckShortcutCombos(GameObject gameObject, Vector3 normal)
         {
-            if(_mouseRotateAroundY.IsActive())
+            if (_mouseRotateAroundY.IsActive())
             {
-                if(Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundY)
+                if (Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundY)
                 {
                     SetStartValue(gameObject);
-                    _rotationAxis = TransformAxes.GetVector(Axis.Y, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, GameObject.transform);
+                    _rotationAxis = TransformAxes.GetVector(Axis.Y,
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace,
+                        GameObject.transform);
                 }
 
                 _rotationMode = RotationMode.RotateAroundY;
             }
             else if (_mouseRotateAroundX.IsActive())
             {
-                if(Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundX)
+                if (Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundX)
                 {
                     SetStartValue(gameObject);
-                    _rotationAxis = TransformAxes.GetVector(Axis.X, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, GameObject.transform);
+                    _rotationAxis = TransformAxes.GetVector(Axis.X,
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace,
+                        GameObject.transform);
                 }
 
                 _rotationMode = RotationMode.RotateAroundX;
             }
             else if (_mouseRotateAroundZ.IsActive())
             {
-                if(Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundZ)
+                if (Begin(gameObject, normal) || _rotationMode != RotationMode.RotateAroundZ)
                 {
                     SetStartValue(gameObject);
-                    _rotationAxis = TransformAxes.GetVector(Axis.Z, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, GameObject.transform);
+                    _rotationAxis = TransformAxes.GetVector(Axis.Z,
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace,
+                        GameObject.transform);
                 }
 
                 _rotationMode = RotationMode.RotateAroundZ;
             }
             else if (_mouseFreeRotate.IsActive())
             {
-                if(Begin(gameObject, normal) || _rotationMode != RotationMode.FreeRotating)
+                if (Begin(gameObject, normal) || _rotationMode != RotationMode.FreeRotating)
                 {
                     SetStartValue(gameObject);
-                    
                 }
-                
+
                 _rotationMode = RotationMode.FreeRotating;
             }
-            else if(_mouseFreeScreen.IsActive())
+            else if (_mouseFreeScreen.IsActive())
             {
-                if(Begin(gameObject, normal) || _rotationMode != RotationMode.ScreenRotating)
+                if (Begin(gameObject, normal) || _rotationMode != RotationMode.ScreenRotating)
                 {
                     SetStartValue(gameObject);
                     _rotationAxis = SceneView.currentDrawingSceneView.camera.transform.forward;
@@ -156,7 +151,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                 }
                 case RotationMode.RotateAroundY:
                 {
-                    if(WayRotateY == WayRotateY.Offset)
+                    if (WayRotateY == WayRotateY.Offset)
                     {
                         RotateObjectAroundAxis(_rotationAxis, EnableSnapRotate);
                     }
@@ -164,7 +159,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     {
                         RotateToMouseForward();
                     }
-                    
+
                     break;
                 }
                 case RotationMode.RotateAroundZ:
@@ -202,7 +197,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             {
                 case RotationMode.RotateAroundX:
                 {
-                    TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.X, out var upwards, out _, out var forward);
+                    TransformAxes.GetOrientation(GameObject.transform,
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.X,
+                        out Vector3 upwards, out _, out Vector3 forward);
 
                     Handles.color = Handles.xAxisColor;
                     Handles.CircleHandleCap(
@@ -214,20 +211,26 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     );
 
                     Handles.color = Handles.selectedColor;
-                    #if UNITY_2020_3_OR_NEWER
-                    Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
-                    #else
+#if UNITY_2020_3_OR_NEWER
+                    Handles.DrawLine(GameObject.transform.position,
+                        GameObject.transform.position +
+                        forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+#else
                     UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
-                    #endif
-                    Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+#endif
+                    Handles.DrawDottedLine(GameObject.transform.position,
+                        GameObject.transform.position + _сurrentRotation * forward *
+                        HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
 
                     break;
                 }
                 case RotationMode.RotateAroundY:
                 {
-                    if(WayRotateY == WayRotateY.Offset)
+                    if (WayRotateY == WayRotateY.Offset)
                     {
-                        TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Y, out var upwards, out _, out var forward);
+                        TransformAxes.GetOrientation(GameObject.transform,
+                            GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Y,
+                            out Vector3 upwards, out _, out Vector3 forward);
 
                         Handles.color = Handles.yAxisColor;
                         Handles.CircleHandleCap(
@@ -239,26 +242,33 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                         );
 
                         Handles.color = Handles.selectedColor;
-                        #if UNITY_2020_3_OR_NEWER
-                        Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
-                        #else
+#if UNITY_2020_3_OR_NEWER
+                        Handles.DrawLine(GameObject.transform.position,
+                            GameObject.transform.position +
+                            forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+#else
                         UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
-                        #endif
-                        Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+#endif
+                        Handles.DrawDottedLine(GameObject.transform.position,
+                            GameObject.transform.position + _сurrentRotation * forward *
+                            HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
                     }
                     else
                     {
-                        if (IntersectsHitPlane(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out var point))
+                        if (IntersectsHitPlane(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition),
+                                out Vector3 point))
                         {
                             Handles.DrawDottedLine(GameObject.transform.position, point, 4.0f);
                         }
                     }
-                    
+
                     break;
                 }
                 case RotationMode.RotateAroundZ:
                 {
-                    TransformAxes.GetOrientation(GameObject.transform, GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Z, out var upwards, out _, out var forward);
+                    TransformAxes.GetOrientation(GameObject.transform,
+                        GlobalCommonComponentSingleton<TransformSpaceSettings>.Instance.TransformSpace, Axis.Z,
+                        out Vector3 upwards, out _, out Vector3 forward);
 
                     Handles.color = Handles.zAxisColor;
                     Handles.CircleHandleCap(
@@ -270,12 +280,16 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     );
 
                     Handles.color = Handles.selectedColor;
-                    #if UNITY_2020_3_OR_NEWER
-                    Handles.DrawLine(GameObject.transform.position, GameObject.transform.position + forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
-                    #else
+#if UNITY_2020_3_OR_NEWER
+                    Handles.DrawLine(GameObject.transform.position,
+                        GameObject.transform.position +
+                        forward * HandleUtility.GetHandleSize(GameObject.transform.position), 1.0f);
+#else
                     UnityEditor.Handles.DrawLine(_gameObject.transform.position, _gameObject.transform.position + forward * HandleUtility.GetHandleSize(_gameObject.transform.position));
-                    #endif
-                    Handles.DrawDottedLine(GameObject.transform.position, GameObject.transform.position + _сurrentRotation * forward * HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
+#endif
+                    Handles.DrawDottedLine(GameObject.transform.position,
+                        GameObject.transform.position + _сurrentRotation * forward *
+                        HandleUtility.GetHandleSize(GameObject.transform.position), 4.0f);
 
                     break;
                 }
@@ -349,10 +363,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         private void RotateToMouseForward()
         {
-            if (IntersectsHitPlane(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out var point))
+            if (IntersectsHitPlane(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), out Vector3 point))
             {
                 Vector3 vector = point - GameObject.transform.position;
-                float vectorLength = vector.magnitude;
+                var vectorLength = vector.magnitude;
 
                 if (vectorLength < 0.01f)
                 {
@@ -371,37 +385,39 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                     _angle = Snapping.Snap(_angle, SnapRotate);
                 }
 
-                GameObject.transform.rotation = 
+                GameObject.transform.rotation =
                     GetRotation(new Vector3(0, _angle, 0));
             }
         }
 
         private Quaternion GetRotation(Vector3 euler)
         {
-            Quaternion placeOrientation = Quaternion.LookRotation(_forward, _upwards);
+            var placeOrientation = Quaternion.LookRotation(_forward, _upwards);
             return placeOrientation * Quaternion.Euler(euler);
         }
 
         private void RotateObjectAroundAxis(Vector3 rotationAxis, bool snapRotate)
         {
             _rotationDist += Event.current.delta.x * MouseRotationSettings.MouseSensitivity * 2f;
-            float angle = _rotationDist;
-            if(snapRotate)
+            var angle = _rotationDist;
+            if (snapRotate)
             {
                 angle = Snapping.Snap(_rotationDist, SnapRotate);
             }
-            
+
             _сurrentRotation = Quaternion.AngleAxis(angle, rotationAxis);
             GameObject.transform.rotation = _сurrentRotation * _startRotation;
         }
 
         private void FreeRotateObject()
         {
-            float rotationAmountInDegreesX = -Event.current.delta.x * MouseRotationSettings.MouseSensitivity * 2f;
-            float rotationAmountInDegreesY = -Event.current.delta.y * MouseRotationSettings.MouseSensitivity * 2f;
+            var rotationAmountInDegreesX = -Event.current.delta.x * MouseRotationSettings.MouseSensitivity * 2f;
+            var rotationAmountInDegreesY = -Event.current.delta.y * MouseRotationSettings.MouseSensitivity * 2f;
 
-            Quaternion rotationX = Quaternion.AngleAxis(rotationAmountInDegreesY, SceneView.currentDrawingSceneView.camera.transform.right);
-            Quaternion rotationY = Quaternion.AngleAxis(rotationAmountInDegreesX, SceneView.currentDrawingSceneView.camera.transform.up);
+            var rotationX = Quaternion.AngleAxis(rotationAmountInDegreesY,
+                SceneView.currentDrawingSceneView.camera.transform.right);
+            var rotationY = Quaternion.AngleAxis(rotationAmountInDegreesX,
+                SceneView.currentDrawingSceneView.camera.transform.up);
 
             _сurrentRotation = rotationX * rotationY;
 
@@ -410,12 +426,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         private bool IntersectsHitPlane(Ray ray, out Vector3 hitPoint)
         {
-            Plane plane = new Plane(_upwards, GameObject.transform.position);
+            var plane = new Plane(_upwards, GameObject.transform.position);
             if (plane.Raycast(ray, out var rayDistance))
             {
                 hitPoint = ray.GetPoint(rayDistance);
                 return true;
             }
+
             hitPoint = Vector3.zero;
             return false;
         }

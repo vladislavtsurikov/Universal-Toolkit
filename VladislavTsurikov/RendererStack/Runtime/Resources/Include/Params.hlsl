@@ -57,53 +57,53 @@ AppendStructuredBuffer<InstanceShaderData> positionShadowLOD3;
 
 float GetDistanceToCamera(float3 itemPos)
 {
-	return distance(itemPos, worldSpaceCameraPos.xyz);
+    return distance(itemPos, worldSpaceCameraPos.xyz);
 }
 
 float GetModifiedDistanceToCamera(float3 instancePosition, float maxScaleValue, float random)
 {
-	const float offsetDistanceToCamera = GetRandomLerp(LODDistanceRandomOffset, random);
+    const float offsetDistanceToCamera = GetRandomLerp(LODDistanceRandomOffset, random);
 
-	float modifiedDistanceToCamera = GetDistanceToCamera(instancePosition) + offsetDistanceToCamera;
+    float modifiedDistanceToCamera = GetDistanceToCamera(instancePosition) + offsetDistanceToCamera;
 
-	const float fieldOfViewFactor = 90 / fieldOfView;
+    const float fieldOfViewFactor = 90 / fieldOfView;
 
-	modifiedDistanceToCamera /= fieldOfViewFactor;
+    modifiedDistanceToCamera /= fieldOfViewFactor;
 
-	modifiedDistanceToCamera /= maxScaleValue;
+    modifiedDistanceToCamera /= maxScaleValue;
 
-	return modifiedDistanceToCamera;
+    return modifiedDistanceToCamera;
 }
 
 void AddPosition(InstanceShaderData instanceData, uint lodIndex, float4 lodFade)
 {
-	instanceData.lodFade = lodFade;
+    instanceData.lodFade = lodFade;
 
-	const uint correctIndex = LODCount > 4 ? lodIndex - startLOD : lodIndex;
-	
-	switch (correctIndex)
+    const uint correctIndex = LODCount > 4 ? lodIndex - startLOD : lodIndex;
+
+    switch (correctIndex)
     {
-        case 0: 
+    case 0:
         {
-			positionLOD0.Append(instanceData);
+            positionLOD0.Append(instanceData);
 
             break;
         }
-        case 1:
+    case 1:
         {
-			positionLOD1.Append(instanceData);
+            positionLOD1.Append(instanceData);
 
             break;
         }
-		case 2:
+    case 2:
         {
-			positionLOD2.Append(instanceData);
+            positionLOD2.Append(instanceData);
 
             break;
         }
-		case 3:
+    case 3:
         {
-			positionLOD3.Append(instanceData);
+            positionLOD3.Append(instanceData);
 
             break;
         }
@@ -112,35 +112,35 @@ void AddPosition(InstanceShaderData instanceData, uint lodIndex, float4 lodFade)
 
 void AddPositionShadow(InstanceShaderData instanceData, float distanceToCamera, uint lodIndex, float4 lodFade)
 {
-	if(distanceToCamera > shadowDistance)
+    if (distanceToCamera > shadowDistance)
     {
         return;
     }
 
-	instanceData.lodFade = lodFade;
+    instanceData.lodFade = lodFade;
 
-	const uint correctIndex = LODCount > 4 ? lodIndex - startLOD : lodIndex;
+    const uint correctIndex = LODCount > 4 ? lodIndex - startLOD : lodIndex;
 
-	switch(correctIndex)
+    switch (correctIndex)
     {
-        case 0: 
+    case 0:
         {
-			positionShadowLOD0.Append(instanceData);
+            positionShadowLOD0.Append(instanceData);
             break;
         }
-        case 1:
+    case 1:
         {
-			positionShadowLOD1.Append(instanceData);
+            positionShadowLOD1.Append(instanceData);
             break;
         }
-		case 2:
+    case 2:
         {
-			positionShadowLOD2.Append(instanceData);
+            positionShadowLOD2.Append(instanceData);
             break;
         }
-		case 3:
+    case 3:
         {
-			positionShadowLOD3.Append(instanceData);
+            positionShadowLOD3.Append(instanceData);
             break;
         }
     }

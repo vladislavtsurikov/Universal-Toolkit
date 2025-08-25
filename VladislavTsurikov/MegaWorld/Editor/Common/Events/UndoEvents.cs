@@ -7,7 +7,7 @@ using VladislavTsurikov.Undo.Editor.GameObject;
 namespace VladislavTsurikov.MegaWorld.Editor.Common.Events
 {
     [InitializeOnLoad]
-    public static class UndoEvents 
+    public static class UndoEvents
     {
         static UndoEvents()
         {

@@ -16,15 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using System.Globalization;
+using System.Text;
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Text;
-
     /// <summary>
-    /// Formatter for all arrays with more than one dimension.
+    ///     Formatter for all arrays with more than one dimension.
     /// </summary>
     /// <typeparam name="TArray">The type of the formatted array.</typeparam>
     /// <typeparam name="TElement">The element type of the formatted array.</typeparam>
@@ -46,7 +45,9 @@ namespace OdinSerializer
 
             if (typeof(TArray).GetElementType() != typeof(TElement))
             {
-                throw new ArgumentException("Array of type " + typeof(TArray).Name + " does not have the required element type of " + typeof(TElement).Name + ".");
+                throw new ArgumentException("Array of type " + typeof(TArray).Name +
+                                            " does not have the required element type of " + typeof(TElement).Name +
+                                            ".");
             }
 
             ArrayRank = typeof(TArray).GetArrayRank();
@@ -58,25 +59,25 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override TArray GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override TArray GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref TArray value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -87,7 +88,7 @@ namespace OdinSerializer
 
                 if (entry != EntryType.String || name != RANKS_NAME)
                 {
-                    value = default(TArray);
+                    value = default;
                     reader.SkipEntry();
                     return;
                 }
@@ -95,18 +96,18 @@ namespace OdinSerializer
                 string lengthStr;
                 reader.ReadString(out lengthStr);
 
-                string[] lengthsStrs = lengthStr.Split(RANKS_SEPARATOR);
+                var lengthsStrs = lengthStr.Split(RANKS_SEPARATOR);
 
                 if (lengthsStrs.Length != ArrayRank)
                 {
-                    value = default(TArray);
+                    value = default;
                     reader.SkipEntry();
                     return;
                 }
 
-                int[] lengths = new int[lengthsStrs.Length];
+                var lengths = new int[lengthsStrs.Length];
 
-                for (int i = 0; i < lengthsStrs.Length; i++)
+                for (var i = 0; i < lengthsStrs.Length; i++)
                 {
                     int rankVal;
                     if (int.TryParse(lengthsStrs[i], out rankVal))
@@ -115,7 +116,7 @@ namespace OdinSerializer
                     }
                     else
                     {
-                        value = default(TArray);
+                        value = default;
                         reader.SkipEntry();
                         return;
                     }
@@ -123,14 +124,14 @@ namespace OdinSerializer
 
                 long rankTotal = lengths[0];
 
-                for (int i = 1; i < lengths.Length; i++)
+                for (var i = 1; i < lengths.Length; i++)
                 {
                     rankTotal *= lengths[i];
                 }
 
                 if (rankTotal != length)
                 {
-                    value = default(TArray);
+                    value = default;
                     reader.SkipEntry();
                     return;
                 }
@@ -138,29 +139,32 @@ namespace OdinSerializer
                 value = (TArray)(object)Array.CreateInstance(typeof(TElement), lengths);
 
                 // We must remember to register the array reference ourselves, since we return null in GetUninitializedObject
-                this.RegisterReferenceID(value, reader);
+                RegisterReferenceID(value, reader);
 
                 // There aren't any OnDeserializing callbacks on arrays.
                 // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                int elements = 0;
+                var elements = 0;
 
                 try
                 {
-                    this.IterateArrayWrite(
+                    IterateArrayWrite(
                         (Array)(object)value,
                         () =>
                         {
                             if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                             {
-                                reader.Context.Config.DebugContext.LogError("Reached end of array after " + elements + " elements, when " + length + " elements were expected.");
+                                reader.Context.Config.DebugContext.LogError("Reached end of array after " + elements +
+                                                                            " elements, when " + length +
+                                                                            " elements were expected.");
                                 throw new InvalidOperationException();
                             }
 
-                            var v = ValueReaderWriter.ReadValue(reader);
+                            TElement v = ValueReaderWriter.ReadValue(reader);
 
                             if (reader.IsInArrayNode == false)
                             {
-                                reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                                reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                            reader.GetDataDump());
                                 throw new InvalidOperationException();
                             }
 
@@ -180,13 +184,13 @@ namespace OdinSerializer
             }
             else
             {
-                value = default(TArray);
+                value = default;
                 reader.SkipEntry();
             }
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -198,16 +202,16 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(array.LongLength);
 
-                int[] lengths = new int[ArrayRank];
+                var lengths = new int[ArrayRank];
 
-                for (int i = 0; i < ArrayRank; i++)
+                for (var i = 0; i < ArrayRank; i++)
                 {
                     lengths[i] = array.GetLength(i);
                 }
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
 
-                for (int i = 0; i < ArrayRank; i++)
+                for (var i = 0; i < ArrayRank; i++)
                 {
                     if (i > 0)
                     {
@@ -217,16 +221,13 @@ namespace OdinSerializer
                     sb.Append(lengths[i].ToString(CultureInfo.InvariantCulture));
                 }
 
-                string lengthStr = sb.ToString();
+                var lengthStr = sb.ToString();
 
                 writer.WriteString(RANKS_NAME, lengthStr);
 
-                this.IterateArrayRead(
+                IterateArrayRead(
                     (Array)(object)value,
-                    (v) =>
-                    {
-                        ValueReaderWriter.WriteValue(v, writer);
-                    });
+                    v => { ValueReaderWriter.WriteValue(v, writer); });
             }
             finally
             {
@@ -236,19 +237,19 @@ namespace OdinSerializer
 
         private void IterateArrayWrite(Array a, Func<TElement> write)
         {
-            int[] indices = new int[ArrayRank];
-            this.IterateArrayWrite(a, 0, indices, write);
+            var indices = new int[ArrayRank];
+            IterateArrayWrite(a, 0, indices, write);
         }
 
         private void IterateArrayWrite(Array a, int rank, int[] indices, Func<TElement> write)
         {
-            for (int i = 0; i < a.GetLength(rank); i++)
+            for (var i = 0; i < a.GetLength(rank); i++)
             {
                 indices[rank] = i;
 
                 if (rank + 1 < a.Rank)
                 {
-                    this.IterateArrayWrite(a, rank + 1, indices, write);
+                    IterateArrayWrite(a, rank + 1, indices, write);
                 }
                 else
                 {
@@ -259,19 +260,19 @@ namespace OdinSerializer
 
         private void IterateArrayRead(Array a, Action<TElement> read)
         {
-            int[] indices = new int[ArrayRank];
-            this.IterateArrayRead(a, 0, indices, read);
+            var indices = new int[ArrayRank];
+            IterateArrayRead(a, 0, indices, read);
         }
 
         private void IterateArrayRead(Array a, int rank, int[] indices, Action<TElement> read)
         {
-            for (int i = 0; i < a.GetLength(rank); i++)
+            for (var i = 0; i < a.GetLength(rank); i++)
             {
                 indices[rank] = i;
 
                 if (rank + 1 < a.Rank)
                 {
-                    this.IterateArrayRead(a, rank + 1, indices, read);
+                    IterateArrayRead(a, rank + 1, indices, read);
                 }
                 else
                 {
@@ -292,31 +293,31 @@ namespace OdinSerializer
 
         public WeakMultiDimensionalArrayFormatter(Type arrayType, Type elementType) : base(arrayType)
         {
-            this.ArrayRank = arrayType.GetArrayRank();
-            this.ElementType = elementType;
-            this.ValueReaderWriter = Serializer.Get(elementType);
+            ArrayRank = arrayType.GetArrayRank();
+            ElementType = elementType;
+            ValueReaderWriter = Serializer.Get(elementType);
         }
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="BaseFormatter{T}.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="BaseFormatter{T}.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.StartOfArray)
             {
@@ -335,7 +336,7 @@ namespace OdinSerializer
                 string lengthStr;
                 reader.ReadString(out lengthStr);
 
-                string[] lengthsStrs = lengthStr.Split(RANKS_SEPARATOR);
+                var lengthsStrs = lengthStr.Split(RANKS_SEPARATOR);
 
                 if (lengthsStrs.Length != ArrayRank)
                 {
@@ -344,9 +345,9 @@ namespace OdinSerializer
                     return;
                 }
 
-                int[] lengths = new int[lengthsStrs.Length];
+                var lengths = new int[lengthsStrs.Length];
 
-                for (int i = 0; i < lengthsStrs.Length; i++)
+                for (var i = 0; i < lengthsStrs.Length; i++)
                 {
                     int rankVal;
                     if (int.TryParse(lengthsStrs[i], out rankVal))
@@ -363,7 +364,7 @@ namespace OdinSerializer
 
                 long rankTotal = lengths[0];
 
-                for (int i = 1; i < lengths.Length; i++)
+                for (var i = 1; i < lengths.Length; i++)
                 {
                     rankTotal *= lengths[i];
                 }
@@ -375,24 +376,26 @@ namespace OdinSerializer
                     return;
                 }
 
-                value = Array.CreateInstance(this.ElementType, lengths);
+                value = Array.CreateInstance(ElementType, lengths);
 
                 // We must remember to register the array reference ourselves, since we return null in GetUninitializedObject
-                this.RegisterReferenceID(value, reader);
+                RegisterReferenceID(value, reader);
 
                 // There aren't any OnDeserializing callbacks on arrays.
                 // Hence we don't invoke this.InvokeOnDeserializingCallbacks(value, reader, context);
-                int elements = 0;
+                var elements = 0;
 
                 try
                 {
-                    this.IterateArrayWrite(
-                        (Array)(object)value,
+                    IterateArrayWrite(
+                        (Array)value,
                         () =>
                         {
                             if (reader.PeekEntry(out name) == EntryType.EndOfArray)
                             {
-                                reader.Context.Config.DebugContext.LogError("Reached end of array after " + elements + " elements, when " + length + " elements were expected.");
+                                reader.Context.Config.DebugContext.LogError("Reached end of array after " + elements +
+                                                                            " elements, when " + length +
+                                                                            " elements were expected.");
                                 throw new InvalidOperationException();
                             }
 
@@ -400,7 +403,8 @@ namespace OdinSerializer
 
                             if (reader.IsInArrayNode == false)
                             {
-                                reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " + reader.GetDataDump());
+                                reader.Context.Config.DebugContext.LogError("Reading array went wrong. Data dump: " +
+                                                                            reader.GetDataDump());
                                 throw new InvalidOperationException();
                             }
 
@@ -426,7 +430,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -438,16 +442,16 @@ namespace OdinSerializer
             {
                 writer.BeginArrayNode(array.LongLength);
 
-                int[] lengths = new int[ArrayRank];
+                var lengths = new int[ArrayRank];
 
-                for (int i = 0; i < ArrayRank; i++)
+                for (var i = 0; i < ArrayRank; i++)
                 {
                     lengths[i] = array.GetLength(i);
                 }
 
-                StringBuilder sb = new StringBuilder();
+                var sb = new StringBuilder();
 
-                for (int i = 0; i < ArrayRank; i++)
+                for (var i = 0; i < ArrayRank; i++)
                 {
                     if (i > 0)
                     {
@@ -457,16 +461,13 @@ namespace OdinSerializer
                     sb.Append(lengths[i].ToString(CultureInfo.InvariantCulture));
                 }
 
-                string lengthStr = sb.ToString();
+                var lengthStr = sb.ToString();
 
                 writer.WriteString(RANKS_NAME, lengthStr);
 
-                this.IterateArrayRead(
-                    (Array)(object)value,
-                    (v) =>
-                    {
-                        ValueReaderWriter.WriteValueWeak(v, writer);
-                    });
+                IterateArrayRead(
+                    (Array)value,
+                    v => { ValueReaderWriter.WriteValueWeak(v, writer); });
             }
             finally
             {
@@ -476,19 +477,19 @@ namespace OdinSerializer
 
         private void IterateArrayWrite(Array a, Func<object> write)
         {
-            int[] indices = new int[ArrayRank];
-            this.IterateArrayWrite(a, 0, indices, write);
+            var indices = new int[ArrayRank];
+            IterateArrayWrite(a, 0, indices, write);
         }
 
         private void IterateArrayWrite(Array a, int rank, int[] indices, Func<object> write)
         {
-            for (int i = 0; i < a.GetLength(rank); i++)
+            for (var i = 0; i < a.GetLength(rank); i++)
             {
                 indices[rank] = i;
 
                 if (rank + 1 < a.Rank)
                 {
-                    this.IterateArrayWrite(a, rank + 1, indices, write);
+                    IterateArrayWrite(a, rank + 1, indices, write);
                 }
                 else
                 {
@@ -499,19 +500,19 @@ namespace OdinSerializer
 
         private void IterateArrayRead(Array a, Action<object> read)
         {
-            int[] indices = new int[ArrayRank];
-            this.IterateArrayRead(a, 0, indices, read);
+            var indices = new int[ArrayRank];
+            IterateArrayRead(a, 0, indices, read);
         }
 
         private void IterateArrayRead(Array a, int rank, int[] indices, Action<object> read)
         {
-            for (int i = 0; i < a.GetLength(rank); i++)
+            for (var i = 0; i < a.GetLength(rank); i++)
             {
                 indices[rank] = i;
 
                 if (rank + 1 < a.Rank)
                 {
-                    this.IterateArrayRead(a, rank + 1, indices, read);
+                    IterateArrayRead(a, rank + 1, indices, read);
                 }
                 else
                 {

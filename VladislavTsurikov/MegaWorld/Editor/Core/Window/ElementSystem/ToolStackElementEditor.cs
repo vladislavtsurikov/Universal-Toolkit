@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
@@ -13,11 +12,12 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
         private ToolComponentStack _toolComponentStack;
 
         public IMGUIComponentStackEditor<Component, IMGUIElementEditor> GeneralComponentStackEditor;
-        
+
         public override void OnEnable()
         {
             _toolComponentStack = (ToolComponentStack)Target;
-            GeneralComponentStackEditor = new IMGUIComponentStackEditor<Component, IMGUIElementEditor>(_toolComponentStack.ComponentStack);
+            GeneralComponentStackEditor =
+                new IMGUIComponentStackEditor<Component, IMGUIElementEditor>(_toolComponentStack.ComponentStack);
         }
     }
 }

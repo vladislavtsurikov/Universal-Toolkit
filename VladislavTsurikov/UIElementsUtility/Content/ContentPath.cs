@@ -3,6 +3,8 @@ using VladislavTsurikov.Core.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Content
 {
-    public class ContentPath : BasePathFinder<ContentPath> { }
+    public class ContentPath : BasePathFinder<ContentPath>
+    {
+    }
 }
 #endif

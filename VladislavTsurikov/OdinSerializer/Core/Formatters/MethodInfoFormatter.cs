@@ -16,19 +16,19 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Linq;
+using System.Reflection;
 using OdinSerializer;
+using OdinSerializer.Utilities;
 
-[assembly: RegisterFormatter(typeof(MethodInfoFormatter<>), weakFallback: typeof(WeakMethodInfoFormatter))]
+[assembly: RegisterFormatter(typeof(MethodInfoFormatter<>), typeof(WeakMethodInfoFormatter))]
 
 namespace OdinSerializer
 {
-    using System;
-    using System.Linq;
-    using System.Reflection;
-    using Utilities;
-
     /// <summary>
-    /// Custom formatter for MethodInfo, since Unity Mono's MethodInfo ISerializable implementation will often crash if the method no longer exists upon deserialization.
+    ///     Custom formatter for MethodInfo, since Unity Mono's MethodInfo ISerializable implementation will often crash if the
+    ///     method no longer exists upon deserialization.
     /// </summary>
     /// <seealso cref="BaseFormatter{T}" />
     public class MethodInfoFormatter<T> : BaseFormatter<T>
@@ -39,9 +39,12 @@ namespace OdinSerializer
         private static readonly Serializer<Type[]> TypeArraySerializer = Serializer.Get<Type[]>();
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref T value, IDataReader reader)
         {
@@ -57,7 +60,7 @@ namespace OdinSerializer
 
                 IFormatter serializableFormatter;
                 serializableFormatter = new WeakSerializableFormatter(typeof(T));
-                value = (T)(object)serializableFormatter.Deserialize(reader);
+                value = (T)serializableFormatter.Deserialize(reader);
                 return;
             }
 
@@ -66,37 +69,38 @@ namespace OdinSerializer
             Type[] signature = null;
             Type[] genericArguments = null;
 
-            while ((entry = reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray && entry != EntryType.EndOfStream)
+            while ((entry = reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray &&
+                   entry != EntryType.EndOfStream)
             {
                 switch (name)
                 {
                     case "declaringType":
-                        {
-                            var t = TypeSerializer.ReadValue(reader);
+                    {
+                        Type t = TypeSerializer.ReadValue(reader);
 
-                            if (t != null)
-                            {
-                                declaringType = t;
-                            }
+                        if (t != null)
+                        {
+                            declaringType = t;
                         }
+                    }
                         break;
 
                     case "methodName":
-                        {
-                            methodName = StringSerializer.ReadValue(reader);
-                        }
+                    {
+                        methodName = StringSerializer.ReadValue(reader);
+                    }
                         break;
 
                     case "signature":
-                        {
-                            signature = TypeArraySerializer.ReadValue(reader);
-                        }
+                    {
+                        signature = TypeArraySerializer.ReadValue(reader);
+                    }
                         break;
 
                     case "genericArguments":
-                        {
-                            genericArguments = TypeArraySerializer.ReadValue(reader);
-                        }
+                    {
+                        genericArguments = TypeArraySerializer.ReadValue(reader);
+                    }
                         break;
 
                     default:
@@ -118,14 +122,14 @@ namespace OdinSerializer
             }
 
             MethodInfo methodInfo;
-            bool useSignature = false;
-            bool wasAmbiguous = false;
+            var useSignature = false;
+            var wasAmbiguous = false;
 
             if (signature != null)
             {
                 useSignature = true;
 
-                for (int i = 0; i < signature.Length; i++)
+                for (var i = 0; i < signature.Length; i++)
                 {
                     if (signature[i] == null)
                     {
@@ -164,11 +168,22 @@ namespace OdinSerializer
             {
                 if (useSignature)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Could not find method with signature " + name + "(" + string.Join(", ", signature.Select(p => p.GetNiceFullName()).ToArray()) + ") on type '" + declaringType.FullName + (wasAmbiguous ? "; resolution was ambiguous between multiple methods" : string.Empty) + ".");
+                    reader.Context.Config.DebugContext.LogWarning("Could not find method with signature " + name + "(" +
+                                                                  string.Join(", ",
+                                                                      signature.Select(p => p.GetNiceFullName())
+                                                                          .ToArray()) + ") on type '" +
+                                                                  declaringType.FullName +
+                                                                  (wasAmbiguous
+                                                                      ? "; resolution was ambiguous between multiple methods"
+                                                                      : string.Empty) + ".");
                 }
                 else
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Could not find method with name " + name + " on type '" + declaringType.GetNiceFullName() + (wasAmbiguous ? "; resolution was ambiguous between multiple methods" : string.Empty) + ".");
+                    reader.Context.Config.DebugContext.LogWarning("Could not find method with name " + name +
+                                                                  " on type '" + declaringType.GetNiceFullName() +
+                                                                  (wasAmbiguous
+                                                                      ? "; resolution was ambiguous between multiple methods"
+                                                                      : string.Empty) + ".");
                 }
 
                 return;
@@ -178,23 +193,29 @@ namespace OdinSerializer
             {
                 if (genericArguments == null)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." + methodInfo.GetNiceName() + "' to deserialize is a generic method definition, but no generic arguments were in the serialization data.");
+                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." +
+                                                                  methodInfo.GetNiceName() +
+                                                                  "' to deserialize is a generic method definition, but no generic arguments were in the serialization data.");
                     return;
                 }
 
-                int argCount = methodInfo.GetGenericArguments().Length;
+                var argCount = methodInfo.GetGenericArguments().Length;
 
                 if (genericArguments.Length != argCount)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." + methodInfo.GetNiceName() + "' to deserialize is a generic method definition, but there is the wrong number of generic arguments in the serialization data.");
+                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." +
+                                                                  methodInfo.GetNiceName() +
+                                                                  "' to deserialize is a generic method definition, but there is the wrong number of generic arguments in the serialization data.");
                     return;
                 }
 
-                for (int i = 0; i < genericArguments.Length; i++)
+                for (var i = 0; i < genericArguments.Length; i++)
                 {
                     if (genericArguments[i] == null)
                     {
-                        reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." + methodInfo.GetNiceName() + "' to deserialize is a generic method definition, but one of the serialized generic argument types failed to bind on deserialization.");
+                        reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() +
+                                                                      "." + methodInfo.GetNiceName() +
+                                                                      "' to deserialize is a generic method definition, but one of the serialized generic argument types failed to bind on deserialization.");
                         return;
                     }
                 }
@@ -205,7 +226,15 @@ namespace OdinSerializer
                 }
                 catch (Exception ex)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." + methodInfo.GetNiceName() + "' to deserialize is a generic method definition, but failed to create generic method from definition, using generic arguments '" + string.Join(", ", genericArguments.Select(p => p.GetNiceFullName()).ToArray()) + "'. Method creation failed with an exception of type " + ex.GetType().GetNiceFullName() + ", with the message: " + ex.Message);
+                    reader.Context.Config.DebugContext.LogWarning("Method '" + declaringType.GetNiceFullName() + "." +
+                                                                  methodInfo.GetNiceName() +
+                                                                  "' to deserialize is a generic method definition, but failed to create generic method from definition, using generic arguments '" +
+                                                                  string.Join(", ",
+                                                                      genericArguments.Select(p => p.GetNiceFullName())
+                                                                          .ToArray()) +
+                                                                  "'. Method creation failed with an exception of type " +
+                                                                  ex.GetType().GetNiceFullName() +
+                                                                  ", with the message: " + ex.Message);
                     return;
                 }
             }
@@ -216,15 +245,21 @@ namespace OdinSerializer
             }
             catch (InvalidCastException)
             {
-                reader.Context.Config.DebugContext.LogWarning("The serialized method '" + declaringType.GetNiceFullName() + "." + methodInfo.GetNiceName() + "' was successfully resolved into a MethodInfo reference of the runtime type '" + methodInfo.GetType().GetNiceFullName() + "', but failed to be cast to expected type '" + typeof(T).GetNiceFullName() + "'.");
+                reader.Context.Config.DebugContext.LogWarning("The serialized method '" +
+                                                              declaringType.GetNiceFullName() + "." +
+                                                              methodInfo.GetNiceName() +
+                                                              "' was successfully resolved into a MethodInfo reference of the runtime type '" +
+                                                              methodInfo.GetType().GetNiceFullName() +
+                                                              "', but failed to be cast to expected type '" +
+                                                              typeof(T).GetNiceFullName() + "'.");
                 return;
             }
 
-            this.RegisterReferenceID(value, reader);
+            RegisterReferenceID(value, reader);
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="!:T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -234,13 +269,16 @@ namespace OdinSerializer
 
             if (methodInfo.GetType().Name.Contains("DynamicMethod"))
             {
-                writer.Context.Config.DebugContext.LogWarning("Cannot serialize a dynamically emitted method " + methodInfo + ".");
+                writer.Context.Config.DebugContext.LogWarning("Cannot serialize a dynamically emitted method " +
+                                                              methodInfo + ".");
                 return;
             }
 
             if (methodInfo.IsGenericMethodDefinition)
             {
-                writer.Context.Config.DebugContext.LogWarning("Serializing a MethodInfo for a generic method definition '" + methodInfo.GetNiceName() + "' is not currently supported.");
+                writer.Context.Config.DebugContext.LogWarning(
+                    "Serializing a MethodInfo for a generic method definition '" + methodInfo.GetNiceName() +
+                    "' is not currently supported.");
                 return;
             }
 
@@ -258,9 +296,9 @@ namespace OdinSerializer
                 parameters = methodInfo.GetParameters();
             }
 
-            Type[] signature = new Type[parameters.Length];
+            var signature = new Type[parameters.Length];
 
-            for (int i = 0; i < signature.Length; i++)
+            for (var i = 0; i < signature.Length; i++)
             {
                 signature[i] = parameters[i].ParameterType;
             }
@@ -275,16 +313,19 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Get an uninitialized object of type <see cref="!:T" />. WARNING: If you override this and return null, the object's ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before deserialization begins.
-        /// You will have to call <see cref="M:OdinSerializer.BaseFormatter`1.RegisterReferenceID(`0,OdinSerializer.IDataReader)" /> and <see cref="M:OdinSerializer.BaseFormatter`1.InvokeOnDeserializingCallbacks(`0,OdinSerializer.DeserializationContext)" /> immediately after creating the object yourself during deserialization.
+        ///     Get an uninitialized object of type <see cref="!:T" />. WARNING: If you override this and return null, the object's
+        ///     ID will not be automatically registered and its OnDeserializing callbacks will not be automatically called, before
+        ///     deserialization begins.
+        ///     You will have to call
+        ///     <see cref="M:OdinSerializer.BaseFormatter`1.RegisterReferenceID(`0,OdinSerializer.IDataReader)" /> and
+        ///     <see
+        ///         cref="M:OdinSerializer.BaseFormatter`1.InvokeOnDeserializingCallbacks(`0,OdinSerializer.DeserializationContext)" />
+        ///     immediately after creating the object yourself during deserialization.
         /// </summary>
         /// <returns>
-        /// An uninitialized object of type <see cref="!:T" />.
+        ///     An uninitialized object of type <see cref="!:T" />.
         /// </returns>
-        protected override T GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override T GetUninitializedObject() => null;
     }
 
     public class WeakMethodInfoFormatter : MethodInfoFormatter<MethodInfo>

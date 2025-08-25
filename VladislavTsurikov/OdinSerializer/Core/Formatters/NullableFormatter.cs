@@ -16,16 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
 using OdinSerializer;
 
-[assembly: RegisterFormatter(typeof(NullableFormatter<>), weakFallback: typeof(WeakNullableFormatter))]
+[assembly: RegisterFormatter(typeof(NullableFormatter<>), typeof(WeakNullableFormatter))]
 
 namespace OdinSerializer
 {
-    using System;
-
     /// <summary>
-    /// Formatter for all <see cref="System.Nullable{T}"/> types.
+    ///     Formatter for all <see cref="System.Nullable{T}" /> types.
     /// </summary>
     /// <typeparam name="T">The type that is nullable.</typeparam>
     /// <seealso cref="BaseFormatter{T?}" />
@@ -33,30 +32,30 @@ namespace OdinSerializer
     {
         private static readonly Serializer<T> TSerializer = Serializer.Get<T>();
 
-        static NullableFormatter()
-        {
+        static NullableFormatter() =>
             // This exists solely to prevent IL2CPP code stripping from removing the generic type's instance constructor
             // which it otherwise seems prone to do, regardless of what might be defined in any link.xml file.
-
             new NullableFormatter<int>();
-        }
 
         /// <summary>
-        /// Creates a new instance of <see cref="NullableFormatter{T}"/>.
+        ///     Creates a new instance of <see cref="NullableFormatter{T}" />.
         /// </summary>
         public NullableFormatter()
         {
         }
 
         /// <summary>
-        /// Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for deserializing a value of type <see cref="!:T" />.
         /// </summary>
-        /// <param name="value">The uninitialized value to serialize into. This value will have been created earlier using <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.</param>
+        /// <param name="value">
+        ///     The uninitialized value to serialize into. This value will have been created earlier using
+        ///     <see cref="M:OdinSerializer.BaseFormatter`1.GetUninitializedObject" />.
+        /// </param>
         /// <param name="reader">The reader to deserialize with.</param>
         protected override void DeserializeImplementation(ref T? value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.Null)
             {
@@ -70,7 +69,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Provides the actual implementation for serializing a value of type <see cref="!:T" />.
+        ///     Provides the actual implementation for serializing a value of type <see cref="!:T" />.
         /// </summary>
         /// <param name="value">The value to serialize.</param>
         /// <param name="writer">The writer to serialize with.</param>
@@ -93,14 +92,14 @@ namespace OdinSerializer
 
         public WeakNullableFormatter(Type nullableType) : base(nullableType)
         {
-            var args = nullableType.GetGenericArguments();
-            this.ValueSerializer = Serializer.Get(args[0]);
+            Type[] args = nullableType.GetGenericArguments();
+            ValueSerializer = Serializer.Get(args[0]);
         }
 
         protected override void DeserializeImplementation(ref object value, IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.Null)
             {
@@ -109,7 +108,7 @@ namespace OdinSerializer
             }
             else
             {
-                value = this.ValueSerializer.ReadValueWeak(reader);
+                value = ValueSerializer.ReadValueWeak(reader);
             }
         }
 
@@ -117,7 +116,7 @@ namespace OdinSerializer
         {
             if (value != null)
             {
-                this.ValueSerializer.WriteValueWeak(value, writer);
+                ValueSerializer.WriteValueWeak(value, writer);
             }
             else
             {
@@ -125,9 +124,6 @@ namespace OdinSerializer
             }
         }
 
-        protected override object GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override object GetUninitializedObject() => null;
     }
 }

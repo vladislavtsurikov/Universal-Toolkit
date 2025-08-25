@@ -16,7 +16,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
             var parts = path.Split('/').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p)).ToList();
 
             // Find the index of the first folder that contains the keepAfter string
-            int index = parts.FindIndex(p => p.Contains(keepAfter, StringComparison.OrdinalIgnoreCase));
+            var index = parts.FindIndex(p => p.Contains(keepAfter, StringComparison.OrdinalIgnoreCase));
 
             // If such a folder was found, keep it and all following folders
             if (index != -1)
@@ -24,8 +24,8 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
                 parts = parts.Skip(index).ToList();
             }
             else
-            {
                 // If not found, clear the parts to return an empty string
+            {
                 parts = new List<string>();
             }
 
@@ -33,7 +33,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
 
             return string.Join(".", parts);
         }
-        
+
         public static string GetNamespaceFromPath(string path, params string[] ignoredFolders)
         {
             if (string.IsNullOrEmpty(path))
@@ -41,13 +41,13 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
                 throw new ArgumentException("Path cannot be null or empty", nameof(path));
             }
 
-            var parts = path.Split('/').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p));
+            IEnumerable<string> parts = path.Split('/').Select(p => p.Trim()).Where(p => !string.IsNullOrEmpty(p));
 
             parts = parts.Where(p => !ignoredFolders.Contains(p, StringComparer.OrdinalIgnoreCase));
 
             return string.Join(".", parts);
         }
-        
+
         public static List<string> GetUsingDirectives(params Type[] types)
         {
             if (types == null || types.Length == 0)

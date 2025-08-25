@@ -1,15 +1,14 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility;
 using UnityEngine;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Log
 {
     [Name("Debug/Log Text")]
     public class LogTextAction : Action
     {
-        [SerializeField]
-        private string _message = "My message"; 
+        private readonly string _message = "My message";
 
         public override string Name => $"Log: {_message}";
 

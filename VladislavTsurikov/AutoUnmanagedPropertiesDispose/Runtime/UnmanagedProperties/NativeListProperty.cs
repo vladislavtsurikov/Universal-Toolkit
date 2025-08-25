@@ -4,7 +4,7 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
     {
         public NativeList<T> NativeList;
 
-        public NativeListProperty(NativeList<T> nativeList) 
+        public NativeListProperty(NativeList<T> nativeList)
         {
             NativeList = nativeList;
         }
@@ -20,7 +20,7 @@ namespace VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime
         {
             if(NativeList.IsCreated)
             {
-                NativeList.Dispose();  
+                NativeList.Dispose();
             }
         }
     }*/

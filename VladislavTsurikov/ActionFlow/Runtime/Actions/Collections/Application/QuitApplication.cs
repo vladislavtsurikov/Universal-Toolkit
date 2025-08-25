@@ -1,5 +1,6 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using UnityEditor;
 using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Application
@@ -13,7 +14,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.Application
         {
             UnityEngine.Application.Quit();
 #if UNITY_EDITOR
-            UnityEditor.EditorApplication.ExitPlaymode();
+            EditorApplication.ExitPlaymode();
 #endif
             return UniTask.FromResult(true);
         }

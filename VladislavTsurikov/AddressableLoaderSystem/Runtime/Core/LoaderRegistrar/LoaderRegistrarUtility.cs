@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
@@ -6,9 +7,10 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
         internal static void RegisterLoaderInitializers(ResourceLoaderManager manager)
         {
-            var resourceLoaderRegistrar = ReflectionFactory.CreateAllInstances<ResourceLoaderRegistrar>();
+            IEnumerable<ResourceLoaderRegistrar> resourceLoaderRegistrar =
+                ReflectionFactory.CreateAllInstances<ResourceLoaderRegistrar>();
 
-            foreach (var registrar in resourceLoaderRegistrar)
+            foreach (ResourceLoaderRegistrar registrar in resourceLoaderRegistrar)
             {
                 registrar.RegisterLoaders(manager);
             }

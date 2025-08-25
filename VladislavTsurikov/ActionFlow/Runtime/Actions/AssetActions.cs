@@ -14,16 +14,17 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
         public AssetActions CancellationActions;
 
         [OdinSerialize]
-        public ActionCollection ActionCollection = new ActionCollection();
+        public ActionCollection ActionCollection = new();
 
-        public async UniTask Setup(bool force = true, object[] setupData = null, 
+        public async UniTask Setup(bool force = true, object[] setupData = null,
             CancellationToken cancellationToken = default, HashSet<AssetActions> visited = null)
         {
             visited ??= new HashSet<AssetActions>();
 
             if (visited.Contains(this))
             {
-                Debug.LogError($"[{nameof(AssetActions)}] Detected recursion loop on {name}. Setup skipped to prevent StackOverflow.");
+                Debug.LogError(
+                    $"[{nameof(AssetActions)}] Detected recursion loop on {name}. Setup skipped to prevent StackOverflow.");
                 return;
             }
 
@@ -33,13 +34,13 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
             {
                 await CancellationActions.Setup(force, setupData, cancellationToken, visited);
             }
-            
+
             await ActionCollection.Setup(force, setupData, cancellationToken);
         }
-        
+
         public async UniTask Run(CancellationToken token)
         {
-            bool isActionsCompeted = await ActionCollection.Run(token);
+            var isActionsCompeted = await ActionCollection.Run(token);
 
             if (!isActionsCompeted)
             {
@@ -48,16 +49,13 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
                     Debug.LogError($"[{nameof(AssetActions)}] CancellationActions are not set");
                     return;
                 }
-                
+
                 await CancellationActions.Run(token);
             }
         }
-        
+
 #if UNITY_EDITOR
-        public void SetDirtyAssetActions()
-        {
-            EditorUtility.SetDirty(this);
-        }
+        public void SetDirtyAssetActions() => EditorUtility.SetDirty(this);
 #endif
     }
 }

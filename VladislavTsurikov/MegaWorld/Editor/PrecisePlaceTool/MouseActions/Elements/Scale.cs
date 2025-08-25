@@ -5,6 +5,7 @@ using UnityEngine;
 using VladislavTsurikov.EditorShortcutCombo.Editor;
 using VladislavTsurikov.Math.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 {
@@ -13,36 +14,30 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         ScaleAxisX,
         ScaleAxisY,
         ScaleAxisZ,
-        UniformScale,
+        UniformScale
     }
-    
-    [ComponentStack.Runtime.AdvancedComponentStack.Name("Scale")]
+
+    [Name("Scale")]
     public class Scale : MouseAction
     {
-        private ScaleMode _scaleMode;
-        private Vector3 _startScale;
-        private float _scaleDist;  
-
-        private ShortcutCombo _mouseUniformScale;
         private ShortcutCombo _mouseScaleX;
         private ShortcutCombo _mouseScaleY;
         private ShortcutCombo _mouseScaleZ;
-        
-        public MouseSensitivitySettings MouseScaleSettings = new MouseSensitivitySettings();
+
+        private ShortcutCombo _mouseUniformScale;
+        private float _scaleDist;
+        private ScaleMode _scaleMode;
+        private Vector3 _startScale;
         public bool EnableSnapScale = false;
+
+        public MouseSensitivitySettings MouseScaleSettings = new();
         public float SnapScale = 1f;
 
         [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
+        private void OnDeserializing() => InitShortcutCombo();
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
-        
+        protected override void OnCreate() => InitShortcutCombo();
+
         private void InitShortcutCombo()
         {
             _mouseUniformScale = new ShortcutCombo();
@@ -64,9 +59,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         public override void CheckShortcutCombos(GameObject gameObject, Vector3 normal)
         {
-            if(_mouseUniformScale.IsActive())
+            if (_mouseUniformScale.IsActive())
             {
-                if(Begin(gameObject, normal) || _scaleMode != ScaleMode.UniformScale)
+                if (Begin(gameObject, normal) || _scaleMode != ScaleMode.UniformScale)
                 {
                     SetStartValue(gameObject);
                 }
@@ -75,7 +70,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             }
             else if (_mouseScaleX.IsActive())
             {
-                if(Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisX)
+                if (Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisX)
                 {
                     SetStartValue(gameObject);
                 }
@@ -84,7 +79,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             }
             else if (_mouseScaleY.IsActive())
             {
-                if(Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisY)
+                if (Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisY)
                 {
                     SetStartValue(gameObject);
                 }
@@ -93,7 +88,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             }
             else if (_mouseScaleZ.IsActive())
             {
-                if(Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisZ)
+                if (Begin(gameObject, normal) || _scaleMode != ScaleMode.ScaleAxisZ)
                 {
                     SetStartValue(gameObject);
                 }
@@ -115,10 +110,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         public override void OnMouseMove()
         {
-            if(_active && GameObject != null)
-            {                
-                float mouseSensitivityScale = CalculateMouseSensitivityScale();
-                float newMouseSensitivity = MouseScaleSettings.MouseSensitivity * mouseSensitivityScale * 0.03f;
+            if (_active && GameObject != null)
+            {
+                var mouseSensitivityScale = CalculateMouseSensitivityScale();
+                var newMouseSensitivity = MouseScaleSettings.MouseSensitivity * mouseSensitivityScale * 0.03f;
 
                 _scaleDist += Event.current.delta.x * newMouseSensitivity;
 
@@ -126,7 +121,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                 {
                     case ScaleMode.ScaleAxisX:
                     {
-                        ScaleObjectAxis( Axis.X, _scaleDist);
+                        ScaleObjectAxis(Axis.X, _scaleDist);
                         break;
                     }
                     case ScaleMode.ScaleAxisY:
@@ -154,7 +149,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
             {
                 case ScaleMode.ScaleAxisX:
                 {
-                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.X, out var upwards, out _, out _);
+                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.X,
+                        out Vector3 upwards,
+                        out _, out _);
 
                     Handles.color = Handles.xAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
@@ -163,7 +160,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                 }
                 case ScaleMode.ScaleAxisY:
                 {
-                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Y, out var upwards, out _, out _);
+                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Y,
+                        out Vector3 upwards,
+                        out _, out _);
 
                     Handles.color = Handles.yAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
@@ -172,7 +171,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                 }
                 case ScaleMode.ScaleAxisZ:
                 {
-                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Z, out var upwards, out _, out _);
+                    TransformAxes.GetOrientation(GameObject.transform, TransformSpace.Local, Axis.Z,
+                        out Vector3 upwards,
+                        out _, out _);
 
                     Handles.color = Handles.zAxisColor;
                     DrawAxisLine(GameObject.transform.position, upwards);
@@ -182,8 +183,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
                 case ScaleMode.UniformScale:
                 {
                     Handles.color = Handles.selectedColor;
-                    var position = GameObject.transform.position;
-                    Handles.RectangleHandleCap(0, position, Quaternion.FromToRotation(Vector3.forward, Vector3.up), HandleUtility.GetHandleSize(position) * 0.5f, EventType.Repaint);
+                    Vector3 position = GameObject.transform.position;
+                    Handles.RectangleHandleCap(0, position, Quaternion.FromToRotation(Vector3.forward, Vector3.up),
+                        HandleUtility.GetHandleSize(position) * 0.5f, EventType.Repaint);
 
                     break;
                 }
@@ -192,25 +194,37 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
 
         private float CalculateMouseSensitivityScale()
         {
-            float maxAbsScaleComponent = Mathf.Abs(GetWithBiggestAbsValue());
-            if (maxAbsScaleComponent < 1e-5f) maxAbsScaleComponent = 0.001f;
+            var maxAbsScaleComponent = Mathf.Abs(GetWithBiggestAbsValue());
+            if (maxAbsScaleComponent < 1e-5f)
+            {
+                maxAbsScaleComponent = 0.001f;
+            }
+
             return 1.0f / maxAbsScaleComponent;
         }
 
         private float GetWithBiggestAbsValue()
         {
-            float maxComponent = _startScale.x;
-            if (Mathf.Abs(maxComponent) < Mathf.Abs(_startScale.y)) maxComponent = _startScale.y;
-            if (Mathf.Abs(maxComponent) < Mathf.Abs(_startScale.z)) maxComponent = _startScale.z;
+            var maxComponent = _startScale.x;
+            if (Mathf.Abs(maxComponent) < Mathf.Abs(_startScale.y))
+            {
+                maxComponent = _startScale.y;
+            }
+
+            if (Mathf.Abs(maxComponent) < Mathf.Abs(_startScale.z))
+            {
+                maxComponent = _startScale.z;
+            }
 
             return maxComponent;
         }
 
         private void UniformScaleObject(float scale)
         {
-            if(EnableSnapScale)
+            if (EnableSnapScale)
             {
-                GameObject.transform.localScale = Snapping.Snap(new Vector3(_startScale.x + scale, _startScale.y + scale, _startScale.z + scale), 
+                GameObject.transform.localScale = Snapping.Snap(
+                    new Vector3(_startScale.x + scale, _startScale.y + scale, _startScale.z + scale),
                     new Vector3(SnapScale, SnapScale, SnapScale));
             }
             else
@@ -223,7 +237,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions
         {
             Vector3 result = GameObject.transform.localScale;
 
-            if(EnableSnapScale)
+            if (EnableSnapScale)
             {
                 switch (axis)
                 {

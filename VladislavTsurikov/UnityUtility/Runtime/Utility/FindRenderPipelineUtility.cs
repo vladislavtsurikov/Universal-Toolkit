@@ -2,26 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEditor.Callbacks;
 
 namespace VladislavTsurikov.UnityUtility.Runtime
 {
     public static class FindRenderPipelineUtility
-    { 
+    {
         private const string HDRP_PACKAGE = "HDRenderPipelineAsset";
         private const string URP_PACKAGE = "UniversalRenderPipelineAsset";
 
-        public static bool IsHDRP; 
+        public static bool IsHDRP;
         public static bool IsURP;
         public static bool IsStandardRP;
-        
+
 #if UNITY_EDITOR
-        [UnityEditor.Callbacks.DidReloadScripts]
+        [DidReloadScripts]
         private static void OnScriptsReloaded()
         {
             IsHDRP = DoesTypeExist(HDRP_PACKAGE);
             IsURP = DoesTypeExist(URP_PACKAGE);
 
-            if(!(IsHDRP || IsURP))
+            if (!(IsHDRP || IsURP))
             {
                 IsStandardRP = true;
             }
@@ -29,10 +30,10 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         private static bool DoesTypeExist(string className)
         {
-             var foundType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
-                              from type in GetTypesSafe(assembly)
-                              where type.Name == className
-                              select type).FirstOrDefault();
+            Type foundType = (from assembly in AppDomain.CurrentDomain.GetAssemblies()
+                from type in GetTypesSafe(assembly)
+                where type.Name == className
+                select type).FirstOrDefault();
 
             return foundType != null;
         }
@@ -43,7 +44,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
             try
             {
-               types = assembly.GetTypes();
+                types = assembly.GetTypes();
             }
             catch (ReflectionTypeLoadException e)
             {

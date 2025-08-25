@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using VladislavTsurikov.ReflectionUtility.Runtime;
 using OdinSerializer.Utilities;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 using Object = UnityEngine.Object;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
@@ -16,7 +16,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
         private const int MaxDepth = 50;
 
-        internal static async UniTask LoadAssetReferencesRecursive(object result, ResourceLoader owner, CancellationToken token)
+        internal static async UniTask LoadAssetReferencesRecursive(object result, ResourceLoader owner,
+            CancellationToken token)
         {
             var visited = new HashSet<object>(ReferenceEqualityComparer<object>.Default);
             var path = new Stack<object>();
@@ -57,7 +58,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             {
                 return;
             }
-            
+
             if (depth > MaxDepth)
             {
                 LogDepthExceeded(path, target);
@@ -77,12 +78,13 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
             path.Push(target);
 
-            var type = target.GetType();
-            var fields = ReflectionFieldCache.GetCachedFields(type, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            Type type = target.GetType();
+            FieldInfo[] fields = ReflectionFieldCache.GetCachedFields(type,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             var tasks = new List<UniTask>();
 
-            foreach (var field in fields)
+            foreach (FieldInfo field in fields)
             {
                 var value = field.GetValue(target);
 
@@ -131,7 +133,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                     continue;
                 }
 
-                var type = element.GetType();
+                Type type = element.GetType();
 
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(KeyValuePair<,>))
                 {
@@ -142,7 +144,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
                         if (val is AssetReference kvAssetRef)
                         {
-                            tasks.Add(LoadAndProcess(kvAssetRef, kvAssetRef.GetType(), owner, visited, depth, path, token));
+                            tasks.Add(LoadAndProcess(kvAssetRef, kvAssetRef.GetType(), owner, visited, depth, path,
+                                token));
                         }
                         else
                         {
@@ -208,23 +211,19 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             return false;
         }
 
-        private static bool ShouldSkipField(FieldInfo field, object value)
-        {
-            return value == null ||
-                   field.IsDefined(typeof(IgnoreResourceAutoload), true) ||
-                   (value is Object uObj && uObj == null);
-        }
+        private static bool ShouldSkipField(FieldInfo field, object value) =>
+            value == null ||
+            field.IsDefined(typeof(IgnoreResourceAutoload), true) ||
+            (value is Object uObj && uObj == null);
 
-        private static bool IsEnumerableButNotStringOrTransform(FieldInfo field, object value)
-        {
-            return field.FieldType != typeof(string) &&
-                   value is not Transform &&
-                   value is IEnumerable;
-        }
+        private static bool IsEnumerableButNotStringOrTransform(FieldInfo field, object value) =>
+            field.FieldType != typeof(string) &&
+            value is not Transform &&
+            value is IEnumerable;
 
         private static bool IsComplexObject(FieldInfo field)
         {
-            var fieldType = field.FieldType;
+            Type fieldType = field.FieldType;
 
             return !fieldType.IsPrimitive &&
                    fieldType != typeof(string) &&
@@ -235,7 +234,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         private static void LogDepthExceeded(Stack<object> path, object target)
         {
 #if ADDRESSABLE_LOADER_LOGS
-            string message = $"[AssetReferenceLoader] Max depth exceeded while processing: {target.GetType().Name}\nPath:\n{string.Join("\n", path)}";
+            string message =
+ $"[AssetReferenceLoader] Max depth exceeded while processing: {target.GetType().Name}\nPath:\n{string.Join("\n", path)}";
             Debug.LogError(message);
 #endif
         }
@@ -243,7 +243,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         private static void LogCycleDetected(Stack<object> path, object target)
         {
 #if ADDRESSABLE_LOADER_LOGS
-            string message = $"[AssetReferenceLoader] Detected cycle (object already visited): {target.GetType().Name}\nPath:\n{string.Join("\n", path)}";
+            string message =
+ $"[AssetReferenceLoader] Detected cycle (object already visited): {target.GetType().Name}\nPath:\n{string.Join("\n", path)}";
             Debug.LogError(message);
 #endif
         }

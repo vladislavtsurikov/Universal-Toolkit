@@ -17,41 +17,37 @@
 //-----------------------------------------------------------------------
 
 using OdinSerializer;
+using UnityEngine;
 
 [assembly: RegisterFormatter(typeof(AnimationCurveFormatter))]
 
 namespace OdinSerializer
 {
-    using UnityEngine;
-
     /// <summary>
-    /// Custom formatter for the <see cref="AnimationCurve"/> type.
+    ///     Custom formatter for the <see cref="AnimationCurve" /> type.
     /// </summary>
-    /// <seealso cref="MinimalBaseFormatter{UnityEngine.AnimationCurve}" />
+    /// <seealso cref="AnimationCurve" />
     public class AnimationCurveFormatter : MinimalBaseFormatter<AnimationCurve>
     {
         private static readonly Serializer<Keyframe[]> KeyframeSerializer = Serializer.Get<Keyframe[]>();
         private static readonly Serializer<WrapMode> WrapModeSerializer = Serializer.Get<WrapMode>();
 
         /// <summary>
-        /// Returns null.
+        ///     Returns null.
         /// </summary>
         /// <returns>
-        /// A null value.
+        ///     A null value.
         /// </returns>
-        protected override AnimationCurve GetUninitializedObject()
-        {
-            return null;
-        }
+        protected override AnimationCurve GetUninitializedObject() => null;
 
         /// <summary>
-        /// Reads into the specified value using the specified reader.
+        ///     Reads into the specified value using the specified reader.
         /// </summary>
         /// <param name="value">The value to read into.</param>
         /// <param name="reader">The reader to use.</param>
         protected override void Read(ref AnimationCurve value, IDataReader reader)
         {
-            var keys = KeyframeSerializer.ReadValue(reader);
+            Keyframe[] keys = KeyframeSerializer.ReadValue(reader);
 
             value = new AnimationCurve(keys);
             value.preWrapMode = WrapModeSerializer.ReadValue(reader);
@@ -59,7 +55,7 @@ namespace OdinSerializer
         }
 
         /// <summary>
-        /// Writes from the specified value using the specified writer.
+        ///     Writes from the specified value using the specified writer.
         /// </summary>
         /// <param name="value">The value to write from.</param>
         /// <param name="writer">The writer to use.</param>

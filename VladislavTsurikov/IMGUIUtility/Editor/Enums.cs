@@ -2,21 +2,21 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 {
     public enum StyleName
     {
-    	Bar,
+        Bar,
         ActiveBar,
-    	LabelButton,
+        LabelButton,
         LabelButtonClick,
         LabelHelp,
-    	LabelFoldout,
-    	LabelButtonSCenter,
-    	LabelSLeft,
-    	LabelTextForIcon,
-    	LabelTextForSelectedArea,
+        LabelFoldout,
+        LabelButtonSCenter,
+        LabelSLeft,
+        LabelTextForIcon,
+        LabelTextForSelectedArea,
         LabelText,
-    	IconButtonMinus,
-    	IconButtonPlus,
-    	IconButtonOk,
-    	IconButtonCancel,
+        IconButtonMinus,
+        IconButtonPlus,
+        IconButtonOk,
+        IconButtonCancel,
         BackgroundStyle,
         Box
     }

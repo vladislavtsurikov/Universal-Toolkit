@@ -16,6 +16,9 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
+using Object = UnityEngine.Object;
 #if NET_STANDARD_2_0
 #error Odin Inspector is incapable of compiling source code against the .NET Standard 2.0 API surface. You can change the API Compatibility Level in the Player settings.
 #endif
@@ -26,57 +29,62 @@
 
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Reflection;
-
 #if CAN_EMIT
-
     using System.Reflection.Emit;
 
 #endif
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate object WeakValueGetter(ref object instance);
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate void WeakValueSetter(ref object instance, object value);
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate FieldType WeakValueGetter<FieldType>(ref object instance);
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate void WeakValueSetter<FieldType>(ref object instance, FieldType value);
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate FieldType ValueGetter<InstanceType, FieldType>(ref InstanceType instance);
 
     /// <summary>
-    /// Not yet documented.
+    ///     Not yet documented.
     /// </summary>
     public delegate void ValueSetter<InstanceType, FieldType>(ref InstanceType instance, FieldType value);
 
     /// <summary>
-    /// Provides utilities for using the <see cref="System.Reflection.Emit"/> namespace.
-    /// <para />
-    /// This class is due for refactoring. Use at your own peril.
+    ///     Provides utilities for using the <see cref="System.Reflection.Emit" /> namespace.
+    ///     <para />
+    ///     This class is due for refactoring. Use at your own peril.
     /// </summary>
     public static class EmitUtilities
     {
+        public delegate void InstanceRefMethodCaller<InstanceType>(ref InstanceType instance);
+
+        public delegate void InstanceRefMethodCaller<InstanceType, TArg1>(ref InstanceType instance, TArg1 arg1);
+
+#if UNITY_EDITOR
+        private static readonly Assembly EditorAssembly = typeof(UnityEditor.Editor).Assembly;
+#endif
+        private static readonly Assembly EngineAssembly = typeof(Object).Assembly;
+
         /// <summary>
-        /// Gets a value indicating whether emitting is supported on the current platform.
+        ///     Gets a value indicating whether emitting is supported on the current platform.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if the current platform can emit; otherwise, <c>false</c>.
+        ///     <c>true</c> if the current platform can emit; otherwise, <c>false</c>.
         /// </value>
         public static bool CanEmit
         {
@@ -90,25 +98,22 @@ namespace OdinSerializer.Utilities
             }
         }
 
-#if UNITY_EDITOR
-        private static Assembly EditorAssembly = typeof(UnityEditor.Editor).Assembly;
-#endif
-        private static Assembly EngineAssembly = typeof(UnityEngine.Object).Assembly;
-
         private static bool EmitIsIllegalForMember(MemberInfo member)
         {
 #if UNITY_EDITOR
-            return member.DeclaringType != null && (member.DeclaringType.Assembly == EditorAssembly || member.DeclaringType.Assembly == EngineAssembly);
+            return member.DeclaringType != null && (member.DeclaringType.Assembly == EditorAssembly ||
+                                                    member.DeclaringType.Assembly == EngineAssembly);
 #else
             return member.DeclaringType != null && member.DeclaringType.Assembly == EngineAssembly;
 #endif
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to get the value.
         /// </summary>
         /// <typeparam name="FieldType">The type of the field to get a value from.</typeparam>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static Func<FieldType> CreateStaticFieldGetter<FieldType>(FieldInfo fieldInfo)
@@ -127,16 +132,13 @@ namespace OdinSerializer.Utilities
 
             if (fieldInfo.IsLiteral)
             {
-                FieldType value = (FieldType)fieldInfo.GetValue(null);
+                var value = (FieldType)fieldInfo.GetValue(null);
                 return () => value;
             }
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate ()
-            {
-                return (FieldType)fieldInfo.GetValue(null);
-            };
+            return delegate { return (FieldType)fieldInfo.GetValue(null); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -159,9 +161,10 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to get the value.
         /// </summary>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static Func<object> CreateWeakStaticFieldGetter(FieldInfo fieldInfo)
@@ -180,10 +183,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate ()
-            {
-                return fieldInfo.GetValue(null);
-            };
+            return delegate { return fieldInfo.GetValue(null); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -212,10 +212,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to set the value.
         /// </summary>
         /// <typeparam name="FieldType">The type of the field to set a value to.</typeparam>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a setter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a setter for.</param>
         /// <returns>A delegate which sets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static Action<FieldType> CreateStaticFieldSetter<FieldType>(FieldInfo fieldInfo)
@@ -239,10 +240,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (FieldType value)
-            {
-                fieldInfo.SetValue(null, value);
-            };
+            return delegate(FieldType value) { fieldInfo.SetValue(null, value); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -266,9 +264,10 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to set the value.
         /// </summary>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a setter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a setter for.</param>
         /// <returns>A delegate which sets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static Action<object> CreateWeakStaticFieldSetter(FieldInfo fieldInfo)
@@ -287,10 +286,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (object value)
-            {
-                fieldInfo.SetValue(null, value);
-            };
+            return delegate(object value) { fieldInfo.SetValue(null, value); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -324,14 +320,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to get the value.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the instance to get a value from.</typeparam>
         /// <typeparam name="FieldType">The type of the field to get a value from.</typeparam>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
-        public static ValueGetter<InstanceType, FieldType> CreateInstanceFieldGetter<InstanceType, FieldType>(FieldInfo fieldInfo)
+        public static ValueGetter<InstanceType, FieldType> CreateInstanceFieldGetter<InstanceType, FieldType>(
+            FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
             {
@@ -347,10 +345,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref InstanceType classInstance)
-            {
-                return (FieldType)fieldInfo.GetValue(classInstance);
-            };
+            return delegate(ref InstanceType classInstance) { return (FieldType)fieldInfo.GetValue(classInstance); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -362,7 +357,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".get_" + fieldInfo.Name;
 
-            DynamicMethod getterMethod = new DynamicMethod(methodName, typeof(FieldType), new Type[1] { typeof(InstanceType).MakeByRefType() }, true);
+            DynamicMethod getterMethod =
+ new DynamicMethod(methodName, typeof(FieldType), new Type[1] { typeof(InstanceType).MakeByRefType() }, true);
             ILGenerator gen = getterMethod.GetILGenerator();
 
             if (typeof(InstanceType).IsValueType)
@@ -384,14 +380,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a field from a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a field from a weakly typed instance of a given type. If emitting is not
+        ///     supported on the current platform, the delegate will use reflection to get the value.
         /// </summary>
         /// <typeparam name="FieldType">The type of the field to get a value from.</typeparam>
-        /// <param name="instanceType">The <see cref="Type"/> of the instance to get a value from.</param>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="instanceType">The <see cref="Type" /> of the instance to get a value from.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
-        public static WeakValueGetter<FieldType> CreateWeakInstanceFieldGetter<FieldType>(Type instanceType, FieldInfo fieldInfo)
+        public static WeakValueGetter<FieldType> CreateWeakInstanceFieldGetter<FieldType>(Type instanceType,
+            FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
             {
@@ -412,10 +410,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance)
-            {
-                return (FieldType)fieldInfo.GetValue(classInstance);
-            };
+            return delegate(ref object classInstance) { return (FieldType)fieldInfo.GetValue(classInstance); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -427,7 +422,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".get_" + fieldInfo.Name;
 
-            DynamicMethod getterMethod = new DynamicMethod(methodName, typeof(FieldType), new Type[1] { typeof(object).MakeByRefType() }, true);
+            DynamicMethod getterMethod =
+ new DynamicMethod(methodName, typeof(FieldType), new Type[1] { typeof(object).MakeByRefType() }, true);
             ILGenerator gen = getterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -452,10 +448,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the weakly typed value of a field from a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the weakly typed value of a field from a weakly typed instance of a given type. If
+        ///     emitting is not supported on the current platform, the delegate will use reflection to get the value.
         /// </summary>
-        /// <param name="instanceType">The <see cref="Type"/> of the instance to get a value from.</param>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="instanceType">The <see cref="Type" /> of the instance to get a value from.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static WeakValueGetter CreateWeakInstanceFieldGetter(Type instanceType, FieldInfo fieldInfo)
@@ -479,10 +476,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance)
-            {
-                return fieldInfo.GetValue(classInstance);
-            };
+            return delegate(ref object classInstance) { return fieldInfo.GetValue(classInstance); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -494,7 +488,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".get_" + fieldInfo.Name;
 
-            DynamicMethod getterMethod = new DynamicMethod(methodName, typeof(object), new Type[1] { typeof(object).MakeByRefType() }, true);
+            DynamicMethod getterMethod =
+ new DynamicMethod(methodName, typeof(object), new Type[1] { typeof(object).MakeByRefType() }, true);
             ILGenerator gen = getterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -529,14 +524,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a field. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to set the value.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the instance to set a value on.</typeparam>
         /// <typeparam name="FieldType">The type of the field to set a value to.</typeparam>
-        /// <param name="fieldInfo">The <see cref="FieldInfo"/> instance describing the field to create a setter for.</param>
+        /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a setter for.</param>
         /// <returns>A delegate which sets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
-        public static ValueSetter<InstanceType, FieldType> CreateInstanceFieldSetter<InstanceType, FieldType>(FieldInfo fieldInfo)
+        public static ValueSetter<InstanceType, FieldType> CreateInstanceFieldSetter<InstanceType, FieldType>(
+            FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
             {
@@ -552,7 +549,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref InstanceType classInstance, FieldType value)
+            return delegate(ref InstanceType classInstance, FieldType value)
             {
                 if (typeof(InstanceType).IsValueType)
                 {
@@ -589,7 +586,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".set_" + fieldInfo.Name;
 
-            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(InstanceType).MakeByRefType(), typeof(FieldType) }, true);
+            DynamicMethod setterMethod =
+ new DynamicMethod(methodName, null, new Type[2] { typeof(InstanceType).MakeByRefType(), typeof(FieldType) }, true);
             ILGenerator gen = setterMethod.GetILGenerator();
 
             if (typeof(InstanceType).IsValueType)
@@ -613,17 +611,19 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a field on a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a field on a weakly typed instance of a given type. If emitting is not
+        ///     supported on the current platform, the delegate will use reflection to set the value.
         /// </summary>
         /// <typeparam name="FieldType">The type of the field to set a value to.</typeparam>
         /// <param name="instanceType">Type of the instance.</param>
         /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a setter for.</param>
         /// <returns>
-        /// A delegate which sets the value of the given field.
+        ///     A delegate which sets the value of the given field.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         /// <exception cref="System.ArgumentException">Field cannot be static.</exception>
-        public static WeakValueSetter<FieldType> CreateWeakInstanceFieldSetter<FieldType>(Type instanceType, FieldInfo fieldInfo)
+        public static WeakValueSetter<FieldType> CreateWeakInstanceFieldSetter<FieldType>(Type instanceType,
+            FieldInfo fieldInfo)
         {
             if (fieldInfo == null)
             {
@@ -644,10 +644,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance, FieldType value)
-            {
-                fieldInfo.SetValue(classInstance, value);
-            };
+            return delegate(ref object classInstance, FieldType value) { fieldInfo.SetValue(classInstance, value); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -659,7 +656,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".set_" + fieldInfo.Name;
 
-            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(FieldType) }, true);
+            DynamicMethod setterMethod =
+ new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(FieldType) }, true);
             ILGenerator gen = setterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -694,12 +692,13 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the weakly typed value of a field on a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the weakly typed value of a field on a weakly typed instance of a given type. If
+        ///     emitting is not supported on the current platform, the delegate will use reflection to set the value.
         /// </summary>
         /// <param name="instanceType">Type of the instance.</param>
         /// <param name="fieldInfo">The <see cref="FieldInfo" /> instance describing the field to create a setter for.</param>
         /// <returns>
-        /// A delegate which sets the value of the given field.
+        ///     A delegate which sets the value of the given field.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         /// <exception cref="System.ArgumentException">Field cannot be static.</exception>
@@ -724,10 +723,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance, object value)
-            {
-                fieldInfo.SetValue(classInstance, value);
-            };
+            return delegate(ref object classInstance, object value) { fieldInfo.SetValue(classInstance, value); };
 #else
             if (EmitIsIllegalForMember(fieldInfo))
             {
@@ -739,7 +735,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = fieldInfo.ReflectedType.FullName + ".set_" + fieldInfo.Name;
 
-            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(object) }, true);
+            DynamicMethod setterMethod =
+ new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(object) }, true);
             ILGenerator gen = setterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -794,10 +791,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the weakly typed value of a field from a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the weakly typed value of a field from a weakly typed instance of a given type. If
+        ///     emitting is not supported on the current platform, the delegate will use reflection to get the value.
         /// </summary>
-        /// <param name="instanceType">The <see cref="Type"/> of the instance to get a value from.</param>
-        /// <param name="propertyInfo">The <see cref="FieldInfo"/> instance describing the field to create a getter for.</param>
+        /// <param name="instanceType">The <see cref="Type" /> of the instance to get a value from.</param>
+        /// <param name="propertyInfo">The <see cref="FieldInfo" /> instance describing the field to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given field.</returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         public static WeakValueGetter CreateWeakInstancePropertyGetter(Type instanceType, PropertyInfo propertyInfo)
@@ -819,7 +817,7 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentException("Property must not have any index parameters");
             }
 
-            var getMethod = propertyInfo.GetGetMethod(true);
+            MethodInfo getMethod = propertyInfo.GetGetMethod(true);
 
             if (getMethod == null)
             {
@@ -833,10 +831,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance)
-            {
-                return propertyInfo.GetValue(classInstance, null);
-            };
+            return delegate(ref object classInstance) { return propertyInfo.GetValue(classInstance, null); };
 #else
             if (EmitIsIllegalForMember(propertyInfo))
             {
@@ -848,7 +843,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = propertyInfo.ReflectedType.FullName + ".get_" + propertyInfo.Name;
 
-            DynamicMethod getterMethod = new DynamicMethod(methodName, typeof(object), new Type[1] { typeof(object).MakeByRefType() }, true);
+            DynamicMethod getterMethod =
+ new DynamicMethod(methodName, typeof(object), new Type[1] { typeof(object).MakeByRefType() }, true);
             ILGenerator gen = getterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -899,12 +895,13 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the weakly typed value of a property on a weakly typed instance of a given type. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the weakly typed value of a property on a weakly typed instance of a given type. If
+        ///     emitting is not supported on the current platform, the delegate will use reflection to set the value.
         /// </summary>
         /// <param name="instanceType">Type of the instance.</param>
         /// <param name="propertyInfo">The <see cref="PropertyInfo" /> instance describing the property to create a setter for.</param>
         /// <returns>
-        /// A delegate which sets the value of the given field.
+        ///     A delegate which sets the value of the given field.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">The fieldInfo parameter is null.</exception>
         /// <exception cref="System.ArgumentException">Property cannot be static.</exception>
@@ -927,7 +924,7 @@ namespace OdinSerializer.Utilities
                 throw new ArgumentException("Property must not have any index parameters");
             }
 
-            var setMethod = propertyInfo.GetSetMethod(true);
+            MethodInfo setMethod = propertyInfo.GetSetMethod(true);
 
             if (setMethod.IsStatic)
             {
@@ -936,7 +933,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref object classInstance, object value)
+            return delegate(ref object classInstance, object value)
             {
                 propertyInfo.SetValue(classInstance, value, null);
             };
@@ -951,7 +948,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = propertyInfo.ReflectedType.FullName + ".set_" + propertyInfo.Name;
 
-            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(object) }, true);
+            DynamicMethod setterMethod =
+ new DynamicMethod(methodName, null, new Type[2] { typeof(object).MakeByRefType(), typeof(object) }, true);
             ILGenerator gen = setterMethod.GetILGenerator();
 
             if (instanceType.IsValueType)
@@ -1021,10 +1019,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a property. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a property. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to set the value.
         /// </summary>
         /// <typeparam name="PropType">The type of the property to set a value to.</typeparam>
-        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> instance describing the property to create a setter for.</param>
+        /// <param name="propertyInfo">The <see cref="PropertyInfo" /> instance describing the property to create a setter for.</param>
         /// <returns>A delegate which sets the value of the given property.</returns>
         /// <exception cref="System.ArgumentNullException">The propertyInfo parameter is null.</exception>
         public static Action<PropType> CreateStaticPropertySetter<PropType>(PropertyInfo propertyInfo)
@@ -1055,10 +1054,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (PropType value)
-            {
-                propertyInfo.SetValue(null, value, null);
-            };
+            return delegate(PropType value) { propertyInfo.SetValue(null, value, null); };
 #else
             if (EmitIsIllegalForMember(propertyInfo))
             {
@@ -1082,10 +1078,11 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a property. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a property. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to get the value.
         /// </summary>
         /// <typeparam name="PropType">The type of the property to get a value from.</typeparam>
-        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> instance describing the property to create a getter for.</param>
+        /// <param name="propertyInfo">The <see cref="PropertyInfo" /> instance describing the property to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given property.</returns>
         /// <exception cref="System.ArgumentNullException">The propertyInfo parameter is null.</exception>
         public static Func<PropType> CreateStaticPropertyGetter<PropType>(PropertyInfo propertyInfo)
@@ -1116,10 +1113,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate ()
-            {
-                return (PropType)propertyInfo.GetValue(null, null);
-            };
+            return delegate { return (PropType)propertyInfo.GetValue(null, null); };
 #else
             if (EmitIsIllegalForMember(propertyInfo))
             {
@@ -1149,14 +1143,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which sets the value of a property. If emitting is not supported on the current platform, the delegate will use reflection to set the value.
+        ///     Creates a delegate which sets the value of a property. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to set the value.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the instance to set a value on.</typeparam>
         /// <typeparam name="PropType">The type of the property to set a value to.</typeparam>
-        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> instance describing the property to create a setter for.</param>
+        /// <param name="propertyInfo">The <see cref="PropertyInfo" /> instance describing the property to create a setter for.</param>
         /// <returns>A delegate which sets the value of the given property.</returns>
         /// <exception cref="System.ArgumentNullException">The propertyInfo parameter is null.</exception>
-        public static ValueSetter<InstanceType, PropType> CreateInstancePropertySetter<InstanceType, PropType>(PropertyInfo propertyInfo)
+        public static ValueSetter<InstanceType, PropType> CreateInstancePropertySetter<InstanceType, PropType>(
+            PropertyInfo propertyInfo)
         {
             if (propertyInfo == null)
             {
@@ -1184,7 +1180,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref InstanceType classInstance, PropType value)
+            return delegate(ref InstanceType classInstance, PropType value)
             {
                 if (typeof(InstanceType).IsValueType)
                 {
@@ -1221,7 +1217,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = propertyInfo.ReflectedType.FullName + ".set_" + propertyInfo.Name;
 
-            DynamicMethod setterMethod = new DynamicMethod(methodName, null, new Type[2] { typeof(InstanceType).MakeByRefType(), typeof(PropType) }, true);
+            DynamicMethod setterMethod =
+ new DynamicMethod(methodName, null, new Type[2] { typeof(InstanceType).MakeByRefType(), typeof(PropType) }, true);
             ILGenerator gen = setterMethod.GetILGenerator();
 
             if (typeof(InstanceType).IsValueType)
@@ -1245,14 +1242,16 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a delegate which gets the value of a property. If emitting is not supported on the current platform, the delegate will use reflection to get the value.
+        ///     Creates a delegate which gets the value of a property. If emitting is not supported on the current platform, the
+        ///     delegate will use reflection to get the value.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the instance to get a value from.</typeparam>
         /// <typeparam name="PropType">The type of the property to get a value from.</typeparam>
-        /// <param name="propertyInfo">The <see cref="PropertyInfo"/> instance describing the property to create a getter for.</param>
+        /// <param name="propertyInfo">The <see cref="PropertyInfo" /> instance describing the property to create a getter for.</param>
         /// <returns>A delegate which gets the value of the given property.</returns>
         /// <exception cref="System.ArgumentNullException">The propertyInfo parameter is null.</exception>
-        public static ValueGetter<InstanceType, PropType> CreateInstancePropertyGetter<InstanceType, PropType>(PropertyInfo propertyInfo)
+        public static ValueGetter<InstanceType, PropType> CreateInstancePropertyGetter<InstanceType, PropType>(
+            PropertyInfo propertyInfo)
         {
             if (propertyInfo == null)
             {
@@ -1280,7 +1279,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (ref InstanceType classInstance)
+            return delegate(ref InstanceType classInstance)
             {
                 return (PropType)propertyInfo.GetValue(classInstance, null);
             };
@@ -1295,7 +1294,8 @@ namespace OdinSerializer.Utilities
 
             string methodName = propertyInfo.ReflectedType.FullName + ".get_" + propertyInfo.Name;
 
-            DynamicMethod getterMethod = new DynamicMethod(methodName, typeof(PropType), new Type[] { typeof(InstanceType).MakeByRefType() }, true);
+            DynamicMethod getterMethod =
+ new DynamicMethod(methodName, typeof(PropType), new Type[] { typeof(InstanceType).MakeByRefType() }, true);
             ILGenerator gen = getterMethod.GetILGenerator();
 
             if (typeof(InstanceType).IsValueType)
@@ -1317,13 +1317,17 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given parameterless instance method and returns the result.
+        ///     Creates a fast delegate method which calls a given parameterless instance method and returns the result.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the class which the method is on.</typeparam>
         /// <typeparam name="ReturnType">The type which is returned by the given method info.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
-        public static Func<InstanceType, ReturnType> CreateMethodReturner<InstanceType, ReturnType>(MethodInfo methodInfo)
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
+        public static Func<InstanceType, ReturnType> CreateMethodReturner<InstanceType, ReturnType>(
+            MethodInfo methodInfo)
         {
             if (methodInfo == null)
             {
@@ -1332,21 +1336,26 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             methodInfo = methodInfo.DeAliasMethod();
 
             // Luckily there's no need to emit this - we can just create a delegate and it's only ~10% slower than calling the method directly
             // from normal compiled/emitted code. As opposed to using MethodInfo.Invoke, which is on average 600 (!!!) times slower.
-            return (Func<InstanceType, ReturnType>)Delegate.CreateDelegate(typeof(Func<InstanceType, ReturnType>), methodInfo);
+            return (Func<InstanceType, ReturnType>)Delegate.CreateDelegate(typeof(Func<InstanceType, ReturnType>),
+                methodInfo);
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given parameterless static method.
+        ///     Creates a fast delegate method which calls a given parameterless static method.
         /// </summary>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
         public static Action CreateStaticMethodCaller(MethodInfo methodInfo)
         {
             if (methodInfo == null)
@@ -1356,7 +1365,8 @@ namespace OdinSerializer.Utilities
 
             if (!methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is an instance method when it has to be static.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is an instance method when it has to be static.");
             }
 
             if (methodInfo.GetParameters().Length > 0)
@@ -1372,10 +1382,13 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given parameterless weakly typed instance method.
+        ///     Creates a fast delegate method which calls a given parameterless weakly typed instance method.
         /// </summary>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
         public static Action<object, TArg1> CreateWeakInstanceMethodCaller<TArg1>(MethodInfo methodInfo)
         {
             if (methodInfo == null)
@@ -1385,10 +1398,11 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
 
             if (parameters.Length != 1)
             {
@@ -1397,17 +1411,15 @@ namespace OdinSerializer.Utilities
 
             if (parameters[0].ParameterType != typeof(TArg1))
             {
-                throw new ArgumentException("The first parameter of the method '" + methodInfo.Name + "' must be of type " + typeof(TArg1) + ".");
+                throw new ArgumentException("The first parameter of the method '" + methodInfo.Name +
+                                            "' must be of type " + typeof(TArg1) + ".");
             }
 
             methodInfo = methodInfo.DeAliasMethod();
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return (object classInstance, TArg1 arg) =>
-            {
-                methodInfo.Invoke(classInstance, new object[] { arg });
-            };
+            return (classInstance, arg) => { methodInfo.Invoke(classInstance, new object[] { arg }); };
 #else
             if (EmitIsIllegalForMember(methodInfo))
             {
@@ -1420,7 +1432,8 @@ namespace OdinSerializer.Utilities
             Type declaringType = methodInfo.DeclaringType;
             string methodName = methodInfo.ReflectedType.FullName + ".call_" + methodInfo.Name;
 
-            DynamicMethod method = new DynamicMethod(methodName, null, new Type[] { typeof(object), typeof(TArg1) }, true);
+            DynamicMethod method =
+ new DynamicMethod(methodName, null, new Type[] { typeof(object), typeof(TArg1) }, true);
             ILGenerator gen = method.GetILGenerator();
 
             if (declaringType.IsValueType)
@@ -1449,7 +1462,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public static Action<object> CreateWeakInstanceMethodCaller(MethodInfo methodInfo)
         {
@@ -1460,7 +1473,8 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.GetParameters().Length > 0)
@@ -1472,10 +1486,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return delegate (object classInstance)
-            {
-                methodInfo.Invoke(classInstance, null);
-            };
+            return delegate(object classInstance) { methodInfo.Invoke(classInstance, null); };
 #else
             if (EmitIsIllegalForMember(methodInfo))
             {
@@ -1521,23 +1532,25 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given weakly typed instance method with one argument and returns a value.
+        ///     Creates a fast delegate method which calls a given weakly typed instance method with one argument and returns a
+        ///     value.
         /// </summary>
         /// <typeparam name="TResult">The type of the result.</typeparam>
         /// <typeparam name="TArg1">The type of the first argument.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
         /// <returns>
-        /// A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
         /// </returns>
         /// <exception cref="System.ArgumentNullException">methodInfo</exception>
         /// <exception cref="System.ArgumentException">
-        /// Given method ' + methodInfo.Name + ' is static when it has to be an instance method.
-        /// or
-        /// Given method ' + methodInfo.Name + ' must return type  + typeof(TResult) + .
-        /// or
-        /// Given method ' + methodInfo.Name + ' must have exactly one parameter.
-        /// or
-        /// The first parameter of the method ' + methodInfo.Name + ' must be of type  + typeof(TArg1) + .
+        ///     Given method ' + methodInfo.Name + ' is static when it has to be an instance method.
+        ///     or
+        ///     Given method ' + methodInfo.Name + ' must return type  + typeof(TResult) + .
+        ///     or
+        ///     Given method ' + methodInfo.Name + ' must have exactly one parameter.
+        ///     or
+        ///     The first parameter of the method ' + methodInfo.Name + ' must be of type  + typeof(TArg1) + .
         /// </exception>
         public static Func<object, TArg1, TResult> CreateWeakInstanceMethodCaller<TResult, TArg1>(MethodInfo methodInfo)
         {
@@ -1548,15 +1561,17 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.ReturnType != typeof(TResult))
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " + typeof(TResult) + ".");
+                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " +
+                                            typeof(TResult) + ".");
             }
 
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
 
             if (parameters.Length != 1)
             {
@@ -1565,14 +1580,15 @@ namespace OdinSerializer.Utilities
 
             if (typeof(TArg1).InheritsFrom(parameters[0].ParameterType) == false)
             {
-                throw new ArgumentException("The first parameter of the method '" + methodInfo.Name + "' must be of type " + typeof(TArg1) + ".");
+                throw new ArgumentException("The first parameter of the method '" + methodInfo.Name +
+                                            "' must be of type " + typeof(TArg1) + ".");
             }
 
             methodInfo = methodInfo.DeAliasMethod();
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return (object classInstance, TArg1 arg1) =>
+            return (classInstance, arg1) =>
             {
                 return (TResult)methodInfo.Invoke(classInstance, new object[] { arg1 });
             };
@@ -1588,7 +1604,8 @@ namespace OdinSerializer.Utilities
             Type declaringType = methodInfo.DeclaringType;
             string methodName = methodInfo.ReflectedType.FullName + ".call_" + methodInfo.Name;
 
-            DynamicMethod method = new DynamicMethod(methodName, typeof(TResult), new Type[] { typeof(object), typeof(TArg1) }, true);
+            DynamicMethod method =
+ new DynamicMethod(methodName, typeof(TResult), new Type[] { typeof(object), typeof(TArg1) }, true);
             ILGenerator gen = method.GetILGenerator();
 
             if (declaringType.IsValueType)
@@ -1617,7 +1634,7 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
         public static Func<object, TResult> CreateWeakInstanceMethodCallerFunc<TResult>(MethodInfo methodInfo)
         {
@@ -1628,15 +1645,17 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.ReturnType != typeof(TResult))
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " + typeof(TResult) + ".");
+                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " +
+                                            typeof(TResult) + ".");
             }
 
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
 
             if (parameters.Length != 0)
             {
@@ -1647,10 +1666,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return (object classInstance) =>
-            {
-                return (TResult)methodInfo.Invoke(classInstance, null);
-            };
+            return classInstance => { return (TResult)methodInfo.Invoke(classInstance, null); };
 #else
             if (EmitIsIllegalForMember(methodInfo))
             {
@@ -1690,9 +1706,10 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Not yet documented.
+        ///     Not yet documented.
         /// </summary>
-        public static Func<object, TArg, TResult> CreateWeakInstanceMethodCallerFunc<TArg, TResult>(MethodInfo methodInfo)
+        public static Func<object, TArg, TResult> CreateWeakInstanceMethodCallerFunc<TArg, TResult>(
+            MethodInfo methodInfo)
         {
             if (methodInfo == null)
             {
@@ -1701,15 +1718,17 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.ReturnType != typeof(TResult))
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " + typeof(TResult) + ".");
+                throw new ArgumentException("Given method '" + methodInfo.Name + "' must return type " +
+                                            typeof(TResult) + ".");
             }
 
-            var parameters = methodInfo.GetParameters();
+            ParameterInfo[] parameters = methodInfo.GetParameters();
 
             if (parameters.Length != 1)
             {
@@ -1725,10 +1744,7 @@ namespace OdinSerializer.Utilities
 
 #if !CAN_EMIT
             // Platform does not support emitting dynamic code
-            return (object classInstance, TArg arg) =>
-            {
-                return (TResult)methodInfo.Invoke(classInstance, new object[] { arg });
-            };
+            return (classInstance, arg) => { return (TResult)methodInfo.Invoke(classInstance, new object[] { arg }); };
 #else
             if (EmitIsIllegalForMember(methodInfo))
             {
@@ -1741,7 +1757,8 @@ namespace OdinSerializer.Utilities
             Type declaringType = methodInfo.DeclaringType;
             string methodName = methodInfo.ReflectedType.FullName + ".call_" + methodInfo.Name;
 
-            DynamicMethod method = new DynamicMethod(methodName, typeof(TResult), new Type[] { typeof(object), typeof(TArg) }, true);
+            DynamicMethod method =
+ new DynamicMethod(methodName, typeof(TResult), new Type[] { typeof(object), typeof(TArg) }, true);
             ILGenerator gen = method.GetILGenerator();
 
             if (declaringType.IsValueType)
@@ -1770,11 +1787,14 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given parameterless instance method on a reference type.
+        ///     Creates a fast delegate method which calls a given parameterless instance method on a reference type.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the class which the method is on.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
         public static Action<InstanceType> CreateInstanceMethodCaller<InstanceType>(MethodInfo methodInfo)
         {
             if (methodInfo == null)
@@ -1784,7 +1804,8 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.GetParameters().Length > 0)
@@ -1794,7 +1815,8 @@ namespace OdinSerializer.Utilities
 
             if (typeof(InstanceType).IsValueType)
             {
-                throw new ArgumentException("This method does not work with struct instances; please use CreateInstanceRefMethodCaller instead.");
+                throw new ArgumentException(
+                    "This method does not work with struct instances; please use CreateInstanceRefMethodCaller instead.");
             }
 
             methodInfo = methodInfo.DeAliasMethod();
@@ -1805,12 +1827,15 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given instance method with a given argument on a reference type.
+        ///     Creates a fast delegate method which calls a given instance method with a given argument on a reference type.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the class which the method is on.</typeparam>
         /// <typeparam name="Arg1">The type of the argument with which to call the method.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
         public static Action<InstanceType, Arg1> CreateInstanceMethodCaller<InstanceType, Arg1>(MethodInfo methodInfo)
         {
             if (methodInfo == null)
@@ -1820,7 +1845,8 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.GetParameters().Length != 1)
@@ -1830,7 +1856,8 @@ namespace OdinSerializer.Utilities
 
             if (typeof(InstanceType).IsValueType)
             {
-                throw new ArgumentException("This method does not work with struct instances; please use CreateInstanceRefMethodCaller instead.");
+                throw new ArgumentException(
+                    "This method does not work with struct instances; please use CreateInstanceRefMethodCaller instead.");
             }
 
             methodInfo = methodInfo.DeAliasMethod();
@@ -1840,16 +1867,17 @@ namespace OdinSerializer.Utilities
             return (Action<InstanceType, Arg1>)Delegate.CreateDelegate(typeof(Action<InstanceType, Arg1>), methodInfo);
         }
 
-        public delegate void InstanceRefMethodCaller<InstanceType>(ref InstanceType instance);
-        public delegate void InstanceRefMethodCaller<InstanceType, TArg1>(ref InstanceType instance, TArg1 arg1);
-
         /// <summary>
-        /// Creates a fast delegate method which calls a given parameterless instance method.
+        ///     Creates a fast delegate method which calls a given parameterless instance method.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the class which the method is on.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
-        public static InstanceRefMethodCaller<InstanceType> CreateInstanceRefMethodCaller<InstanceType>(MethodInfo methodInfo)
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
+        public static InstanceRefMethodCaller<InstanceType> CreateInstanceRefMethodCaller<InstanceType>(
+            MethodInfo methodInfo)
         {
             if (methodInfo == null)
             {
@@ -1858,7 +1886,8 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.GetParameters().Length > 0)
@@ -1890,7 +1919,8 @@ namespace OdinSerializer.Utilities
             Type declaringType = methodInfo.DeclaringType;
             string methodName = methodInfo.ReflectedType.FullName + ".call_" + methodInfo.Name;
 
-            DynamicMethod method = new DynamicMethod(methodName, typeof(void), new Type[] { typeof(InstanceType).MakeByRefType() }, true);
+            DynamicMethod method =
+ new DynamicMethod(methodName, typeof(void), new Type[] { typeof(InstanceType).MakeByRefType() }, true);
             ILGenerator gen = method.GetILGenerator();
 
             if (declaringType.IsValueType)
@@ -1912,13 +1942,17 @@ namespace OdinSerializer.Utilities
         }
 
         /// <summary>
-        /// Creates a fast delegate method which calls a given instance method with a given argument on a struct type.
+        ///     Creates a fast delegate method which calls a given instance method with a given argument on a struct type.
         /// </summary>
         /// <typeparam name="InstanceType">The type of the class which the method is on.</typeparam>
         /// <typeparam name="Arg1">The type of the argument with which to call the method.</typeparam>
         /// <param name="methodInfo">The method info instance which is used.</param>
-        /// <returns>A delegate which calls the method and returns the result, except it's hundreds of times faster than MethodInfo.Invoke.</returns>
-        public static InstanceRefMethodCaller<InstanceType, Arg1> CreateInstanceRefMethodCaller<InstanceType, Arg1>(MethodInfo methodInfo)
+        /// <returns>
+        ///     A delegate which calls the method and returns the result, except it's hundreds of times faster than
+        ///     MethodInfo.Invoke.
+        /// </returns>
+        public static InstanceRefMethodCaller<InstanceType, Arg1> CreateInstanceRefMethodCaller<InstanceType, Arg1>(
+            MethodInfo methodInfo)
         {
             if (methodInfo == null)
             {
@@ -1927,14 +1961,15 @@ namespace OdinSerializer.Utilities
 
             if (methodInfo.IsStatic)
             {
-                throw new ArgumentException("Given method '" + methodInfo.Name + "' is static when it has to be an instance method.");
+                throw new ArgumentException("Given method '" + methodInfo.Name +
+                                            "' is static when it has to be an instance method.");
             }
 
             if (methodInfo.GetParameters().Length != 1)
             {
                 throw new ArgumentException("Given method must have only one parameter.");
             }
-            
+
             methodInfo = methodInfo.DeAliasMethod();
 
 #if !CAN_EMIT
@@ -1959,7 +1994,8 @@ namespace OdinSerializer.Utilities
             Type declaringType = methodInfo.DeclaringType;
             string methodName = methodInfo.ReflectedType.FullName + ".call_" + methodInfo.Name;
 
-            DynamicMethod method = new DynamicMethod(methodName, typeof(void), new Type[] { typeof(InstanceType).MakeByRefType(), typeof(Arg1) }, true);
+            DynamicMethod method =
+ new DynamicMethod(methodName, typeof(void), new Type[] { typeof(InstanceType).MakeByRefType(), typeof(Arg1) }, true);
             ILGenerator gen = method.GetILGenerator();
 
             if (declaringType.IsValueType)

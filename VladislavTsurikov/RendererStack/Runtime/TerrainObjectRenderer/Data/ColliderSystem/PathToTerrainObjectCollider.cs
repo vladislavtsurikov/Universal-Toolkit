@@ -8,17 +8,17 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 {
     public class PathToTerrainObjectCollider : PathToColliderObject
     {
-        public readonly SceneDataManager SceneDataManager;
-        public readonly PrototypeRendererData PrototypeRendererData;
-        public readonly ColliderCell ColliderCell; 
-        public readonly Cell RenderCell;
-        public readonly BVHNodeAABB<TerrainObjectCollider> LeafNode;
         public readonly BVHObjectTree<TerrainObjectCollider> BVHObjectTree;
-        
+        public readonly ColliderCell ColliderCell;
+        public readonly BVHNodeAABB<TerrainObjectCollider> LeafNode;
+        public readonly PrototypeRendererData PrototypeRendererData;
+        public readonly Cell RenderCell;
+        public readonly SceneDataManager SceneDataManager;
+
         public PathToTerrainObjectCollider(List<object> datas)
         {
             foreach (var item in datas)
-            { 
+            {
                 switch (item)
                 {
                     case SceneDataManager sceneDataManager:

@@ -11,13 +11,10 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.Windows
         private const string WindowTitle = "Renderer Stack";
         public const string KWindowMenuPath = "Window/Vladislav Tsurikov/Renderer Stack";
 
-        [MenuItem(KWindowMenuPath, false, 0)]
-        public static void Open() => OpenWindow(WindowTitle);
-
         protected override void OnEnable()
         {
             base.OnEnable();
-            
+
             SceneView.duringSceneGui += OnSceneGUI;
             EditorApplication.modifierKeysChanged += Repaint;
         }
@@ -25,10 +22,13 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.Windows
         protected override void OnDisable()
         {
             base.OnDisable();
-            
+
             SceneView.duringSceneGui -= OnSceneGUI;
             EditorApplication.modifierKeysChanged -= Repaint;
         }
+
+        [MenuItem(KWindowMenuPath, false, 0)]
+        public static void Open() => OpenWindow(WindowTitle);
 
         private void OnSceneGUI(SceneView sceneView)
         {

@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using UnityEngine;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UnityUtility.Editor;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
@@ -11,11 +10,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         {
             Transform newTransform = area.StamperTool.transform;
             newTransform.rotation = Quaternion.identity;
-            var localScale = newTransform.transform.localScale;
-            localScale = new Vector3 (Mathf.Max(1f, localScale.z), Mathf.Max(1f, localScale.y), Mathf.Max(1f, localScale.z));
+            Vector3 localScale = newTransform.transform.localScale;
+            localScale = new Vector3(Mathf.Max(1f, localScale.z), Mathf.Max(1f, localScale.y),
+                Mathf.Max(1f, localScale.z));
             newTransform.transform.localScale = localScale;
 
-            if(area.HandleSettingsMode == HandleSettingsMode.Custom)
+            if (area.HandleSettingsMode == HandleSettingsMode.Custom)
             {
                 Color color = area.ColorCube;
                 color.a *= alpha;
@@ -23,7 +23,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
             }
             else
             {
-                float thickness = 4.0f;
+                var thickness = 4.0f;
                 Color color = Color.yellow;
                 color.a *= alpha;
                 DrawHandles.DrawCube(newTransform.localToWorldMatrix, color, thickness);

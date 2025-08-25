@@ -7,19 +7,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 {
     public class ToolComponentStack : Component
     {
+        public ComponentStackOnlyDifferentTypes<Component> ComponentStack = new();
+
         public Type ToolType;
 
-        public ComponentStackOnlyDifferentTypes<Component> ComponentStack = 
-            new ComponentStackOnlyDifferentTypes<Component>();
+        protected override async UniTask SetupComponent(object[] setupData = null) => await ComponentStack.Setup();
 
-        protected override async UniTask SetupComponent(object[] setupData = null)
-        {
-            await ComponentStack.Setup();
-        }
-
-        public override bool DeleteElement()
-        {
-            return ToolType != null;
-        }
+        public override bool DeleteElement() => ToolType != null;
     }
 }

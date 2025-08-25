@@ -1,36 +1,33 @@
 ﻿#if UNITY_EDITOR
 using System;
-using VladislavTsurikov.ComponentStack.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool
 {
     [Serializable]
     [Name("Edit Tool Settings")]
-    public class EditToolSettings : Component 
+    public class EditToolSettings : Component
     {
-        [OdinSerialize]
-		private ActionStack _actionStack = new ActionStack();
-
-		public ActionStack ActionStack 
-		{
-			get
-			{
-				_actionStack.RemoveInvalidElements();
-				return _actionStack;
-			}
-		}
-
-		public float SphereSize = 40;
+        public float SphereSize = 40;
         public float MaxDistance = 200;
 
-        protected override void SetupComponent(object[] setupData = null)
+        [OdinSerialize]
+        private ActionStack _actionStack = new();
+
+        public ActionStack ActionStack
         {
-	        _actionStack.Setup();
+            get
+            {
+                _actionStack.RemoveInvalidElements();
+                return _actionStack;
+            }
         }
+
+        protected override UniTask SetupComponent(object[] setupData = null) => _actionStack.Setup();
     }
 }
 #endif

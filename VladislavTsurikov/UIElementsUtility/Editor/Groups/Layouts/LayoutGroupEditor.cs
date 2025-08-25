@@ -9,21 +9,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.Layouts
     public class LayoutGroupEditor : UnityEditor.Editor
     {
         private LayoutGroup _layoutGroup => (LayoutGroup)target;
-        
+
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("Setup"))
             {
                 Setup();
             }
-            
+
             base.OnInspectorGUI();
         }
 
-        private void Setup()
-        {
-            _layoutGroup.Setup();
-        }
+        private void Setup() => _layoutGroup.Setup();
     }
 }
 #endif

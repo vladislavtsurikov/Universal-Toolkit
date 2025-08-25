@@ -48,12 +48,15 @@ Shader "RendererStack/Standard"
     }
 
     CGINCLUDE
-        #define UNITY_SETUP_BRDF_INPUT MetallicSetup
+    #define UNITY_SETUP_BRDF_INPUT MetallicSetup
     ENDCG
 
     SubShader
     {
-        Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
+        Tags
+        {
+            "RenderType"="Opaque" "PerformanceChecks"="False"
+        }
         LOD 150
 
         // ------------------------------------------------------------------
@@ -61,7 +64,10 @@ Shader "RendererStack/Standard"
         Pass
         {
             Name "FORWARD"
-            Tags { "LightMode" = "ForwardBase" }
+            Tags
+            {
+                "LightMode" = "ForwardBase"
+            }
 
             Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
@@ -87,7 +93,7 @@ Shader "RendererStack/Standard"
             #pragma vertex vertBase
             #pragma fragment fragBase
             #include "UnityStandardCoreForward.cginc"
-            
+
             #include "Assets/VladislavTsurikov/RendererStack/Runtime/Shaders/Include/GPUInstancedIndirectInclude.cginc"
             #pragma instancing_options procedural:setupGPUInstancedIndirect
             #pragma multi_compile_instancing
@@ -98,9 +104,15 @@ Shader "RendererStack/Standard"
         Pass
         {
             Name "FORWARD_DELTA"
-            Tags { "LightMode" = "ForwardAdd" }
+            Tags
+            {
+                "LightMode" = "ForwardAdd"
+            }
             Blend [_SrcBlend] One
-            Fog { Color (0,0,0,0) } // in additive pass fog should be black
+            Fog
+            {
+                Color (0,0,0,0)
+            } // in additive pass fog should be black
             ZWrite Off
             ZTest LEqual
 
@@ -130,9 +142,13 @@ Shader "RendererStack/Standard"
         }
         // ------------------------------------------------------------------
         //  Shadow rendering pass
-        Pass {
+        Pass
+        {
             Name "ShadowCaster"
-            Tags { "LightMode" = "ShadowCaster" }
+            Tags
+            {
+                "LightMode" = "ShadowCaster"
+            }
 
             ZWrite On ZTest LEqual
 
@@ -162,7 +178,10 @@ Shader "RendererStack/Standard"
         Pass
         {
             Name "META"
-            Tags { "LightMode"="Meta" }
+            Tags
+            {
+                "LightMode"="Meta"
+            }
 
             Cull Off
 

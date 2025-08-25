@@ -8,13 +8,13 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
     {
         public List<SceneReference> GetSceneReferences()
         {
-            List<SceneReference> sceneReferences = new List<SceneReference>();
+            var sceneReferences = new List<SceneReference>();
 
-            foreach (var sceneCollection in ElementList)
+            foreach (SceneCollection sceneCollection in ElementList)
             {
                 sceneReferences.AddRange(sceneCollection.GetSceneReferences());
             }
-            
+
             return sceneReferences;
         }
     }

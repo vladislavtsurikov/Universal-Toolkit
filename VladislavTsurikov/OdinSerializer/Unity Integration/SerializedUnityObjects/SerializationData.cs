@@ -16,161 +16,162 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using OdinSerializer.Utilities;
+using UnityEngine;
+using Object = UnityEngine.Object;
+
 namespace OdinSerializer
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Utilities;
-
     /// <summary>
-    /// Unity serialized data struct that contains all data needed by Odin serialization.
+    ///     Unity serialized data struct that contains all data needed by Odin serialization.
     /// </summary>
     [Serializable]
     public struct SerializationData
     {
         /// <summary>
-        /// The name of the <see cref="PrefabModificationsReferencedUnityObjects"/> field.
+        ///     The name of the <see cref="PrefabModificationsReferencedUnityObjects" /> field.
         /// </summary>
-        public const string PrefabModificationsReferencedUnityObjectsFieldName = "PrefabModificationsReferencedUnityObjects";
+        public const string PrefabModificationsReferencedUnityObjectsFieldName =
+            "PrefabModificationsReferencedUnityObjects";
 
         /// <summary>
-        /// The name of the <see cref="PrefabModifications"/> field.
+        ///     The name of the <see cref="PrefabModifications" /> field.
         /// </summary>
         public const string PrefabModificationsFieldName = "PrefabModifications";
 
         /// <summary>
-        /// The name of the <see cref="Prefab"/> field.
+        ///     The name of the <see cref="Prefab" /> field.
         /// </summary>
         public const string PrefabFieldName = "Prefab";
 
         /// <summary>
-        /// The data format used by the serializer. This field will be automatically set to the format specified in the global serialization config
-        /// when the Unity object gets serialized, unless the Unity object implements the <see cref="IOverridesSerializationFormat"/> interface.
+        ///     The data format used by the serializer. This field will be automatically set to the format specified in the global
+        ///     serialization config
+        ///     when the Unity object gets serialized, unless the Unity object implements the
+        ///     <see cref="IOverridesSerializationFormat" /> interface.
         /// </summary>
         [SerializeField]
         public DataFormat SerializedFormat;
 
         /// <summary>
-        /// The serialized data when serializing with the Binray format.
+        ///     The serialized data when serializing with the Binray format.
         /// </summary>
         [SerializeField]
         public byte[] SerializedBytes;
 
         /// <summary>
-        /// All serialized Unity references.
+        ///     All serialized Unity references.
         /// </summary>
         [SerializeField]
-        public List<UnityEngine.Object> ReferencedUnityObjects;
+        public List<Object> ReferencedUnityObjects;
 
         /// <summary>
-        /// Whether the object contains any serialized data.
+        ///     Whether the object contains any serialized data.
         /// </summary>
         [Obsolete("Use ContainsData instead")]
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public bool HasEditorData
         {
             get
             {
-                switch (this.SerializedFormat)
+                switch (SerializedFormat)
                 {
                     case DataFormat.Binary:
                     case DataFormat.JSON:
-                        return !(this.SerializedBytesString.IsNullOrWhitespace() && (this.SerializedBytes == null || this.SerializedBytes.Length == 0));
+                        return !(SerializedBytesString.IsNullOrWhitespace() &&
+                                 (SerializedBytes == null || SerializedBytes.Length == 0));
 
                     case DataFormat.Nodes:
-                        return !(this.SerializationNodes == null || this.SerializationNodes.Count == 0);
+                        return !(SerializationNodes == null || SerializationNodes.Count == 0);
 
                     default:
-                        throw new NotImplementedException(this.SerializedFormat.ToString());
+                        throw new NotImplementedException(SerializedFormat.ToString());
                 }
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether the struct contains any data.
-        /// If this is false, then it could mean that Unity has not yet deserialized the struct.
+        ///     Gets a value indicating whether the struct contains any data.
+        ///     If this is false, then it could mean that Unity has not yet deserialized the struct.
         /// </summary>
-        public bool ContainsData
-        {
-            get
-            {
-                return
-                    // this.SerializedBytesString != null && // Unity serialized strings remains null when an object is created until it's deserialized.
-                    this.SerializedBytes != null &&
-                    this.SerializationNodes != null &&
-                    this.PrefabModifications != null &&
-                    this.ReferencedUnityObjects != null;
-            }
-        }
+        public bool ContainsData =>
+            // this.SerializedBytesString != null && // Unity serialized strings remains null when an object is created until it's deserialized.
+            SerializedBytes != null &&
+            SerializationNodes != null &&
+            PrefabModifications != null &&
+            ReferencedUnityObjects != null;
 
         /// <summary>
-        /// The serialized data when serializing with the JSON format.
+        ///     The serialized data when serializing with the JSON format.
         /// </summary>
         [SerializeField]
         public string SerializedBytesString;
 
         /// <summary>
-        /// The reference to the prefab this is only populated in prefab scene instances.
+        ///     The reference to the prefab this is only populated in prefab scene instances.
         /// </summary>
         [SerializeField]
-        public UnityEngine.Object Prefab;
+        public Object Prefab;
 
         /// <summary>
-        /// All serialized Unity references.
+        ///     All serialized Unity references.
         /// </summary>
         [SerializeField]
-        public List<UnityEngine.Object> PrefabModificationsReferencedUnityObjects;
+        public List<Object> PrefabModificationsReferencedUnityObjects;
 
         /// <summary>
-        /// All Odin serialized prefab modifications.
+        ///     All Odin serialized prefab modifications.
         /// </summary>
         [SerializeField]
         public List<string> PrefabModifications;
 
         /// <summary>
-        /// The serialized data when serializing with the Nodes format.
+        ///     The serialized data when serializing with the Nodes format.
         /// </summary>
         [SerializeField]
         public List<SerializationNode> SerializationNodes;
 
         /// <summary>
-        /// Resets all data.
+        ///     Resets all data.
         /// </summary>
         public void Reset()
         {
-            this.SerializedFormat = DataFormat.Binary;
+            SerializedFormat = DataFormat.Binary;
 
-            if (this.SerializedBytes != null && this.SerializedBytes.Length > 0)
+            if (SerializedBytes != null && SerializedBytes.Length > 0)
             {
-                this.SerializedBytes = new byte[0];
+                SerializedBytes = new byte[0];
             }
 
-            if (this.ReferencedUnityObjects != null && this.ReferencedUnityObjects.Count > 0)
+            if (ReferencedUnityObjects != null && ReferencedUnityObjects.Count > 0)
             {
-                this.ReferencedUnityObjects.Clear();
+                ReferencedUnityObjects.Clear();
             }
 
-            this.Prefab = null;
+            Prefab = null;
 
-            if (this.SerializationNodes != null && this.SerializationNodes.Count > 0)
+            if (SerializationNodes != null && SerializationNodes.Count > 0)
             {
-                this.SerializationNodes.Clear();
+                SerializationNodes.Clear();
             }
 
-            if (this.SerializedBytesString != null && this.SerializedBytesString.Length > 0)
+            if (SerializedBytesString != null && SerializedBytesString.Length > 0)
             {
-                this.SerializedBytesString = string.Empty;
+                SerializedBytesString = string.Empty;
             }
 
-            if (this.PrefabModificationsReferencedUnityObjects != null && this.PrefabModificationsReferencedUnityObjects.Count > 0)
+            if (PrefabModificationsReferencedUnityObjects != null &&
+                PrefabModificationsReferencedUnityObjects.Count > 0)
             {
-                this.PrefabModificationsReferencedUnityObjects.Clear();
+                PrefabModificationsReferencedUnityObjects.Clear();
             }
 
-            if (this.PrefabModifications != null && this.PrefabModifications.Count > 0)
+            if (PrefabModifications != null && PrefabModifications.Count > 0)
             {
-                this.PrefabModifications.Clear();
+                PrefabModifications.Clear();
             }
         }
     }

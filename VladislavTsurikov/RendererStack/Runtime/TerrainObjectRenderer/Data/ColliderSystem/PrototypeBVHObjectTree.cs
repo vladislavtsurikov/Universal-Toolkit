@@ -12,40 +12,47 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 {
     public class PrototypeBVHObjectTree
     {
+        public readonly BVHObjectTree<TerrainObjectCollider> BVHObjectTree = new();
+
         [NonSerialized]
         private PrototypeTerrainObject _proto;
-        
-        public readonly BVHObjectTree<TerrainObjectCollider> BVHObjectTree = new BVHObjectTree<TerrainObjectCollider>();
+
+        public PrototypeBVHObjectTree(int prototypeID) => PrototypeID = prototypeID;
 
         public int PrototypeID { get; }
-        
+
         public PrototypeTerrainObject Proto
         {
             get
             {
-                if(_proto == null)
+                if (_proto == null)
                 {
                     _proto = (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(PrototypeID);
                 }
+
                 return _proto;
             }
         }
 
-        public PrototypeBVHObjectTree(int prototypeID)
-        {
-            PrototypeID = prototypeID;
-        }
-
-        public TerrainObjectCollider RegisterObject(TerrainObjectCollider objectCollider, Cell cell, ColliderCell colliderCell, PrototypeRendererData prototypeStorageRendererData, SceneDataManager sceneDataManager)
+        public TerrainObjectCollider RegisterObject(TerrainObjectCollider objectCollider, Cell cell,
+            ColliderCell colliderCell, PrototypeRendererData prototypeStorageRendererData,
+            SceneDataManager sceneDataManager)
         {
             AABB objectAABB = objectCollider.GetAABB();
-        
+
             var treeNode = new BVHNodeAABB<TerrainObjectCollider>(objectCollider);
             treeNode.Position = objectAABB.Center;
             treeNode.Size = objectAABB.Size;
-            
-            List<object> datas = new List<object>
-                { treeNode, sceneDataManager, BVHObjectTree, cell, colliderCell, prototypeStorageRendererData };
+
+            var datas = new List<object>
+            {
+                treeNode,
+                sceneDataManager,
+                BVHObjectTree,
+                cell,
+                colliderCell,
+                prototypeStorageRendererData
+            };
             objectCollider.PathToColliderObject = new PathToTerrainObjectCollider(datas);
             objectCollider.Instance.TerrainObjectCollider = objectCollider;
 
@@ -53,7 +60,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
 
             return objectCollider;
         }
-        
+
         public bool Filter(ObjectFilter objectFilter)
         {
             if (Proto == null || !Proto.Active)
@@ -65,36 +72,33 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Col
             {
                 return true;
             }
-            
-            if(!LayerEx.IsLayerBitSet(objectFilter.LayerMask, Proto.Layer))
+
+            if (!LayerEx.IsLayerBitSet(objectFilter.LayerMask, Proto.Layer))
             {
                 return false;
             }
 
-            if(objectFilter.FindOnlySpecificInstancePrefabs)
+            if (objectFilter.FindOnlySpecificInstancePrefabs)
             {
-                if(objectFilter.FindPrefabs.Count == 0 || Proto.Prefab == null)
+                if (objectFilter.FindPrefabs.Count == 0 || Proto.Prefab == null)
                 {
                     return false;
                 }
-                
+
                 foreach (GameObject prefab in objectFilter.FindPrefabs)
                 {
-                    if(GameObjectUtility.IsSameGameObject(prefab, Proto.Prefab))
+                    if (GameObjectUtility.IsSameGameObject(prefab, Proto.Prefab))
                     {
                         return true;
                     }
                 }
-                
+
                 return false;
             }
-            
+
             return true;
         }
 
-        public void ClearBVHObjectTree()
-        {
-            BVHObjectTree.Clear();
-        }
+        public void ClearBVHObjectTree() => BVHObjectTree.Clear();
     }
 }

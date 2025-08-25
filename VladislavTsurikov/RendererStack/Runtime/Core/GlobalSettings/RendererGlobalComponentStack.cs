@@ -1,26 +1,20 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
 {
     public class RendererGlobalComponentStack : Component
     {
-        public Type RendererType;
-        
         [OdinSerialize]
-        public ComponentStackOnlyDifferentTypes<GlobalComponent> ComponentStack = 
-            new ComponentStackOnlyDifferentTypes<GlobalComponent>();
+        public ComponentStackOnlyDifferentTypes<GlobalComponent> ComponentStack = new();
 
-        protected override void SetupComponent(object[] setupData = null)
-        {
-            ComponentStack.Setup();
-        }
+        public Type RendererType;
 
-        public override bool DeleteElement()
-        {
-            return RendererType != null;
-        }
+        protected override UniTask SetupComponent(object[] setupData = null) => ComponentStack.Setup();
+
+        public override bool DeleteElement() => RendererType != null;
     }
 }

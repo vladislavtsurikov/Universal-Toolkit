@@ -25,10 +25,10 @@ namespace OdinSerializer
     public abstract class ReflectionOrEmittedBaseFormatter<T> : ReflectionFormatter<T>
     {
 #if CAN_EMIT
-
         protected override void DeserializeImplementation(ref T value, IDataReader reader)
         {
-            var formatter = FormatterEmitter.GetEmittedFormatter(typeof(T), reader.Context.Config.SerializationPolicy) as FormatterEmitter.RuntimeEmittedFormatter<T>;
+            var formatter =
+ FormatterEmitter.GetEmittedFormatter(typeof(T), reader.Context.Config.SerializationPolicy) as FormatterEmitter.RuntimeEmittedFormatter<T>;
 
             if (formatter == null)
                 return;
@@ -37,7 +37,8 @@ namespace OdinSerializer
             string name;
             EntryType entry;
 
-            while ((entry = reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray && entry != EntryType.EndOfStream)
+            while ((entry =
+ reader.PeekEntry(out name)) != EntryType.EndOfNode && entry != EntryType.EndOfArray && entry != EntryType.EndOfStream)
             {
                 formatter.Read(ref value, name, entry, reader);
 
@@ -53,7 +54,8 @@ namespace OdinSerializer
 
         protected override void SerializeImplementation(ref T value, IDataWriter writer)
         {
-            var formatter = FormatterEmitter.GetEmittedFormatter(typeof(T), writer.Context.Config.SerializationPolicy) as FormatterEmitter.RuntimeEmittedFormatter<T>;
+            var formatter =
+ FormatterEmitter.GetEmittedFormatter(typeof(T), writer.Context.Config.SerializationPolicy) as FormatterEmitter.RuntimeEmittedFormatter<T>;
 
             if (formatter == null)
                 return;

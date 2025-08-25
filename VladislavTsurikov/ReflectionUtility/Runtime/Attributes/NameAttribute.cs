@@ -6,9 +6,6 @@ namespace VladislavTsurikov.ReflectionUtility
     {
         public readonly string Name;
 
-        public NameAttribute(string name)
-        {
-            Name = name;
-        }
+        public NameAttribute(string name) => Name = name;
     }
 }

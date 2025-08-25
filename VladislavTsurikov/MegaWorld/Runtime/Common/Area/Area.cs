@@ -7,46 +7,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
     public class Area
     {
         private Vector3 _size;
-        
-        public float Rotation = 0;
 
         public Texture2D Mask = Texture2D.whiteTexture;
 
-        public float SizeMultiplier
-        {
-            get
-            {
-                if (Rotation == 0)
-                {
-                    return 1;
-                }
-                else
-                {
-                    float sizeMultiplier = Mathf.Abs(CosAngle);
-                    sizeMultiplier += Mathf.Abs(SinAngle);
-
-                    return sizeMultiplier;
-                }
-            }
-        }
-
-        public Vector3 Size
-        {
-            get => _size * SizeMultiplier;
-            protected set => _size = value;
-        }
-        
-        public float CosAngle => Mathf.Cos(Rotation * Mathf.Deg2Rad);
-        public float SinAngle => Mathf.Sin(Rotation * Mathf.Deg2Rad);
-        
-        public Vector3 Center { get; }
-
-        public Bounds Bounds =>
-            new()
-            {
-                size = new Vector3(Size.x, Size.y, Size.z),
-                center = Center
-            };
+        public float Rotation = 0;
 
         protected Area(Vector3 center, Vector3 size)
         {
@@ -57,31 +21,55 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Area
         protected Area(Vector3 center, float size) : this(center, new Vector3(size, size, size))
         {
         }
-        
-        public bool Contains(Vector3 point)
+
+        public float SizeMultiplier
         {
-            return Bounds.Contains(point);
+            get
+            {
+                if (Rotation == 0)
+                {
+                    return 1;
+                }
+
+                var sizeMultiplier = Mathf.Abs(CosAngle);
+                sizeMultiplier += Mathf.Abs(SinAngle);
+
+                return sizeMultiplier;
+            }
         }
 
-        public bool Contains(Vector2 point)
+        public Vector3 Size
         {
-            return RectExtension.CreateRectFromBounds(Bounds).Contains(point);
+            get => _size * SizeMultiplier;
+            protected set => _size = value;
         }
-        
+
+        public float CosAngle => Mathf.Cos(Rotation * Mathf.Deg2Rad);
+        public float SinAngle => Mathf.Sin(Rotation * Mathf.Deg2Rad);
+
+        public Vector3 Center { get; }
+
+        public Bounds Bounds =>
+            new() { size = new Vector3(Size.x, Size.y, Size.z), center = Center };
+
+        public bool Contains(Vector3 point) => Bounds.Contains(point);
+
+        public bool Contains(Vector2 point) => RectExtension.CreateRectFromBounds(Bounds).Contains(point);
+
         public float GetAlpha(Vector2 pos, Vector2 size)
         {
             if (Mask == null)
             {
                 return 1.0f;
             }
-            
+
             pos += Vector2Int.one;
-            
+
             if (Rotation == 0.0f)
             {
                 return TextureUtility.GetAlpha(pos, size, Mask);
             }
-            
+
             Vector2 halfTarget = size / 2.0f;
             Vector2 origin = pos - halfTarget;
             origin *= SizeMultiplier;

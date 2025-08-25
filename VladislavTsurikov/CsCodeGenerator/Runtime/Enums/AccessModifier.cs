@@ -6,6 +6,6 @@
         Private,
         Protected,
         Internal,
-        Protected_Internal,
+        Protected_Internal
     }
 }

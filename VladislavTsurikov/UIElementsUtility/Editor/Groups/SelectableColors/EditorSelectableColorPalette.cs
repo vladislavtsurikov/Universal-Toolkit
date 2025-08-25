@@ -8,21 +8,18 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
     public class EditorSelectableColorPaletteEditor : UnityEditor.Editor
     {
         private EditorSelectableColorPalette _editorSelectableColorPalette => (EditorSelectableColorPalette)target;
-        
+
         public override void OnInspectorGUI()
         {
             if (GUILayout.Button("Setup"))
             {
                 Setup();
             }
-            
+
             base.OnInspectorGUI();
         }
 
-        private void Setup()
-        {
-            _editorSelectableColorPalette.Setup();
-        }
+        private void Setup() => _editorSelectableColorPalette.Setup();
     }
 }
 #endif

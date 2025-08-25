@@ -6,9 +6,11 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
     public class SceneAInjectionValidator : MonoBehaviour
     {
         [Inject]
-        private ConfigSceneA _sceneAConfig;
-        [Inject]
         private ConfigSceneAWithAssetReference _configSceneAWithAssetReference;
+
+        [Inject]
+        private ConfigSceneA _sceneAConfig;
+
         [Inject]
         private SceneAConfigLoader _sceneAConfigLoader;
 
@@ -22,7 +24,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
             {
                 Debug.Log($"[SceneAInjectionValidator] SceneAConfig injected successfully: {_sceneAConfig.name}");
             }
-            
+
             if (_configSceneAWithAssetReference == null)
             {
                 Debug.LogError("[SceneAInjectionValidator] Injected ConfigSceneAWithAssetReference is NULL!");
@@ -35,11 +37,12 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
                 }
                 else
                 {
-                    Debug.Log($"[SceneAInjectionValidator] Successfully injected ConfigSceneAWithAssetReference: {_sceneAConfig.name}, " +
-                              $"PrefabRef: {_configSceneAWithAssetReference.PrefabRef.Asset.name}");
+                    Debug.Log(
+                        $"[SceneAInjectionValidator] Successfully injected ConfigSceneAWithAssetReference: {_sceneAConfig.name}, " +
+                        $"PrefabRef: {_configSceneAWithAssetReference.PrefabRef.Asset.name}");
                 }
             }
-            
+
             if (_sceneAConfigLoader == null)
             {
                 Debug.LogError("[SceneAInjectionValidator] Injected _sceneAConfigLoader is NULL!");

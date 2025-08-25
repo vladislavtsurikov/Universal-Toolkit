@@ -16,48 +16,51 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+using System.Reflection;
+using Object = UnityEngine.Object;
+
 namespace OdinSerializer.Utilities
 {
-    using System;
-    using System.Reflection;
-
     /// <summary>
-    /// Extends various Unity classes.
+    ///     Extends various Unity classes.
     /// </summary>
     public static class UnityExtensions
     {
-        private static readonly ValueGetter<UnityEngine.Object, IntPtr> UnityObjectCachedPtrFieldGetter;
+        private static readonly ValueGetter<Object, IntPtr> UnityObjectCachedPtrFieldGetter;
 
         static UnityExtensions()
         {
-            var field = typeof(UnityEngine.Object).GetField("m_CachedPtr", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+            FieldInfo field = typeof(Object).GetField("m_CachedPtr",
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
             if (field != null)
             {
-                UnityObjectCachedPtrFieldGetter = EmitUtilities.CreateInstanceFieldGetter<UnityEngine.Object, IntPtr>(field);
+                UnityObjectCachedPtrFieldGetter = EmitUtilities.CreateInstanceFieldGetter<Object, IntPtr>(field);
             }
         }
 
         /// <summary>
-        /// Determines whether a Unity object is null or "fake null",
-        /// without ever calling Unity's own equality operators.
-        /// This method is useful for checking if a Unity object is
-        /// null, destroyed or missing at times when it is not allowed
-        /// to call Unity's own equality operators, for example when
-        /// not running on the main thread.
+        ///     Determines whether a Unity object is null or "fake null",
+        ///     without ever calling Unity's own equality operators.
+        ///     This method is useful for checking if a Unity object is
+        ///     null, destroyed or missing at times when it is not allowed
+        ///     to call Unity's own equality operators, for example when
+        ///     not running on the main thread.
         /// </summary>
         /// <param name="obj">The Unity object to check.</param>
         /// <returns>True if the object is null, missing or destroyed; otherwise false.</returns>
-        public static bool SafeIsUnityNull(this UnityEngine.Object obj)
+        public static bool SafeIsUnityNull(this Object obj)
         {
-            if (object.ReferenceEquals(obj, null))
+            if (ReferenceEquals(obj, null))
             {
                 return true;
             }
 
             if (UnityObjectCachedPtrFieldGetter == null)
             {
-                throw new NotSupportedException("Could not find the field 'm_CachedPtr' in the class UnityEngine.Object; cannot perform a special null check.");
+                throw new NotSupportedException(
+                    "Could not find the field 'm_CachedPtr' in the class UnityEngine.Object; cannot perform a special null check.");
             }
 
             IntPtr ptr = UnityObjectCachedPtrFieldGetter(ref obj);

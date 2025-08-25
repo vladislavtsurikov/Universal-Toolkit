@@ -10,22 +10,22 @@
         ZTest Always Cull Off ZWrite Off
 
         HLSLINCLUDE
-
         #include "UnityCG.cginc"
-		#include "TerrainTool.cginc"
+        #include "TerrainTool.cginc"
 
         sampler2D _MainTex;
-		sampler2D _BlendTex;
+        sampler2D _BlendTex;
 
         int _BlendMode;
 
-        struct appdata_t 
+        struct appdata_t
         {
             float4 vertex : POSITION;
             float2 pcUV : TEXCOORD0;
         };
 
-        struct v2f {
+        struct v2f
+        {
             float4 vertex : SV_POSITION;
             float2 pcUV : TEXCOORD0;
         };
@@ -37,13 +37,11 @@
             o.pcUV = v.pcUV;
             return o;
         }
-
         ENDHLSL
 
         Pass // 0 - Multiply
         {
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment Blend
 
@@ -56,29 +54,28 @@
 
                 switch (_BlendMode)
                 {
-                    case 0: //Multiply
+                case 0: //Multiply
                     {
                         result = mainValue * blendValue;
 
-	            		break;
+                        break;
                     }
-                    case 1: //Add
+                case 1: //Add
                     {
-	            		result = mainValue + blendValue;
+                        result = mainValue + blendValue;
 
-	            		break;
+                        break;
                     }
-                    case 2: //Subtract
+                case 2: //Subtract
                     {
-	            		result = mainValue - blendValue;
+                        result = mainValue - blendValue;
 
-	            		break;
+                        break;
                     }
                 }
 
                 return clamp(result, 0, 1);
             }
-
             ENDHLSL
         }
     }

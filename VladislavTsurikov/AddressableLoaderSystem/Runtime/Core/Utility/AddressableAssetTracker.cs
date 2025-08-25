@@ -9,15 +9,10 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
     internal static class AddressableAssetTracker
     {
-        private class TrackedEntry
-        {
-            public AsyncOperationHandle Handle;
-            public HashSet<ResourceLoader> Owners = new();
-        }
-
         private static readonly Dictionary<object, TrackedEntry> _registry = new();
 
-        internal static async UniTask<T> TrackAndLoad<T>(object key, ResourceLoader owner, CancellationToken cancellationToken) where T : Object
+        internal static async UniTask<T> TrackAndLoad<T>(object key, ResourceLoader owner,
+            CancellationToken cancellationToken) where T : Object
         {
             if (key == null)
             {
@@ -30,14 +25,15 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                 existing.Owners.Add(owner);
                 return (T)existing.Handle.Result;
             }
-            
+
             AsyncOperationHandle<T> handle = Addressables.LoadAssetAsync<T>(key);
             await handle.ToUniTask(cancellationToken: cancellationToken);
 
             return TrackLoadedHandle(key, owner, handle);
         }
 
-        internal static async UniTask<T> TrackAndLoad<T>(AssetReference reference, ResourceLoader owner, CancellationToken cancellationToken) where T : Object
+        internal static async UniTask<T> TrackAndLoad<T>(AssetReference reference, ResourceLoader owner,
+            CancellationToken cancellationToken) where T : Object
         {
             if (reference == null)
             {
@@ -63,7 +59,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
             await handle.ToUniTask(cancellationToken: cancellationToken);
 
-            object key = reference.RuntimeKey;
+            var key = reference.RuntimeKey;
 
             if (_registry.TryGetValue(key, out TrackedEntry existing))
             {
@@ -78,7 +74,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         {
             List<object> toRemove = new();
 
-            foreach (var pair in _registry)
+            foreach (KeyValuePair<object, TrackedEntry> pair in _registry)
             {
                 TrackedEntry entry = pair.Value;
 
@@ -91,12 +87,12 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                 }
             }
 
-            foreach (object key in toRemove)
+            foreach (var key in toRemove)
             {
                 _registry.Remove(key);
             }
         }
-        
+
         internal static ResourceLoader TryGetSingleOwner(AssetReference reference)
         {
             if (reference == null)
@@ -104,11 +100,11 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                 return null;
             }
 
-            object key = reference.RuntimeKey;
+            var key = reference.RuntimeKey;
 
-            if (_registry.TryGetValue(key, out var entry) && entry.Owners.Count == 1)
+            if (_registry.TryGetValue(key, out TrackedEntry entry) && entry.Owners.Count == 1)
             {
-                foreach (var owner in entry.Owners)
+                foreach (ResourceLoader owner in entry.Owners)
                 {
                     return owner;
                 }
@@ -116,31 +112,32 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
             return null;
         }
-        
+
         private static Object TrackLoadedHandle(object key, ResourceLoader owner, AsyncOperationHandle handle)
         {
-            TrackedEntry entry = new TrackedEntry
-            {
-                Handle = handle
-            };
+            var entry = new TrackedEntry { Handle = handle };
 
             entry.Owners.Add(owner);
             _registry[key] = entry;
-            
+
             return (Object)handle.Result;
         }
-        
-        private static T TrackLoadedHandle<T>(object key, ResourceLoader owner, AsyncOperationHandle<T> handle) where T : Object
+
+        private static T TrackLoadedHandle<T>(object key, ResourceLoader owner, AsyncOperationHandle<T> handle)
+            where T : Object
         {
-            TrackedEntry entry = new TrackedEntry
-            {
-                Handle = handle
-            };
+            var entry = new TrackedEntry { Handle = handle };
 
             entry.Owners.Add(owner);
             _registry[key] = entry;
-            
+
             return handle.Result;
+        }
+
+        private class TrackedEntry
+        {
+            public readonly HashSet<ResourceLoader> Owners = new();
+            public AsyncOperationHandle Handle;
         }
     }
 }

@@ -6,13 +6,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool
 {
     public class PrecisePlaceToolAllShortcutCombos : DataTypeSingleton<PrecisePlaceToolAllShortcutCombos>
     {
+        public PrecisePlaceToolAllShortcutCombos() => CreateCombos();
+
         public ShortcutCombo Restore { get; private set; }
 
-        public PrecisePlaceToolAllShortcutCombos()
-        {
-            CreateCombos();
-        }
-        
         private void CreateCombos()
         {
             Restore = new ShortcutCombo();

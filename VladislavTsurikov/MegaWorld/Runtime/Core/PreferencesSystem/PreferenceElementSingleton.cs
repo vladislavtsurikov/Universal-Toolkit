@@ -3,6 +3,7 @@
     public static class PreferenceElementSingleton<T> where T : PreferenceSettings
     {
         private static T _instance;
+
         public static T Instance
         {
             get
@@ -11,7 +12,7 @@
                 {
                     _instance = (T)PreferencesSettings.Instance.GetElement(typeof(T));
                 }
-                
+
                 return _instance;
             }
         }

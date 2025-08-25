@@ -2,11 +2,10 @@
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Rendering;
-using VladislavTsurikov.ComponentStack.Runtime.Core.Extensions;
+using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.RendererStack.Runtime.Common.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Common.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings;
 using VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect;
 using VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera;
 #if BillboardSystem
@@ -15,13 +14,13 @@ using VladislavTsurikov.InstantRenderer.LargeObjectRenderer.Scripts.RendererData
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager
 {
-    public static class RenderManager 
+    public static class RenderManager
     {
-        private static readonly GPUInstancedIndirectRenderer _gpuInstancedIndirectRenderer = new GPUInstancedIndirectRenderer();
+        private static readonly GPUInstancedIndirectRenderer _gpuInstancedIndirectRenderer = new();
 #if BillboardSystem
         public static RenderImposterCells RenderImposterCells = new RenderImposterCells();
 #endif
-        
+
         public static void Render(Type rendererType, SelectionData selectionData)
         {
             Profiler.BeginSample("Render");
@@ -30,19 +29,20 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager
             {
                 _gpuInstancedIndirectRenderer.Setup();
             }
-            
-            CameraManager cameraManager = (CameraManager)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(CameraManager));
 
-            for (int cameraIndex = 0; cameraIndex <= cameraManager.VirtualCameraList.Count - 1; cameraIndex++)
-            {            
-                if(cameraManager.VirtualCameraList[cameraIndex].Ignored)
+            var cameraManager =
+                (CameraManager)RendererStackManager.Instance.SceneComponentStack.GetElement(typeof(CameraManager));
+
+            for (var cameraIndex = 0; cameraIndex <= cameraManager.VirtualCameraList.Count - 1; cameraIndex++)
+            {
+                if (cameraManager.VirtualCameraList[cameraIndex].Ignored)
                 {
                     continue;
                 }
-                
+
                 Camera targetCamera = cameraManager.VirtualCameraList[cameraIndex].GetRenderingCamera();
 
-                for (int protoIndex = 0; protoIndex <= selectionData.PrototypeList.Count - 1; protoIndex++)
+                for (var protoIndex = 0; protoIndex <= selectionData.PrototypeList.Count - 1; protoIndex++)
                 {
                     Prototype proto = selectionData.PrototypeList[protoIndex];
 
@@ -56,30 +56,33 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager
                     {
                         continue;
                     }
-                    
-                    Shadow shadowSettings = (Shadow)proto.GetSettings(typeof(Shadow));
-                    
-                    Quality quality = (Quality)GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality),rendererType);
+
+                    var shadowSettings = (Shadow)proto.GetSettings(typeof(Shadow));
+
+                    var quality =
+                        (Quality)GlobalSettings.GlobalSettings.Instance.GetElement(typeof(Quality), rendererType);
 
                     ShadowCastingMode shadowCastingMode = quality.GetShadowCastingMode();
-                    
+
                     if (!shadowSettings.IsValid())
                     {
                         shadowCastingMode = ShadowCastingMode.Off;
                     }
-                    
-                    DistanceCulling distanceCulling = (DistanceCulling)proto.GetSettings(typeof(DistanceCulling));
-                    
-                    float maxDistance = Utility.Utility.GetMaxDistance(rendererType, cameraManager.VirtualCameraList[cameraIndex], distanceCulling);
+
+                    var distanceCulling = (DistanceCulling)proto.GetSettings(typeof(DistanceCulling));
+
+                    var maxDistance = Utility.Utility.GetMaxDistance(rendererType,
+                        cameraManager.VirtualCameraList[cameraIndex], distanceCulling);
 
 #if BillboardSystem
                     RenderImposterCells.Render(selectionData, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
 #endif
-                    
-                    _gpuInstancedIndirectRenderer.Render(selectionData, protoIndex, cameraIndex, targetCamera, shadowCastingMode, maxDistance);
+
+                    _gpuInstancedIndirectRenderer.Render(selectionData, protoIndex, cameraIndex, targetCamera,
+                        shadowCastingMode, maxDistance);
                 }
             }
-            
+
             Profiler.EndSample();
         }
     }

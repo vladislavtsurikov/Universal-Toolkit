@@ -8,14 +8,12 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
     {
         public static bool UseAccelerationPhysics = true;
 
-        public static DisablePhysicsMode ActiveDisablePhysicsMode { get; private set; } = new ObjectTimeDisablePhysicsMode();
+        static PhysicsSimulator() => EditorAndRuntimeUpdate.AddUpdateFunction(SimulatePhysicsIfNecessary);
 
-        static PhysicsSimulator() 
-        {
-            EditorAndRuntimeUpdate.AddUpdateFunction(SimulatePhysicsIfNecessary);
-        }
+        public static DisablePhysicsMode ActiveDisablePhysicsMode { get; private set; } =
+            new ObjectTimeDisablePhysicsMode();
 
-        private static void SimulatePhysicsIfNecessary() 
+        private static void SimulatePhysicsIfNecessary()
         {
             if (SimulatedBodyStack.SimulatedBodyHashSet.Count == 0)
             {
@@ -43,29 +41,29 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
 #endif
 
             float accelerationPhysics = UseAccelerationPhysics ? PhysicsSimulatorSettings.Instance.SpeedUpPhysics : 1;
-            
-            for (int i = 0; i < accelerationPhysics; i++)
+
+            for (var i = 0; i < accelerationPhysics; i++)
             {
                 Physics.Simulate(Time.fixedDeltaTime);
 
                 SimulatedBodyStack.DisablePhysicsSupportIfObjectStopped();
-                
-                if(SimulatedBodyStack.SimulatedBodyHashSet.Count == 0)
+
+                if (SimulatedBodyStack.SimulatedBodyHashSet.Count == 0)
                 {
                     break;
                 }
             }
-            
+
 #if UNITY_2022_3_OR_NEWER
             Physics.simulationMode = simulationMode;
 #else
             Physics.autoSimulation = prevAutoSimulation;
 #endif
         }
-        
+
         public static void SetDisablePhysicsMode<T>() where T : DisablePhysicsMode
         {
-            if(ActiveDisablePhysicsMode.GetType() != typeof(T))
+            if (ActiveDisablePhysicsMode.GetType() != typeof(T))
             {
                 ActiveDisablePhysicsMode.OnDisable();
 
@@ -73,9 +71,6 @@ namespace VladislavTsurikov.PhysicsSimulator.Runtime
             }
         }
 
-        public static void ResetDisablePhysicsMode()
-        {
-            ActiveDisablePhysicsMode?.Reset();
-        }
+        public static void ResetDisablePhysicsMode() => ActiveDisablePhysicsMode?.Reset();
     }
 }

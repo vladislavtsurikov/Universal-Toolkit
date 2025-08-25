@@ -7,12 +7,10 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
 {
     public class DestroyedTerrainObject : UndoRecord
     {
-        private readonly List<DestroyedData> _destroyDataList = new List<DestroyedData>();
+        private readonly List<DestroyedData> _destroyDataList = new();
 
-        public DestroyedTerrainObject(TerrainObjectInstance gameObject)
-        {
+        public DestroyedTerrainObject(TerrainObjectInstance gameObject) =>
             _destroyDataList.Add(new DestroyedData(gameObject));
-        }
 
         public override void Merge(UndoRecord record)
         {
@@ -26,7 +24,7 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
         {
             foreach (DestroyedData destroyData in _destroyDataList)
             {
-                if(destroyData.Prefab != null)
+                if (destroyData.Prefab != null)
                 {
                     destroyData.Instantiate();
                 }
@@ -36,19 +34,17 @@ namespace VladislavTsurikov.Undo.Editor.TerrainObjectRenderer
         private class DestroyedData
         {
             private readonly TerrainObjectInstance _instance;
-            
+
             public readonly UnityEngine.GameObject Prefab;
 
             public DestroyedData(TerrainObjectInstance gameObject)
             {
                 Prefab = gameObject.Proto.Prefab;
-                _instance = gameObject; 
+                _instance = gameObject;
             }
 
-            public void Instantiate()
-            {
+            public void Instantiate() =>
                 TerrainObjectRendererAPI.AddInstance(Prefab, _instance.Position, _instance.Scale, _instance.Rotation);
-            }
         }
     }
 }

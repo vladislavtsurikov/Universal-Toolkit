@@ -12,10 +12,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
             {
                 return;
             }
-            
+
             RenderPipelineManager.beginCameraRendering -= BeginRenderingSrp;
             RenderPipelineManager.beginCameraRendering += BeginRenderingSrp;
-            
+
             UnityEngine.Camera.onPreCull -= BeginRendering;
             UnityEngine.Camera.onPreCull += BeginRendering;
         }
@@ -28,7 +28,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         private void BeginRendering(UnityEngine.Camera cam)
         {
-            if(RendererStackManager.Instance == null || RendererStackManager.Instance.EditorPlayModeSimulation)
+            if (RendererStackManager.Instance == null || RendererStackManager.Instance.EditorPlayModeSimulation)
             {
                 return;
             }
@@ -37,7 +37,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
             if (camera != null)
             {
-                if(cam.name == "SceneCamera")
+                if (cam.name == "SceneCamera")
                 {
                     camera.Camera = cam;
                 }
@@ -48,7 +48,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         private void BeginRenderingSrp(ScriptableRenderContext context, UnityEngine.Camera cam)
         {
-            if(RendererStackManager.Instance.EditorPlayModeSimulation)
+            if (RendererStackManager.Instance.EditorPlayModeSimulation)
             {
                 return;
             }
@@ -57,11 +57,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
             if (camera != null)
             {
-                if(cam.name == "SceneCamera")
+                if (cam.name == "SceneCamera")
                 {
                     camera.Camera = cam;
                 }
-                
+
                 RendererStackManager.Instance.RendererStack.Render();
             }
         }

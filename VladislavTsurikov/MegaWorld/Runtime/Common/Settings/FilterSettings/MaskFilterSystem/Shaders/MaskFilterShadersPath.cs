@@ -2,5 +2,7 @@
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Shaders
 {
-    public class MaskFilterShadersPath : BasePathFinder<MaskFilterShadersPath> { }
+    public class MaskFilterShadersPath : BasePathFinder<MaskFilterShadersPath>
+    {
+    }
 }

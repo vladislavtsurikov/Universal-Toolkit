@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
-using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.MegaWorld.Editor.BrushEraseTool.PrototypeElements;
 using VladislavTsurikov.MegaWorld.Editor.Common.Window;
@@ -23,10 +22,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.Undo.Editor.GameObject;
-using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 using VladislavTsurikov.UnityUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
@@ -36,49 +34,59 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 {
     [Name("Brush Erase")]
     [SupportMultipleSelectedGroups]
-    [SupportedPrototypeTypes(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)})]
-    [AddGlobalCommonComponents(new []{typeof(TransformSpaceSettings), typeof(LayerSettings)})]
+    [SupportedPrototypeTypes(new[]
+    {
+        typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)
+    })]
+    [AddGlobalCommonComponents(new[] { typeof(TransformSpaceSettings), typeof(LayerSettings) })]
     [AddToolComponents(new[] { typeof(BrushEraseToolSettings), typeof(BrushSettings) })]
-    [AddPrototypeComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail)} , new []{typeof(AdditionalEraseSetting)})]
-    [AddGroupComponents(new []{typeof(PrototypeTerrainObject), typeof(PrototypeGameObject)}, new []{typeof(FilterSettings)})]
-    [AddGroupComponents(new []{typeof(PrototypeTerrainDetail)}, new []{typeof(MaskFilterComponentSettings)})]
+    [AddPrototypeComponents(
+        new[] { typeof(PrototypeTerrainObject), typeof(PrototypeGameObject), typeof(PrototypeTerrainDetail) },
+        new[] { typeof(AdditionalEraseSetting) })]
+    [AddGroupComponents(new[] { typeof(PrototypeTerrainObject), typeof(PrototypeGameObject) },
+        new[] { typeof(FilterSettings) })]
+    [AddGroupComponents(new[] { typeof(PrototypeTerrainDetail) }, new[] { typeof(MaskFilterComponentSettings) })]
     public class BrushEraseTool : ToolWindow
     {
-        private SpacingMouseMove _mouseMove = new SpacingMouseMove();
         private BrushSettings _brushSettings;
-        
+        private SpacingMouseMove _mouseMove = new();
+
         protected override void OnEnable()
         {
-            _brushSettings = (BrushSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushSettings));
+            _brushSettings =
+                (BrushSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushSettings));
 
             _mouseMove = new SpacingMouseMove();
             _mouseMove.OnMouseDown += OnMouseDown;
             _mouseMove.OnMouseDrag += OnMouseDrag;
             _mouseMove.OnRepaint += OnRepaint;
         }
-        
+
         protected override void DoTool()
         {
             _mouseMove.Spacing = _brushSettings.Spacing;
             _mouseMove.LookAtSize = _brushSettings.BrushSize;
-            
+
             _mouseMove.Run();
         }
-        
+
         protected override void HandleKeyboardEvents()
         {
-            BrushSettings brushSettings = (BrushSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushSettings));
-            
+            var brushSettings =
+                (BrushSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushSettings));
+
             brushSettings.ScrollBrushRadiusEvent();
         }
-        
+
         private void OnMouseDown()
         {
             foreach (Group group in WindowData.Instance.SelectedData.SelectedGroupList)
             {
-                BoxArea area = _brushSettings.BrushJitterSettings.GetAreaVariables(_brushSettings, _mouseMove.Raycast.Point, group);
+                BoxArea area = _brushSettings.BrushJitterSettings.GetAreaVariables(_brushSettings,
+                    _mouseMove.Raycast.Point,
+                    group);
 
-                if(area.RayHit != null)
+                if (area.RayHit != null)
                 {
                     EraseGroup(group, area);
                 }
@@ -89,10 +97,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
         {
             foreach (Group group in WindowData.Instance.SelectedData.SelectedGroupList)
             {
-                RayHit originalRaycastInfo = RaycastUtility.Raycast(RayUtility.GetRayDown(dragPoint), 
+                RayHit originalRaycastInfo = RaycastUtility.Raycast(RayUtility.GetRayDown(dragPoint),
                     GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType));
 
-                if(originalRaycastInfo != null)
+                if (originalRaycastInfo != null)
                 {
                     BoxArea area = _brushSettings.GetAreaVariables(originalRaycastInfo);
 
@@ -104,7 +112,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
         private void OnRepaint()
         {
             BoxArea area = _brushSettings.GetAreaVariables(_mouseMove.Raycast);
-            BrushEraseToolVisualisation.Draw(area, WindowData.Instance.SelectionData, GlobalCommonComponentSingleton<LayerSettings>.Instance);
+            BrushEraseToolVisualisation.Draw(area, WindowData.Instance.SelectionData,
+                GlobalCommonComponentSingleton<LayerSettings>.Instance);
         }
 
         private void EraseGroup(Group group, BoxArea area)
@@ -126,9 +135,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
         private void EraseTerrainObject(Group group, BoxArea boxArea)
         {
 #if RENDERER_STACK
-            BrushEraseToolSettings brushEraseToolSettings = (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushEraseToolSettings));
+            BrushEraseToolSettings brushEraseToolSettings =
+ (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushEraseToolSettings));
             
-            FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
+            FilterSettings filterSettings =
+ (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
             
             if(filterSettings.FilterType == FilterType.MaskFilter)
             {
@@ -142,7 +153,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                     return true;
                 }
 
-                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
+                AdditionalEraseSetting additionalEraseSetting =
+ (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
 
                 float fitness = 1;
 
@@ -158,11 +170,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
                 {
                     if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                     {
-                        fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                        fitness =
+ TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                     }
                 }
 
-                float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
+                float maskFitness =
+ TextureUtility.GetFromWorldPosition(boxArea.Bounds, instance.Position, boxArea.Mask);
 
                 fitness *= maskFitness;
 
@@ -188,64 +202,72 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 
         private void EraseGameObject(Group group, BoxArea boxArea)
         {
-            BrushEraseToolSettings brushEraseToolSettings = (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushEraseToolSettings));
-            
-            FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
-            
-            if(filterSettings.FilterType == FilterType.MaskFilter)
+            var brushEraseToolSettings =
+                (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool),
+                    typeof(BrushEraseToolSettings));
+
+            var filterSettings = (FilterSettings)group.GetElement(typeof(BrushEraseTool), typeof(FilterSettings));
+
+            if (filterSettings.FilterType == FilterType.MaskFilter)
             {
                 FilterMaskOperation.UpdateMaskTexture(filterSettings.MaskFilterComponentSettings, boxArea);
             }
-            
+
             PrototypeGameObjectOverlap.OverlapBox(boxArea.Bounds, (proto, go) =>
             {
-                if(proto == null || proto.Active == false || proto.Selected == false)
+                if (proto == null || proto.Active == false || proto.Selected == false)
                 {
                     return true;
                 }
 
-                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
-                
+                var additionalEraseSetting =
+                    (AdditionalEraseSetting)proto.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
+
                 GameObject prefabRoot = GameObjectUtility.GetPrefabRoot(go);
-                
+
                 if (prefabRoot == null)
                 {
                     return true;
                 }
 
-                if(boxArea.Bounds.Contains(prefabRoot.transform.position))
+                if (boxArea.Bounds.Contains(prefabRoot.transform.position))
                 {
                     float fitness = 1;
 
-                    if(filterSettings.FilterType == FilterType.SimpleFilter)
+                    if (filterSettings.FilterType == FilterType.SimpleFilter)
                     {
-                        if (Physics.Raycast(RayUtility.GetRayFromCameraPosition(prefabRoot.transform.position), out var hit, PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance, 
-                                GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(group.PrototypeType)))
-    		            {
+                        if (Physics.Raycast(RayUtility.GetRayFromCameraPosition(prefabRoot.transform.position),
+                                out RaycastHit hit,
+                                PreferenceElementSingleton<RaycastPreferenceSettings>.Instance.MaxRayDistance,
+                                GlobalCommonComponentSingleton<LayerSettings>.Instance.GetCurrentPaintLayers(
+                                    group.PrototypeType)))
+                        {
                             fitness = filterSettings.SimpleFilter.GetFitness(hit.point, hit.normal);
                         }
                     }
                     else
                     {
-                        if(filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
+                        if (filterSettings.MaskFilterComponentSettings.MaskFilterStack.ElementList.Count != 0)
                         {
-                            fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
+                            fitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position,
+                                filterSettings.MaskFilterComponentSettings.FilterMaskTexture2D);
                         }
                     }
 
-                    float maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position, boxArea.Mask);
+                    var maskFitness = TextureUtility.GetFromWorldPosition(boxArea.Bounds, prefabRoot.transform.position,
+                        boxArea.Mask);
 
                     fitness *= maskFitness;
 
                     fitness *= brushEraseToolSettings.EraseStrength;
 
-                    float successOfErase = Random.Range(0.0f, 1.0f);
+                    var successOfErase = Random.Range(0.0f, 1.0f);
 
-                    if(successOfErase < fitness)
+                    if (successOfErase < fitness)
                     {
-                        float randomSuccessForErase = Random.Range(0.0f, 1.0f);
+                        var randomSuccessForErase = Random.Range(0.0f, 1.0f);
 
-                        if(randomSuccessForErase < additionalEraseSetting.Success / 100)
+                        if (randomSuccessForErase < additionalEraseSetting.Success / 100)
                         {
                             Undo.Editor.Undo.RegisterUndoAfterMouseUp(new DestroyedGameObject(go));
                             Object.DestroyImmediate(prefabRoot);
@@ -261,114 +283,125 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushEraseTool
 
         private void EraseTerrainDetails(Group group, BoxArea area)
         {
-            BrushEraseToolSettings brushEraseToolSettings = (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool), typeof(BrushEraseToolSettings));
-            
-            if(TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
+            var brushEraseToolSettings =
+                (BrushEraseToolSettings)ToolsComponentStack.GetElement(typeof(BrushEraseTool),
+                    typeof(BrushEraseToolSettings));
+
+            if (TerrainResourcesController.IsSyncError(group, Terrain.activeTerrain))
             {
                 return;
             }
-            
-            MaskFilterComponentSettings maskFilterComponentSettings = (MaskFilterComponentSettings)group.GetElement(typeof(BrushEraseTool), typeof(MaskFilterComponentSettings));
-            
+
+            var maskFilterComponentSettings =
+                (MaskFilterComponentSettings)group.GetElement(typeof(BrushEraseTool),
+                    typeof(MaskFilterComponentSettings));
+
             FilterMaskOperation.UpdateMaskTexture(maskFilterComponentSettings, area);
 
             var eraseSize = new Vector2Int(
-                UnityTerrainUtility.WorldToDetail(area.BoxSize, area.TerrainUnder.terrainData.size.x, area.TerrainUnder.terrainData),
-                UnityTerrainUtility.WorldToDetail(area.BoxSize, area.TerrainUnder.terrainData.size.z, area.TerrainUnder.terrainData));
-        
+                UnityTerrainUtility.WorldToDetail(area.BoxSize, area.TerrainUnder.terrainData.size.x,
+                    area.TerrainUnder.terrainData),
+                UnityTerrainUtility.WorldToDetail(area.BoxSize, area.TerrainUnder.terrainData.size.z,
+                    area.TerrainUnder.terrainData));
+
             Vector2Int halfBrushSize = eraseSize / 2;
 
-            Vector2Int center = new Vector2Int(
-                UnityTerrainUtility.WorldToDetail(area.RayHit.Point.x - area.TerrainUnder.transform.position.x, area.TerrainUnder.terrainData),
-                UnityTerrainUtility.WorldToDetail(area.RayHit.Point.z - area.TerrainUnder.transform.position.z, area.TerrainUnder.terrainData.size.z, 
+            var center = new Vector2Int(
+                UnityTerrainUtility.WorldToDetail(area.RayHit.Point.x - area.TerrainUnder.transform.position.x,
+                    area.TerrainUnder.terrainData),
+                UnityTerrainUtility.WorldToDetail(area.RayHit.Point.z - area.TerrainUnder.transform.position.z,
+                    area.TerrainUnder.terrainData.size.z,
                     area.TerrainUnder.terrainData));
-        
-            var position = center - halfBrushSize;
+
+            Vector2Int position = center - halfBrushSize;
             var startPosition = Vector2Int.Max(position, Vector2Int.zero);
-        
+
             Vector2Int offset = startPosition - position;
-        
+
             Vector2Int current;
             float fitness = 1;
             float detailmapResolution = area.TerrainUnder.terrainData.detailResolution;
             int x, y;
-            
+
             foreach (Prototype prototype in group.PrototypeList)
             {
-                PrototypeTerrainDetail prototypeTerrainDetail = (PrototypeTerrainDetail)prototype;
-                
-                if(prototypeTerrainDetail.Active == false || prototypeTerrainDetail.Selected == false)
+                var prototypeTerrainDetail = (PrototypeTerrainDetail)prototype;
+
+                if (prototypeTerrainDetail.Active == false || prototypeTerrainDetail.Selected == false)
                 {
                     continue;
                 }
 
-                AdditionalEraseSetting additionalEraseSetting = (AdditionalEraseSetting)prototypeTerrainDetail.GetElement(typeof(BrushEraseTool), typeof(AdditionalEraseSetting));
+                var additionalEraseSetting =
+                    (AdditionalEraseSetting)prototypeTerrainDetail.GetElement(typeof(BrushEraseTool),
+                        typeof(AdditionalEraseSetting));
 
-                int[,] localData = area.TerrainUnder.terrainData.GetDetailLayer(
+                var localData = area.TerrainUnder.terrainData.GetDetailLayer(
                     startPosition.x, startPosition.y,
                     Mathf.Max(0, Mathf.Min(position.x + eraseSize.x, (int)detailmapResolution) - startPosition.x),
-                    Mathf.Max(0, Mathf.Min(position.y + eraseSize.y, (int)detailmapResolution) - startPosition.y), prototypeTerrainDetail.TerrainProtoId);
+                    Mathf.Max(0, Mathf.Min(position.y + eraseSize.y, (int)detailmapResolution) - startPosition.y),
+                    prototypeTerrainDetail.TerrainProtoId);
 
                 float widthY = localData.GetLength(1);
                 float heightX = localData.GetLength(0);
-                
+
                 if (maskFilterComponentSettings.MaskFilterStack.ElementList.Count > 0)
-			    {
+                {
                     for (y = 0; y < widthY; y++)
+                    for (x = 0; x < heightX; x++)
                     {
-                        for (x = 0; x < heightX; x++)
+                        current = new Vector2Int(y, x);
+
+                        var randomSuccess = Random.Range(0.0f, 1.0f);
+
+                        if (randomSuccess < additionalEraseSetting.Success / 100)
                         {
-                            current = new Vector2Int(y, x);
+                            Vector2 normal = Vector2.zero;
+                            normal.y = Mathf.InverseLerp(0, eraseSize.y, current.y);
+                            normal.x = Mathf.InverseLerp(0, eraseSize.x, current.x);
 
-                            float randomSuccess = Random.Range(0.0f, 1.0f);
+                            fitness = TextureUtility.Get(normal, maskFilterComponentSettings.FilterMaskTexture2D);
 
-                            if(randomSuccess < additionalEraseSetting.Success / 100)
-                            {
-                                Vector2 normal = Vector2.zero;
-                                normal.y = Mathf.InverseLerp(0, eraseSize.y, current.y);
-                                normal.x = Mathf.InverseLerp(0, eraseSize.x, current.x);
+                            var maskFitness = area.GetAlpha(current + offset, eraseSize);
 
-                                fitness = TextureUtility.Get(normal, maskFilterComponentSettings.FilterMaskTexture2D);
+                            fitness *= maskFitness;
 
-                                float maskFitness = area.GetAlpha(current + offset, eraseSize);
+                            fitness *= brushEraseToolSettings.EraseStrength;
 
-                                fitness *= maskFitness;
+                            var targetStrength = Mathf.Max(0,
+                                localData[x, y] - Mathf.RoundToInt(Mathf.Lerp(0, 10, fitness)));
 
-                                fitness *= brushEraseToolSettings.EraseStrength;
-
-                                int targetStrength = Mathf.Max(0, localData[x, y] - Mathf.RoundToInt(Mathf.Lerp(0, 10, fitness)));
-
-                                localData[x, y] = targetStrength;
-                            }
+                            localData[x, y] = targetStrength;
                         }
                     }
 
-                    area.TerrainUnder.terrainData.SetDetailLayer(startPosition.x, startPosition.y, prototypeTerrainDetail.TerrainProtoId, localData);
+                    area.TerrainUnder.terrainData.SetDetailLayer(startPosition.x, startPosition.y,
+                        prototypeTerrainDetail.TerrainProtoId, localData);
                 }
                 else
                 {
                     for (y = 0; y < widthY; y++)
+                    for (x = 0; x < heightX; x++)
                     {
-                        for (x = 0; x < heightX; x++)
+                        current = new Vector2Int(y, x);
+
+                        var randomSuccess = Random.Range(0.0f, 1.0f);
+
+                        if (randomSuccess < additionalEraseSetting.Success / 100)
                         {
-                            current = new Vector2Int(y, x);
+                            var maskFitness = area.GetAlpha(current + offset, eraseSize);
 
-                            float randomSuccess = Random.Range(0.0f, 1.0f);
+                            maskFitness *= brushEraseToolSettings.EraseStrength;
 
-                            if(randomSuccess < additionalEraseSetting.Success / 100)
-                            {
-                                float maskFitness = area.GetAlpha(current + offset, eraseSize);
+                            var targetStrength = Mathf.Max(0,
+                                localData[x, y] - Mathf.RoundToInt(Mathf.Lerp(0, 10, maskFitness)));
 
-                                maskFitness *= brushEraseToolSettings.EraseStrength;
-
-                                int targetStrength = Mathf.Max(0, localData[x, y] - Mathf.RoundToInt(Mathf.Lerp(0, 10, maskFitness)));
-
-                                localData[x, y] = targetStrength;
-                            }
+                            localData[x, y] = targetStrength;
                         }
                     }
 
-                    area.TerrainUnder.terrainData.SetDetailLayer(startPosition.x, startPosition.y, prototypeTerrainDetail.TerrainProtoId, localData);
+                    area.TerrainUnder.terrainData.SetDetailLayer(startPosition.x, startPosition.y,
+                        prototypeTerrainDetail.TerrainProtoId, localData);
                 }
             }
         }

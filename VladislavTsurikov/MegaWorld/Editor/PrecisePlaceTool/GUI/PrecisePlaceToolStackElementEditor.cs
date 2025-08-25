@@ -4,106 +4,118 @@ using UnityEngine;
 using VladislavTsurikov.ComponentStack.Editor.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
+using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.MouseActions;
 
 namespace VladislavTsurikov.MegaWorld.Editor.PrecisePlaceTool.GUI
 {
-	[DontDrawFoldout]
-	[ElementEditor(typeof(PrecisePlaceToolSettings))]
+    [DontDrawFoldout]
+    [ElementEditor(typeof(PrecisePlaceToolSettings))]
     public class PrecisePlaceToolStackElementEditor : IMGUIElementEditor
     {
-	    private PrecisePlaceToolSettings _settings;
-	    private IMGUIComponentStackEditor<MouseAction, IMGUIElementEditor> _mouseActionStackEditor;
-	    
-	    private bool _moveFoldout = true;
-	    private bool _mouseActionsFoldout = true;
+        private bool _mouseActionsFoldout = true;
+        private IMGUIComponentStackEditor<MouseAction, IMGUIElementEditor> _mouseActionStackEditor;
 
-	    private bool _mouseDragSettingsFoldout = true;
-	    private bool _prototypeToggleSettingsFoldout = true;
+        private bool _mouseDragSettingsFoldout = true;
 
-	    public override void OnEnable()
-	    {
-		    _settings = (PrecisePlaceToolSettings)Target;
-		    _mouseActionStackEditor = new IMGUIComponentStackEditor<MouseAction, IMGUIElementEditor>(_settings.MouseActionStack);
-	    }
+        private bool _moveFoldout = true;
+        private bool _prototypeToggleSettingsFoldout = true;
+        private PrecisePlaceToolSettings _settings;
 
-	    public override void OnGUI()
-	    {
-		    _settings.RememberPastTransform = CustomEditorGUILayout.Toggle(new GUIContent("Remember Past Transform"), _settings.RememberPastTransform);
+        public override void OnEnable()
+        {
+            _settings = (PrecisePlaceToolSettings)Target;
+            _mouseActionStackEditor =
+                new IMGUIComponentStackEditor<MouseAction, IMGUIElementEditor>(_settings.MouseActionStack);
+        }
 
-			_mouseDragSettingsFoldout = CustomEditorGUILayout.Foldout(_mouseDragSettingsFoldout, "Mouse Drag Settings");
+        public override void OnGUI()
+        {
+            _settings.RememberPastTransform = CustomEditorGUILayout.Toggle(new GUIContent("Remember Past Transform"),
+                _settings.RememberPastTransform);
 
-			if(_mouseDragSettingsFoldout)
-			{
-				EditorGUI.indentLevel++;
+            _mouseDragSettingsFoldout = CustomEditorGUILayout.Foldout(_mouseDragSettingsFoldout, "Mouse Drag Settings");
 
-				_settings.Spacing = Mathf.Max(CustomEditorGUILayout.FloatField(new GUIContent("Spacing"), _settings.Spacing), 0.5f);
-				_settings.RandomSelectPrototype = CustomEditorGUILayout.Toggle(new GUIContent("Random Select Prototype"), _settings.RandomSelectPrototype);
+            if (_mouseDragSettingsFoldout)
+            {
+                EditorGUI.indentLevel++;
 
-				EditorGUI.indentLevel--;
-			}
+                _settings.Spacing =
+                    Mathf.Max(CustomEditorGUILayout.FloatField(new GUIContent("Spacing"), _settings.Spacing), 0.5f);
+                _settings.RandomSelectPrototype =
+                    CustomEditorGUILayout.Toggle(new GUIContent("Random Select Prototype"),
+                        _settings.RandomSelectPrototype);
 
-			_prototypeToggleSettingsFoldout = CustomEditorGUILayout.Foldout(_prototypeToggleSettingsFoldout, "Prototype Toggle Settings");
+                EditorGUI.indentLevel--;
+            }
 
-			if(_prototypeToggleSettingsFoldout)
-			{
-				EditorGUI.indentLevel++;
+            _prototypeToggleSettingsFoldout =
+                CustomEditorGUILayout.Foldout(_prototypeToggleSettingsFoldout, "Prototype Toggle Settings");
 
-				_settings.UseTransformComponents = CustomEditorGUILayout.Toggle(new GUIContent("Use Transform Components"), _settings.UseTransformComponents);
-				_settings.OverlapCheck = CustomEditorGUILayout.Toggle(new GUIContent("Overlap Check"), _settings.OverlapCheck);
+            if (_prototypeToggleSettingsFoldout)
+            {
+                EditorGUI.indentLevel++;
 
-				if(_settings.OverlapCheck)
-				{
-					EditorGUI.indentLevel++;
-					_settings.VisualizeOverlapCheckSettings = CustomEditorGUILayout.Toggle(new GUIContent("Visualize Overlap Check Settings"), _settings.VisualizeOverlapCheckSettings);
-					EditorGUI.indentLevel--;
-				}
+                _settings.UseTransformComponents =
+                    CustomEditorGUILayout.Toggle(new GUIContent("Use Transform Components"),
+                        _settings.UseTransformComponents);
+                _settings.OverlapCheck =
+                    CustomEditorGUILayout.Toggle(new GUIContent("Overlap Check"), _settings.OverlapCheck);
 
-				EditorGUI.indentLevel--;
-			}
+                if (_settings.OverlapCheck)
+                {
+                    EditorGUI.indentLevel++;
+                    _settings.VisualizeOverlapCheckSettings = CustomEditorGUILayout.Toggle(
+                        new GUIContent("Visualize Overlap Check Settings"), _settings.VisualizeOverlapCheckSettings);
+                    EditorGUI.indentLevel--;
+                }
 
-			_moveFoldout = CustomEditorGUILayout.Foldout(_moveFoldout, "Move Action");
+                EditorGUI.indentLevel--;
+            }
 
-			if(_moveFoldout)
-			{
-				EditorGUI.indentLevel++;
+            _moveFoldout = CustomEditorGUILayout.Foldout(_moveFoldout, "Move Action");
 
-				//settings.EnableSnapMove = CustomEditorGUI.Toggle(new GUIContent("Enable Snap Move"), settings.EnableSnapMove);
-				//if(settings.EnableSnapMove)
-				//{
-				//	EditorGUI.indentLevel++;
-				//	settings.SnapMove = CustomEditorGUI.Vector3Field(new GUIContent("Snap Move"), settings.SnapMove);
-				//	EditorGUI.indentLevel--;
-				//}
+            if (_moveFoldout)
+            {
+                EditorGUI.indentLevel++;
 
-				_settings.Align = CustomEditorGUILayout.Toggle(new GUIContent("Align"), _settings.Align);
+                //settings.EnableSnapMove = CustomEditorGUI.Toggle(new GUIContent("Enable Snap Move"), settings.EnableSnapMove);
+                //if(settings.EnableSnapMove)
+                //{
+                //	EditorGUI.indentLevel++;
+                //	settings.SnapMove = CustomEditorGUI.Vector3Field(new GUIContent("Snap Move"), settings.SnapMove);
+                //	EditorGUI.indentLevel--;
+                //}
 
-				if(_settings.Align)
-				{
-					EditorGUI.indentLevel++;
+                _settings.Align = CustomEditorGUILayout.Toggle(new GUIContent("Align"), _settings.Align);
 
-					_settings.WeightToNormal = CustomEditorGUILayout.Slider(new GUIContent("Weight To Normal"), _settings.WeightToNormal, 0, 1);
+                if (_settings.Align)
+                {
+                    EditorGUI.indentLevel++;
 
-					EditorGUI.indentLevel--;
-				}
+                    _settings.WeightToNormal = CustomEditorGUILayout.Slider(new GUIContent("Weight To Normal"),
+                        _settings.WeightToNormal, 0, 1);
 
-				_settings.AlongStroke = CustomEditorGUILayout.Toggle(new GUIContent("Along Stroke"), _settings.AlongStroke);
+                    EditorGUI.indentLevel--;
+                }
 
-				EditorGUI.indentLevel--;
-			}
+                _settings.AlongStroke =
+                    CustomEditorGUILayout.Toggle(new GUIContent("Along Stroke"), _settings.AlongStroke);
 
-			_mouseActionsFoldout = CustomEditorGUILayout.Foldout(_mouseActionsFoldout, "Mouse Actions");
+                EditorGUI.indentLevel--;
+            }
 
-			if(_mouseActionsFoldout)
-			{
-				EditorGUI.indentLevel++;
+            _mouseActionsFoldout = CustomEditorGUILayout.Foldout(_mouseActionsFoldout, "Mouse Actions");
 
-				_mouseActionStackEditor.OnGUI();
+            if (_mouseActionsFoldout)
+            {
+                EditorGUI.indentLevel++;
 
-				EditorGUI.indentLevel--;
-			}
-	    }
+                _mouseActionStackEditor.OnGUI();
+
+                EditorGUI.indentLevel--;
+            }
+        }
     }
 }
 #endif

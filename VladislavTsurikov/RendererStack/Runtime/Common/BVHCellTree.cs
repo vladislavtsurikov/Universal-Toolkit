@@ -6,10 +6,10 @@ using VladislavTsurikov.QuadTree.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Common
 {
-    public class BvhCellTree<T> where T: class, IHasRect
+    public class BvhCellTree<T> where T : class, IHasRect
     {
-        private readonly Dictionary<T, BVHNodeAABB<T>> _leafNodes = new Dictionary<T, BVHNodeAABB<T>>();
-        protected readonly BVHTree<BVHNodeAABB<T>, T> Tree = new BVHTree<BVHNodeAABB<T>, T>();
+        private readonly Dictionary<T, BVHNodeAABB<T>> _leafNodes = new();
+        protected readonly BVHTree<BVHNodeAABB<T>, T> Tree = new();
 
         public void Clear()
         {
@@ -17,30 +17,27 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common
             _leafNodes.Clear();
         }
 
-        public AABB GetAABB()
-        {
-            return Tree.GetAABB();
-        }
+        public AABB GetAABB() => Tree.GetAABB();
 
         public BVHNodeAABB<T> RegisterObject(T cell, AABB aabb)
         {
-            if(_leafNodes.ContainsKey(cell))
+            if (_leafNodes.ContainsKey(cell))
             {
                 return null;
             }
-            
+
             var treeNode = new BVHNodeAABB<T>(cell);
             treeNode.Position = aabb.Center;
             treeNode.Size = aabb.Size;
             Tree.InsertLeafNode(treeNode);
-            _leafNodes.Add(cell, treeNode); 
+            _leafNodes.Add(cell, treeNode);
 
             return treeNode;
         }
-        
+
         public List<T> OverlapCellsBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation)
         {
-            List<T> overlappedObjects = new List<T>();
+            var overlappedObjects = new List<T>();
 
             foreach (BVHNode<T> node in Tree.OverlapBox(boxCenter, boxSize, boxRotation))
             {
@@ -52,7 +49,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common
 
         public List<T> OverlapCellsSphere(Vector3 sphereCenter, float sphereRadius)
         {
-            List<T> overlappedObjects = new List<T>();
+            var overlappedObjects = new List<T>();
 
             foreach (BVHNode<T> node in Tree.OverlapSphere(sphereCenter, sphereRadius))
             {
@@ -71,10 +68,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common
 
         public List<T> RaycastAll(Ray ray)
         {
-            var nodeHits = Tree.RaycastAll(ray, false);
+            List<BVHNodeRayHit<T>> nodeHits = Tree.RaycastAll(ray, false);
 
-            List<T> overlappedCells = new List<T>();
-            foreach (var hit in nodeHits)
+            var overlappedCells = new List<T>();
+            foreach (BVHNodeRayHit<T> hit in nodeHits)
             {
                 overlappedCells.Add(hit.HitNode.Data);
             }
@@ -84,7 +81,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common
 
         public BVHNodeAABB<T> ChangeNodeSize(T cell, AABB aabb)
         {
-            if(!_leafNodes.ContainsKey(cell))
+            if (!_leafNodes.ContainsKey(cell))
             {
                 return null;
             }
@@ -95,17 +92,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.Common
         }
 
 #if UNITY_EDITOR
-        #region Gizmos
-        public void DrawAllCells(Color nodeColor)
-        {
-            Tree.DrawAllCells(Matrix4x4.identity, nodeColor);
-        }
 
-        public List<BVHNodeRayHit<T>> DrawRaycast(Ray ray, Color nodeColor)
-        {
-            return Tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
-        }
+        #region Gizmos
+
+        public void DrawAllCells(Color nodeColor) => Tree.DrawAllCells(Matrix4x4.identity, nodeColor);
+
+        public List<BVHNodeRayHit<T>> DrawRaycast(Ray ray, Color nodeColor) =>
+            Tree.DrawRaycast(ray, Matrix4x4.identity, nodeColor);
+
         #endregion
+
 #endif
     }
 }

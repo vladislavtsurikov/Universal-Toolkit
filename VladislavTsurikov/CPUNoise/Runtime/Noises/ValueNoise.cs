@@ -2,39 +2,32 @@
 
 namespace VladislavTsurikov.CPUNoise.Runtime
 {
-
     /// <summary>
-    /// Simple noise implementation by interpolating random values.
-    /// Works same as Perlin noise but uses the values instead of gradients.
-    /// Perlin noise uses gradients as it makes better noise but this still
-   ///  looks good and might be a little faster.
+    ///     Simple noise implementation by interpolating random values.
+    ///     Works same as Perlin noise but uses the values instead of gradients.
+    ///     Perlin noise uses gradients as it makes better noise but this still
+    ///     looks good and might be a little faster.
     /// </summary>
-	public class ValueNoiseCPU : NoiseCPU
-	{
-
-        private PermutationTable Perm { get; set; }
-
-        public ValueNoiseCPU(int seed, float frequency, float amplitude = 1.0f) 
+    public class ValueNoiseCPU : NoiseCPU
+    {
+        public ValueNoiseCPU(int seed, float frequency, float amplitude = 1.0f)
         {
-
             Frequency = frequency;
             Amplitude = amplitude;
             Offset = Vector3.zero;
 
             Perm = new PermutationTable(1024, 255, seed);
-
         }
 
+        private PermutationTable Perm { get; }
+
         /// <summary>
-        /// Update the seed.
+        ///     Update the seed.
         /// </summary>
-        public override void UpdateSeed(int seed)
-        {
-            Perm.Build(seed);
-        }
+        public override void UpdateSeed(int seed) => Perm.Build(seed);
 
         /// <summary>
-        /// Sample the noise in 1 dimension.
+        ///     Sample the noise in 1 dimension.
         /// </summary>
         public override float Sample1D(float x)
         {
@@ -49,14 +42,14 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             float n1 = Perm[ix0 + 1];
 
             // rescale from 0 to 255 to -1 to 1.
-            float n = Lerp(s, n0, n1) * Perm.Inverse;
+            var n = Lerp(s, n0, n1) * Perm.Inverse;
             n = n * 2.0f - 1.0f;
 
             return n * Amplitude;
         }
 
         /// <summary>
-        /// Sample the noise in 2 dimensions.
+        ///     Sample the noise in 2 dimensions.
         /// </summary>
         public override float Sample2D(float x, float y)
         {
@@ -83,18 +76,17 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             var n1 = Lerp(t, nx0, nx1);
 
             // rescale from 0 to 255 to -1 to 1.
-            float n = Lerp(s, n0, n1) * Perm.Inverse;
+            var n = Lerp(s, n0, n1) * Perm.Inverse;
             n = n * 2.0f - 1.0f;
 
             return n * Amplitude;
         }
 
         /// <summary>
-        /// Sample the noise in 3 dimensions.
+        ///     Sample the noise in 3 dimensions.
         /// </summary>
         public override float Sample3D(float x, float y, float z)
         {
-
             x = (x + Offset.x) * Frequency;
             y = (y + Offset.y) * Frequency;
             z = (z + Offset.z) * Frequency;
@@ -131,21 +123,14 @@ namespace VladislavTsurikov.CPUNoise.Runtime
             var n1 = Lerp(t, nx0, nx1);
 
             // rescale from 0 to 255 to -1 to 1.
-            float n = Lerp(s, n0, n1) * Perm.Inverse;
+            var n = Lerp(s, n0, n1) * Perm.Inverse;
             n = n * 2.0f - 1.0f;
 
             return n * Amplitude;
         }
 
-        private float Fade(float t) { return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f); }
+        private float Fade(float t) => t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
 
-        private float Lerp(float t, float a, float b) { return a + t * (b - a); }
-
-	}
-
+        private float Lerp(float t, float a, float b) => a + t * (b - a);
+    }
 }
-
-
-
-
-

@@ -12,14 +12,14 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
     {
         private static Sector _activeSceneSector;
 
-        [OdinSerialize] 
-        public List<SectorLayer> SectorLayerList = new List<SectorLayer>();
+        [OdinSerialize]
+        public List<SectorLayer> SectorLayerList = new();
 
         public static Sector ActiveSceneSector
         {
             get
             {
-                if (_activeSceneSector == null || !_activeSceneSector.SceneReference.Scene.isLoaded) 
+                if (_activeSceneSector == null || !_activeSceneSector.SceneReference.Scene.isLoaded)
                 {
                     _activeSceneSector = new Sector(SceneManager.GetActiveScene(), new Bounds(), null);
                 }
@@ -30,7 +30,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         protected override void SetupSceneData()
         {
-            foreach (var sectorLayer in SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerList)
             {
                 sectorLayer.Setup();
             }
@@ -40,7 +40,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public SectorLayer GetSectorLayer(string tag)
         {
-            foreach (var sectorLayer in SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerList)
             {
                 if (sectorLayer.Tag == tag)
                 {
@@ -53,14 +53,12 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public Sector GetSector(Scene scene)
         {
-            foreach (var sectorLayer in SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerList)
+            foreach (Sector sector in sectorLayer.SectorList)
             {
-                foreach (var sector in sectorLayer.SectorList)
+                if (scene.name == sector.SceneReference.Scene.name)
                 {
-                    if (scene.name == sector.SceneReference.Scene.name)
-                    {
-                        return sector;
-                    }
+                    return sector;
                 }
             }
 
@@ -69,7 +67,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
         public List<Sector> GetLoadedScenes(string tag)
         {
-            foreach (var sectorLayer in SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerList)
             {
                 if (sectorLayer.Tag == tag)
                 {
@@ -79,11 +77,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
             return null;
         }
-        
+
 #if UNITY_EDITOR
         public void RemoveSector(Sector sector)
         {
-            foreach (var sectorLayer in SectorLayerList)
+            foreach (SectorLayer sectorLayer in SectorLayerList)
             {
                 if (sectorLayer.SectorList.Remove(sector))
                 {
@@ -91,7 +89,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 }
             }
         }
-        
+
         public void AddSector(string tag, SceneAsset sceneAsset, Bounds bounds)
         {
             SectorLayer sectorLayer = GetSectorLayer(tag);
@@ -103,7 +101,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
 
             sectorLayer.AddSector(sceneAsset, bounds);
         }
-        
+
         public SceneReference CreateScene(string tag, string sceneName, Bounds bounds)
         {
             SectorLayer sectorLayer = GetSectorLayer(tag);

@@ -12,96 +12,91 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
 {
     public class TerrainObjectInstance : Instance
     {
+        private readonly ComponentStackOnlyDifferentTypes<Script> _scriptList = new();
+
+        public readonly int PrototypeID;
         private bool _enable = true;
-        private readonly ComponentStackOnlyDifferentTypes<Script> _scriptList = new ComponentStackOnlyDifferentTypes<Script>();
 
         private PrototypeTerrainObject _proto;
-        
-        public readonly int PrototypeID;
+
+        [NonSerialized]
+        public HierarchyTerrainObjectInstance HierarchyTerrainObjectInstance;
+
+        [NonSerialized]
+        public TerrainObjectCollider TerrainObjectCollider;
+
+        public TerrainObjectInstance(Vector3 position, Vector3 scale, Quaternion rotation, PrototypeTerrainObject proto)
+            : base(position, scale, rotation)
+        {
+            _proto = proto;
+            PrototypeID = proto.ID;
+            _ = _scriptList.Setup(true, new object[]{this});
+        }
+
+        public TerrainObjectInstance(int id, Vector3 position, Vector3 scale, Quaternion rotation,
+            PrototypeTerrainObject proto) : base(id, position, scale, rotation)
+        {
+            _proto = proto;
+            PrototypeID = proto.ID;
+            _ = _scriptList.Setup(true, new object[]{this});
+        }
 
         public PrototypeTerrainObject Proto
         {
             get
             {
-                if(_proto == null)
+                if (_proto == null)
                 {
                     _proto = (PrototypeTerrainObject)TerrainObjectRenderer.Instance.SelectionData.GetProto(PrototypeID);
                 }
+
                 return _proto;
             }
         }
 
-        [NonSerialized] 
-        public TerrainObjectCollider TerrainObjectCollider;
-        [NonSerialized] 
-        public HierarchyTerrainObjectInstance HierarchyTerrainObjectInstance;
-        
         public bool Enable
         {
             get => _enable;
             set
             {
-                if (_enable == value) return;
-                
+                if (_enable == value)
+                {
+                    return;
+                }
+
                 _enable = value;
 
                 TerrainObjectCollider.PathToTerrainObjectCollider.PrototypeRendererData.SetEnable(this);
             }
         }
 
-        public TerrainObjectInstance(Vector3 position, Vector3 scale, Quaternion rotation, PrototypeTerrainObject proto) : base(position, scale, rotation)
-        {
-            _proto = proto;
-            PrototypeID = proto.ID;
-            _scriptList.Setup(true, this);
-        }
-        
-        public TerrainObjectInstance(int id, Vector3 position, Vector3 scale, Quaternion rotation, PrototypeTerrainObject proto) : base(id, position, scale, rotation)
-        {
-            _proto = proto;
-            PrototypeID = proto.ID;
-            _scriptList.Setup(true, this);
-        }
+        public bool HasScriptType(Type type) => GetScript(type) != null;
 
-        public bool HasScriptType(Type type)
-        {
-            return GetScript(type) != null;
-        }
-        
         public void AddScript(Script protoScript)
         {
             if (!HasScriptType(protoScript.GetType()))
             {
-                var script = DeepCopier.Copy(protoScript);
+                Script script = DeepCopier.Copy(protoScript);
                 _scriptList.AddIfMissingType(script);
             }
         }
 
-        public void SetupScripts()
-        {
-            _scriptList.Setup();
-        }
+        public void SetupScripts() => _ = _scriptList.Setup();
 
-        public Script[] GetScripts()
-        {
-            return _scriptList.ElementList.ToArray();
-        }
-        
-        public Script GetScript(Type type)
-        {
-            return _scriptList.GetElement(type);
-        }
+        public Script[] GetScripts() => _scriptList.ElementList.ToArray();
+
+        public Script GetScript(Type type) => _scriptList.GetElement(type);
 
         protected override void DestroyInstance()
         {
             PathToTerrainObjectCollider pathToTerrainObjectCollider = TerrainObjectCollider.PathToTerrainObjectCollider;
-            
+
             pathToTerrainObjectCollider.BVHObjectTree.Tree.RemoveLeafNode(pathToTerrainObjectCollider.LeafNode);
             pathToTerrainObjectCollider.PrototypeRendererData.RemovePersistentInstance(this);
 
             pathToTerrainObjectCollider.ColliderCell.ChangeNodeSizeIfNecessary(TerrainObjectCollider);
             pathToTerrainObjectCollider.RenderCell.ChangeNodeSizeIfNecessary(TerrainObjectCollider);
-            
+
             SceneObjectsBounds.ChangeSceneObjectsBounds(pathToTerrainObjectCollider.SceneDataManager.Sector);
 
             if (HierarchyTerrainObjectInstance != null)
@@ -113,17 +108,17 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         protected override void TransformChanged()
         {
             PathToTerrainObjectCollider pathToTerrainObjectCollider = TerrainObjectCollider.PathToTerrainObjectCollider;
-            
+
             pathToTerrainObjectCollider.BVHObjectTree.Tree.RemoveLeafNode(pathToTerrainObjectCollider.LeafNode);
-            
+
             pathToTerrainObjectCollider.PrototypeRendererData.RemovePersistentInstance(this);
 
             TerrainObjectRendererData.AddInstance(this, Sectorize.Sectorize.GetSectorLayerTag());
-            
+
             if (HierarchyTerrainObjectInstance != null)
             {
-                var gameObject = HierarchyTerrainObjectInstance.gameObject;
-                
+                GameObject gameObject = HierarchyTerrainObjectInstance.gameObject;
+
                 gameObject.transform.position = Position;
                 gameObject.transform.rotation = Rotation;
                 gameObject.transform.localScale = Scale;
@@ -133,24 +128,21 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data
         protected override void Reposition()
         {
             PathToTerrainObjectCollider pathToTerrainObjectCollider = TerrainObjectCollider.PathToTerrainObjectCollider;
-            
+
             pathToTerrainObjectCollider.BVHObjectTree.Tree.RemoveLeafNode(pathToTerrainObjectCollider.LeafNode);
-            
+
             pathToTerrainObjectCollider.PrototypeRendererData.RemovePersistentInstance(this);
 
             TerrainObjectRendererData.AddInstance(this, Sectorize.Sectorize.GetSectorLayerTag());
-            
+
             if (HierarchyTerrainObjectInstance != null)
             {
-                var gameObject = HierarchyTerrainObjectInstance.gameObject;
-                
+                GameObject gameObject = HierarchyTerrainObjectInstance.gameObject;
+
                 gameObject.transform.position = Position;
             }
         }
 
-        protected override Vector3 GetMultiplySize()
-        {
-            return Proto.RenderModel.MultiplySize;
-        }
+        protected override Vector3 GetMultiplySize() => Proto.RenderModel.MultiplySize;
     }
 }

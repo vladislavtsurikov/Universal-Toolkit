@@ -1,23 +1,23 @@
-﻿Shader "Hidden/MegaWorld/Expand" 
+﻿Shader "Hidden/MegaWorld/Expand"
 {
-    Properties 
-    { 
-        _MainTex ("Texture", any) = "" {} 
-	}
+    Properties
+    {
+        _MainTex ("Texture", any) = "" {}
+    }
 
-    SubShader {
+    SubShader
+    {
 
         ZTest Always Cull Off ZWrite Off
 
         CGINCLUDE
-        
         #include "UnityCG.cginc"
         #include "TerrainTool.cginc"
         #include "Includes/Common.cginc"
 
         sampler2D _MainTex;
         float4 _MainTex_TexelSize;
-        
+
         float KernelSize;
         float MaxKernelSize;
 
@@ -27,113 +27,112 @@
 
         struct appdata_t
         {
-	        float4 vertex : POSITION;
-	        float2 pcUV : TEXCOORD0;
+            float4 vertex : POSITION;
+            float2 pcUV : TEXCOORD0;
         };
 
         struct v2f
         {
-	        float4 vertex : SV_POSITION;
-	        float2 pcUV : TEXCOORD0;
+            float4 vertex : SV_POSITION;
+            float2 pcUV : TEXCOORD0;
         };
 
         v2f vert(appdata_t v)
         {
-	        v2f o;
-	        o.vertex = UnityObjectToClipPos(v.vertex);
-	        o.pcUV = v.pcUV;
-	        return o;
+            v2f o;
+            o.vertex = UnityObjectToClipPos(v.vertex);
+            o.pcUV = v.pcUV;
+            return o;
         }
 
         float Smooth(float2 heightmapUV, float height, bool vertical)
         {
-	        float divisor = 1.0f;
-	        float offset = 0.0f;
-	        float h = height;
-			
-	        for (int i = 0; i < KernelWeightCount; i++)
-	        {
-		        offset += _MainTex_TexelSize.x * KernelSize;
-		        divisor += 2.0f * KernelWeights[i];
+            float divisor = 1.0f;
+            float offset = 0.0f;
+            float h = height;
 
-		        float2 UV1;
-		        float2 UV2;
-	        	
-		        if(vertical)
-		        {
-			        UV1 = heightmapUV + float2(0.0f, offset);
-			        UV2 = heightmapUV - float2(0.0f, offset);
-		        }
-		        else
-		        {
-			        UV1 = heightmapUV + float2(offset, 0.0f);
-			        UV2 = heightmapUV - float2(offset, 0.0f);
-		        }
+            for (int i = 0; i < KernelWeightCount; i++)
+            {
+                offset += _MainTex_TexelSize.x * KernelSize;
+                divisor += 2.0f * KernelWeights[i];
 
-		        h += KernelWeights[i] * UnpackHeightmap(tex2D(_MainTex, UV1));
-		        h += KernelWeights[i] * UnpackHeightmap(tex2D(_MainTex, UV2));
-	        }
+                float2 UV1;
+                float2 UV2;
 
-	        h /= divisor;
+                if (vertical)
+                {
+                    UV1 = heightmapUV + float2(0.0f, offset);
+                    UV2 = heightmapUV - float2(0.0f, offset);
+                }
+                else
+                {
+                    UV1 = heightmapUV + float2(offset, 0.0f);
+                    UV2 = heightmapUV - float2(offset, 0.0f);
+                }
 
-	        float3 newHeight = float3(h, min(h, height), max(h, height));
-	        return newHeight;
+                h += KernelWeights[i] * UnpackHeightmap(tex2D(_MainTex, UV1));
+                h += KernelWeights[i] * UnpackHeightmap(tex2D(_MainTex, UV2));
+            }
+
+            h /= divisor;
+
+            float3 newHeight = float3(h, min(h, height), max(h, height));
+            return newHeight;
         }
-        
         ENDCG
-    	
-    	Pass
-		{
-			Name "Expand Horizontal"
 
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment SmoothHorizontal
-
-			float4 SmoothHorizontal(v2f i) : SV_Target
-			{
-				float2 heightmapUV = PaintContextUVToHeightmapUV(i.pcUV);
-
-				float height = UnpackHeightmap(tex2D(_MainTex, heightmapUV));
-				
-				float newHeight = Smooth(heightmapUV, height, false);
-
-				float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
-
-                float maxClamp = Lerp(1, 0.3f, inverseValue);
-
-				newHeight = Remap(newHeight, 0, maxClamp);
-
-				return newHeight;
-			}
-			ENDCG
-		}
         Pass
-		{
-			Name "Expand Vertical"
+        {
+            Name "Expand Horizontal"
 
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment SmoothHorizontal
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment SmoothHorizontal
 
-			float4 SmoothHorizontal(v2f i) : SV_Target
-			{
-				float2 heightmapUV = PaintContextUVToHeightmapUV(i.pcUV);
+            float4 SmoothHorizontal(v2f i) : SV_Target
+            {
+                float2 heightmapUV = PaintContextUVToHeightmapUV(i.pcUV);
 
-				float height = UnpackHeightmap(tex2D(_MainTex, heightmapUV));
+                float height = UnpackHeightmap(tex2D(_MainTex, heightmapUV));
 
-				float newHeight = Smooth(heightmapUV, height, true);
+                float newHeight = Smooth(heightmapUV, height, false);
 
-				float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
+                float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
 
                 float maxClamp = Lerp(1, 0.3f, inverseValue);
 
-				newHeight = Remap(newHeight, 0, maxClamp);
-				
-				return newHeight;
-			}
-			ENDCG
-		}
+                newHeight = Remap(newHeight, 0, maxClamp);
+
+                return newHeight;
+            }
+            ENDCG
+        }
+        Pass
+        {
+            Name "Expand Vertical"
+
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment SmoothHorizontal
+
+            float4 SmoothHorizontal(v2f i) : SV_Target
+            {
+                float2 heightmapUV = PaintContextUVToHeightmapUV(i.pcUV);
+
+                float height = UnpackHeightmap(tex2D(_MainTex, heightmapUV));
+
+                float newHeight = Smooth(heightmapUV, height, true);
+
+                float inverseValue = InverseLerp(0, MaxKernelSize, KernelSize);
+
+                float maxClamp = Lerp(1, 0.3f, inverseValue);
+
+                newHeight = Remap(newHeight, 0, maxClamp);
+
+                return newHeight;
+            }
+            ENDCG
+        }
     }
     Fallback Off
 }

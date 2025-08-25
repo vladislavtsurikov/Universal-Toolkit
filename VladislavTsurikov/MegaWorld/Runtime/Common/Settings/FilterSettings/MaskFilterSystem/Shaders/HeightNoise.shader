@@ -1,20 +1,22 @@
 ﻿Shader "Hidden/MegaWorld/HeightNoise"
 {
-    Properties { _HeightTex ("Texture", any) = "" {} }
+    Properties
+    {
+        _HeightTex ("Texture", any) = "" {}
+    }
 
     SubShader
     {
         ZTest Always Cull OFF ZWrite Off
 
         HLSLINCLUDE
-
         #include "UnityCG.cginc"
         #include "TerrainTool.cginc"
 
         sampler2D _HeightTex;
         sampler2D _BaseMaskTex;
-        float4 _MainTex_TexelSize;      // 1/width, 1/height, width, height
-        
+        float4 _MainTex_TexelSize; // 1/width, 1/height, width, height
+
         sampler2D _NoiseTex;
         float4 _NoiseTex_TexelSize;
 
@@ -42,17 +44,17 @@
             float2 pcUV : TEXCOORD0;
         };
 
-        v2f vert( appdata_t v )
+        v2f vert(appdata_t v)
         {
             v2f o;
-            
-            o.vertex = UnityObjectToClipPos( v.vertex );
+
+            o.vertex = UnityObjectToClipPos(v.vertex);
             o.pcUV = v.pcUV;
 
             return o;
         }
 
-        float Lerp(float v0, float v1, float t) 
+        float Lerp(float v0, float v1, float t)
         {
             return (1 - t) * v0 + t * v1;
         }
@@ -62,13 +64,14 @@
             return (t - a) / (b - a);
         }
 
-        float GetSharpenHeightNoise(float fractalValue, float maxRangeNoise, float minRangeNoise, float height, float minHeight, float maxHeight)
+        float GetSharpenHeightNoise(float fractalValue, float maxRangeNoise, float minRangeNoise, float height,
+                                    float minHeight, float maxHeight)
         {
             fractalValue = clamp(fractalValue, 0, 1);
 
-            if(height > maxHeight)
+            if (height > maxHeight)
             {
-                if(height < maxHeight)
+                if (height < maxHeight)
                 {
                     return 1;
                 }
@@ -81,21 +84,21 @@
 
                 float clampNoiseMin = falloffHeightNoise;
                 float clampNoiseMax = falloffHeightNoise;
-                
-                if (fractalValue < clampNoiseMin) 
+
+                if (fractalValue < clampNoiseMin)
                 {
                     return 0;
                 }
-                else if (fractalValue > clampNoiseMax) 
+                else if (fractalValue > clampNoiseMax)
                 {
                     return 1;
                 }
 
                 return fractalValue;
             }
-            else if(height < minHeight)
+            else if (height < minHeight)
             {
-                if(height > maxHeight)
+                if (height > maxHeight)
                 {
                     return 1;
                 }
@@ -105,15 +108,15 @@
                 fractalValue = clamp(fractalValue, 0, 1);
 
                 float falloffHeightNoise = InverseLerp(minHeight, newMinHeight, height);
-                
+
                 float clampNoiseMin = falloffHeightNoise;
                 float clampNoiseMax = falloffHeightNoise;
-                
-                if (fractalValue < clampNoiseMin) 
+
+                if (fractalValue < clampNoiseMin)
                 {
                     return 0;
                 }
-                else if (fractalValue > clampNoiseMax) 
+                else if (fractalValue > clampNoiseMax)
                 {
                     return 1;
                 }
@@ -125,61 +128,59 @@
                 return 1;
             }
         }
-
         ENDHLSL
 
         Pass
         {
             HLSLPROGRAM
-
             #pragma vertex vert
             #pragma fragment frag
 
-            float4 frag( v2f i ) : SV_Target
+            float4 frag(v2f i) : SV_Target
             {
-                float height = UnpackHeightmap(tex2D( _HeightTex, i.pcUV)) * 2;
+                float height = UnpackHeightmap(tex2D(_HeightTex, i.pcUV)) * 2;
 
                 height = Lerp(_ClampMinHeight, _ClampMaxHeight, height);
 
                 // need to adjust uvs due to "scaling" from brush rotation
-                float2 pcUVRescale = float2( length( _PCUVToBrushUVScales.xy ), length( _PCUVToBrushUVScales.zw ) );
+                float2 pcUVRescale = float2(length(_PCUVToBrushUVScales.xy), length(_PCUVToBrushUVScales.zw));
 
                 // get noise mask value
-                float2 noiseUV = ( i.pcUV - ( .5 ).xx ) * pcUVRescale + ( .5 ).xx + ( .5 ).xx * _NoiseTex_TexelSize.xy;
-                float noiseValue = UnpackHeightmap( tex2D( _NoiseTex, i.pcUV ) );
+                float2 noiseUV = (i.pcUV - (.5).xx) * pcUVRescale + (.5).xx + (.5).xx * _NoiseTex_TexelSize.xy;
+                float noiseValue = UnpackHeightmap(tex2D(_NoiseTex, i.pcUV));
                 noiseValue = clamp(noiseValue, 0, 1);
 
                 float blendHeightValue = 1;
                 float result = 1;
 
-                blendHeightValue = GetSharpenHeightNoise(noiseValue, _MaxRangeNoise, _MinRangeNoise, height, _MinHeight, _MaxHeight);
+                blendHeightValue = GetSharpenHeightNoise(noiseValue, _MaxRangeNoise, _MinRangeNoise, height, _MinHeight,
+                                                         _MaxHeight);
                 blendHeightValue = clamp(blendHeightValue, 0, 1);
 
                 switch (_BlendMode)
                 {
-                    case 0: //Multiply
+                case 0: //Multiply
                     {
                         result = UnpackHeightmap(tex2D(_BaseMaskTex, i.pcUV)) * blendHeightValue;
 
-	            		break;
+                        break;
                     }
-                    case 1: //Add
+                case 1: //Add
                     {
-	            		result = UnpackHeightmap(tex2D(_BaseMaskTex, i.pcUV)) + blendHeightValue;
+                        result = UnpackHeightmap(tex2D(_BaseMaskTex, i.pcUV)) + blendHeightValue;
 
-	            		break;
+                        break;
                     }
-                    case 2: //Subtract
+                case 2: //Subtract
                     {
-	            		result = UnpackHeightmap(tex2D(_BaseMaskTex, i.pcUV)) - blendHeightValue;
+                        result = UnpackHeightmap(tex2D(_BaseMaskTex, i.pcUV)) - blendHeightValue;
 
-	            		break;
+                        break;
                     }
                 }
 
                 return clamp(result, 0, 1);
             }
-
             ENDHLSL
         }
     }

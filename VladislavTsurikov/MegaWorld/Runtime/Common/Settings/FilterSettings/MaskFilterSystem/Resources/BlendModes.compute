@@ -15,25 +15,25 @@ void BlendModes(uint3 id : SV_DispatchThreadID)
 
     switch (_BlendMode)
     {
-        case 0: //Multiply
+    case 0: //Multiply
         {
             result = mainValue01 * mainValue02;
 
-			break;
+            break;
         }
-        case 1: //Add
+    case 1: //Add
         {
-			result = mainValue01 + mainValue02;
+            result = mainValue01 + mainValue02;
 
-			break;
+            break;
         }
-        case 2: //Subtract
+    case 2: //Subtract
         {
-			result = mainValue01 - mainValue02;
+            result = mainValue01 - mainValue02;
 
-			break;
+            break;
         }
     }
 
-	OutputTex[id.xy] = clamp(result, 0, 1);
+    OutputTex[id.xy] = clamp(result, 0, 1);
 }

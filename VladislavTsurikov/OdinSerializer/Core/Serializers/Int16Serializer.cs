@@ -19,42 +19,43 @@
 namespace OdinSerializer
 {
     /// <summary>
-    /// Serializer for the <see cref="short"/> type.
+    ///     Serializer for the <see cref="short" /> type.
     /// </summary>
-    /// <seealso cref="Serializer{System.Int16}" />
+    /// <seealso cref="short" />
     public sealed class Int16Serializer : Serializer<short>
     {
         /// <summary>
-        /// Reads a value of type <see cref="short" />.
+        ///     Reads a value of type <see cref="short" />.
         /// </summary>
         /// <param name="reader">The reader to use.</param>
         /// <returns>
-        /// The value which has been read.
+        ///     The value which has been read.
         /// </returns>
         public override short ReadValue(IDataReader reader)
         {
             string name;
-            var entry = reader.PeekEntry(out name);
+            EntryType entry = reader.PeekEntry(out name);
 
             if (entry == EntryType.Integer)
             {
                 short value;
                 if (reader.ReadInt16(out value) == false)
                 {
-                    reader.Context.Config.DebugContext.LogWarning("Failed to read entry '" + name + "' of type " + entry.ToString());
+                    reader.Context.Config.DebugContext.LogWarning(
+                        "Failed to read entry '" + name + "' of type " + entry);
                 }
+
                 return value;
             }
-            else
-            {
-                reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.Integer.ToString() + ", but got entry '" + name + "' of type " + entry.ToString());
-                reader.SkipEntry();
-                return default(short);
-            }
+
+            reader.Context.Config.DebugContext.LogWarning("Expected entry of type " + EntryType.Integer +
+                                                          ", but got entry '" + name + "' of type " + entry);
+            reader.SkipEntry();
+            return default;
         }
 
         /// <summary>
-        /// Writes a value of type <see cref="short" />.
+        ///     Writes a value of type <see cref="short" />.
         /// </summary>
         /// <param name="name">The name of the value to write.</param>
         /// <param name="value">The value to write.</param>

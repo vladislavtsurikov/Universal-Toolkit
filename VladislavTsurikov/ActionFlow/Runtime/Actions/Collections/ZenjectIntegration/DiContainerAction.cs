@@ -6,18 +6,18 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
     public abstract class DiContainerAction : Action
     {
         protected abstract string ClassName { get; }
-        
+
         protected DiContainer DiContainer { get; private set; }
         protected bool IsErrorInDiContainer { get; private set; }
         protected string ErrorMessage { get; private set; }
-        
+
         protected override UniTask SetupComponent(object[] setupData = null)
         {
             if (setupData == null)
             {
                 return UniTask.CompletedTask;
             }
-            
+
             DiContainer = (DiContainer)setupData[0];
             SetupDiContainerAction();
             return UniTask.CompletedTask;
@@ -26,8 +26,8 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
         protected virtual void SetupDiContainerAction()
         {
         }
-        
-        protected T TryResolve<T>() where T: class
+
+        protected T TryResolve<T>() where T : class
         {
             var component = DiContainer.TryResolve(typeof(T));
             if (component == null)

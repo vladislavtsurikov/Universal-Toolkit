@@ -8,7 +8,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
     public static class ResourceLoaderExtensions
     {
-        public static UniTask<GameObject> InstantiateWithAutoLoad(this ResourceLoader loader, AssetReferenceGameObject prefabRef, Transform parent = null, CancellationToken cancellationToken = default)
+        public static UniTask<GameObject> InstantiateWithAutoLoad(this ResourceLoader loader,
+            AssetReferenceGameObject prefabRef, Transform parent = null, CancellationToken cancellationToken = default)
         {
             if (prefabRef == null)
             {
@@ -19,7 +20,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
             AsyncOperationHandle<GameObject> handle = parent != null
                 ? prefabRef.InstantiateAsync(parent)
                 : prefabRef.InstantiateAsync();
-            
+
             var completionSource = new UniTaskCompletionSource<GameObject>();
 
             handle.Completed += async operation =>
@@ -28,7 +29,8 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
                 if (instance != null)
                 {
-                    await AssetReferenceReflectionLoader.LoadAssetReferencesRecursive(instance, loader, cancellationToken);
+                    await AssetReferenceReflectionLoader.LoadAssetReferencesRecursive(instance, loader,
+                        cancellationToken);
                     completionSource.TrySetResult(instance);
                 }
                 else

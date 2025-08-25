@@ -7,12 +7,11 @@ using VladislavTsurikov.ColorUtility.Runtime;
 namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem
 {
     [ComponentStack.Runtime.AdvancedComponentStack.Name("Fly Up")]
-	public class FlyUp : PhysicsEffect
+    public class FlyUp : PhysicsEffect
     {
+        public float Force = 30f;
         public float MaxForce => 200;
 
-        public float Force = 30f;
-        
         public override void ApplyEffect(Vector3 positionOffsetY, Rigidbody rb)
         {
             Vector3 forceDirection = Vector3.up;
@@ -26,7 +25,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
         {
             Vector3 positionUp = GetPositionOffsetY(rayHit);
 
-            Color colorBlue = new Color(0.2f, 0.5f, 0.7f);
+            var colorBlue = new Color(0.2f, 0.5f, 0.7f);
 
             Handles.color = colorBlue.WithAlpha(GetOpacity(Force, MaxForce));
             Handles.SphereHandleCap(0, positionUp, Quaternion.identity, Size, EventType.Repaint);
@@ -37,8 +36,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
 
             Vector3 direction = Vector3.up;
             Handles.color = colorBlue.WithAlpha(0.5f);
-            Handles.ArrowHandleCap(0, positionUp, Quaternion.FromToRotation(Vector3.forward, direction), Size / 2, EventType.Repaint);
+            Handles.ArrowHandleCap(0, positionUp, Quaternion.FromToRotation(Vector3.forward, direction), Size / 2,
+                EventType.Repaint);
         }
-	}
+    }
 }
 #endif

@@ -14,21 +14,20 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
     [ElementEditor(typeof(Group))]
     public class GroupEditor : SceneTypeEditor
     {
+        private readonly Color _color = new Color().From256(0, 122, 163);
+        private readonly float _windowHeight = 50f;
         private Group _group;
         private ReorderableList _reorderableList;
-
-        private readonly float _windowHeight = 50f;
-        private Color _color = new Color().From256(0, 122, 163);
 
         public override void OnEnable()
         {
             base.OnEnable();
 
             _group = (Group)Target;
-            _reorderableList = new ReorderableList(_group.SceneReferences, typeof(SceneReference), true, true, false, false)
+            _reorderableList =
+                new ReorderableList(_group.SceneReferences, typeof(SceneReference), true, true, false, false)
                 {
-                    drawHeaderCallback = DrawHeader,
-                    drawElementCallback = DrawElement
+                    drawHeaderCallback = DrawHeader, drawElementCallback = DrawElement
                 };
         }
 
@@ -43,7 +42,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
 
             if (HasDropOperation())
             {
-                Rect windowRect = new Rect(rect.x, rect.y, rect.width, _windowHeight);
+                var windowRect = new Rect(rect.x, rect.y, rect.width, _windowHeight);
                 DrawDragAndDropWindow(initialGUIColor, windowRect, "+");
                 DropOperation(windowRect);
                 rect.y += _windowHeight + CustomEditorGUI.SingleLineHeight;
@@ -74,19 +73,17 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
         {
             Rect rectField = totalRect;
             rectField.width -= 14;
-            
+
             _group.SceneReferences[index].SceneAsset = (SceneAsset)CustomEditorGUI.ObjectField(
                 new Rect(rectField.x, rectField.y, rectField.width, EditorGUIUtility.singleLineHeight),
                 null, _group.SceneReferences[index].SceneAsset, typeof(SceneAsset));
-            
-            Rect iconRect = new Rect(rectField.x + rectField.width + 2, rectField.y + 2, 14, 14);
 
-            if (CustomEditorGUI.DrawIcon(iconRect, StyleName.IconButtonMinus, EditorColors.Instance.Red) || Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp) //rename OK button
+            var iconRect = new Rect(rectField.x + rectField.width + 2, rectField.y + 2, 14, 14);
+
+            if (CustomEditorGUI.DrawIcon(iconRect, StyleName.IconButtonMinus, EditorColors.Instance.Red) ||
+                (Event.current.keyCode == KeyCode.Return && Event.current.type == EventType.KeyUp)) //rename OK button
             {
-                EditorApplication.delayCall += () =>
-                {
-                    _group.SceneReferences.RemoveAt(index);
-                };
+                EditorApplication.delayCall += () => { _group.SceneReferences.RemoveAt(index); };
 
                 Event.current.Use();
             }
@@ -95,7 +92,7 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
         private void DrawHeader(Rect rect)
         {
             CustomEditorGUI.Label(rect, "Scenes", CustomEditorGUI.GetStyle(StyleName.LabelFoldout));
-            
+
             DrawPlusButton(rect);
         }
 
@@ -162,16 +159,16 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.SceneTypeSystem
         {
             Rect buttonRect = rect;
             buttonRect.x += rect.width - EditorGUIUtility.singleLineHeight - 3;
-			
+
             Color color = GUI.color;
             var menuRect = new Rect(buttonRect.x, buttonRect.y + 2f, 14, 14);
-            
+
             if (CustomEditorGUI.DrawIcon(menuRect, StyleName.IconButtonPlus, EditorColors.Instance.Green))
             {
                 _group.SceneReferences.Add(new SceneReference());
                 Event.current.Use();
             }
-            
+
             GUI.color = color;
         }
     }

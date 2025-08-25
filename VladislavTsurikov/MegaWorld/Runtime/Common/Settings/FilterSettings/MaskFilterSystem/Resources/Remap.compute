@@ -13,29 +13,29 @@ float InverseLerp(float a, float b, float t)
 
 float GetHeightScale(float height)
 {
-	return saturate((height - HeightRange.x) / (HeightRange.y - HeightRange.x));
+    return saturate((height - HeightRange.x) / (HeightRange.y - HeightRange.x));
 }
 
 #pragma kernel Remap
 [numthreads(1, 1, 1)]
 void Remap(uint3 id : SV_DispatchThreadID)
 {
-	float heightScale = GetHeightScale(In_BaseMaskTex[id.xy]);
+    float heightScale = GetHeightScale(In_BaseMaskTex[id.xy]);
 
     float value;
 
-    if (heightScale < RemapMin) 
+    if (heightScale < RemapMin)
     {
         value = 0;
     }
-    else if(heightScale > RemapMax)
+    else if (heightScale > RemapMax)
     {
         value = 1;
     }
     else
-	{
+    {
         value = InverseLerp(RemapMin, RemapMax, heightScale);
-	}
+    }
 
     OutputTex[id.xy] = value;
 }

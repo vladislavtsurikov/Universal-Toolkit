@@ -6,6 +6,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
     public static class EditorAndRuntimeUpdate
     {
         public delegate void UpdateEvent();
+
         private static UpdateEvent _update;
 
         static EditorAndRuntimeUpdate()
@@ -21,33 +22,24 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 #endif
             }
         }
-        
+
         public static void AddUpdateFunction(UpdateEvent function)
         {
             _update -= function;
             _update += function;
         }
-        
-        public static void RemoveUpdateFunction(UpdateEvent function)
-        {
-            _update -= function;
-        }
+
+        public static void RemoveUpdateFunction(UpdateEvent function) => _update -= function;
 
 #if UNITY_EDITOR
-        private static void EditorUpdate()
-        {
-            _update?.Invoke();
-        }
+        private static void EditorUpdate() => _update?.Invoke();
 #endif
-        
+
         [MonoBehaviourName("Universal Toolkit Runtime Update")]
         [DontDestroyOnLoad]
         public class UniversalToolkitRuntimeUpdate : MonoBehaviourSingleton<UniversalToolkitRuntimeUpdate>
         {
-            private void Update()
-            {
-                _update?.Invoke();
-            }
+            private void Update() => _update?.Invoke();
         }
     }
 }

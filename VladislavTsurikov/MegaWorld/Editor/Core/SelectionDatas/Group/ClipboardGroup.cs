@@ -4,30 +4,28 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas;
+using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Editor;
-using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
-using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 {
     public class ClipboardGroup : ClipboardObject
     {
-        private ClipboardStack<Runtime_Core_Component> _clipboardGroupGeneralComponentStack;
-        private ClipboardStack<Runtime_Core_Component> _clipboardGroupComponentStack;
+        private readonly ClipboardStack<Runtime_Core_Component> _clipboardGroupComponentStack;
+        private readonly ClipboardStack<Runtime_Core_Component> _clipboardGroupGeneralComponentStack;
 
         public ClipboardGroup(Type toolType, Type prototypeType) : base(prototypeType, toolType)
         {
             _clipboardGroupGeneralComponentStack = new ClipboardStack<Runtime_Core_Component>();
             _clipboardGroupComponentStack = new ClipboardStack<Runtime_Core_Component>();
         }
-        
+
         protected override void Copy(List<IHasElementStack> objects)
         {
             _clipboardGroupGeneralComponentStack.Copy(GetGeneralStacks(objects));
@@ -48,38 +46,37 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 
         private List<Runtime_Core_Component> GetAllCopiedComponent()
         {
-            List<Runtime_Core_Component> copiedComponents = (List<Runtime_Core_Component>)_clipboardGroupGeneralComponentStack.CopiedComponentList;
+            var copiedComponents =
+                (List<Runtime_Core_Component>)_clipboardGroupGeneralComponentStack.CopiedComponentList;
             copiedComponents.AddRange(_clipboardGroupComponentStack.CopiedComponentList);
             return copiedComponents;
         }
 
         private List<AdvancedComponentStack<Runtime_Core_Component>> GetGeneralStacks(List<IHasElementStack> objects)
         {
-            List<AdvancedComponentStack<Runtime_Core_Component>> stacks = new List<AdvancedComponentStack<Runtime_Core_Component>>();
+            var stacks = new List<AdvancedComponentStack<Runtime_Core_Component>>();
 
-            foreach (var obj in objects)
+            foreach (IHasElementStack obj in objects)
             {
                 stacks.Add(obj.ComponentStackManager.GeneralComponentStack);
             }
-            
+
             return stacks;
         }
-        
+
         private List<AdvancedComponentStack<Runtime_Core_Component>> GetStacks(List<IHasElementStack> objects)
         {
-            List<AdvancedComponentStack<Runtime_Core_Component>> stacks = new List<AdvancedComponentStack<Runtime_Core_Component>>();
+            var stacks = new List<AdvancedComponentStack<Runtime_Core_Component>>();
 
-            foreach (var obj in objects)
+            foreach (IHasElementStack obj in objects)
+            foreach (ToolComponentStack toolComponentStack in obj.ComponentStackManager.ToolsComponentStack.ElementList)
             {
-                foreach (var toolComponentStack in obj.ComponentStackManager.ToolsComponentStack.ElementList)
+                if (toolComponentStack.ToolType == ToolType)
                 {
-                    if (toolComponentStack.ToolType == ToolType)
-                    {
-                        stacks.Add(toolComponentStack.ComponentStack);
-                    }
+                    stacks.Add(toolComponentStack.ComponentStack);
                 }
             }
-            
+
             return stacks;
         }
 
@@ -87,29 +84,33 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
         {
             if (AllowMenu(selectedData))
             {
-                if(selectedData.HasOneSelectedGroup())
+                if (selectedData.HasOneSelectedGroup())
                 {
-                    menu.AddItem(new GUIContent("Copy All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => 
-                        Copy(new List<IHasElementStack>{ selectedData.SelectedGroup })));
+                    menu.AddItem(new GUIContent("Copy All Settings"), false, ContextMenuUtility.ContextMenuCallback,
+                        new Action(() =>
+                            Copy(new List<IHasElementStack> { selectedData.SelectedGroup })));
                 }
 
-                if(GetAllCopiedComponent().Count != 0)
+                if (GetAllCopiedComponent().Count != 0)
                 {
-                    menu.AddItem(new GUIContent("Paste All Settings"), false, ContextMenuUtility.ContextMenuCallback, new Action(() => 
-                        ClipboardAction(new List<IHasElementStack>(selectedData.SelectedGroupList), true)));
+                    menu.AddItem(new GUIContent("Paste All Settings"), false, ContextMenuUtility.ContextMenuCallback,
+                        new Action(() =>
+                            ClipboardAction(new List<IHasElementStack>(selectedData.SelectedGroupList), true)));
 
                     foreach (Runtime_Core_Component component in GetAllCopiedComponent())
                     {
                         NameAttribute nameAttribute = component.GetType().GetAttribute<NameAttribute>();
-                        
+
                         if (nameAttribute == null)
                         {
                             Debug.Log("MenuItem is not found for " + component.Name);
                             continue;
                         }
-                        
-                        menu.AddItem(new GUIContent("Paste Settings/" + nameAttribute.Name), false, ContextMenuUtility.ContextMenuCallback, 
-                            new Action(() => ClipboardAction(new List<IHasElementStack>(selectedData.SelectedGroupList), component.GetType(), true)));	
+
+                        menu.AddItem(new GUIContent("Paste Settings/" + nameAttribute.Name), false,
+                            ContextMenuUtility.ContextMenuCallback,
+                            new Action(() => ClipboardAction(new List<IHasElementStack>(selectedData.SelectedGroupList),
+                                component.GetType(), true)));
                     }
                 }
             }
@@ -117,19 +118,21 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group
 
         private bool AllowMenu(SelectedData selectedData)
         {
-            if(selectedData.HasOneSelectedGroup())
+            if (selectedData.HasOneSelectedGroup())
             {
-                if(selectedData.SelectedGroup.ComponentStackManager.GetAllElementTypes(ToolType, PrototypeType).Count == 0)
+                if (selectedData.SelectedGroup.ComponentStackManager.GetAllElementTypes(ToolType, PrototypeType)
+                        .Count == 0)
                 {
                     return false;
                 }
             }
-            
-            if(selectedData.HasOneSelectedGroup())
+
+            if (selectedData.HasOneSelectedGroup())
             {
                 return true;
             }
-            else if (GroupUtility.GetGeneralPrototypeType(selectedData.SelectedGroupList) != null)
+
+            if (GroupUtility.GetGeneralPrototypeType(selectedData.SelectedGroupList) != null)
             {
                 return true;
             }

@@ -8,23 +8,23 @@ using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.ComponentStack.Editor.Core
 {
-    public static class AllEditorTypes<T> where T: Element
+    public static class AllEditorTypes<T> where T : Element
     {
-        public static Dictionary<Type, Type> Types = new Dictionary<Type, Type>(); // ElementType => EditorType
+        public static Dictionary<Type, Type> Types = new(); // ElementType => EditorType
 
         static AllEditorTypes()
         {
-            List<Type> componentTypes = AllTypesDerivedFrom<T>.Types.ToList();
+            var componentTypes = AllTypesDerivedFrom<T>.Types.ToList();
 
-            var editorTypes = AllTypesDerivedFrom<ElementEditor>.Types
+            IEnumerable<Type> editorTypes = AllTypesDerivedFrom<ElementEditor>.Types
                 .Where(
                     t => t.IsDefined(typeof(ElementEditorAttribute), false)
                          && !t.IsAbstract
                 );
-            
-            foreach (var type in editorTypes)
+
+            foreach (Type type in editorTypes)
             {
-                var attribute = type.GetAttribute<ElementEditorAttribute>();
+                ElementEditorAttribute attribute = type.GetAttribute<ElementEditorAttribute>();
 
                 if (componentTypes.Contains(attribute.SettingsType))
                 {

@@ -2,9 +2,9 @@
 using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
-using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.EditorColors;
 using VladislavTsurikov.UIElementsUtility.Runtime.Core;
+using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
 {
@@ -17,18 +17,15 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
     ]
     public class EditorSelectableColorPalette : DataGroup<EditorSelectableColorPalette, EditorSelectableColorInfo>
     {
-        internal void AddNewItem() =>
-            _items.Insert(0, new EditorSelectableColorInfo());
+        internal void AddNewItem() => _items.Insert(0, new EditorSelectableColorInfo());
 
-        internal void SortByColorName() =>
-            _items = _items.OrderBy(item => item.ColorName).ToList();
+        internal void SortByColorName() => _items = _items.OrderBy(item => item.ColorName).ToList();
 
-        internal void SortByHue() =>
-            _items = _items.OrderByDescending(item => item.Normal.ColorOnDark.Hue()).ToList();
+        internal void SortByHue() => _items = _items.OrderByDescending(item => item.Normal.ColorOnDark.Hue()).ToList();
 
         internal EditorSelectableColorInfo GetSelectableColorInfo(string colorName, bool debuggable = false)
         {
-            string cleanName = colorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
+            var cleanName = colorName.RemoveWhitespaces().RemoveAllSpecialCharacters();
 
             _items = _items.Where(item => item != null).ToList();
 
@@ -53,6 +50,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
             {
                 return editorSelectableColorInfo.GetColor(state);
             }
+
             Debug.LogWarning($"SelectableColor '{colorName}' not found! Returned Color.magenta");
             return Color.magenta;
         }
@@ -64,6 +62,7 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors
             {
                 return editorSelectableColorInfo.GetThemeColor(state);
             }
+
             Debug.LogWarning($"SelectableColor '{colorName}' not found! Returned null");
             return null;
         }

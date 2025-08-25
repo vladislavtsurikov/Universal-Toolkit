@@ -9,7 +9,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
         public override IEnumerable<ResourceLoader> GetLoaders()
         {
-            var allTypes = AppDomain.CurrentDomain.GetAssemblies()
+            IEnumerable<Type> allTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(t =>
                     t.IsClass &&
@@ -17,7 +17,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
                     typeof(ResourceLoader).IsAssignableFrom(t) &&
                     t.HasParameterlessConstructor());
 
-            foreach (var type in allTypes)
+            foreach (Type type in allTypes)
             {
                 yield return (ResourceLoader)Activator.CreateInstance(type);
             }

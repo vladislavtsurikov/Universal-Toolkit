@@ -1,11 +1,9 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
-using VladislavTsurikov.UIElementsUtility.Runtime;
 using VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport;
 
 namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
@@ -13,29 +11,31 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
     [Serializable]
     public class EditorWorldSpaceUIDocumentSupport
     {
-        private WorldSpaceUIDocument _worldSpaceUIDocument;
-        [HideInInspector]
-        [SerializeField] 
-        private UIDocument _uiDocument;
-        
-        [SerializeField]
-        private WorldSpacePanelSettings _worldSpacePanelSettings = new WorldSpacePanelSettings();
-        [SerializeField]
-        private WorldSpaceRenderTexture _worldSpaceRenderTexture = new WorldSpaceRenderTexture();
-        
         private const float DelayBeforeUpdateRenderTextureResolution = 0.1f;
-        private Coroutine _delayedUpdateRenderTextureResolutionCoroutine;
-        
-        [SerializeField]
-        private Vector2Int _resolution;
-        
-        private MeshFilter _meshFilter;
-        private MeshRenderer _meshRenderer;
-        private MeshCollider _meshCollider;
+
+        public const string AssetsFolderName = "WorldSpaceUI";
 
         private static readonly int _mainTex = Shader.PropertyToID("_MainTex");
-        
-        public const string AssetsFolderName = "WorldSpaceUI";
+
+        [HideInInspector]
+        [SerializeField]
+        private UIDocument _uiDocument;
+
+        [SerializeField]
+        private WorldSpacePanelSettings _worldSpacePanelSettings = new();
+
+        [SerializeField]
+        private WorldSpaceRenderTexture _worldSpaceRenderTexture = new();
+
+        [SerializeField]
+        private Vector2Int _resolution;
+
+        private Coroutine _delayedUpdateRenderTextureResolutionCoroutine;
+        private MeshCollider _meshCollider;
+
+        private MeshFilter _meshFilter;
+        private MeshRenderer _meshRenderer;
+        private WorldSpaceUIDocument _worldSpaceUIDocument;
 
         public Vector2Int Resolution
         {
@@ -46,15 +46,16 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
                 {
                     return;
                 }
-                
+
                 _resolution = value;
-                
+
                 if (_delayedUpdateRenderTextureResolutionCoroutine != null)
                 {
                     _worldSpaceUIDocument.StopCoroutine(_delayedUpdateRenderTextureResolutionCoroutine);
                 }
 
-                _delayedUpdateRenderTextureResolutionCoroutine = _worldSpaceUIDocument.StartCoroutine(DelayedUpdateRenderTextureResolution());
+                _delayedUpdateRenderTextureResolutionCoroutine =
+                    _worldSpaceUIDocument.StartCoroutine(DelayedUpdateRenderTextureResolution());
             }
         }
 
@@ -65,23 +66,23 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
 
             if (_resolution == Vector2Int.zero)
             {
-                var localScale = worldSpaceUIDocument.transform.localScale;
+                Vector3 localScale = worldSpaceUIDocument.transform.localScale;
                 _resolution = new Vector2Int((int)(localScale.x * 100), (int)(localScale.y * 100));
             }
 
             SetupAssets();
             SetupMeshComponents();
         }
-        
+
         private void SetupMeshComponents()
         {
             _meshCollider = _worldSpaceUIDocument.GetComponent<MeshCollider>();
             _meshFilter = _worldSpaceUIDocument.GetComponent<MeshFilter>();
             _meshRenderer = _worldSpaceUIDocument.GetComponent<MeshRenderer>();
-        
-            var mesh = UnityEngine.Resources.GetBuiltinResource<Mesh>("Quad.fbx");
+
+            Mesh mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
             var material = new Material(Shader.Find("Unlit/Transparent"));
-        
+
             _meshCollider.sharedMesh = mesh;
             _meshFilter.mesh = mesh;
 
@@ -89,17 +90,17 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
             _meshRenderer.sharedMaterial = material;
             _meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
         }
-    
+
         private void SetupAssets()
         {
             _worldSpaceRenderTexture.Setup(_resolution);
             _worldSpacePanelSettings.Setup(_uiDocument, _resolution, _worldSpaceRenderTexture.TargetRenderTexture);
         }
-        
+
         private IEnumerator DelayedUpdateRenderTextureResolution()
         {
             yield return new WaitForSecondsRealtime(DelayBeforeUpdateRenderTextureResolution);
-            
+
             if (_uiDocument != null && _uiDocument.panelSettings != null)
             {
                 _uiDocument.panelSettings.referenceResolution = _resolution;
@@ -109,9 +110,10 @@ namespace VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport
 
             if (!_worldSpacePanelSettings.CreatePanelSettingsIfNecessary())
             {
-                _worldSpacePanelSettings.PanelSettings.UpdatePanelSettingsToWorldSpaceSupport(_resolution, _worldSpaceRenderTexture.TargetRenderTexture);
+                _worldSpacePanelSettings.PanelSettings.UpdatePanelSettingsToWorldSpaceSupport(_resolution,
+                    _worldSpaceRenderTexture.TargetRenderTexture);
             }
-            
+
             if (_meshRenderer != null && _meshRenderer.sharedMaterial != null)
             {
                 _meshRenderer.sharedMaterial.SetTexture(_mainTex, _worldSpaceRenderTexture.TargetRenderTexture);

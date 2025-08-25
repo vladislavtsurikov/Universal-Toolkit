@@ -7,11 +7,8 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
 {
     public class ButtonSelector : FieldSelector
     {
-        public override bool IsValidFieldType(Type fieldType)
-        {
-            return fieldType == typeof(Button);
-        }
-        
+        public override bool IsValidFieldType(Type fieldType) => fieldType == typeof(Button);
+
         public Button ResolveButton(DiContainer diContainer)
         {
             if (DeclaringType == null)
@@ -20,7 +17,7 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
                 return null;
             }
 
-            object view = diContainer.Resolve(DeclaringType);
+            var view = diContainer.Resolve(DeclaringType);
             return ResolveButtonFromView(view);
         }
 
@@ -41,9 +38,6 @@ namespace QuestsSystem.IntegrationActionFlow.Pointer
             return button;
         }
 
-        private Button GetButton(object target)
-        {
-            return GetFieldValue(target) as Button;
-        }
+        private Button GetButton(object target) => GetFieldValue(target) as Button;
     }
 }

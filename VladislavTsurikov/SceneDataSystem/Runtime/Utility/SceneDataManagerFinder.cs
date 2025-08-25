@@ -12,13 +12,13 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
         public static SceneDataManager Find(Scene scene, bool getActive = true)
         {
             Profiler.BeginSample("FindSceneDataManager");
-            
+
             if (!scene.isLoaded)
             {
                 Profiler.EndSample();
                 return null;
             }
-            
+
             GameObject[] gameObjects = scene.GetRootGameObjects();
 
             foreach (GameObject go in gameObjects)
@@ -30,27 +30,27 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                         continue;
                     }
                 }
-                
+
                 Object obj = go.GetComponentInChildren(typeof(SceneDataManager));
-                if(obj != null)
+                if (obj != null)
                 {
-                    SceneDataManager sceneDataManager = (SceneDataManager)obj;
+                    var sceneDataManager = (SceneDataManager)obj;
                     if (!sceneDataManager.IsSetup)
                     {
-                        sceneDataManager.Setup(); 
+                        sceneDataManager.Setup();
                     }
-                    
+
                     Profiler.EndSample();
 
                     return sceneDataManager;
                 }
             }
-            
+
             Profiler.EndSample();
 
             return null;
         }
-        
+
         public static List<SceneDataManager> OverlapSphere(Vector3 center, float radius, string sectorLayerTag = null)
         {
             if (SceneManager.sceneCount == 1)
@@ -58,9 +58,9 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 return new List<SceneDataManager> { SectorLayerManager.ActiveSceneSector.SceneDataManager };
             }
 
-            List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
+            var sceneDataManagers = new List<SceneDataManager>();
 
-            foreach (var sector in FindSector.OverlapSphere(center, radius, sectorLayerTag))
+            foreach (Sector sector in FindSector.OverlapSphere(center, radius, sectorLayerTag))
             {
                 if (sector.IsLoaded)
                 {
@@ -76,16 +76,17 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             return sceneDataManagers;
         }
 
-        public static List<SceneDataManager> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation, string sectorLayerTag = null)
+        public static List<SceneDataManager> OverlapBox(Vector3 boxCenter, Vector3 boxSize, Quaternion boxRotation,
+            string sectorLayerTag = null)
         {
             if (SceneManager.sceneCount == 1)
             {
                 return new List<SceneDataManager> { SectorLayerManager.ActiveSceneSector.SceneDataManager };
-            } 
-            
-            List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
-            
-            foreach (var sector in FindSector.OverlapBox(boxCenter, boxSize, boxRotation, sectorLayerTag))
+            }
+
+            var sceneDataManagers = new List<SceneDataManager>();
+
+            foreach (Sector sector in FindSector.OverlapBox(boxCenter, boxSize, boxRotation, sectorLayerTag))
             {
                 if (sector.IsLoaded)
                 {
@@ -100,17 +101,17 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
             return sceneDataManagers;
         }
-        
+
         public static List<SceneDataManager> OverlapPosition(Vector3 position, string sectorLayerTag, bool objectBounds)
         {
             if (SceneManager.sceneCount == 1)
             {
                 return new List<SceneDataManager> { SectorLayerManager.ActiveSceneSector.SceneDataManager };
-            } 
-            
-            List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
-            
-            foreach (var sector in FindSector.OverlapPosition(position, sectorLayerTag, objectBounds))
+            }
+
+            var sceneDataManagers = new List<SceneDataManager>();
+
+            foreach (Sector sector in FindSector.OverlapPosition(position, sectorLayerTag, objectBounds))
             {
                 if (sector.IsLoaded)
                 {
@@ -131,39 +132,35 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
             if (SceneManager.sceneCount == 1)
             {
                 return new List<SceneDataManager> { SectorLayerManager.ActiveSceneSector.SceneDataManager };
-            } 
-            
-            List<SceneDataManager> sceneDataManagers = new List<SceneDataManager>();
-            
+            }
+
+            var sceneDataManagers = new List<SceneDataManager>();
+
             List<SectorLayer> sectorLayers = SectorLayer.GetCurrentSectorLayers(sectorLayerTag);
 
             if (sectorLayers == null)
             {
                 return sceneDataManagers;
             }
-            
-            foreach (var sectorLayer in sectorLayers)
-            {
-                foreach (var sector in sectorLayer.ObjectBoundsBVHTree.RaycastAll(ray))
-                {
-                    if (sector.IsLoaded)
-                    {
-                        SceneDataManager sceneDataManager = sector.SceneDataManager;
 
-                        if (sceneDataManager != null)
-                        {
-                            sceneDataManagers.Add(sector.SceneDataManager);
-                        }
+            foreach (SectorLayer sectorLayer in sectorLayers)
+            foreach (Sector sector in sectorLayer.ObjectBoundsBVHTree.RaycastAll(ray))
+            {
+                if (sector.IsLoaded)
+                {
+                    SceneDataManager sceneDataManager = sector.SceneDataManager;
+
+                    if (sceneDataManager != null)
+                    {
+                        sceneDataManagers.Add(sector.SceneDataManager);
                     }
                 }
             }
 
             return sceneDataManagers;
         }
-        
-        public static SceneDataManager GetSceneDataManagerFromActiveScene()
-        {
-            return SectorLayerManager.ActiveSceneSector.SceneDataManager;
-        }
+
+        public static SceneDataManager GetSceneDataManagerFromActiveScene() =>
+            SectorLayerManager.ActiveSceneSector.SceneDataManager;
     }
 }

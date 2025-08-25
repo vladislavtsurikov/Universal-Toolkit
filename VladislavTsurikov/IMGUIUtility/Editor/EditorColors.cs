@@ -12,6 +12,19 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
     {
         private static EditorColors instance;
 
+        public Color redNormal = new Color().From256(255, 0, 66);
+        public Color greenNormal = new Color().From256(0, 255, 131);
+        public Color redDark = new Color().From256(128, 12, 34);
+        public Color greenDark = new Color().From256(0, 115, 59);
+
+        public Color orangeNormal = new Color().From256(255, 145, 0);
+        public Color orangeDark = new Color().From256(128, 73, 0);
+
+        public Color docsButtonColor = new(0.89f, 0.74f, 0.3f, 1f);
+        public Color docsLabelColor = Color.gray;
+
+        public Color separatorColor = new Color32(127, 127, 127, 255);
+
         public static EditorColors Instance
         {
             get
@@ -20,39 +33,12 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return instance;
                 }
-                
-                instance = AssetDatabase.LoadAssetAtPath<EditorColors>(CommonPath.CombinePath(IMGUIContentPath.Path, "EditorColors.asset"));
+
+                instance = AssetDatabase.LoadAssetAtPath<EditorColors>(CommonPath.CombinePath(IMGUIContentPath.Path,
+                    "EditorColors.asset"));
                 return instance;
             }
         }
-
-        public Color redNormal = new Color().From256(255, 0, 66);
-    	public Color greenNormal = new Color().From256(0, 255, 131);
-    	public Color redDark = new Color().From256(128, 12, 34);
-    	public Color greenDark = new Color().From256(0, 115, 59);
-
-    	public Color orangeNormal = new Color().From256(255, 145, 0);
-    	public Color orangeDark = new Color().From256(128, 73, 0);
-
-        public Color docsButtonColor = new Color(0.89f, 0.74f, 0.3f, 1f);
-        public Color docsLabelColor = Color.gray;
-
-        #region LightTheme
-		public Color labelColorLightTheme = new Color(0f, 0f, 0f, 1f);
-        public Color clickButtonColorLightTheme = new Color(0.95f, 0.95f, 0.95f, 1f);
-        public Color toggleButtonActiveColorLightTheme = new Color(0.26f, 0.6f, 0.83f, 1f);
-        public Color toggleButtonInactiveColorLightTheme = new Color(0.95f, 0.95f, 0.95f, 1f);
-        public Color boxColorLightTheme = new Color(0.8f, 0.8f, 0.8f, 1f);
-        #endregion
-
-        
-        #region DarkTheme
-        public Color labelColorDarkTheme = new Color(0.9f, 0.9f, 0.9f, 1f);
-        public Color clickButtonColorDarkTheme = new Color(0.3f, 0.3f, 0.3f, 1f);
-        public Color toggleButtonActiveColorDarkTheme = new Color(0.22f, 0.52f, 0.71f, 1f);
-        public Color toggleButtonInactiveColorDarkTheme = new Color(0.3f, 0.3f, 0.3f, 1f);
-        public Color boxColorDarkTheme = new Color(0.3f, 0.3f, 0.3f, 1f);
-        #endregion        
 
         public Color Green
         {
@@ -61,12 +47,9 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 if (EditorGUIUtility.isProSkin)
                 {
                     return greenNormal;
-                    
                 }
-                else
-                {
-                    return greenDark;
-                }
+
+                return greenDark;
             }
         }
 
@@ -78,10 +61,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return redNormal;
                 }
-                else
-                {
-                    return redDark;
-                }
+
+                return redDark;
             }
         }
 
@@ -93,10 +74,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return labelColorDarkTheme;
                 }
-                else
-                {
-                    return labelColorLightTheme;
-                }
+
+                return labelColorLightTheme;
             }
         }
 
@@ -108,10 +87,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return clickButtonColorDarkTheme;
                 }
-                else
-                {
-                    return clickButtonColorLightTheme;
-                }
+
+                return clickButtonColorLightTheme;
             }
         }
 
@@ -123,10 +100,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return toggleButtonActiveColorDarkTheme;
                 }
-                else
-                {
-                    return toggleButtonActiveColorLightTheme;
-                }
+
+                return toggleButtonActiveColorLightTheme;
             }
         }
 
@@ -138,10 +113,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return toggleButtonInactiveColorDarkTheme;
                 }
-                else
-                {
-                    return toggleButtonInactiveColorLightTheme;
-                }
+
+                return toggleButtonInactiveColorLightTheme;
             }
         }
 
@@ -153,26 +126,43 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
                 {
                     return boxColorDarkTheme;
                 }
-                else
-                {
-                    return boxColorLightTheme;
-                }
+
+                return boxColorLightTheme;
             }
         }
 
-        public Color separatorColor = new Color32(127, 127, 127, 255);
+        #region LightTheme
+
+        public Color labelColorLightTheme = new(0f, 0f, 0f, 1f);
+        public Color clickButtonColorLightTheme = new(0.95f, 0.95f, 0.95f, 1f);
+        public Color toggleButtonActiveColorLightTheme = new(0.26f, 0.6f, 0.83f, 1f);
+        public Color toggleButtonInactiveColorLightTheme = new(0.95f, 0.95f, 0.95f, 1f);
+        public Color boxColorLightTheme = new(0.8f, 0.8f, 0.8f, 1f);
+
+        #endregion
+
+
+        #region DarkTheme
+
+        public Color labelColorDarkTheme = new(0.9f, 0.9f, 0.9f, 1f);
+        public Color clickButtonColorDarkTheme = new(0.3f, 0.3f, 0.3f, 1f);
+        public Color toggleButtonActiveColorDarkTheme = new(0.22f, 0.52f, 0.71f, 1f);
+        public Color toggleButtonInactiveColorDarkTheme = new(0.3f, 0.3f, 0.3f, 1f);
+        public Color boxColorDarkTheme = new(0.3f, 0.3f, 0.3f, 1f);
+
+        #endregion
     }
 
     [CustomEditor(typeof(EditorColors))]
     public class EditorColorsEditor : UnityEditor.Editor
     {
-        protected readonly Dictionary<string, SerializedProperty> SerializedProperties = new Dictionary<string, SerializedProperty>();
+        protected readonly Dictionary<string, SerializedProperty> SerializedProperties = new();
 
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            GUIStyle labelStyle = new GUIStyle("Label") { fontStyle = FontStyle.Italic };
+            var labelStyle = new GUIStyle("Label") { fontStyle = FontStyle.Italic };
 
             if (EditorGUIUtility.isProSkin)
             {
@@ -185,7 +175,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
             EditorGUILayout.LabelField("Colors", labelStyle);
             EditorGUILayout.Space(3);
-            
+
 
             EditorGUILayout.PropertyField(GetProperty("redNormal"), new GUIContent("Red Normal"), true);
             EditorGUILayout.PropertyField(GetProperty("greenNormal"), new GUIContent("Green Normal"), true);
@@ -197,15 +187,18 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
             EditorGUILayout.PropertyField(GetProperty("docsButtonColor"), new GUIContent("Docs Button Color"), true);
             EditorGUILayout.PropertyField(GetProperty("docsLabelColor"), new GUIContent("Docs Label Color"), true);
-            
+
             EditorGUILayout.Space(3);
             EditorGUILayout.LabelField("Light Colors", labelStyle);
             EditorGUILayout.Space(3);
 
             EditorGUILayout.PropertyField(GetProperty("labelColorLightTheme"), new GUIContent("Label"), true);
-            EditorGUILayout.PropertyField(GetProperty("clickButtonColorLightTheme"), new GUIContent("Click Button Color"), true);
-            EditorGUILayout.PropertyField(GetProperty("toggleButtonActiveColorLightTheme"), new GUIContent("Toggle Button Active Color"), true);
-            EditorGUILayout.PropertyField(GetProperty("toggleButtonInactiveColorLightTheme"), new GUIContent("Toggle Button Inactive Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("clickButtonColorLightTheme"),
+                new GUIContent("Click Button Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("toggleButtonActiveColorLightTheme"),
+                new GUIContent("Toggle Button Active Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("toggleButtonInactiveColorLightTheme"),
+                new GUIContent("Toggle Button Inactive Color"), true);
             EditorGUILayout.PropertyField(GetProperty("boxColorLightTheme"), new GUIContent("Box Color"), true);
 
             EditorGUILayout.Space(3);
@@ -213,9 +206,12 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
             EditorGUILayout.Space(3);
 
             EditorGUILayout.PropertyField(GetProperty("labelColorDarkTheme"), new GUIContent("Label"), true);
-            EditorGUILayout.PropertyField(GetProperty("clickButtonColorDarkTheme"), new GUIContent("Click Button Color"), true);
-            EditorGUILayout.PropertyField(GetProperty("toggleButtonActiveColorDarkTheme"), new GUIContent("Toggle Button Active Color"), true);
-            EditorGUILayout.PropertyField(GetProperty("toggleButtonInactiveColorDarkTheme"), new GUIContent("Toggle Button Inactive Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("clickButtonColorDarkTheme"),
+                new GUIContent("Click Button Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("toggleButtonActiveColorDarkTheme"),
+                new GUIContent("Toggle Button Active Color"), true);
+            EditorGUILayout.PropertyField(GetProperty("toggleButtonInactiveColorDarkTheme"),
+                new GUIContent("Toggle Button Inactive Color"), true);
             EditorGUILayout.PropertyField(GetProperty("boxColorDarkTheme"), new GUIContent("Box Color"), true);
 
             EditorGUILayout.Space(3);
@@ -229,10 +225,18 @@ namespace VladislavTsurikov.IMGUIUtility.Editor
 
         protected SerializedProperty GetProperty(string propertyName)
         {
-            string key = propertyName;
-            if (SerializedProperties.ContainsKey(key)) return SerializedProperties[key];
+            var key = propertyName;
+            if (SerializedProperties.ContainsKey(key))
+            {
+                return SerializedProperties[key];
+            }
+
             SerializedProperty s = serializedObject.FindProperty(propertyName);
-            if (s == null) return null;
+            if (s == null)
+            {
+                return null;
+            }
+
             SerializedProperties.Add(key, s);
             return s;
         }

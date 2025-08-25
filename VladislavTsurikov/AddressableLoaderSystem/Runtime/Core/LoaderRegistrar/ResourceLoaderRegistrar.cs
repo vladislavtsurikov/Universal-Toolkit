@@ -8,7 +8,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 
         public void RegisterLoaders(ResourceLoaderManager manager)
         {
-            foreach (var loader in GetLoaders())
+            foreach (ResourceLoader loader in GetLoaders())
             {
                 manager.Register(loader);
             }

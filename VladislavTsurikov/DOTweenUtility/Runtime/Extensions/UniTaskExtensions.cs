@@ -14,7 +14,7 @@ namespace VladislavTsurikov.DOTweenUtility.Runtime
                 {
                     Debugger.LogInvalidTween(tween);
                 }
-                
+
                 return;
             }
 

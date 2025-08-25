@@ -10,7 +10,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             Transform[] childTransforms = gameObject.GetComponentsInChildren<Transform>();
             var allChildren = new List<GameObject>(childTransforms.Length);
 
-            foreach (var child in childTransforms)
+            foreach (Transform child in childTransforms)
             {
                 if (child.gameObject != gameObject)
                 {
@@ -26,7 +26,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             Transform[] childTransforms = gameObject.GetComponentsInChildren<Transform>();
             var allChildren = new List<GameObject>(childTransforms.Length);
 
-            foreach (var child in childTransforms)
+            foreach (Transform child in childTransforms)
             {
                 allChildren.Add(child.gameObject);
             }
@@ -38,9 +38,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         {
             Transform[] childTransforms = gameObject.GetComponentsInChildren<Transform>();
 
-            foreach (var child in childTransforms)
+            foreach (Transform child in childTransforms)
             {
-                if(GameObjectUtility.IsSameGameObject(child.gameObject, findGameObject, true))
+                if (GameObjectUtility.IsSameGameObject(child.gameObject, findGameObject, true))
                 {
                     return true;
                 }
@@ -79,7 +79,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             {
                 return skinnedRenderer.enabled;
             }
-            
+
             SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
@@ -90,31 +90,33 @@ namespace VladislavTsurikov.UnityUtility.Runtime
         }
 
         public static Bounds GetInstantiatedBounds(this GameObject prefab)
-		{
-			GameObject go = Object.Instantiate(prefab);
-			go.transform.position = prefab.transform.position;
-			Bounds bounds = new Bounds(go.transform.position, Vector3.zero);
-			foreach (Renderer r in go.GetComponentsInChildren<Renderer>())
-			{
-				bounds.Encapsulate(r.bounds);
-			}
-			foreach (Collider c in go.GetComponentsInChildren<Collider>())
-			{
-				bounds.Encapsulate(c.bounds);
-			}
-			Object.DestroyImmediate(go);
-			return bounds;
-		}
-        
+        {
+            GameObject go = Object.Instantiate(prefab);
+            go.transform.position = prefab.transform.position;
+            var bounds = new Bounds(go.transform.position, Vector3.zero);
+            foreach (Renderer r in go.GetComponentsInChildren<Renderer>())
+            {
+                bounds.Encapsulate(r.bounds);
+            }
+
+            foreach (Collider c in go.GetComponentsInChildren<Collider>())
+            {
+                bounds.Encapsulate(c.bounds);
+            }
+
+            Object.DestroyImmediate(go);
+            return bounds;
+        }
+
         public static Bounds GetObjectWorldBounds(this GameObject gameObject)
         {
-            Bounds worldBounds = new Bounds();
-            bool found = false;
+            var worldBounds = new Bounds();
+            var found = false;
 
-            for (int i = 0; i < gameObject.transform.childCount; i++)
+            for (var i = 0; i < gameObject.transform.childCount; i++)
             {
                 GameObject go = gameObject.transform.GetChild(i).gameObject;
-                
+
                 if (!go.activeInHierarchy)
                 {
                     continue;
@@ -150,9 +152,9 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 }
                 else if ((rectTransform = go.GetComponent<RectTransform>()) != null)
                 {
-                    Vector3[] fourCorners = new Vector3[4];
+                    var fourCorners = new Vector3[4];
                     rectTransform.GetWorldCorners(fourCorners);
-                    Bounds rectBounds = new Bounds();
+                    var rectBounds = new Bounds();
 
                     rectBounds.center = fourCorners[0];
                     rectBounds.Encapsulate(fourCorners[1]);
@@ -175,13 +177,12 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             {
                 return new Bounds(gameObject.transform.position, Vector3.one);
             }
-            else
-            {
-                return worldBounds;
-            }
+
+            return worldBounds;
         }
-        
-        public static void CopyTransform(this GameObject gameObject, GameObject copyGameObject, bool copyPosition = true)
+
+        public static void CopyTransform(this GameObject gameObject, GameObject copyGameObject,
+            bool copyPosition = true)
         {
             if (copyPosition)
             {
@@ -191,7 +192,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             gameObject.transform.rotation = copyGameObject.transform.rotation;
             gameObject.transform.localScale = copyGameObject.transform.localScale;
         }
-        
+
         public static void DisableMeshRenderers(this GameObject gameObject)
         {
             Renderer renderer = gameObject.GetComponent<Renderer>();
@@ -200,8 +201,8 @@ namespace VladislavTsurikov.UnityUtility.Runtime
             {
                 renderer.enabled = false;
             }
-            
-            for (int i = 0; i < gameObject.transform.childCount; i++)
+
+            for (var i = 0; i < gameObject.transform.childCount; i++)
             {
                 GameObject go = gameObject.transform.GetChild(i).gameObject;
 
@@ -218,7 +219,7 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 }
             }
         }
-        
+
         public static T InstantiateWithComponent<T>(this GameObject prefab, Transform parent = null) where T : Component
         {
             if (prefab == null)
@@ -227,22 +228,23 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                 return null;
             }
 
-            var instance = Object.Instantiate(prefab, parent);
-            var component = instance.GetComponent<T>();
+            GameObject instance = Object.Instantiate(prefab, parent);
+            T component = instance.GetComponent<T>();
 
             if (component == null)
             {
-                Debug.LogError($"GameObjectExtensions: Component of type {typeof(T).Name} not found in the instantiated prefab.");
+                Debug.LogError(
+                    $"GameObjectExtensions: Component of type {typeof(T).Name} not found in the instantiated prefab.");
                 Object.Destroy(instance);
                 return null;
             }
 
             return component;
         }
-        
+
         public static void ClearChildren(this GameObject parent)
         {
-            int children = parent.transform.childCount;
+            var children = parent.transform.childCount;
             for (var i = children - 1; i >= 0; i--)
             {
                 Object.Destroy(parent.transform.GetChild(i).gameObject);

@@ -1,25 +1,29 @@
 using System;
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.ColliderSystem.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Area;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.Utility;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using Random = System.Random;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
 {
     [Serializable]
-    public class BrushJitterSettings 
+    public class BrushJitterSettings
     {
         [OdinSerialize]
-        private float _brushSizeJitter;
+        private float _brushRotationJitter;
+
         [OdinSerialize]
         private float _brushScatter;
-        [OdinSerialize]
-        private float _brushRotationJitter;
+
         [OdinSerialize]
         private float _brushScatterJitter;
+
+        [OdinSerialize]
+        private float _brushSizeJitter;
 
         public float BrushSizeJitter
         {
@@ -27,14 +31,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
             set => _brushSizeJitter = Mathf.Clamp01(value);
         }
 
-        
+
         public float BrushScatter
         {
             get => _brushScatter;
             set => _brushScatter = Mathf.Clamp01(value);
         }
 
-        
+
         public float BrushRotationJitter
         {
             get => _brushRotationJitter;
@@ -49,31 +53,30 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.BrushSettings
 
         public BoxArea GetAreaVariables(BrushSettings brush, Vector3 point, Group group)
         {
-            System.Random rand = new System.Random(Time.frameCount);
-            
-            float size = brush.BrushSize;
+            var rand = new Random(Time.frameCount);
+
+            var size = brush.BrushSize;
             size -= brush.BrushRadius * BrushSizeJitter * (float)rand.NextDouble() * 2;
 
             float rotation = 0;
-            rotation += Mathf.Sign((float)rand.NextDouble() - 0.5f) * brush.BrushRotation * BrushRotationJitter * (float)rand.NextDouble();
+            rotation += Mathf.Sign((float)rand.NextDouble() - 0.5f) * brush.BrushRotation * BrushRotationJitter *
+                        (float)rand.NextDouble();
 
-            Vector3 scatterDir = new Vector3((float)(rand.NextDouble() * 2 - 1), 0, (float)(rand.NextDouble() * 2 - 1)).normalized;
-            float scatterLengthMultiplier = BrushScatter - (float)rand.NextDouble() * BrushScatterJitter;
-            float scatterLength = brush.BrushRadius * scatterLengthMultiplier;
+            Vector3 scatterDir = new Vector3((float)(rand.NextDouble() * 2 - 1), 0, (float)(rand.NextDouble() * 2 - 1))
+                .normalized;
+            var scatterLengthMultiplier = BrushScatter - (float)rand.NextDouble() * BrushScatterJitter;
+            var scatterLength = brush.BrushRadius * scatterLengthMultiplier;
 
             point += scatterDir * scatterLength;
 
             LayerSettings layerSettings = GlobalCommonComponentSingleton<LayerSettings>.Instance;
 
-            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(point), layerSettings.GetCurrentPaintLayers(group.PrototypeType));
+            RayHit rayHit = RaycastUtility.Raycast(RayUtility.GetRayDown(point),
+                layerSettings.GetCurrentPaintLayers(group.PrototypeType));
 
-            if(rayHit != null)
+            if (rayHit != null)
             {
-                BoxArea area = new BoxArea(rayHit, size)
-                {
-                    Rotation = rotation,
-                    Mask = brush.GetCurrentRaw()
-                };
+                var area = new BoxArea(rayHit, size) { Rotation = rotation, Mask = brush.GetCurrentRaw() };
 
                 return area;
             }

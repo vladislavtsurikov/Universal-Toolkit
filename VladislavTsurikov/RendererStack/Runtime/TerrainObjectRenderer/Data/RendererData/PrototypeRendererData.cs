@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using OdinSerializer;
 #if BillboardSystem
 using VladislavTsurikov.InstantRenderer.LargeObjectRenderer.Scripts.RendererData.BillboardSystem;
 #endif
@@ -14,8 +14,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
         private int _prototypeID;
 
         [NonSerialized]
-        public TemporaryInstances TemporaryInstances = new TemporaryInstances();
-        
+        public TemporaryInstances TemporaryInstances = new();
+
 #if BillboardSystem
         [NonSerialized]
         public CombinedImposterMesh CombinedImposterMesh = new CombinedImposterMesh();
@@ -24,12 +24,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
         public int PrototypeID => _prototypeID;
 
         [OdinSerialize]
-        public List<Instance> InstanceList = new List<Instance>();
-        
-        public PrototypeRendererData(int prototypeID)
-        {
-            _prototypeID = prototypeID;
-        }
+        public List<Instance> InstanceList = new();
+
+        public PrototypeRendererData(int prototypeID) => _prototypeID = prototypeID;
 
         public void Setup()
         {
@@ -42,18 +39,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
 
         public void ConvertPersistentDataToTemporaryData()
         {
-            if(TemporaryInstances == null)
+            if (TemporaryInstances == null)
             {
                 TemporaryInstances = new TemporaryInstances();
             }
-            
-            TemporaryInstances.ConvertPersistentDataToTemporaryData(InstanceList); 
+
+            TemporaryInstances.ConvertPersistentDataToTemporaryData(InstanceList);
 #if BillboardSystem
             CombinedImposterMesh.CreateImposterMesh(PrototypeID, this);
 #endif
         }
 
-        public void AddPersistentData(TerrainObjectInstance instance)  
+        public void AddPersistentData(TerrainObjectInstance instance)
         {
             Instance item;
             item.ID = instance.ID;
@@ -61,7 +58,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
             item.Rotation = instance.Rotation;
             item.Scale = instance.Scale;
             InstanceList.Add(item);
-            
+
             ModifiedPrototypeRenderDataStack.Add(this);
         }
 
@@ -71,16 +68,16 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
             {
                 return;
             }
-            
+
             InstanceList.Clear();
             ModifiedPrototypeRenderDataStack.Add(this);
         }
 
         public void RemovePersistentInstance(TerrainObjectInstance instance)
         {
-            for (int i = 0; i < InstanceList.Count; i++)
+            for (var i = 0; i < InstanceList.Count; i++)
             {
-                if(InstanceList[i].ID == instance.ID)
+                if (InstanceList[i].ID == instance.ID)
                 {
                     InstanceList.RemoveAt(i);
                     ModifiedPrototypeRenderDataStack.Add(this);
@@ -91,9 +88,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
 
         public void SyncPersistentRendererInstance(TerrainObjectInstance instance)
         {
-            for (int i = 0; i < InstanceList.Count; i++)
+            for (var i = 0; i < InstanceList.Count; i++)
             {
-                if(InstanceList[i].ID == instance.ID)
+                if (InstanceList[i].ID == instance.ID)
                 {
                     InstanceList[i] = Instance.ConvertToSerializableInstance(instance);
                     ModifiedPrototypeRenderDataStack.Add(this);
@@ -104,11 +101,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
 
         public void SetEnable(TerrainObjectInstance instance)
         {
-            for (int i = 0; i < InstanceList.Count; i++)
+            for (var i = 0; i < InstanceList.Count; i++)
             {
-                if(InstanceList[i].ID == instance.ID)
+                if (InstanceList[i].ID == instance.ID)
                 {
-                    if(instance.Enable)
+                    if (instance.Enable)
                     {
                         InstanceList.Add(Instance.ConvertToSerializableInstance(instance));
                     }
@@ -126,7 +123,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
         public void OnDisable()
         {
             TemporaryInstances?.DisposeUnmanagedMemory();
-            
+
 #if BillboardSystem
             CombinedImposterMesh?.Dispose();
 #endif

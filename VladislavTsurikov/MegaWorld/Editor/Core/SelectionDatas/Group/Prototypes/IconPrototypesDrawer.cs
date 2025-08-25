@@ -9,8 +9,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 {
     public class IconPrototypesDrawer : PrototypesDrawer
     {
+        private readonly IconStackEditor _iconStackEditor = new(true);
         private bool _selectPrototypeFoldout = true;
-        private readonly IconStackEditor _iconStackEditor = new IconStackEditor(true);
 
         public IconPrototypesDrawer(SelectionData selectionData, Type toolType) : base(selectionData, toolType)
         {
@@ -19,10 +19,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
         public override void OnGUI()
         {
             EditorGUILayout.BeginHorizontal();
-            
-            if(Data.SelectedData.SelectedGroup != null)
+
+            if (Data.SelectedData.SelectedGroup != null)
             {
-                _selectPrototypeFoldout = CustomEditorGUILayout.Foldout(_selectPrototypeFoldout, "Prototypes " + "(" + Data.SelectedData.SelectedGroup.GetPrototypeTypeName() + ")");
+                _selectPrototypeFoldout = CustomEditorGUILayout.Foldout(_selectPrototypeFoldout,
+                    "Prototypes " + "(" + Data.SelectedData.SelectedGroup.GetPrototypeTypeName() + ")");
             }
             else
             {
@@ -31,11 +32,11 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 
             EditorGUILayout.EndHorizontal();
 
-            if(_selectPrototypeFoldout)
+            if (_selectPrototypeFoldout)
             {
                 ++EditorGUI.indentLevel;
 
-                if(Data.SelectedData.SelectedGroup == null)
+                if (Data.SelectedData.SelectedGroup == null)
                 {
                     _iconStackEditor.OnGUI("To Draw Prototype, you need to select one group");
                 }
@@ -43,7 +44,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
                 {
                     _iconStackEditor.AddIconCallback = Data.SelectedData.SelectedGroup.AddMissingPrototype;
                     _iconStackEditor.IconMenuCallback = PrototypeMenu;
-                    _iconStackEditor.OnGUI(Data.SelectedData.SelectedGroup.PrototypeList, Data.SelectedData.SelectedGroup.PrototypeType);
+                    _iconStackEditor.OnGUI(Data.SelectedData.SelectedGroup.PrototypeList,
+                        Data.SelectedData.SelectedGroup.PrototypeType);
                 }
 
                 --EditorGUI.indentLevel;

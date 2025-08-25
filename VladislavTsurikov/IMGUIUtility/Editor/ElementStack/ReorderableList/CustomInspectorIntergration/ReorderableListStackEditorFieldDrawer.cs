@@ -4,21 +4,18 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.ReflectionUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.CustomInspector.Editor.IMGUI;
+using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
 {
     public class ReorderableListStackEditorFieldDrawer : IMGUIFieldDrawer
     {
-        private readonly Dictionary<object, object> _cachedEditors = new Dictionary<object, object>();
+        private readonly Dictionary<object, object> _cachedEditors = new();
 
-        public override bool CanDraw(Type type)
-        {
-            return type.TryGetGenericArgument(typeof(AdvancedComponentStack<>)) != null;
-        }
+        public override bool CanDraw(Type type) => type.TryGetGenericArgument(typeof(AdvancedComponentStack<>)) != null;
 
         public override object Draw(Rect rect, GUIContent label, Type fieldType, object value)
         {
@@ -34,7 +31,8 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
                 return null;
             }
 
-            Rect listRect = new Rect(rect.x, rect.y + EditorGUIUtility.singleLineHeight, rect.width, rect.height - EditorGUIUtility.singleLineHeight);
+            var listRect = new Rect(rect.x, rect.y + EditorGUIUtility.singleLineHeight, rect.width,
+                rect.height - EditorGUIUtility.singleLineHeight);
 
             MethodInfo onGuiMethod = collectionEditor.GetType().GetMethod(
                 "OnGUI",
@@ -46,14 +44,11 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             return value;
         }
 
-        public override bool ShouldCreateInstanceIfNull()
-        {
-            return true;
-        }
+        public override bool ShouldCreateInstanceIfNull() => true;
 
         public override float GetFieldsHeight(object target)
         {
-            if (!_cachedEditors.TryGetValue(target, out var collectionEditor) || 
+            if (!_cachedEditors.TryGetValue(target, out var collectionEditor) ||
                 collectionEditor.GetType().GetMethod("GetElementStackHeight") is not { } getHeightMethod)
             {
                 Debug.LogWarning("GetFieldsHeight: Missing collectionEditor or GetElementStackHeight method.");
@@ -67,7 +62,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
         {
             if (!_cachedEditors.TryGetValue(value, out var collectionEditor))
             {
-                var componentType = fieldType.TryGetGenericArgument(typeof(ComponentStack<>));
+                Type componentType = fieldType.TryGetGenericArgument(typeof(ComponentStack<>));
 
                 if (componentType == null)
                 {

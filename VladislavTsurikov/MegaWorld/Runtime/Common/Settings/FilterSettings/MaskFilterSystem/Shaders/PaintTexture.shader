@@ -1,95 +1,101 @@
 ﻿Shader "PaintTexture"
 {
-	Properties{ _MainTex("Texture", any) = "" {} }
+    Properties
+    {
+        _MainTex("Texture", any) = "" {}
+    }
 
-	SubShader{
-			
-		ZTest Always Cull Off ZWrite Off
+    SubShader
+    {
 
-		CGINCLUDE
-			#include "UnityCG.cginc"
-			#include "TerrainTool.cginc"
+        ZTest Always Cull Off ZWrite Off
+
+        CGINCLUDE
+        #include "UnityCG.cginc"
+        #include "TerrainTool.cginc"
 
 
-			sampler2D _MainTex;
-			float4 _MainTex_TexelSize;      // 1/width, 1/height, width, height
+        sampler2D _MainTex;
+        float4 _MainTex_TexelSize; // 1/width, 1/height, width, height
 
-			sampler2D _BrushTex;
-			sampler2D _FilterTex;
-            sampler2D _SourceAlphamapRenderTextureTex;
+        sampler2D _BrushTex;
+        sampler2D _FilterTex;
+        sampler2D _SourceAlphamapRenderTextureTex;
 
-			float4 _BrushParams;
-			#define BRUSH_STRENGTH      (_BrushParams[0])
-			#define BRUSH_TARGETHEIGHT  (_BrushParams[1])
-			
-			struct appdata_t {
-				float4 vertex : POSITION;
-				float2 pcUV : TEXCOORD0;
-			};
+        float4 _BrushParams;
+        #define BRUSH_STRENGTH      (_BrushParams[0])
+        #define BRUSH_TARGETHEIGHT  (_BrushParams[1])
 
-			struct v2f {
-				float4 vertex : SV_POSITION;
-				float2 pcUV : TEXCOORD0;
-			};
+        struct appdata_t
+        {
+            float4 vertex : POSITION;
+            float2 pcUV : TEXCOORD0;
+        };
 
-			v2f vert(appdata_t v)
-			{
-				v2f o;
-				o.vertex = UnityObjectToClipPos(v.vertex);
-				o.pcUV = v.pcUV;
-				return o;
-			}
-		ENDCG
+        struct v2f
+        {
+            float4 vertex : SV_POSITION;
+            float2 pcUV : TEXCOORD0;
+        };
 
-		Pass    // 0 paint splat alphamap
-		{
-			Name "Paint splat texture"
+        v2f vert(appdata_t v)
+        {
+            v2f o;
+            o.vertex = UnityObjectToClipPos(v.vertex);
+            o.pcUV = v.pcUV;
+            return o;
+        }
+        ENDCG
 
-			CGPROGRAM
-			#pragma vertex vert
-			#pragma fragment PaintSplatAlphamap
+        Pass // 0 paint splat alphamap
+        {
+            Name "Paint splat texture"
 
-			float ApplyBrush(float height, float brushStrength)
-			{
-				float targetHeight = 1.0f;
-				if (targetHeight > height)
-				{
-					height += brushStrength;
-					height = height < targetHeight ? height : targetHeight;
-				}
-				else
-				{
-					height -= brushStrength;
-					height = height > targetHeight ? height : targetHeight;
-				}
-				return height;
-			}
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment PaintSplatAlphamap
 
-			float4 PaintSplatAlphamap(v2f i) : SV_Target
-			{
-				float2 brushUV = PaintContextUVToBrushUV(i.pcUV);
-				float2 normalUV = PaintContextUVToBrushUV(i.pcUV);
+            float ApplyBrush(float height, float brushStrength)
+            {
+                float targetHeight = 1.0f;
+                if (targetHeight > height)
+                {
+                    height += brushStrength;
+                    height = height < targetHeight ? height : targetHeight;
+                }
+                else
+                {
+                    height -= brushStrength;
+                    height = height > targetHeight ? height : targetHeight;
+                }
+                return height;
+            }
 
-				// out of bounds multiplier
-				float oob = all(saturate(brushUV) == brushUV) ? 1.0f : 0.0f;
+            float4 PaintSplatAlphamap(v2f i) : SV_Target
+            {
+                float2 brushUV = PaintContextUVToBrushUV(i.pcUV);
+                float2 normalUV = PaintContextUVToBrushUV(i.pcUV);
 
-				float filterStrength = UnpackHeightmap(tex2D(_FilterTex, i.pcUV));
+                // out of bounds multiplier
+                float oob = all(saturate(brushUV) == brushUV) ? 1.0f : 0.0f;
 
-                if(UnpackHeightmap(tex2D(_SourceAlphamapRenderTextureTex, i.pcUV)) + 0.1 >= filterStrength)
+                float filterStrength = UnpackHeightmap(tex2D(_FilterTex, i.pcUV));
+
+                if (UnpackHeightmap(tex2D(_SourceAlphamapRenderTextureTex, i.pcUV)) + 0.1 >= filterStrength)
                 {
                     filterStrength = 0;
                 }
 
-				float brushStrength = BRUSH_STRENGTH * oob * UnpackHeightmap(tex2D(_BrushTex, brushUV.xy)) * filterStrength;
+                float brushStrength = BRUSH_STRENGTH * oob * UnpackHeightmap(tex2D(_BrushTex, brushUV.xy)) *
+                    filterStrength;
 
-				float splatMap = tex2D(_MainTex, i.pcUV).r;
-				float targetAlpha = BRUSH_TARGETHEIGHT;
+                float splatMap = tex2D(_MainTex, i.pcUV).r;
+                float targetAlpha = BRUSH_TARGETHEIGHT;
 
-				return lerp(splatMap, targetAlpha, brushStrength);
-			}
-
-			ENDCG
-		}
-	}
-	Fallback Off
+                return lerp(splatMap, targetAlpha, brushStrength);
+            }
+            ENDCG
+        }
+    }
+    Fallback Off
 }

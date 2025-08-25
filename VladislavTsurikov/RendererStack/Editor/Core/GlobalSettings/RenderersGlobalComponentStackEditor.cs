@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR 
+﻿#if UNITY_EDITOR
 using System;
 using UnityEditor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
@@ -7,7 +7,8 @@ using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 
 namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
 {
-    public class RenderersGlobalComponentStackEditor : IMGUIComponentStackEditor<RendererGlobalComponentStack, RendererGlobalComponentStackEditor>
+    public class RenderersGlobalComponentStackEditor : IMGUIComponentStackEditor<RendererGlobalComponentStack,
+        RendererGlobalComponentStackEditor>
     {
         public RenderersGlobalComponentStackEditor(RenderersGlobalComponentStack stack) : base(stack)
         {
@@ -16,12 +17,14 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
         protected override void OnIMGUIComponentStackGUI()
         {
             EditorGUI.BeginChangeCheck();
-            
-            var stackEditor = GetRendererGlobalComponentStackEditor(RendererStackManager.Instance.RendererStack.SelectedElement.GetType());
+
+            IMGUIElementEditor stackEditor =
+                GetRendererGlobalComponentStackEditor(RendererStackManager.Instance.RendererStack.SelectedElement
+                    .GetType());
 
             stackEditor?.OnGUI();
-            
-            if(EditorGUI.EndChangeCheck())
+
+            if (EditorGUI.EndChangeCheck())
             {
                 EditorUtility.SetDirty(Runtime.Core.GlobalSettings.GlobalSettings.Instance);
             }
@@ -29,10 +32,12 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.GlobalSettings
 
         private static IMGUIElementEditor GetRendererGlobalComponentStackEditor(Type rendererType)
         {
-            foreach (var item in Runtime.Core.GlobalSettings.GlobalSettings.Instance.RenderersGlobalComponentStackEditor.Editors)
+            foreach (RendererGlobalComponentStackEditor item in Runtime.Core.GlobalSettings.GlobalSettings.Instance
+                         .RenderersGlobalComponentStackEditor
+                         .Editors)
             {
-                RendererGlobalComponentStack stack = (RendererGlobalComponentStack)item.Target;
-                
+                var stack = (RendererGlobalComponentStack)item.Target;
+
                 if (stack.RendererType == rendererType)
                 {
                     return item;

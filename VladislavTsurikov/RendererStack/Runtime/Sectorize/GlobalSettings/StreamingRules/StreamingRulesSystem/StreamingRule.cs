@@ -5,6 +5,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.Strea
 {
     public abstract class StreamingRule : Component
     {
-        protected ComponentStackOnlyDifferentTypes<StreamingRule> StreamingRuleComponentStack => (ComponentStackOnlyDifferentTypes<StreamingRule>)Stack;
+        protected ComponentStackOnlyDifferentTypes<StreamingRule> StreamingRuleComponentStack =>
+            (ComponentStackOnlyDifferentTypes<StreamingRule>)Stack;
     }
 }

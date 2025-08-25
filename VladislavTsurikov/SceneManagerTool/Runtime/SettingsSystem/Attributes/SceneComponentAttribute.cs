@@ -2,5 +2,7 @@
 
 namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem
 {
-    public class SceneComponentAttribute : Attribute { }
+    public class SceneComponentAttribute : Attribute
+    {
+    }
 }

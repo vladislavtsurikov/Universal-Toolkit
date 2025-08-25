@@ -4,18 +4,18 @@ using VladislavTsurikov.IMGUIUtility.Editor;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
-	public class ToolsWindow : BaseWindow<ToolsWindow>
-	{
-		protected override void OnGUI()
-		{
-			base.OnGUI();
-			
-			EditorGUI.indentLevel = 0;
+    public class ToolsWindow : BaseWindow<ToolsWindow>
+    {
+        protected override void OnGUI()
+        {
+            base.OnGUI();
 
-			CustomEditorGUILayout.IsInspector = false;
+            EditorGUI.indentLevel = 0;
 
-			WindowData.Instance.WindowToolStackEditor.OnTabStackGUI();
+            CustomEditorGUILayout.IsInspector = false;
+
+            WindowData.Instance.WindowToolStackEditor.OnTabStackGUI();
         }
-	}
+    }
 }
 #endif

@@ -4,11 +4,8 @@
     {
         protected readonly StamperTool StamperTool;
 
-        protected Respawn(StamperTool stamperTool)
-        {
-            StamperTool = stamperTool;
-        }
-        
+        protected Respawn(StamperTool stamperTool) => StamperTool = stamperTool;
+
         public abstract void OnRespawn();
     }
 }

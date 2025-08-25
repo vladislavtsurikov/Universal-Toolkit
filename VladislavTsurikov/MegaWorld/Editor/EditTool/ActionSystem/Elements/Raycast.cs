@@ -13,24 +13,18 @@ using VladislavTsurikov.Undo.Editor.TerrainObjectRenderer;
 namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 {
     [ComponentStack.Runtime.AdvancedComponentStack.Name("Raycast")]
-	public class Raycast : Action
+    public class Raycast : Action
     {
         private ShortcutCombo _shortcutCombo;
+        public LayerMask GroundLayers = 1;
 
         public float RaycastPositionOffset = 0;
-        public LayerMask GroundLayers = 1;
-        
-        [OnDeserializing]
-        private void OnDeserializing()
-        {
-            InitShortcutCombo();
-        }
 
-        protected override void OnCreate()
-        {
-            InitShortcutCombo();
-        }
-        
+        [OnDeserializing]
+        private void OnDeserializing() => InitShortcutCombo();
+
+        protected override void OnCreate() => InitShortcutCombo();
+
         private void InitShortcutCombo()
         {
             _shortcutCombo = new ShortcutCombo();
@@ -39,22 +33,23 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 
         public override void OnMouseMove()
         {
-            RayHit rayHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition), GroundLayers);
-            if(rayHit != null)
+            RayHit rayHit = ColliderUtility.Raycast(HandleUtility.GUIPointToWorldRay(Event.current.mousePosition),
+                GroundLayers);
+            if (rayHit != null)
             {
-                Vector3 finalPosition = new Vector3(rayHit.Point.x, rayHit.Point.y + RaycastPositionOffset, rayHit.Point.z);
+                var finalPosition = new Vector3(rayHit.Point.x, rayHit.Point.y + RaycastPositionOffset, rayHit.Point.z);
                 EditTool.FindObject.Position = finalPosition;
             }
         }
 
         protected override void RegisterUndo()
         {
-            if(EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
+            if (EditTool.FindObject.PrototypeType == typeof(PrototypeGameObject))
             {
-                GameObject go = (GameObject)EditTool.FindObject.Obj;
+                var go = (GameObject)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new GameObjectTransform(go));
             }
-            else if(EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
+            else if (EditTool.FindObject.PrototypeType == typeof(PrototypeTerrainObject))
             {
                 TerrainObjectInstance instance = (TerrainObjectInstance)EditTool.FindObject.Obj;
                 Undo.Editor.Undo.RegisterUndoAfterMouseUp(new TerrainObjectTransform(instance));
@@ -63,7 +58,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem
 
         public override bool CheckShortcutCombo()
         {
-            if(_shortcutCombo.IsActive())
+            if (_shortcutCombo.IsActive())
             {
                 return true;
             }

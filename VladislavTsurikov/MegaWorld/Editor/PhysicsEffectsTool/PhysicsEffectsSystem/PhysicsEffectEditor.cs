@@ -13,7 +13,8 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
 
         public override void OnGUI()
         {
-            _settings.PositionOffsetY = CustomEditorGUILayout.Slider(new GUIContent("Position Offset Y"), _settings.PositionOffsetY, -20, 20);
+            _settings.PositionOffsetY = CustomEditorGUILayout.Slider(new GUIContent("Position Offset Y"),
+                _settings.PositionOffsetY, -20, 20);
             _settings.Size = CustomEditorGUILayout.Slider(new GUIContent("Size"), _settings.Size, 0, 100);
 
             OnPhysicsEffectGUI();
@@ -21,7 +22,6 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSy
 
         protected virtual void OnPhysicsEffectGUI()
         {
-            
         }
     }
 }

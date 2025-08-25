@@ -15,12 +15,14 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
 
         static TerrainObjectRendererStreamingSupport()
         {
-            Runtime.TerrainObjectRenderer.TerrainObjectRenderer.AfterSetupPrototypeRendererRendererEvent -= SetupPrototypeRendererRenderer;
-            Runtime.TerrainObjectRenderer.TerrainObjectRenderer.AfterSetupPrototypeRendererRendererEvent += SetupPrototypeRendererRenderer;
-            
+            Runtime.TerrainObjectRenderer.TerrainObjectRenderer.AfterSetupPrototypeRendererRendererEvent -=
+                SetupPrototypeRendererRenderer;
+            Runtime.TerrainObjectRenderer.TerrainObjectRenderer.AfterSetupPrototypeRendererRendererEvent +=
+                SetupPrototypeRendererRenderer;
+
             StreamingUtilityEvents.BeforeDeleteAllAdditiveScenesEvent -= ScenesCreatedOrDeleted;
             StreamingUtilityEvents.BeforeDeleteAllAdditiveScenesEvent += ScenesCreatedOrDeleted;
-            
+
             Runtime.Sectorize.Sectorize.CreateScenesAfterEvent -= ScenesCreatedOrDeleted;
             Runtime.Sectorize.Sectorize.CreateScenesAfterEvent += ScenesCreatedOrDeleted;
         }
@@ -28,8 +30,9 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
         private static void ScenesCreatedOrDeleted()
         {
             _largeObjectInstances = new List<TerrainObjectCollider>();
-            
-            foreach (TerrainObjectRendererData item in SceneDataStackUtility.GetAllSceneData<TerrainObjectRendererData>())
+
+            foreach (TerrainObjectRendererData item in
+                     SceneDataStackUtility.GetAllSceneData<TerrainObjectRendererData>())
             {
                 _largeObjectInstances.AddRange(item.GetAllInstances());
             }
@@ -39,7 +42,8 @@ namespace VladislavTsurikov.RendererStack.Editor.TerrainObjectRenderer
         {
             if (_largeObjectInstances != null)
             {
-                TerrainObjectRendererData.AddInstances(_largeObjectInstances, Runtime.Sectorize.Sectorize.GetSectorLayerTag());
+                TerrainObjectRendererData.AddInstances(_largeObjectInstances,
+                    Runtime.Sectorize.Sectorize.GetSectorLayerTag());
                 _largeObjectInstances.Clear();
                 _largeObjectInstances = null;
             }

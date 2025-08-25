@@ -5,43 +5,43 @@ using VladislavTsurikov.Math.Runtime;
 
 namespace VladislavTsurikov.ColliderSystem.Runtime
 {
-    public abstract class ColliderObject 
+    public abstract class ColliderObject
     {
-        public readonly System.Object Obj;
+        public readonly object Obj;
         public PathToColliderObject PathToColliderObject;
 
-        protected ColliderObject(System.Object obj)
-        {
-            Obj = obj;
-        }
+        protected ColliderObject(object obj) => Obj = obj;
 
         public virtual void Raycast(Ray ray, List<RayHit> sortedObjectHits)
         {
-            var mesh = GetMesh();
+            Mesh mesh = GetMesh();
             if (mesh != null && IsRendererEnabled())
             {
-                var meshRayHit = GetMesh().Raycast(ray, GetMatrix());
+                MeshRayHit meshRayHit = GetMesh().Raycast(ray, GetMatrix());
                 if (meshRayHit != null)
                 {
                     sortedObjectHits.Add(new RayHit(this, meshRayHit));
                 }
             }
         }
-        
-        public void SetPathToObjectCollider<T>(List<object> pathDatas, BVHObjectTree<T> tree, BVHNode<T> node) where T: ColliderObject
+
+        public void SetPathToObjectCollider<T>(List<object> pathDatas, BVHObjectTree<T> tree, BVHNode<T> node)
+            where T : ColliderObject
         {
             if (pathDatas == null)
             {
                 return;
             }
-            
+
             pathDatas.Add(tree);
             pathDatas.Add(node);
 
             SetPathToObjectCollider(pathDatas);
         }
 
-        protected virtual void SetPathToObjectCollider(List<object> pathDatas){}
+        protected virtual void SetPathToObjectCollider(List<object> pathDatas)
+        {
+        }
 
         public abstract bool IsRendererEnabled();
         public abstract Mesh GetMesh();

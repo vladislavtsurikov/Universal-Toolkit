@@ -5,29 +5,29 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 {
     public static class SceneDataStackUtility
     {
-        public static T InstanceSceneData<T>(Scene scene) where T: SceneData
+        public static T InstanceSceneData<T>(Scene scene) where T : SceneData
         {
             if (!scene.isLoaded)
             {
                 return null;
             }
-            
+
             SceneDataManager sceneDataManager = SceneDataManagerUtility.InstanceSceneDataManager(scene);
 
             return (T)sceneDataManager.SceneDataStack.CreateIfMissingType(typeof(T));
         }
-        
-        public static void Setup<T>(bool force) where T: SceneData
+
+        public static void Setup<T>(bool force) where T : SceneData
         {
-            foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager()) 
+            foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
                 sceneDataManager.SceneDataStack.SetupElement<T>(force);
             }
         }
 
-        public static List<T> GetAllSceneData<T>() where T: SceneData
+        public static List<T> GetAllSceneData<T>() where T : SceneData
         {
-            List<T> sceneDataList = new List<T>();
+            var sceneDataList = new List<T>();
 
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
@@ -35,10 +35,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
                 {
                     continue;
                 }
-                
-                T sceneData = (T)sceneDataManager.SceneDataStack.GetElement(typeof(T));
 
-                if(sceneData != null)
+                var sceneData = (T)sceneDataManager.SceneDataStack.GetElement(typeof(T));
+
+                if (sceneData != null)
                 {
                     sceneDataList.Add(sceneData);
                 }
@@ -46,11 +46,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.Utility
 
             return sceneDataList;
         }
-        
-        public static bool HasMultipleSceneData<T>() where T: SceneData
+
+        public static bool HasMultipleSceneData<T>() where T : SceneData
         {
-            int count = 0;
-            
+            var count = 0;
+
             foreach (SceneDataManager sceneDataManager in SceneDataManagerUtility.GetAllSceneDataManager())
             {
                 if (sceneDataManager.SceneDataStack.GetElement(typeof(T)) != null)

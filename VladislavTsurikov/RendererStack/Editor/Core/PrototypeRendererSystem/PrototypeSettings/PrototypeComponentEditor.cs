@@ -9,7 +9,7 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
     public class PrototypeComponentEditor : ReorderableListComponentEditor
     {
         private Type _rendererType;
-        
+
         protected Prototype Prototype => TargetPrototypeComponent.Prototype;
 
         private PrototypeComponent TargetPrototypeComponent => (PrototypeComponent)Target;
@@ -20,7 +20,8 @@ namespace VladislavTsurikov.RendererStack.Editor.Core.PrototypeRendererSystem.Pr
             {
                 if (_rendererType == null)
                 {
-                    foreach (var prototypeRendererStack in PrototypesStorage.Instance.PrototypeRendererStacks)
+                    foreach (PrototypesRendererStorage prototypeRendererStack in PrototypesStorage.Instance
+                                 .PrototypeRendererStacks)
                     {
                         if (prototypeRendererStack.GetPrototype(Prototype.ID) != null)
                         {

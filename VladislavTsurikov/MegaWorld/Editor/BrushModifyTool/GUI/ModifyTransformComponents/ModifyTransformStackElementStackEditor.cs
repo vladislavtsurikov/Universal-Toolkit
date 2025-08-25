@@ -9,20 +9,17 @@ namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool.GUI.ModifyTransform
     [ElementEditor(typeof(ModifyTransformSettings))]
     public class ModifyTransformStackElementStackEditor : IMGUIElementEditor
     {
-        private ModifyTransformSettings _settings;
-        
         private ModifyTransformStackEditor _modifyTransformStackEditor;
+        private ModifyTransformSettings _settings;
 
         public override void OnEnable()
         {
             _settings = (ModifyTransformSettings)Target;
-            _modifyTransformStackEditor = new ModifyTransformStackEditor(new GUIContent("Modify Transform Components"), _settings.ModifyTransformComponentStack);
+            _modifyTransformStackEditor = new ModifyTransformStackEditor(new GUIContent("Modify Transform Components"),
+                _settings.ModifyTransformComponentStack);
         }
 
-        public override void OnGUI() 
-        {
-            _modifyTransformStackEditor.OnGUI();
-        }
+        public override void OnGUI() => _modifyTransformStackEditor.OnGUI();
     }
 }
 #endif

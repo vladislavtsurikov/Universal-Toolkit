@@ -1,26 +1,22 @@
-﻿namespace OdinSerializer
+﻿using UnityEngine;
+
+namespace OdinSerializer
 {
     /// <summary>
-    /// Defines default loggers for serialization and deserialization. This class and all of its loggers are thread safe.
+    ///     Defines default loggers for serialization and deserialization. This class and all of its loggers are thread safe.
     /// </summary>
     public static class DefaultLoggers
     {
-        private static readonly object LOCK = new object();
+        private static readonly object LOCK = new();
         private static volatile ILogger unityLogger;
 
         /// <summary>
-        /// The default logger - usually this is <see cref="UnityLogger"/>.
+        ///     The default logger - usually this is <see cref="UnityLogger" />.
         /// </summary>
-        public static ILogger DefaultLogger
-        {
-            get
-            {
-                return UnityLogger;
-            }
-        }
+        public static ILogger DefaultLogger => UnityLogger;
 
         /// <summary>
-        /// Logs messages using Unity's <see cref="UnityEngine.Debug"/> class.
+        ///     Logs messages using Unity's <see cref="UnityEngine.Debug" /> class.
         /// </summary>
         public static ILogger UnityLogger
         {
@@ -32,7 +28,7 @@
                     {
                         if (unityLogger == null)
                         {
-                            unityLogger = new CustomLogger(UnityEngine.Debug.LogWarning, UnityEngine.Debug.LogError, UnityEngine.Debug.LogException);
+                            unityLogger = new CustomLogger(Debug.LogWarning, Debug.LogError, Debug.LogException);
                         }
                     }
                 }

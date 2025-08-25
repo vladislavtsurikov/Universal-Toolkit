@@ -11,14 +11,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
     {
         private MaskOperationsFilter _maskOperationsFilter;
 
-        public override void OnEnable()
-        {
-            _maskOperationsFilter = (MaskOperationsFilter)Target;
-        }
-        
+        public override void OnEnable() => _maskOperationsFilter = (MaskOperationsFilter)Target;
+
         public override void OnGUI(Rect rect, int index)
         {
-            _maskOperationsFilter.MaskOperations = (MaskOperations)EditorGUI.EnumPopup(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), _maskOperationsFilter.MaskOperations);
+            _maskOperationsFilter.MaskOperations = (MaskOperations)EditorGUI.EnumPopup(
+                new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                _maskOperationsFilter.MaskOperations);
 
             rect.y += EditorGUIUtility.singleLineHeight;
 
@@ -26,47 +25,60 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             {
                 case MaskOperations.Add:
                 {
-                    _maskOperationsFilter.Value = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Value"), _maskOperationsFilter.Value, 0f, 1f);
+                    _maskOperationsFilter.Value =
+                        EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                            new GUIContent("Value"), _maskOperationsFilter.Value, 0f, 1f);
                     break;
                 }
                 case MaskOperations.Multiply:
                 {
-                    _maskOperationsFilter.Value = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Value"), _maskOperationsFilter.Value, 0f, 1f);
+                    _maskOperationsFilter.Value =
+                        EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                            new GUIContent("Value"), _maskOperationsFilter.Value, 0f, 1f);
                     break;
                 }
                 case MaskOperations.Power:
                 {
-                    _maskOperationsFilter.Value = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Value"), _maskOperationsFilter.Value, 1f, 10f);
+                    _maskOperationsFilter.Value =
+                        EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                            new GUIContent("Value"), _maskOperationsFilter.Value, 1f, 10f);
                     break;
                 }
                 case MaskOperations.Clamp:
                 {
-                    GUIStyle alignmentStyleRight = new GUIStyle(GUI.skin.label)
+                    var alignmentStyleRight = new GUIStyle(GUI.skin.label)
                     {
-                        alignment = TextAnchor.MiddleRight,
-                        stretchWidth = true
+                        alignment = TextAnchor.MiddleRight, stretchWidth = true
                     };
-                    GUIStyle alignmentStyleLeft = new GUIStyle(GUI.skin.label)
+                    var alignmentStyleLeft = new GUIStyle(GUI.skin.label)
                     {
-                        alignment = TextAnchor.MiddleLeft,
-                        stretchWidth = true
+                        alignment = TextAnchor.MiddleLeft, stretchWidth = true
                     };
 
-                    EditorGUI.MinMaxSlider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Range"), ref _maskOperationsFilter.ClampRange.x, ref _maskOperationsFilter.ClampRange.y, 0, 1);
+                    EditorGUI.MinMaxSlider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Range"), ref _maskOperationsFilter.ClampRange.x,
+                        ref _maskOperationsFilter.ClampRange.y, 0, 1);
 
                     rect.y += EditorGUIUtility.singleLineHeight;
 
-                    Rect numFieldRect = new Rect(rect.x + EditorGUIUtility.labelWidth, rect.y, (rect.width - EditorGUIUtility.labelWidth) * 0.2f, EditorGUIUtility.singleLineHeight);
-                    GUIContent minContent = new GUIContent("");
+                    var numFieldRect = new Rect(rect.x + EditorGUIUtility.labelWidth, rect.y,
+                        (rect.width - EditorGUIUtility.labelWidth) * 0.2f, EditorGUIUtility.singleLineHeight);
+                    var minContent = new GUIContent("");
                     EditorGUI.LabelField(numFieldRect, minContent, alignmentStyleLeft);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    _maskOperationsFilter.ClampRange.x = EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.ClampRange.x);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    _maskOperationsFilter.ClampRange.x =
+                        EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.ClampRange.x);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
                     EditorGUI.LabelField(numFieldRect, " ");
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    _maskOperationsFilter.ClampRange.y = EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.ClampRange.y);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    GUIContent maxContent = new GUIContent("");
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    _maskOperationsFilter.ClampRange.y =
+                        EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.ClampRange.y);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    var maxContent = new GUIContent("");
                     EditorGUI.LabelField(numFieldRect, maxContent, alignmentStyleRight);
 
                     rect.y += EditorGUIUtility.singleLineHeight;
@@ -74,38 +86,47 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
                 }
                 case MaskOperations.Invert:
                 {
-                    _maskOperationsFilter.StrengthInvert = EditorGUI.Slider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Strength"), _maskOperationsFilter.StrengthInvert, 0f, 1f);
+                    _maskOperationsFilter.StrengthInvert = EditorGUI.Slider(
+                        new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Strength"), _maskOperationsFilter.StrengthInvert, 0f, 1f);
 
                     break;
                 }
                 case MaskOperations.Remap:
                 {
-                    GUIStyle alignmentStyleRight = new GUIStyle(GUI.skin.label)
+                    var alignmentStyleRight = new GUIStyle(GUI.skin.label)
                     {
-                        alignment = TextAnchor.MiddleRight,
-                        stretchWidth = true
+                        alignment = TextAnchor.MiddleRight, stretchWidth = true
                     };
-                    GUIStyle alignmentStyleLeft = new GUIStyle(GUI.skin.label)
+                    var alignmentStyleLeft = new GUIStyle(GUI.skin.label)
                     {
-                        alignment = TextAnchor.MiddleLeft,
-                        stretchWidth = true
+                        alignment = TextAnchor.MiddleLeft, stretchWidth = true
                     };
 
-                    EditorGUI.MinMaxSlider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight), new GUIContent("Range"), ref _maskOperationsFilter.RemapRange.x, ref _maskOperationsFilter.RemapRange.y, 0, 1);
+                    EditorGUI.MinMaxSlider(new Rect(rect.x, rect.y, rect.width, EditorGUIUtility.singleLineHeight),
+                        new GUIContent("Range"), ref _maskOperationsFilter.RemapRange.x,
+                        ref _maskOperationsFilter.RemapRange.y, 0, 1);
 
                     rect.y += EditorGUIUtility.singleLineHeight;
 
-                    Rect numFieldRect = new Rect(rect.x + EditorGUIUtility.labelWidth, rect.y, (rect.width - EditorGUIUtility.labelWidth) * 0.2f, EditorGUIUtility.singleLineHeight);
-                    GUIContent minContent = new GUIContent("");
+                    var numFieldRect = new Rect(rect.x + EditorGUIUtility.labelWidth, rect.y,
+                        (rect.width - EditorGUIUtility.labelWidth) * 0.2f, EditorGUIUtility.singleLineHeight);
+                    var minContent = new GUIContent("");
                     EditorGUI.LabelField(numFieldRect, minContent, alignmentStyleLeft);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    _maskOperationsFilter.RemapRange.x = EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.RemapRange.x);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    _maskOperationsFilter.RemapRange.x =
+                        EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.RemapRange.x);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
                     EditorGUI.LabelField(numFieldRect, " ");
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    _maskOperationsFilter.RemapRange.y = EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.RemapRange.y);
-                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width, EditorGUIUtility.singleLineHeight);
-                    GUIContent maxContent = new GUIContent("");
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    _maskOperationsFilter.RemapRange.y =
+                        EditorGUI.FloatField(numFieldRect, _maskOperationsFilter.RemapRange.y);
+                    numFieldRect = new Rect(numFieldRect.x + numFieldRect.width, rect.y, numFieldRect.width,
+                        EditorGUIUtility.singleLineHeight);
+                    var maxContent = new GUIContent("");
                     EditorGUI.LabelField(numFieldRect, maxContent, alignmentStyleRight);
 
                     rect.y += EditorGUIUtility.singleLineHeight;
@@ -114,9 +135,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             }
         }
 
-        public override float GetElementHeight(int index) 
+        public override float GetElementHeight(int index)
         {
-            float height = EditorGUIUtility.singleLineHeight;
+            var height = EditorGUIUtility.singleLineHeight;
 
             height += EditorGUIUtility.singleLineHeight;
 
@@ -142,10 +163,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
             return height;
         }
 
-        public override string GetAdditionalName()
-        {
-            return "[" + _maskOperationsFilter.MaskOperations + "]";
-        }
+        public override string GetAdditionalName() => "[" + _maskOperationsFilter.MaskOperations + "]";
     }
 }
 #endif

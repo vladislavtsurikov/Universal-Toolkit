@@ -12,7 +12,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.TransformElementSy
         {
             foreach (TransformComponent item in _elementList)
             {
-                if(item.Active)
+                if (item.Active)
                 {
                     item.SetInstanceData(ref instance, fitness, normal);
                 }

@@ -7,13 +7,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
     public enum CameraCullingMode
     {
         FrustumCulling = 0,
-        Complete360 = 1        
+        Complete360 = 1
     }
-    
+
     public class TerrainObjectRendererCameraSettings : CameraComponent
     {
         public CameraCullingMode CameraCullingMode = CameraCullingMode.FrustumCulling;
-        public float LodBias = 1;
         public bool EnableColliders = true;
+        public float LodBias = 1;
     }
 }

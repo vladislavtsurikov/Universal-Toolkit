@@ -13,25 +13,26 @@ namespace VladislavTsurikov.ReflectionUtility.Runtime
             {
                 if (type.IsGenericType && type.GetGenericTypeDefinition() == genericType)
                 {
-                    var arguments = type.GetGenericArguments();
+                    Type[] arguments = type.GetGenericArguments();
                     if (argumentIndex >= 0 && argumentIndex < arguments.Length)
                     {
                         return arguments[argumentIndex];
                     }
 
-                    Debug.LogError($"TryGetGenericArgument: Invalid argument index {argumentIndex} for type {type.FullName}.");
+                    Debug.LogError(
+                        $"TryGetGenericArgument: Invalid argument index {argumentIndex} for type {type.FullName}.");
                     return null;
                 }
+
                 type = type.BaseType;
             }
+
             return null;
         }
-        
-        public static bool HasParameterlessConstructor(this Type type)
-        {
-            return type
+
+        public static bool HasParameterlessConstructor(this Type type) =>
+            type
                 .GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
                 .Any(c => c.GetParameters().Length == 0);
-        }
     }
 }

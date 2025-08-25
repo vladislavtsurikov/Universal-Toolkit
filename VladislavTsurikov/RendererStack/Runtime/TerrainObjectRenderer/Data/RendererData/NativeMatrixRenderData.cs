@@ -2,10 +2,8 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
-using Unity.Mathematics;
 using UnityEngine;
 using VladislavTsurikov.AutoUnmanagedPropertiesDispose.Runtime;
-using VladislavTsurikov.UnityUtility.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.RendererData
 {
@@ -21,30 +19,31 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
             InverseMatrix = math.inverse(Matrix);
             LODControl = new Vector4();
         }
-    };
-    
-    public class NativeRenderData 
+    }
+
+    public class NativeRenderData
     {
-        public NativeArrayProperty<InstanceShaderData> InstanceShaderDataList = new NativeArrayProperty<InstanceShaderData>(); 
+        public NativeArrayProperty<InstanceShaderData> InstanceShaderDataList = new();
 
         public unsafe void ConvertPersistentDataToRenderData(List<Instance> instances)
         {
             InstanceShaderDataList.ChangeNativeArray(new NativeArray<InstanceShaderData>());
-            
-            if(instances.Count != 0)
+
+            if (instances.Count != 0)
             {
-                NativeArray<Instance> nativeItemArray = new NativeArray<Instance>(instances.Count, Allocator.Persistent);
+                var nativeItemArray = new NativeArray<Instance>(instances.Count, Allocator.Persistent);
                 nativeItemArray.CopyFromFast(instances);
-                
-                InstanceShaderDataList.ChangeNativeArray(new NativeArray<InstanceShaderData>(instances.Count, Allocator.Persistent));
-                
-                ConvertToInstanceShaderDataJob loadPersistentStorageToMatrixJob =
+
+                InstanceShaderDataList.ChangeNativeArray(
+                    new NativeArray<InstanceShaderData>(instances.Count, Allocator.Persistent));
+
+                var loadPersistentStorageToMatrixJob =
                     new ConvertToInstanceShaderDataJob
                     {
                         InstanceArray = nativeItemArray,
-                        InstanceShaderDataPtr = InstanceShaderDataList.NativeArray.GetUnsafePtr(),
+                        InstanceShaderDataPtr = InstanceShaderDataList.NativeArray.GetUnsafePtr()
                     };
-                
+
                 loadPersistentStorageToMatrixJob.Schedule(instances.Count, 64).Complete();
 
                 nativeItemArray.Dispose();

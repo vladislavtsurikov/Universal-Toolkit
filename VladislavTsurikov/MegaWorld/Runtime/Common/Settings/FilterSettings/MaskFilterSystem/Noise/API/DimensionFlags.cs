@@ -1,32 +1,38 @@
-﻿namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API
+﻿using System;
+
+namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.FilterSettings.MaskFilterSystem.Noise.API
 {
     /// <summary>
-    /// An enum used for defining which n-dimensional spaces a particular
-    /// NoiseType or FractalType implementation supports
+    ///     An enum used for defining which n-dimensional spaces a particular
+    ///     NoiseType or FractalType implementation supports
     /// </summary>
-    [System.Serializable]
-    [System.Flags]
+    [Serializable]
+    [Flags]
     public enum NoiseDimensionFlags
     {
         /// <summary>
-        /// No dimensions are supported
+        ///     No dimensions are supported
         /// </summary>
         None = 0,
+
         /// <summary>
-        /// One-dimensional noise is supported
+        ///     One-dimensional noise is supported
         /// </summary>
         _1D = 1 << 0,
+
         /// <summary>
-        /// Two-dimensional noise is supported
+        ///     Two-dimensional noise is supported
         /// </summary>
         _2D = 1 << 1,
+
         /// <summary>
-        /// Three-dimensional noise is supported
+        ///     Three-dimensional noise is supported
         /// </summary>
         _3D = 1 << 2,
+
         /// <summary>
-        /// Four-dimensional noise is supported
+        ///     Four-dimensional noise is supported
         /// </summary>
-        _4D = 1 << 3,
+        _4D = 1 << 3
     }
-}  
+}

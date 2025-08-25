@@ -5,15 +5,15 @@ namespace VladislavTsurikov.SceneManagerTool.Editor.BuildSceneCollectionSystem
     public class NetBuildEditor : ComponentEditor
     {
         private SceneCollectionStackEditor _serverSceneCollectionStack;
-        
+
         private NetBuild _netBuild;
 
         public override void OnEnable()
         {
             base.OnEnable();
 
-            Debug.Log("new ");    
-            
+            Debug.Log("new ");
+
             _netBuild = (NetBuild)Target;
             // _sceneCollectionStackEditor = new SceneCollectionStackEditor(new GUIContent("Client Scene Collection"), _buildSceneCollection.SceneCollectionStack);
             // _serverSceneCollectionStack = new SceneCollectionStackEditor(new GUIContent("Server Scene Collection"), _netBuild.ServerSceneCollectionStack);

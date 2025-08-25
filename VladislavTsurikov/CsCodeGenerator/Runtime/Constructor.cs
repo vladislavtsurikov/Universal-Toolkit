@@ -7,7 +7,7 @@
             base.BuiltInDataType = null;
             base.Name = name;
         }
-        
+
         public override bool IsVisible { get; set; } = true;
 
         public new string Name => base.Name;

@@ -25,12 +25,12 @@ namespace VladislavTsurikov.SceneUtility.Editor.Integration.CustomInspector
             {
                 return value;
             }
-        
+
             sceneReference.SceneAsset = (SceneAsset)EditorGUI.ObjectField(
-                rect, 
-                label, 
-                sceneReference.SceneAsset, 
-                typeof(SceneAsset), 
+                rect,
+                label,
+                sceneReference.SceneAsset,
+                typeof(SceneAsset),
                 false);
 
             return sceneReference;

@@ -4,11 +4,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
 {
     public static class ModifiedPrototypeRenderDataStack
     {
-        private static List<PrototypeRendererData> _prototypeRenderData = new List<PrototypeRendererData>();
+        private static readonly List<PrototypeRendererData> _prototypeRenderData = new();
 
         public static void Add(PrototypeRendererData prototypeRendererData)
         {
-            if(!_prototypeRenderData.Contains(prototypeRendererData))
+            if (!_prototypeRenderData.Contains(prototypeRendererData))
             {
                 _prototypeRenderData.Add(prototypeRendererData);
             }
@@ -24,14 +24,8 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.Data.Ren
             _prototypeRenderData.Clear();
         }
 
-        public static int GetCount()
-        {
-            return _prototypeRenderData.Count;
-        }
+        public static int GetCount() => _prototypeRenderData.Count;
 
-        public static void Clear()
-        {
-            _prototypeRenderData.Clear();
-        }
+        public static void Clear() => _prototypeRenderData.Clear();
     }
 }

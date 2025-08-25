@@ -10,10 +10,7 @@ namespace VladislavTsurikov.SceneManagerTool.Examples.LevelSelect
         public Text Text;
         public SceneCollection Collection;
 
-        public void OpenLevel()
-        {
-            Collection.Load().Forget();
-        }
+        public void OpenLevel() => Collection.Load().Forget();
 
         public void ApplyData(string text, SceneCollection collection)
         {

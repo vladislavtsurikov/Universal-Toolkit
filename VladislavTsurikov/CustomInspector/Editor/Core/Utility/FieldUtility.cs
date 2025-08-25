@@ -12,11 +12,11 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
     {
         public static object GetOrCreateFieldInstance(FieldInfo field, object target)
         {
-            object value = field.GetValue(target);
+            var value = field.GetValue(target);
 
             if (value == null && field.FieldType.IsClass)
             {
-                var constructor = field.FieldType.GetConstructor(Type.EmptyTypes);
+                ConstructorInfo constructor = field.FieldType.GetConstructor(Type.EmptyTypes);
 
                 if (constructor != null)
                 {
@@ -27,8 +27,9 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
 
             return value;
         }
-        
-        public static FieldInfo[] GetSerializableFields(Type targetType, BindingFlags bindingFlags, bool excludeInternal, Type[] excludedDeclaringTypes)
+
+        public static FieldInfo[] GetSerializableFields(Type targetType, BindingFlags bindingFlags,
+            bool excludeInternal, Type[] excludedDeclaringTypes)
         {
             if (targetType == null)
             {
@@ -45,11 +46,12 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
                     (excludedDeclaringTypes == null || !excludedDeclaringTypes.Contains(field.DeclaringType)))
                 .ToArray();
         }
-        
+
 #if UNITY_EDITOR
         public static string GetFieldLabel<T>(string fieldName)
         {
-            FieldInfo field = typeof(T).GetField(fieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            FieldInfo field = typeof(T).GetField(fieldName,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             if (field == null)
             {
                 throw new ArgumentException($"Field '{fieldName}' not found in type '{typeof(T).Name}'.");
@@ -57,10 +59,10 @@ namespace VladislavTsurikov.CustomInspector.Editor.Core
 
             return GetFieldLabel(field);
         }
-        
+
         public static string GetFieldLabel(FieldInfo field)
         {
-            var nameAttribute = field.GetCustomAttribute<NameAttribute>();
+            NameAttribute nameAttribute = field.GetCustomAttribute<NameAttribute>();
             return nameAttribute?.Name ?? ObjectNames.NicifyVariableName(field.Name);
         }
 #endif

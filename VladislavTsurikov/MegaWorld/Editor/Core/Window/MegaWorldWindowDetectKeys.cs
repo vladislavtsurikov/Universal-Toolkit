@@ -13,10 +13,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             {
                 UnspawnUtility.UnspawnGroups(WindowData.Instance.SelectedData.SelectedGroupList, true);
             }
-            
-            if(current.keyCode == KeyCode.Escape && current.modifiers == 0)
+
+            if (current.keyCode == KeyCode.Escape && current.modifiers == 0)
             {
-                if(WindowData.Instance.SelectedTool != null)
+                if (WindowData.Instance.SelectedTool != null)
                 {
                     WindowData.Instance.WindowToolStack.OnDisable();
                     Tools.current = Tool.Move;
@@ -28,7 +28,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 
         private static Event KeyDeleteEvent()
         {
-            Event retEvent = Event.KeyboardEvent("^" + "backspace");
+            var retEvent = Event.KeyboardEvent("^" + "backspace");
             return retEvent;
         }
     }

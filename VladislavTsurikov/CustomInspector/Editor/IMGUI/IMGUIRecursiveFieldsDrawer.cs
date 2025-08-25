@@ -16,14 +16,14 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
             Action<object, Rect> drawField)
         {
             EditorGUI.indentLevel++;
-                    
-            bool foldoutState = GetFoldoutState(value);
+
+            var foldoutState = GetFoldoutState(value);
 
             foldoutState = EditorGUI.Foldout(fieldRect, foldoutState, ObjectNames.NicifyVariableName(fieldInfo.Name));
 
             SetFoldoutState(value, foldoutState);
-            
-            float foldoutHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+
+            var foldoutHeight = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
 
             fieldRect.y += foldoutHeight;
 
@@ -31,7 +31,7 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
             {
                 drawField(value, fieldRect);
             }
-            
+
             EditorGUI.indentLevel--;
 
             return foldoutHeight;

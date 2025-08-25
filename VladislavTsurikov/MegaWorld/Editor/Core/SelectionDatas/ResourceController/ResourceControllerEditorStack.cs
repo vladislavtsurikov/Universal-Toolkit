@@ -7,16 +7,13 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceControl
 {
     public class ResourceControllerEditorStack : ComponentStackOnlyDifferentTypes<ResourceControllerEditor>
     {
-        protected override void OnCreateElements()
-        {
-            CreateAllElementTypes();
-        }
+        protected override void OnCreateElements() => CreateAllElementTypes();
 
         public ResourceControllerEditor GetResourceControllerEditor(Type prototypeType)
         {
-            foreach (var editor in _elementList)
+            foreach (ResourceControllerEditor editor in _elementList)
             {
-                ResourceControllerAttribute resourceControllerAttribute =
+                var resourceControllerAttribute =
                     (ResourceControllerAttribute)editor.GetType().GetAttribute(typeof(ResourceControllerAttribute));
 
                 if (resourceControllerAttribute.PrototypeType == prototypeType)

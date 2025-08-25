@@ -4,6 +4,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
     {
         Prototypes,
         ActiveScene,
-        GlobalSettings,
+        GlobalSettings
     }
 }

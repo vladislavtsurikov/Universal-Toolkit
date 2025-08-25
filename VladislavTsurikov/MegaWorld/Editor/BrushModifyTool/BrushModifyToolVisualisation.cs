@@ -15,39 +15,44 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.P
 
 namespace VladislavTsurikov.MegaWorld.Editor.BrushModifyTool
 {
-    public static class BrushModifyToolVisualisation 
+    public static class BrushModifyToolVisualisation
     {
-        private static MaskFilterVisualisation _maskFilterVisualisation = new MaskFilterVisualisation();
-        
+        private static readonly MaskFilterVisualisation _maskFilterVisualisation = new();
+
         public static void Draw(BoxArea area)
         {
-            if(area == null || area.RayHit == null)
+            if (area == null || area.RayHit == null)
             {
                 return;
             }
 
-            if(WindowData.Instance.SelectedData.HasOneSelectedGroup())
+            if (WindowData.Instance.SelectedData.HasOneSelectedGroup())
             {
                 Group group = WindowData.Instance.SelectedData.SelectedGroup;
-                
-                if (group.PrototypeType == typeof(PrototypeGameObject) || group.PrototypeType == typeof(PrototypeTerrainObject))
+
+                if (group.PrototypeType == typeof(PrototypeGameObject) ||
+                    group.PrototypeType == typeof(PrototypeTerrainObject))
                 {
-                    FilterSettings filterSettings = (FilterSettings)group.GetElement(typeof(BrushModifyTool), typeof(FilterSettings));
-                        
-                    if(filterSettings.FilterType != FilterType.MaskFilter)
+                    var filterSettings =
+                        (FilterSettings)group.GetElement(typeof(BrushModifyTool), typeof(FilterSettings));
+
+                    if (filterSettings.FilterType != FilterType.MaskFilter)
                     {
-                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter, GlobalCommonComponentSingleton<LayerSettings>.Instance);
+                        SimpleFilterVisualisation.DrawSimpleFilter(group, area, filterSettings.SimpleFilter,
+                            GlobalCommonComponentSingleton<LayerSettings>.Instance);
                         VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                     }
                     else
                     {
-                        _maskFilterVisualisation.DrawMaskFilterVisualization(filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
+                        _maskFilterVisualisation.DrawMaskFilterVisualization(
+                            filterSettings.MaskFilterComponentSettings.MaskFilterStack, area);
                     }
                 }
             }
             else
             {
-                if(SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(BrushModifyTool), WindowData.Instance.SelectedData))
+                if (SimpleFilterUtility.HasOneActiveSimpleFilter(typeof(BrushModifyTool),
+                        WindowData.Instance.SelectedData))
                 {
                     VisualisationUtility.DrawCircleHandles(area.BoxSize, area.RayHit);
                 }

@@ -11,18 +11,19 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.GUI
     [ElementEditor(typeof(PhysicsEffectsTool))]
     public class PhysicsEffectsToolEditor : ToolWindowEditor
     {
-	    public override void DrawButtons()
-	    {
-		    UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
-		    
-		    PhysicsEffectsToolSettingsEditor editor = (PhysicsEffectsToolSettingsEditor)ToolsComponentStackEditor.GetEditor(typeof(PhysicsEffectsTool), typeof(PhysicsEffectsToolSettings));
-		    editor.PhysicsEffectStackEditor.DrawButtons();
-	    }
-	    
-	    public override void DrawFirstSettings()
-	    {
-		    PhysicsSimulatorSettingsEditor.OnGUI<GlobalTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance, false);
-	    }
+        public override void DrawButtons()
+        {
+            UndoEditor.DrawButtons(TargetType, WindowData.Instance.SelectedData);
+
+            var editor =
+                (PhysicsEffectsToolSettingsEditor)ToolsComponentStackEditor.GetEditor(typeof(PhysicsEffectsTool),
+                    typeof(PhysicsEffectsToolSettings));
+            editor.PhysicsEffectStackEditor.DrawButtons();
+        }
+
+        public override void DrawFirstSettings() =>
+            PhysicsSimulatorSettingsEditor.OnGUI<GlobalTimeDisablePhysicsMode>(PhysicsSimulatorSettings.Instance,
+                false);
     }
 }
 #endif

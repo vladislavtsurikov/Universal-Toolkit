@@ -1,31 +1,32 @@
 #if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.Core.Runtime;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstancedIndirect
 {
-    public static class GenerateGPUInstancedIndirectShader 
+    public static class GenerateGPUInstancedIndirectShader
     {
-        [NonSerialized] 
-        private static string[] _gpuInstancedIndirectSetup = new string[]
+        [NonSerialized]
+        private static readonly string[] _gpuInstancedIndirectSetup =
         {
-            "#include \"XXX\"\n",
-            "#pragma instancing_options procedural:setupGPUInstancedIndirect\n",
-            "#pragma multi_compile_instancing\n",
-        }; 
+            "#include \"XXX\"\n", "#pragma instancing_options procedural:setupGPUInstancedIndirect\n",
+            "#pragma multi_compile_instancing\n"
+        };
 
         static GenerateGPUInstancedIndirectShader()
         {
-            string[] searchFolders = AssetDatabase.FindAssets("GPUInstancedIndirectInclude");
+            var searchFolders = AssetDatabase.FindAssets("GPUInstancedIndirectInclude");
 
-            for (int i = 0; i < searchFolders.Length; i++)
+            for (var i = 0; i < searchFolders.Length; i++)
             {
-                if (AssetDatabase.GUIDToAssetPath(searchFolders[i]).EndsWith("GPUInstancedIndirectInclude.cginc")) 
+                if (AssetDatabase.GUIDToAssetPath(searchFolders[i]).EndsWith("GPUInstancedIndirectInclude.cginc"))
                 {
-                    string cgincQr = AssetDatabase.GUIDToAssetPath(searchFolders[i]);
+                    var cgincQr = AssetDatabase.GUIDToAssetPath(searchFolders[i]);
 
                     _gpuInstancedIndirectSetup[0] = _gpuInstancedIndirectSetup[0].Replace("XXX", cgincQr);
 
@@ -36,10 +37,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 
         private static List<string> RemoveExistingProceduralSetup(string originalAssetPath)
         {
-            string[] originalLines = System.IO.File.ReadAllLines(originalAssetPath);
-            List<string> newShaderlines = new List<string>();
+            var originalLines = File.ReadAllLines(originalAssetPath);
+            var newShaderlines = new List<string>();
 
-            foreach (string line in originalLines)
+            foreach (var line in originalLines)
             {
                 if (!line.Contains("#pragma instancing_options")
                     && !line.Contains("GPUInstancedIndirectInclude.cginc")
@@ -49,17 +50,18 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
                 }
             }
 
-            return newShaderlines; 
+            return newShaderlines;
         }
 
-        private static List<string> ChangeShaderName(string newShaderName, Shader originalShader, List<string> shaderLines)
-        { 
-            for (int i = 0; i < shaderLines.Count; i++)
+        private static List<string> ChangeShaderName(string newShaderName, Shader originalShader,
+            List<string> shaderLines)
+        {
+            for (var i = 0; i < shaderLines.Count; i++)
             {
                 if (shaderLines[i].Contains(originalShader.name))
                 {
                     shaderLines[i] = shaderLines[i].Replace(originalShader.name, newShaderName);
-                } 
+                }
             }
 
             return shaderLines;
@@ -67,11 +69,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 
         private static List<string> AddGPUInstancedIndirectSupport(List<string> shaderLines)
         {
-            for (int lineIndex = 0; lineIndex < shaderLines.Count; lineIndex++)
+            for (var lineIndex = 0; lineIndex < shaderLines.Count; lineIndex++)
             {
                 if (shaderLines[lineIndex].Contains("HLSLPROGRAM"))
                 {
-                    for (int i = lineIndex; i < shaderLines.Count; i++)
+                    for (var i = lineIndex; i < shaderLines.Count; i++)
                     {
                         if (shaderLines[i].Contains("ENDHLSL"))
                         {
@@ -81,9 +83,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
                     }
                 }
 
-                if(shaderLines[lineIndex].Contains("CGPROGRAM"))
+                if (shaderLines[lineIndex].Contains("CGPROGRAM"))
                 {
-                    for (int i = lineIndex; i < shaderLines.Count; i++)
+                    for (var i = lineIndex; i < shaderLines.Count; i++)
                     {
                         if (shaderLines[i].Contains("ENDCG"))
                         {
@@ -93,39 +95,40 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
                     }
                 }
             }
-            
+
             return shaderLines;
         }
 
         public static Shader Create(Shader originalShader, bool useOriginal = false)
-        { 
+        {
             if (originalShader == null || originalShader.name == RendererStackConstants.ShaderUnityInternalError)
             {
                 Debug.LogError("Can not find shader! Please make sure that the material has a shader assigned.");
                 return null;
             }
 
-            Shader originalShaderRef = Shader.Find(originalShader.name);
-            string originalAssetPath = AssetDatabase.GetAssetPath(originalShaderRef);
+            var originalShaderRef = Shader.Find(originalShader.name);
+            var originalAssetPath = AssetDatabase.GetAssetPath(originalShaderRef);
 
             // can not work with ShaderGraph or other non shader code
             if (!originalAssetPath.EndsWith(".shader"))
-            {   
+            {
                 return null;
             }
 
-            List<string> shaderLines = new List<string>();
+            var shaderLines = new List<string>();
 
             shaderLines = RemoveExistingProceduralSetup(originalAssetPath);
-            
-            EditorUtility.DisplayProgressBar("Shader Conversion", "Creating a shader with GPU Instanced Instanced support...", 0.1f);
 
-            string newShaderName = useOriginal ? "" : "GPUInstancedIndirect/" + originalShader.name;
+            EditorUtility.DisplayProgressBar("Shader Conversion",
+                "Creating a shader with GPU Instanced Instanced support...", 0.1f);
+
+            var newShaderName = useOriginal ? "" : "GPUInstancedIndirect/" + originalShader.name;
             shaderLines = ChangeShaderName(newShaderName, originalShader, shaderLines);
             shaderLines = AddGPUInstancedIndirectSupport(shaderLines);
-            
+
             Shader shader = CreateShader(originalAssetPath, shaderLines, useOriginal);
-            
+
             EditorUtility.ClearProgressBar();
 
             return shader;
@@ -133,12 +136,13 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 
         private static Shader CreateShader(List<string> shaderLines, string assetPath)
         {
-            byte[] bytes = GetBytesFromStrings(shaderLines);
-            System.IO.FileStream fs = System.IO.File.Create(assetPath);
+            var bytes = GetBytesFromStrings(shaderLines);
+            FileStream fs = File.Create(assetPath);
             fs.Write(bytes, 0, bytes.Length);
             fs.Close();
 
-            EditorUtility.DisplayProgressBar("Shader Conversion", "Creating a shader with GPU Instanced Instanced support...", 0.3f);
+            EditorUtility.DisplayProgressBar("Shader Conversion",
+                "Creating a shader with GPU Instanced Instanced support...", 0.3f);
             AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
             AssetDatabase.Refresh();
 
@@ -149,38 +153,42 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RenderManager.GPUInstance
 
         private static Shader CreateShader(string originalAssetPath, List<string> shaderLines, bool useOriginal)
         {
-            string originalFileName = System.IO.Path.GetFileName(originalAssetPath);
-            
+            var originalFileName = Path.GetFileName(originalAssetPath);
+
             if (originalAssetPath.StartsWith("Packages/"))
             {
-                if (!System.IO.Directory.Exists(RendererStackConstants.PathToShaders))
+                if (!Directory.Exists(RendererStackConstants.PathToShaders))
                 {
-                    System.IO.Directory.CreateDirectory(RendererStackConstants.PathToShaders);
+                    Directory.CreateDirectory(RendererStackConstants.PathToShaders);
                 }
-                
-                string assetPath = CommonPath.CombinePath(RendererStackConstants.PathToShaders, originalFileName);
 
-                string newAssetPath = assetPath.Replace(originalFileName, originalFileName.Replace(".shader", "_GPUInstancedIndirect.shader"));
+                var assetPath = CommonPath.CombinePath(RendererStackConstants.PathToShaders, originalFileName);
+
+                var newAssetPath = assetPath.Replace(originalFileName,
+                    originalFileName.Replace(".shader", "_GPUInstancedIndirect.shader"));
 
                 return CreateShader(shaderLines, newAssetPath);
             }
             else
             {
-                string newAssetPath = useOriginal ? originalAssetPath : originalAssetPath.Replace(originalFileName, originalFileName.Replace(".shader", "_GPUInstancedIndirect.shader"));
+                var newAssetPath = useOriginal
+                    ? originalAssetPath
+                    : originalAssetPath.Replace(originalFileName,
+                        originalFileName.Replace(".shader", "_GPUInstancedIndirect.shader"));
 
                 return CreateShader(shaderLines, newAssetPath);
             }
         }
-        
+
         public static byte[] GetBytesFromStrings(List<string> shaderLines)
         {
-            string shaderText = "";
-            foreach (string line in shaderLines)
+            var shaderText = "";
+            foreach (var line in shaderLines)
             {
                 shaderText += line;
             }
 
-            return System.Text.Encoding.UTF8.GetBytes(shaderText);
+            return Encoding.UTF8.GetBytes(shaderText);
         }
     }
 }

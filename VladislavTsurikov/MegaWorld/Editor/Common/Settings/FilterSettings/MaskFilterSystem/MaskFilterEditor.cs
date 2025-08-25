@@ -5,10 +5,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Common.Settings.FilterSettings.Mask
 {
     public abstract class MaskFilterEditor : ReorderableListComponentEditor
     {
-        public virtual string GetAdditionalName()
-        {
-            return "";
-        }
+        public virtual string GetAdditionalName() => "";
     }
 }
 #endif

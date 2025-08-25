@@ -14,7 +14,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.BuildSceneCollectionSystem
             {
                 return new List<SceneReference>();
             }
-            
+
             return ActiveBuildSceneCollection.GetSceneReferences();
         }
     }

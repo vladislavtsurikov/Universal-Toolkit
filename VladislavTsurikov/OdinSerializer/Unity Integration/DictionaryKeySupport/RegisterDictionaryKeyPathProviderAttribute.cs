@@ -16,18 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+using System;
+
 namespace OdinSerializer
 {
-    using System;
-
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public sealed class RegisterDictionaryKeyPathProviderAttribute : Attribute
     {
         public readonly Type ProviderType;
 
-        public RegisterDictionaryKeyPathProviderAttribute(Type providerType)
-        {
-            this.ProviderType = providerType;
-        }
+        public RegisterDictionaryKeyPathProviderAttribute(Type providerType) => ProviderType = providerType;
     }
 }
