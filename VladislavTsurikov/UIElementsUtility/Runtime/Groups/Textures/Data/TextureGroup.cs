@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using VladislavTsurikov.UIElementsUtility.Runtime.Core;
 using VladislavTsurikov.Utility.Runtime;
+using VladislavTsurikov.UIElementsUtility.Editor.Groups.Textures;
+using VladislavTsurikov.UIElementsUtility.Runtime.Core;
 #if UNITY_EDITOR
 using UnityEditor;
-using VladislavTsurikov.UIElementsUtility.Editor.Groups.Textures;
 #endif
 
 namespace VladislavTsurikov.UIElementsUtility.Runtime.Groups.Textures
