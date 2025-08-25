@@ -16,26 +16,22 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.Scripting;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
 #if UNITY_EDITOR
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration
+namespace OdinSerializer.Editor
 {
+    using OdinSerializer.Utilities;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Reflection.Emit;
+    using UnityEditor;
+    using UnityEditor.SceneManagement;
+    using UnityEngine;
+    using UnityEngine.Scripting;
+
     public static class AOTSupportUtilities
     {
         /// <summary>

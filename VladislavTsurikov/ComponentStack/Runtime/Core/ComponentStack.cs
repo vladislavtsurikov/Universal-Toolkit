@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
+using OdinSerializer.Utilities;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
@@ -12,7 +14,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
     public abstract class ComponentStack<T> where T : Component
     {
         [NonSerialized] 
-        private bool _isDirty = true;
+        public bool IsDirty = true;
         
         [OdinSerialize]
         protected AdvancedElementList<T> _elementList = new AdvancedElementList<T>();
@@ -21,52 +23,43 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         
         public IReadOnlyList<T> ElementList => _elementList;
 
-        public bool IsDirty
-        {
-            get => _isDirty;
-            set
-            {
-                if (_isDirty == value)
-                {
-                    return;
-                }
-                
-                _isDirty = value;
-                    
-                if (_isDirty)
-                {
-                    OnCollectionChanged?.Invoke();
-                }
-            }
-        }
-        
         public bool IsSetup { get; private set; }
-
-        public event Action OnCollectionChanged;
+        
+        public event Action<int> ElementAdded;
+        public event Action<int> ElementRemoved;
+        public event Action ListChanged;
 
         public T SelectedElement
         {
             get { return _elementList.FirstOrDefault(t => t.Selected); }
         }
-
-        public void Setup(bool force = true, params object[] setupData)
+        
+        public async UniTask Setup(bool force = true, object[] setupData = null, CancellationToken cancellationToken = default)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             _elementList ??= new AdvancedElementList<T>();
-            
+
+            _elementList.OnAdded += HandleElementAdded;
+            _elementList.OnRemoved += HandleElementRemoved;
+            _elementList.OnListChanged += HandleListChanged;
+
             IsSetup = true;
 
-            IsDirty = true;
             SetupData = setupData;
 
             OnSetup();
             RemoveInvalidElements();
             CreateElements();
 
-            for (int i = 0; i < _elementList.Count; i++)
+            foreach (var element in _elementList)
             {
-                _elementList[i].Stack = this;
-                _elementList[i].SetupWithSetupData(force, setupData);
+                cancellationToken.ThrowIfCancellationRequested();
+                element.Stack = this;
+                await element.SetupWithSetupData(force, setupData);
             }
+
+            IsDirty = true;
         }
 
         public void OnDisable()
@@ -77,6 +70,10 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             {
                 ((IDisableable)_elementList[i]).OnDisable();
             }
+            
+            _elementList.OnAdded -= HandleElementAdded;
+            _elementList.OnRemoved -= HandleElementRemoved;
+            _elementList.OnListChanged -= HandleListChanged;
 
             OnDisableStack();
         }
@@ -156,7 +153,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             }
             else
             {
-                _elementList[index] = element;
+                _elementList.Insert(index, element);
             }
 
             if (_elementList.Count == 1)
@@ -281,6 +278,21 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             }
 
             return null;
+        }
+        
+        private void HandleElementAdded(int index)
+        {
+            ElementAdded?.Invoke(index);
+        }
+
+        private void HandleElementRemoved(int index)
+        {
+            ElementRemoved?.Invoke(index);
+        }
+
+        private void HandleListChanged()
+        {
+            ListChanged?.Invoke();
         }
 
         protected virtual void OnSetup()

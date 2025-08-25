@@ -15,11 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using UnityEngine;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using UnityEngine;
+
     /// <summary>
     /// Utility class indicating current Unity version.
     /// </summary>

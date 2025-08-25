@@ -9,7 +9,7 @@ using VladislavTsurikov.ComponentStack.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList.Attributes;
+using VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes;

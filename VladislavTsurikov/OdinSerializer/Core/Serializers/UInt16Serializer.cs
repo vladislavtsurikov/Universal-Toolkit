@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="ushort"/> type.
     /// </summary>
-    /// <seealso cref="ushort" />
+    /// <seealso cref="Serializer{System.UInt16}" />
     public sealed class UInt16Serializer : Serializer<ushort>
     {
         /// <summary>

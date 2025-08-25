@@ -14,7 +14,7 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
 
         static AllEditorTypes()
         {
-            var elementTypes = AllTypesDerivedFrom<T>.Types;
+            List<Type> componentTypes = AllTypesDerivedFrom<T>.Types.ToList();
 
             var editorTypes = AllTypesDerivedFrom<ElementEditor>.Types
                 .Where(
@@ -26,16 +26,14 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
             {
                 var attribute = type.GetAttribute<ElementEditorAttribute>();
 
-                if (elementTypes.Contains(attribute.SettingsType))
+                if (componentTypes.Contains(attribute.SettingsType))
                 {
                     if (!Types.Keys.Contains(attribute.SettingsType))
                     {
                         Types.Add(attribute.SettingsType, type);
+
+                        componentTypes.Remove(attribute.SettingsType);
                     }
-                }
-                else if(attribute.SettingsType.ToString() == typeof(T).ToString())
-                {
-                    Types.Add(attribute.SettingsType, type);
                 }
             }
         }

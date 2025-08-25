@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.Math.Runtime;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint;
 #if UNITY_EDITOR
 using UnityEditor;
-using VladislavTsurikov.MegaWorld.Runtime.Common.Utility.Repaint;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks

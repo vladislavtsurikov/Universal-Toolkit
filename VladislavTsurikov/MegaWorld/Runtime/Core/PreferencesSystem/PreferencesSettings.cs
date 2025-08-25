@@ -1,9 +1,9 @@
 ﻿using System;
+using OdinSerializer;
 using UnityEditor;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.ScriptableObjectUtility.Runtime;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem

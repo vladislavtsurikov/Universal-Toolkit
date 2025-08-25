@@ -15,18 +15,15 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using Utilities;
+
     /// <summary>
     /// An Odin-serialized prefab modification, containing all the information necessary to apply the modification.
     /// </summary>

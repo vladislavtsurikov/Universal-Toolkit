@@ -1,7 +1,9 @@
 ﻿using System;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 {
@@ -30,7 +32,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
             OnUpdate();
         }
         
-        public Component GetElement(Type elementType)
+        public Runtime_Core_Component GetElement(Type elementType)
         {
             return _componentStack.GetElement(elementType);
         }
@@ -38,7 +40,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
         public void Setup()
         {
             Data.Setup();
-            _componentStack.Setup(true, this);
+            _componentStack.Setup(true, new object[]{this}).Forget();
             OnToolEnable();
 
             IsSetup = true; 

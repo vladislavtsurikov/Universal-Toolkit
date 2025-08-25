@@ -15,15 +15,14 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.SerializationNodes
+namespace OdinSerializer
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+
     /// <summary>
     /// Not yet documented.
     /// </summary>

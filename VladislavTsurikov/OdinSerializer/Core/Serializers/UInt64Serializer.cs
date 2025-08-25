@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="ulong"/> type.
     /// </summary>
-    /// <seealso cref="ulong" />
+    /// <seealso cref="Serializer{System.UInt64}" />
     public sealed class UInt64Serializer : Serializer<ulong>
     {
         /// <summary>

@@ -16,11 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Attribute indicating that a generic type definition class which implements the <see cref="IFormatter{T}" /> interface somewhere in its hierarchy is a custom formatter for *any variation* of the generic type definition T.
     /// <para />

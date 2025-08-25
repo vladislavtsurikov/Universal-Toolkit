@@ -15,14 +15,15 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-#if UNITY_EDITOR
-using System;
-using System.Linq;
-using UnityEditor;
-using VladislavTsurikov.OdinSerializer.Utilities;
 
-namespace VladislavTsurikov.OdinSerializer.Config
+#if UNITY_EDITOR
+
+namespace OdinSerializer.Utilities.Editor
 {
+    using System;
+    using System.Linq;
+    using UnityEditor;
+
     public enum AssemblyImportSettings
     {
         BuildOnly,
@@ -128,7 +129,7 @@ namespace VladislavTsurikov.OdinSerializer.Config
             {
                 importer.ClearSettings();
                 importer.SetCompatibleWithAnyPlatform(includeInBuild);
-                Platforms.ForEach(p => importer.SetCompatibleWithPlatform((BuildTarget)p, includeInBuild));
+                Platforms.ForEach(p => importer.SetCompatibleWithPlatform(p, includeInBuild));
 
                 if (includeInBuild)
                 {

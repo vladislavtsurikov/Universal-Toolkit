@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
-using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 using Object = UnityEngine.Object;
+#if RENDERER_STACK
+using VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem;
+using VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer;
+#endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject
 {

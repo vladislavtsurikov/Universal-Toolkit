@@ -15,12 +15,11 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Collections.Generic;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Not yet documented.
     /// </summary>

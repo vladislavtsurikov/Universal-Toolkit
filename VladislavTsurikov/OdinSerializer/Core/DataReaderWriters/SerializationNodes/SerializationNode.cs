@@ -15,12 +15,10 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.SerializationNodes
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// A serialization node as used by the <see cref="DataFormat.Nodes"/> format.
     /// </summary>

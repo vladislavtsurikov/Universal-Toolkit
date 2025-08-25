@@ -2,10 +2,12 @@
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
 {
-    public class ComponentStack : ComponentStackOnlyDifferentTypes<Component>
+    public class ComponentStack : ComponentStackOnlyDifferentTypes<Runtime_Core_Component>
     {
         private UnityEngine.MonoBehaviour _tool;
 

@@ -16,21 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(BoundsFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="Bounds"/> type.
     /// </summary>
-    /// <seealso cref="Bounds" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Bounds}" />
     public class BoundsFormatter : MinimalBaseFormatter<Bounds>
     {
         private static readonly Serializer<Vector3> Vector3Serializer = Serializer.Get<Vector3>();

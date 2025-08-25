@@ -15,17 +15,18 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Reflection;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+    using System.Reflection;
+
     /// <summary>
     /// Helper class for quickly and easily implementing the <see cref="ISerializationPolicy"/> interface.
     /// </summary>
     public class CustomSerializationPolicy : ISerializationPolicy
     {
+        private string id;
+        private bool allowNonSerializableTypes;
         private Func<MemberInfo, bool> shouldSerializeFunc;
 
         /// <summary>
@@ -49,8 +50,8 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
                 throw new ArgumentNullException("shouldSerializeFunc");
             }
 
-            this.ID = id;
-            this.AllowNonSerializableTypes = allowNonSerializableTypes;
+            this.id = id;
+            this.allowNonSerializableTypes = allowNonSerializableTypes;
             this.shouldSerializeFunc = shouldSerializeFunc;
         }
 
@@ -60,7 +61,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// The identifier of the policy.
         /// </value>
-        public string ID { get; }
+        public string ID { get { return this.id; } }
 
         /// <summary>
         /// Gets a value indicating whether to allow non serializable types. (Types which are not decorated with <see cref="System.SerializableAttribute" />.)
@@ -68,7 +69,7 @@ namespace VladislavTsurikov.OdinSerializer.Core.Misc
         /// <value>
         /// <c>true</c> if serializable types are allowed; otherwise, <c>false</c>.
         /// </value>
-        public bool AllowNonSerializableTypes { get; }
+        public bool AllowNonSerializableTypes { get { return this.allowNonSerializableTypes; } }
 
         /// <summary>
         /// Gets a value indicating whether a given <see cref="MemberInfo" /> should be serialized or not.

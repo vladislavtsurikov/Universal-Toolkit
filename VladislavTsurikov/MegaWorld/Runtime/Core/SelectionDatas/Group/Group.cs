@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OdinSerializer;
+using OdinSerializer.Utilities;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
@@ -11,10 +13,10 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.DefaultComponentsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-using VladislavTsurikov.OdinSerializer.Utilities;
+using VladislavTsurikov.ReflectionUtility;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 {
@@ -104,7 +106,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
 
             _componentStackManager.SetupElementStack(typeof(AddGeneralGroupComponentsAttribute),
                 typeof(AddGroupComponentsAttribute), PrototypeType);
-            _defaultGroupComponentStack.Setup(true, this);
+            _defaultGroupComponentStack.Setup(true, new object[]{this});
         }
 
         public void SetupPrototypesElementStack()
@@ -115,12 +117,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group
             }
         }
 
-        public Component GetElement(Type elementType)
+        public Runtime_Core_Component GetElement(Type elementType)
         {
             return _componentStackManager.GeneralComponentStack.GetElement(elementType);
         }
 
-        public Component GetElement(Type toolType, Type elementType)
+        public Runtime_Core_Component GetElement(Type toolType, Type elementType)
         {
             return _componentStackManager.ToolsComponentStack.GetElement(toolType, elementType);
         }

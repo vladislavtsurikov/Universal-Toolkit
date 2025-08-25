@@ -10,6 +10,8 @@ namespace VladislavTsurikov.Utility.Runtime
 {
     public static class StringExtension
     {
+        private const string InvisibleSymbolsRange = "\\u0009\\u00a0\\u00ad\\u034f\\u061c\\u115f\\u1160\\u17b4\\u17b5\\u180b-\\u180e\\u2000-\\u200f\\u202a-\\u202f\\u205f-\\u206f\\u2800\\u3000\\u3164\\ufe00-\\ufe0f\\ufeff\\uffa0\\ufffc";
+
         /// <summary> Remove all whitespaces from string </summary>
         /// <param name="target"> Target string </param>
         public static string RemoveWhitespaces(this string target) =>
@@ -342,12 +344,66 @@ namespace VladislavTsurikov.Utility.Runtime
                 : encoding == null
                     ? throw new ArgumentNullException(nameof(encoding))
                     : encoding.GetByteCount(target);
-        
+
+        /// <summary>
+        /// Exluding special characters and invisible symbols. Also removes multiple spaces
+        /// </summary>
+        public static string LeaveOnlyLettersAndDigits(this string target, bool withSpecialCharacters = false)
+        {
+            StringBuilder pattern = new();
+            pattern.Append("[");
+            if (!withSpecialCharacters)
+            {
+                pattern.Append("-_$&+,/:;=?@#|'<>.^*()%!");
+            }
+            pattern.Append($"{InvisibleSymbolsRange}]");
+            target = Regex.Replace(target, pattern.ToString(), "");
+            return Regex.Replace(target, "\\u0020{2,}", " ");
+        }
+
+        public static bool IsLettersAndDigitsOnly(this string target, bool isSpecialSymbolsAllowed = false)
+        {
+            StringBuilder pattern = new();
+            pattern.Append("[\\p{L}0-9");
+            if (isSpecialSymbolsAllowed)
+            {
+                pattern.Append("-_$&+,/:;=?@#|'<>.^*()%!");
+            }
+            pattern.Append("]");
+            bool isLetterOrDigit = Regex.IsMatch(target, pattern.ToString());
+            bool haveInvisibleSymbols = Regex.IsMatch(target, $"[{InvisibleSymbolsRange}]");
+            return isLetterOrDigit && !haveInvisibleSymbols;
+        }
+
+        /// <summary>
+        /// Removing any non digit symbols from text
+        /// </summary>
+        public static string LeaveOnlyDigits(this string target) =>
+            Regex.Replace(target, "[^0-9]", "");
+
+        public static bool IsSpacesOnly(this string target) =>
+            !Regex.IsMatch(target, "[^\u0020]");
+
 #if UNITY_EDITOR
         public static string Nicify(this string value)
         {
             return ObjectNames.NicifyVariableName(value);
         }
 #endif
+        
+        public static string FirstCharToUpper(this string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return input;
+            }
+
+            if (input.Length == 1)
+            {
+                return input.ToUpper();
+            }
+
+            return char.ToUpper(input[0]) + input.Substring(1);
+        }
     }
 }

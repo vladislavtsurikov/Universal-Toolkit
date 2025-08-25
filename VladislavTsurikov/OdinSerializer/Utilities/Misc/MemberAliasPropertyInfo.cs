@@ -16,12 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Globalization;
-using System.Reflection;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Globalization;
+    using System.Reflection;
+
     /// <summary>
     /// Provides a methods of representing imaginary properties which are unique to serialization.
     /// <para />
@@ -35,6 +35,9 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </summary>
         private const string FakeNameSeparatorString = "+";
 
+        private PropertyInfo aliasedProperty;
+        private string mangledName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberAliasPropertyInfo"/> class.
         /// </summary>
@@ -42,8 +45,8 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="namePrefix">The name prefix to use.</param>
         public MemberAliasPropertyInfo(PropertyInfo prop, string namePrefix)
         {
-            this.AliasedProperty = prop;
-            this.Name = string.Concat(namePrefix, FakeNameSeparatorString, this.AliasedProperty.Name);
+            this.aliasedProperty = prop;
+            this.mangledName = string.Concat(namePrefix, FakeNameSeparatorString, this.aliasedProperty.Name);
         }
 
         /// <summary>
@@ -54,39 +57,39 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="separatorString">The separator string to use.</param>
         public MemberAliasPropertyInfo(PropertyInfo prop, string namePrefix, string separatorString)
         {
-            this.AliasedProperty = prop;
-            this.Name = string.Concat(namePrefix, separatorString, this.AliasedProperty.Name);
+            this.aliasedProperty = prop;
+            this.mangledName = string.Concat(namePrefix, separatorString, this.aliasedProperty.Name);
         }
 
         /// <summary>
         /// The backing PropertyInfo that is being aliased.
         /// </summary>
-        public PropertyInfo AliasedProperty { get; }
+        public PropertyInfo AliasedProperty { get { return this.aliasedProperty; } }
 
         /// <summary>
         /// Gets the module in which the type that declares the member represented by the current <see cref="T:System.Reflection.MemberInfo" /> is defined.
         /// </summary>
-        public override Module Module { get { return this.AliasedProperty.Module; } }
+        public override Module Module { get { return this.aliasedProperty.Module; } }
 
         /// <summary>
         /// Gets a value that identifies a metadata element.
         /// </summary>
-        public override int MetadataToken { get { return this.AliasedProperty.MetadataToken; } }
+        public override int MetadataToken { get { return this.aliasedProperty.MetadataToken; } }
 
         /// <summary>
         /// Gets the name of the current member.
         /// </summary>
-        public override string Name { get; }
+        public override string Name { get { return this.mangledName; } }
 
         /// <summary>
         /// Gets the class that declares this member.
         /// </summary>
-        public override Type DeclaringType { get { return this.AliasedProperty.DeclaringType; } }
+        public override Type DeclaringType { get { return this.aliasedProperty.DeclaringType; } }
 
         /// <summary>
         /// Gets the class object that was used to obtain this instance of MemberInfo.
         /// </summary>
-        public override Type ReflectedType { get { return this.AliasedProperty.ReflectedType; } }
+        public override Type ReflectedType { get { return this.aliasedProperty.ReflectedType; } }
 
         /// <summary>
         /// Gets the type of the property.
@@ -94,7 +97,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The type of the property.
         /// </value>
-        public override Type PropertyType { get { return this.AliasedProperty.PropertyType; } }
+        public override Type PropertyType { get { return this.aliasedProperty.PropertyType; } }
 
         /// <summary>
         /// Gets the attributes.
@@ -102,7 +105,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The attributes.
         /// </value>
-        public override PropertyAttributes Attributes { get { return this.AliasedProperty.Attributes; } }
+        public override PropertyAttributes Attributes { get { return this.aliasedProperty.Attributes; } }
 
         /// <summary>
         /// Gets a value indicating whether this instance can read.
@@ -110,7 +113,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         ///   <c>true</c> if this instance can read; otherwise, <c>false</c>.
         /// </value>
-        public override bool CanRead { get { return this.AliasedProperty.CanRead; } }
+        public override bool CanRead { get { return this.aliasedProperty.CanRead; } }
 
         /// <summary>
         /// Gets a value indicating whether this instance can write.
@@ -118,7 +121,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         ///   <c>true</c> if this instance can write; otherwise, <c>false</c>.
         /// </value>
-        public override bool CanWrite { get { return this.AliasedProperty.CanWrite; } }
+        public override bool CanWrite { get { return this.aliasedProperty.CanWrite; } }
 
         /// <summary>
         /// When overridden in a derived class, returns an array of all custom attributes applied to this member.
@@ -129,7 +132,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(bool inherit)
         {
-            return this.AliasedProperty.GetCustomAttributes(inherit);
+            return this.aliasedProperty.GetCustomAttributes(inherit);
         }
 
         /// <summary>
@@ -142,7 +145,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         {
-            return this.AliasedProperty.GetCustomAttributes(attributeType, inherit);
+            return this.aliasedProperty.GetCustomAttributes(attributeType, inherit);
         }
 
         /// <summary>
@@ -155,7 +158,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            return this.AliasedProperty.IsDefined(attributeType, inherit);
+            return this.aliasedProperty.IsDefined(attributeType, inherit);
         }
 
         /// <summary>
@@ -167,7 +170,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override MethodInfo[] GetAccessors(bool nonPublic)
         {
-            return this.AliasedProperty.GetAccessors(nonPublic);
+            return this.aliasedProperty.GetAccessors(nonPublic);
         }
 
         /// <summary>
@@ -179,7 +182,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override MethodInfo GetGetMethod(bool nonPublic)
         {
-            return this.AliasedProperty.GetGetMethod(nonPublic);
+            return this.aliasedProperty.GetGetMethod(nonPublic);
         }
 
         /// <summary>
@@ -188,7 +191,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <returns>The index parameters of the property.</returns>
         public override ParameterInfo[] GetIndexParameters()
         {
-            return this.AliasedProperty.GetIndexParameters();
+            return this.aliasedProperty.GetIndexParameters();
         }
 
         /// <summary>
@@ -200,7 +203,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override MethodInfo GetSetMethod(bool nonPublic)
         {
-            return this.AliasedProperty.GetSetMethod(nonPublic);
+            return this.aliasedProperty.GetSetMethod(nonPublic);
         }
 
         /// <summary>
@@ -214,7 +217,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <returns>The value of the property on the given instance.</returns>
         public override object GetValue(object obj, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            return this.AliasedProperty.GetValue(obj, invokeAttr, binder, index, culture);
+            return this.aliasedProperty.GetValue(obj, invokeAttr, binder, index, culture);
         }
 
         /// <summary>
@@ -228,7 +231,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="culture">The culture to use.</param>
         public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, object[] index, CultureInfo culture)
         {
-            this.AliasedProperty.SetValue(obj, value, invokeAttr, binder, index, culture);
+            this.aliasedProperty.SetValue(obj, value, invokeAttr, binder, index, culture);
         }
     }
 }

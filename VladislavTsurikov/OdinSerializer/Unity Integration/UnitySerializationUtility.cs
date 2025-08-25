@@ -18,31 +18,24 @@
 
 //#define PREFAB_DEBUG
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Text;
 using UnityEditor;
-using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Events;
-using VladislavTsurikov.OdinSerializer.Config;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Binary;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.Json;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters.SerializationNodes;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-using VladislavTsurikov.OdinSerializer.Utilities;
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration
+namespace OdinSerializer
 {
+    using System.Globalization;
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using Utilities;
+    using UnityEngine;
+    using UnityEngine.Events;
+    using System.Runtime.CompilerServices;
+    using UnityEngine.Assertions;
+    using System.Runtime.Serialization;
+
 #if PREFAB_DEBUG && !SIRENIX_INTERNAL
 #warning "Prefab serialization debugging is enabled outside of Sirenix internal. Are you sure this is right?"
 #endif
@@ -833,8 +826,8 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
                                     {
                                         if (reference == null) continue;
                                         if (!(reference is GameObject || reference is Component)) continue;
-                                        if (AssetDatabase.Contains(reference)) continue;
-
+                                        if (UnityEditor.AssetDatabase.Contains(reference)) continue;
+                                        
                                         var referencePrefabType = PrefabUtility.GetPrefabAssetType(reference);
 
                                         bool mightBeInPrefab = referencePrefabType != PrefabAssetType.NotAPrefab;
@@ -857,6 +850,7 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
                                         }
 
                                         var gameObject = (GameObject)(reference is GameObject ? reference : (reference as Component).gameObject);
+                                        
                                         var referenceRoot = PrefabUtility.GetOutermostPrefabInstanceRoot(gameObject);
 
                                         if (referenceRoot != instanceRoot)
@@ -2635,8 +2629,6 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
 
                     foreach (var root in rootPrefabs)
                     {
-                        if(root == null)
-                            continue;
                         RegisterRecursive(root);
                     }
                 }
@@ -2657,6 +2649,11 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
 
             private static void RegisterRecursive(GameObject go)
             {
+                if (go == null)
+                {
+                    return;
+                }
+
                 selectedPrefabObjects.Add(go);
 
                 var components = go.GetComponents<Component>();

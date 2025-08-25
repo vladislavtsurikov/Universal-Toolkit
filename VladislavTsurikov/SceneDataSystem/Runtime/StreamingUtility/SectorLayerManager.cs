@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using OdinSerializer;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneUtility.Runtime;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility

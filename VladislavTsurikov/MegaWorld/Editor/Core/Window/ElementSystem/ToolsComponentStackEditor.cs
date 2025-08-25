@@ -5,15 +5,17 @@ using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
+using ElementsSystem_ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
+using GlobalSettings_ElementsSystem_ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 using ToolsComponentStack = VladislavTsurikov.MegaWorld.Runtime.Core.GlobalSettings.ElementsSystem.ToolsComponentStack;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window.ElementSystem
 {
     public class ToolsComponentStackEditor : IMGUIComponentStackEditor<ToolComponentStack, ToolStackElementEditor>
     {
-        private ToolsComponentStack _toolsComponentStack;
+        private GlobalSettings_ElementsSystem_ToolsComponentStack _toolsComponentStack;
         
-        public ToolsComponentStackEditor(ToolsComponentStack stack) : base(stack)
+        public ToolsComponentStackEditor(GlobalSettings_ElementsSystem_ToolsComponentStack stack) : base(stack)
         {
             _toolsComponentStack = stack;
         }

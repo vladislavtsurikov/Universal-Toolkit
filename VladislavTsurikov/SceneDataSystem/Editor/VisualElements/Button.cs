@@ -7,9 +7,9 @@ using UnityEngine.Events;
 using UnityEngine.UIElements;
 using VladislavTsurikov.ColorUtility.Runtime;
 using VladislavTsurikov.UIElementsUtility;
+using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 using VladislavTsurikov.UIElementsUtility.Editor.Groups.SelectableColors;
 using VladislavTsurikov.UIElementsUtility.Runtime;
-using VladislavTsurikov.UIElementsUtility.Runtime.Utility;
 using VisualElementExtensions = VladislavTsurikov.UIElementsUtility.Runtime.Utility.VisualElementExtensions;
 
 namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
@@ -91,7 +91,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         public Button()
         {
             Add(TemplateContainer = GetLayout.VisualElements.Button.CloneTree());
-            VisualElementExtensions.AddStyle(TemplateContainer, GetStyle.VisualElements.Button);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.AddStyle(TemplateContainer, GetStyle.VisualElements.Button);
             
             LayoutContainer = TemplateContainer.Q<VisualElement>(nameof(LayoutContainer));
             ButtonContainer = LayoutContainer.Q<VisualElement>(nameof(ButtonContainer));
@@ -103,7 +103,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             ButtonStyleDependentElements = new List<VisualElement>(ElementSizeDependentElements);
             IconDependentComponents = new List<VisualElement>(ElementSizeDependentElements);
 
-            VisualElementExtensions.SetStyleUnityFont(ButtonLabel, Font);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleUnityFont(ButtonLabel, Font);
 
             Element = new Element(this)
             {
@@ -117,12 +117,12 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                 ResetElementSize();
                 ResetLayoutOrientation();
                 ResetButtonStyle();
-                VisualElementExtensions.ResetLayout(this);
+                UIElementsUtility.Runtime.Utility.VisualElementExtensions.ResetLayout(this);
                 this.ResetAccentColor();
                 this.ClearIcon();
                 this.ClearLabelText();
                 this.ClearOnClick();
-                VisualElementExtensions.SetTooltip(this, string.Empty);
+                UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(this, string.Empty);
                 SelectionState = SelectionState.Normal;
             }
         }
@@ -152,9 +152,9 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             ResetButtonStyle();
 
             this.SetEnabled(true);
-            VisualElementExtensions.ResetLayout(this);
-            VisualElementExtensions.SetTooltip(this, string.Empty);
-            VisualElementExtensions.SetName(this, string.Empty);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.ResetLayout(this);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(this, string.Empty);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetName(this, string.Empty);
             this.ResetAccentColor();
             this.ClearIcon();
             this.ClearLabelText();
@@ -163,7 +163,7 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             this.SetSelectionState(SelectionState.Normal);
             
             
-            VisualElementExtensions.SetStyleTextAlign(ButtonLabel, TextAnchor.MiddleCenter);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleTextAlign(ButtonLabel, TextAnchor.MiddleCenter);
         }
         
         private void StateChanged()
@@ -190,10 +190,10 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
                     throw new ArgumentOutOfRangeException();
             }
 
-            VisualElementExtensions.SetStyleBackgroundImageTintColor(ButtonIcon, Element.IconColor); //Icon
-            VisualElementExtensions.SetStyleColor(ButtonLabel, Element.TextColor); //Label
-            VisualElementExtensions.SetStyleBackgroundColor(ButtonContainer, Element.ContainerColor); //Background
-            VisualElementExtensions.SetStyleBorderColor(LayoutContainer, Element.ContainerBorderColor); //Border
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImageTintColor(ButtonIcon, Element.IconColor); //Icon
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleColor(ButtonLabel, Element.TextColor); //Label
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundColor(ButtonContainer, Element.ContainerColor); //Background
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBorderColor(LayoutContainer, Element.ContainerBorderColor); //Border
         }
 
         public void ExecuteOnClick(EventBase clickEvent = null)
@@ -253,14 +253,14 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
         /// <param name="labelText"> Label text </param>
         public static T SetLabelText<T>(this T target, string labelText) where T : Button
         {
-            VisualElementExtensions.SetStyleDisplay(target.ButtonLabel
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonLabel
                     .SetText(labelText), String.IsNullOrEmpty(labelText) ? DisplayStyle.None : DisplayStyle.Flex);
             return target;
         }
 
         /// <summary> Clear the text and tooltip values from the button's label </summary>
         public static T ClearLabelText<T>(this T target) where T : Button =>
-            VisualElementExtensions.SetTooltip(target.SetLabelText(string.Empty), string.Empty);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetTooltip(target.SetLabelText(string.Empty), string.Empty);
 
         #endregion
 
@@ -314,8 +314,8 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.UpdateIconType(IconType.Static);
             //target.iconReaction?.Recycle();
             //target.iconReaction = null;
-            VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, iconTexture2D);
-            VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.Flex);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, iconTexture2D);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.Flex);
             //target.SetAnimationTrigger(ButtonAnimationTrigger.None);
             return target;
         }
@@ -327,8 +327,8 @@ namespace VladislavTsurikov.SceneDataSystem.Editor.VisualElements
             target.UpdateIconType(IconType.None);
             //target.iconReaction?.Recycle();
             //target.iconReaction = null;
-            VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, (Texture2D)null);
-            VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.None);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleBackgroundImage(target.ButtonIcon, (Texture2D)null);
+            UIElementsUtility.Runtime.Utility.VisualElementExtensions.SetStyleDisplay(target.ButtonIcon, DisplayStyle.None);
             return target;
         }
 

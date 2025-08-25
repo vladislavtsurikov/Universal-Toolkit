@@ -16,21 +16,18 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(Color32Formatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Custom formatter for the <see cref="Color32"/> type.
     /// </summary>
-    /// <seealso cref="Color32" />
+    /// <seealso cref="MinimalBaseFormatter{UnityEngine.Color32}" />
     public class Color32Formatter : MinimalBaseFormatter<Color32>
     {
         private static readonly Serializer<byte> ByteSerializer = Serializer.Get<byte>();

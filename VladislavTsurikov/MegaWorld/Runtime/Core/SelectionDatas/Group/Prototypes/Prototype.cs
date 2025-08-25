@@ -1,12 +1,14 @@
 ﻿using System;
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Utility;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Object = UnityEngine.Object;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes
 {
@@ -88,12 +90,12 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
                 typeof(AddPrototypeComponentsAttribute), GetType());
         }
         
-        public Component GetElement(Type elementType)
+        public Runtime_Core_Component GetElement(Type elementType)
         {
             return _componentStackManager.GeneralComponentStack.GetElement(elementType);
         }
 
-        public Component GetElement(Type toolType, Type elementType)
+        public Runtime_Core_Component GetElement(Type toolType, Type elementType)
         {
             return _componentStackManager.ToolsComponentStack.GetElement(toolType, elementType);
         }

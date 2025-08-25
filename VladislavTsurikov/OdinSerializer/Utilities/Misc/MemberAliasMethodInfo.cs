@@ -16,12 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Globalization;
-using System.Reflection;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Globalization;
+    using System.Reflection;
+
     /// <summary>
     /// Provides a methods of representing aliased methods.
     /// <para />
@@ -38,6 +38,9 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </summary>
         private const string FAKE_NAME_SEPARATOR_STRING = "+";
 
+        private MethodInfo aliasedMethod;
+        private string mangledName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberAliasMethodInfo"/> class.
         /// </summary>
@@ -45,8 +48,8 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="namePrefix">The name prefix to use.</param>
         public MemberAliasMethodInfo(MethodInfo method, string namePrefix)
         {
-            this.AliasedMethod = method;
-            this.Name = string.Concat(namePrefix, FAKE_NAME_SEPARATOR_STRING, this.AliasedMethod.Name);
+            this.aliasedMethod = method;
+            this.mangledName = string.Concat(namePrefix, FAKE_NAME_SEPARATOR_STRING, this.aliasedMethod.Name);
         }
 
         /// <summary>
@@ -57,8 +60,8 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="separatorString">The separator string to use.</param>
         public MemberAliasMethodInfo(MethodInfo method, string namePrefix, string separatorString)
         {
-            this.AliasedMethod = method;
-            this.Name = string.Concat(namePrefix, separatorString, this.AliasedMethod.Name);
+            this.aliasedMethod = method;
+            this.mangledName = string.Concat(namePrefix, separatorString, this.aliasedMethod.Name);
         }
 
         /// <summary>
@@ -67,39 +70,39 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The aliased method.
         /// </value>
-        public MethodInfo AliasedMethod { get; }
+        public MethodInfo AliasedMethod { get { return this.aliasedMethod; } }
 
         /// <summary>
         /// Gets the custom attributes for the return type.
         /// </summary>
-        public override ICustomAttributeProvider ReturnTypeCustomAttributes { get { return this.AliasedMethod.ReturnTypeCustomAttributes; } }
+        public override ICustomAttributeProvider ReturnTypeCustomAttributes { get { return this.aliasedMethod.ReturnTypeCustomAttributes; } }
 
         /// <summary>
         /// Gets a handle to the internal metadata representation of a method.
         /// </summary>
-        public override RuntimeMethodHandle MethodHandle { get { return this.AliasedMethod.MethodHandle; } }
+        public override RuntimeMethodHandle MethodHandle { get { return this.aliasedMethod.MethodHandle; } }
 
         /// <summary>
         /// Gets the attributes associated with this method.
         /// </summary>
-        public override MethodAttributes Attributes { get { return this.AliasedMethod.Attributes; } }
+        public override MethodAttributes Attributes { get { return this.aliasedMethod.Attributes; } }
 
-        public override Type ReturnType { get { return this.AliasedMethod.ReturnType; } }
+        public override Type ReturnType { get { return this.aliasedMethod.ReturnType; } }
 
         /// <summary>
         /// Gets the class that declares this member.
         /// </summary>
-        public override Type DeclaringType { get { return this.AliasedMethod.DeclaringType; } }
+        public override Type DeclaringType { get { return this.aliasedMethod.DeclaringType; } }
 
         /// <summary>
         /// Gets the name of the current member.
         /// </summary>
-        public override string Name { get; }
+        public override string Name { get { return this.mangledName; } }
 
         /// <summary>
         /// Gets the class object that was used to obtain this instance of MemberInfo.
         /// </summary>
-        public override Type ReflectedType { get { return this.AliasedMethod.ReflectedType; } }
+        public override Type ReflectedType { get { return this.aliasedMethod.ReflectedType; } }
 
         /// <summary>
         /// When overridden in a derived class, returns the MethodInfo object for the method on the direct or indirect base class in which the method represented by this instance was first declared.
@@ -109,7 +112,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override MethodInfo GetBaseDefinition()
         {
-            return this.AliasedMethod.GetBaseDefinition();
+            return this.aliasedMethod.GetBaseDefinition();
         }
 
         /// <summary>
@@ -121,7 +124,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(bool inherit)
         {
-            return this.AliasedMethod.GetCustomAttributes(inherit);
+            return this.aliasedMethod.GetCustomAttributes(inherit);
         }
 
         /// <summary>
@@ -134,7 +137,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         {
-            return this.AliasedMethod.GetCustomAttributes(attributeType, inherit);
+            return this.aliasedMethod.GetCustomAttributes(attributeType, inherit);
         }
 
         /// <summary>
@@ -145,7 +148,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override MethodImplAttributes GetMethodImplementationFlags()
         {
-            return this.AliasedMethod.GetMethodImplementationFlags();
+            return this.aliasedMethod.GetMethodImplementationFlags();
         }
 
         /// <summary>
@@ -156,7 +159,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override ParameterInfo[] GetParameters()
         {
-            return this.AliasedMethod.GetParameters();
+            return this.aliasedMethod.GetParameters();
         }
 
         /// <summary>
@@ -172,7 +175,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object Invoke(object obj, BindingFlags invokeAttr, Binder binder, object[] parameters, CultureInfo culture)
         {
-            return this.AliasedMethod.Invoke(obj, invokeAttr, binder, parameters, culture);
+            return this.aliasedMethod.Invoke(obj, invokeAttr, binder, parameters, culture);
         }
 
         /// <summary>
@@ -185,7 +188,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            return this.AliasedMethod.IsDefined(attributeType, inherit);
+            return this.aliasedMethod.IsDefined(attributeType, inherit);
         }
     }
 }

@@ -1,8 +1,8 @@
 using UnityEngine;
 using UnityEngine.UIElements;
+using VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport;
 #if UNITY_EDITOR
 using UnityEditor;
-using VladislavTsurikov.UIElementsUtility.Editor.WorldSpaceSupport;
 #endif
 
 namespace VladislavTsurikov.UIElementsUtility.Runtime.WorldSpaceSupport

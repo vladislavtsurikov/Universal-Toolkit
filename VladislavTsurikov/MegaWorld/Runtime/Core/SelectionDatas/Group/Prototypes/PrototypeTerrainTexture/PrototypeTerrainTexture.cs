@@ -1,10 +1,11 @@
 ﻿using System;
 using UnityEngine;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
-using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack.Attributes;
+using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
+using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
+using VladislavTsurikov.ReflectionUtility;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
-using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture

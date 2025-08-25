@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="decimal"/> type.
     /// </summary>
-    /// <seealso cref="decimal" />
+    /// <seealso cref="Serializer{System.Decimal}" />
     public sealed class DecimalSerializer : Serializer<decimal>
     {
         /// <summary>

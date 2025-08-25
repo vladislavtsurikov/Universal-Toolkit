@@ -1,14 +1,17 @@
 #if UNITY_EDITOR
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceController;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 using Object = UnityEngine.Object;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
 {
-    public abstract class ToolWindow : Component
+    public abstract class ToolWindow : Runtime_Core_Component
     {
 	    private bool _mouseDownHappened;
 	    
@@ -62,9 +65,10 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             DoTool();
         }
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
 	        OnEnable();
+	        return UniTask.CompletedTask;
         }
 
         protected override void OnDisableElement()

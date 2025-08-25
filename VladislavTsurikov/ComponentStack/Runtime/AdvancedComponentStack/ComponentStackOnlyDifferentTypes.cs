@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 {
@@ -8,19 +10,19 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
     /// Prevents elements of the same type from being created.
     /// </summary>
     public class ComponentStackOnlyDifferentTypes<T> : AdvancedComponentStack<T>
-        where T : Component
+        where T : Runtime_Core_Component
     {
         public override void OnRemoveInvalidElements()
         {
             RemoveElementsWithSameType();
         }
 
-        public void SetupElement<T2>(bool force = false) where T2: Component
+        public void SetupElement<T2>(bool force = false) where T2: Runtime_Core_Component
         {
             SetupElement(typeof(T2), force);
         }
         
-        public T2 GetElement<T2>() where T2 : Component
+        public T2 GetElement<T2>() where T2 : Runtime_Core_Component
         {
             object component = GetElement(typeof(T2), out _);
 
@@ -39,7 +41,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
                 throw new ArgumentOutOfRangeException(nameof(type));
             }
 
-            Component component = GetElement(type);
+            Runtime_Core_Component component = GetElement(type);
 
             component?.Setup(force);
         }
@@ -98,13 +100,13 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             }
         }
 
-        public T2 GetAndAutoUpdateComponent<T2>(Action<T2> updateComponent) where T2 : Component
+        public T2 GetAndAutoUpdateComponent<T2>(Action<T2> updateComponent) where T2 : Runtime_Core_Component
         {
             T2 component = GetElement<T2>();
 
             if (component != null)
             {
-                OnCollectionChanged += CollectionChanged;
+                ListChanged += CollectionChanged;
                 
                 void CollectionChanged()
                 {
@@ -113,7 +115,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
 
                     if (newComponent == null)
                     {
-                        OnCollectionChanged -= CollectionChanged;
+                        ListChanged -= CollectionChanged;
                     }
                 }
             }

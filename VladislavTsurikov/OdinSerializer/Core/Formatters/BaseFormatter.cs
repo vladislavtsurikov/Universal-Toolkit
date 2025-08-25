@@ -15,21 +15,19 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
+
 #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
 #define CAN_EMIT
 #endif
 
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using OdinSerializer.Utilities;
+    using System;
+    using System.Collections.Generic;
+    using System.Reflection;
+    using System.Runtime.Serialization;
+
     /// <summary>
     /// Provides common functionality for serializing and deserializing values of type <see cref="T"/>, and provides automatic support for the following common serialization conventions:
     /// <para />

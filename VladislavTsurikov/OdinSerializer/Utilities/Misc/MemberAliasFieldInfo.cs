@@ -16,12 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Globalization;
-using System.Reflection;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.Globalization;
+    using System.Reflection;
+
     /// <summary>
     /// Provides a methods of representing imaginary fields which are unique to serialization.
     /// <para />
@@ -35,6 +35,9 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </summary>
         private const string FAKE_NAME_SEPARATOR_STRING = "+";
 
+        private FieldInfo aliasedField;
+        private string mangledName;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberAliasFieldInfo"/> class.
         /// </summary>
@@ -42,8 +45,8 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="namePrefix">The name prefix to use.</param>
         public MemberAliasFieldInfo(FieldInfo field, string namePrefix)
         {
-            this.AliasedField = field;
-            this.Name = string.Concat(namePrefix, FAKE_NAME_SEPARATOR_STRING, this.AliasedField.Name);
+            this.aliasedField = field;
+            this.mangledName = string.Concat(namePrefix, FAKE_NAME_SEPARATOR_STRING, this.aliasedField.Name);
         }
 
         /// <summary>
@@ -54,8 +57,8 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="separatorString">The separator string to use.</param>
         public MemberAliasFieldInfo(FieldInfo field, string namePrefix, string separatorString)
         {
-            this.AliasedField = field;
-            this.Name = string.Concat(namePrefix, separatorString, this.AliasedField.Name);
+            this.aliasedField = field;
+            this.mangledName = string.Concat(namePrefix, separatorString, this.aliasedField.Name);
         }
 
         /// <summary>
@@ -64,32 +67,32 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The aliased field.
         /// </value>
-        public FieldInfo AliasedField { get; }
+        public FieldInfo AliasedField { get { return this.aliasedField; } }
 
         /// <summary>
         /// Gets the module in which the type that declares the member represented by the current <see cref="T:System.Reflection.MemberInfo" /> is defined.
         /// </summary>
-        public override Module Module { get { return this.AliasedField.Module; } }
+        public override Module Module { get { return this.aliasedField.Module; } }
 
         /// <summary>
         /// Gets a value that identifies a metadata element.
         /// </summary>
-        public override int MetadataToken { get { return this.AliasedField.MetadataToken; } }
+        public override int MetadataToken { get { return this.aliasedField.MetadataToken; } }
 
         /// <summary>
         /// Gets the name of the current member.
         /// </summary>
-        public override string Name { get; }
+        public override string Name { get { return this.mangledName; } }
 
         /// <summary>
         /// Gets the class that declares this member.
         /// </summary>
-        public override Type DeclaringType { get { return this.AliasedField.DeclaringType; } }
+        public override Type DeclaringType { get { return this.aliasedField.DeclaringType; } }
 
         /// <summary>
         /// Gets the class object that was used to obtain this instance of MemberInfo.
         /// </summary>
-        public override Type ReflectedType { get { return this.AliasedField.ReflectedType; } }
+        public override Type ReflectedType { get { return this.aliasedField.ReflectedType; } }
 
         /// <summary>
         /// Gets the type of the field.
@@ -97,12 +100,12 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The type of the field.
         /// </value>
-        public override Type FieldType { get { return this.AliasedField.FieldType; } }
+        public override Type FieldType { get { return this.aliasedField.FieldType; } }
 
         /// <summary>
         /// Gets a RuntimeFieldHandle, which is a handle to the internal metadata representation of a field.
         /// </summary>
-        public override RuntimeFieldHandle FieldHandle { get { return this.AliasedField.FieldHandle; } }
+        public override RuntimeFieldHandle FieldHandle { get { return this.aliasedField.FieldHandle; } }
 
         /// <summary>
         /// Gets the attributes.
@@ -110,7 +113,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <value>
         /// The attributes.
         /// </value>
-        public override FieldAttributes Attributes { get { return this.AliasedField.Attributes; } }
+        public override FieldAttributes Attributes { get { return this.aliasedField.Attributes; } }
 
         /// <summary>
         /// When overridden in a derived class, returns an array of all custom attributes applied to this member.
@@ -121,7 +124,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(bool inherit)
         {
-            return this.AliasedField.GetCustomAttributes(inherit);
+            return this.aliasedField.GetCustomAttributes(inherit);
         }
 
         /// <summary>
@@ -134,7 +137,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override object[] GetCustomAttributes(Type attributeType, bool inherit)
         {
-            return this.AliasedField.GetCustomAttributes(attributeType, inherit);
+            return this.aliasedField.GetCustomAttributes(attributeType, inherit);
         }
 
         /// <summary>
@@ -147,7 +150,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// </returns>
         public override bool IsDefined(Type attributeType, bool inherit)
         {
-            return this.AliasedField.IsDefined(attributeType, inherit);
+            return this.aliasedField.IsDefined(attributeType, inherit);
         }
 
         /// <summary>
@@ -157,7 +160,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <returns>The value of the field.</returns>
         public override object GetValue(object obj)
         {
-            return this.AliasedField.GetValue(obj);
+            return this.aliasedField.GetValue(obj);
         }
 
         /// <summary>
@@ -170,7 +173,7 @@ namespace VladislavTsurikov.OdinSerializer.Utilities
         /// <param name="culture">The software preferences of a particular culture.</param>
         public override void SetValue(object obj, object value, BindingFlags invokeAttr, Binder binder, CultureInfo culture)
         {
-            this.AliasedField.SetValue(obj, value, invokeAttr, binder, culture);
+            this.aliasedField.SetValue(obj, value, invokeAttr, binder, culture);
         }
     }
 }

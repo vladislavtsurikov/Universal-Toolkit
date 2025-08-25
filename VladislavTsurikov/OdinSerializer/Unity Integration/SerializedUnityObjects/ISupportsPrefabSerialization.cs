@@ -16,7 +16,7 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects
+namespace OdinSerializer
 {
     /// <summary>
     /// Indicates that an Odin-serialized Unity object supports prefab serialization.

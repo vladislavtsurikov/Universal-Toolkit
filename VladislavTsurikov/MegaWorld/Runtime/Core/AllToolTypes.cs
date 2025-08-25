@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 #if UNITY_EDITOR
-using VladislavTsurikov.MegaWorld.Editor.Core.Window;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core

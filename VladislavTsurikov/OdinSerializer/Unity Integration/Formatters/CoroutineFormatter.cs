@@ -16,17 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(CoroutineFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.Formatters
+namespace OdinSerializer
 {
+    using System;
+    using UnityEngine;
+
     /// <summary>
     /// <para>
     /// Custom formatter for the <see cref="Coroutine"/> type.

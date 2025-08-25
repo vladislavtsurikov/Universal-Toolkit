@@ -5,6 +5,8 @@ using Prototype = VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas
 {
+	using Prototype = Group.Prototypes.Prototype;
+
 	public class SelectedData
 	{
 		private SelectionData _selectionData;

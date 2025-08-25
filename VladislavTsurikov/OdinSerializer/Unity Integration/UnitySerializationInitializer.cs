@@ -16,20 +16,19 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Config;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration
+namespace OdinSerializer
 {
+    using UnityEngine;
+
     /// <summary>
     /// Utility class which initializes the Sirenix serialization system to be compatible with Unity.
     /// </summary>
     public static class UnitySerializationInitializer
     {
         private static readonly object LOCK = new object();
+        private static bool initialized = false;
 
-        public static bool Initialized { get; private set; } = false;
+        public static bool Initialized { get { return initialized; } }
 
         public static RuntimePlatform CurrentPlatform { get; private set; }
         
@@ -38,11 +37,11 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
         /// </summary>
         public static void Initialize()
         {
-            if (!Initialized)
+            if (!initialized)
             {
                 lock (LOCK)
                 {
-                    if (!Initialized)
+                    if (!initialized)
                     {
                         try
                         {
@@ -76,7 +75,7 @@ namespace VladislavTsurikov.OdinSerializer.Unity_Integration
                         }
                         finally
                         {
-                            Initialized = true;
+                            initialized = true;
                         }
                     }
                 }

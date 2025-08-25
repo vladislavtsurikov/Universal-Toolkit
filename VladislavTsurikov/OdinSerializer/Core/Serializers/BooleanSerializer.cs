@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="bool"/> type.
     /// </summary>
-    /// <seealso cref="bool" />
+    /// <seealso cref="Serializer{System.Boolean}" />
     public sealed class BooleanSerializer : Serializer<bool>
     {
         /// <summary>

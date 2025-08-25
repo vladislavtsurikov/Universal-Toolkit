@@ -16,25 +16,23 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Core.Serializers;
-using VladislavTsurikov.OdinSerializer.Utilities;
+using OdinSerializer;
 
 [assembly: RegisterFormatter(typeof(HashSetFormatter<>), weakFallback: typeof(WeakHashSetFormatter))]
 
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using Utilities;
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Reflection;
+
     /// <summary>
     /// Custom generic formatter for the generic type definition <see cref="HashSet{T}"/>.
     /// </summary>
     /// <typeparam name="T">The element type of the formatted list.</typeparam>
-    /// <seealso cref="HashSet{T}" />
+    /// <seealso cref="BaseFormatter{System.Collections.Generic.HashSet{T}}" />
     public class HashSetFormatter<T> : BaseFormatter<HashSet<T>>
     {
         private static readonly Serializer<T> TSerializer = Serializer.Get<T>();

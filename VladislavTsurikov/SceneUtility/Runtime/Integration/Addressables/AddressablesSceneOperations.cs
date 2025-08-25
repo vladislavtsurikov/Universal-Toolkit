@@ -1,5 +1,4 @@
 ﻿#if SCENE_MANAGER_ADDRESSABLES
-using UnityEngine;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
@@ -11,8 +10,8 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
 {
     public class AddressablesSceneOperations : SceneOperations
     {
-        public AsyncOperationHandle<SceneInstance> _loadSceneAsyncOperation;
-        public AsyncOperationHandle<SceneInstance> _unloadSceneAsyncOperation;
+        private AsyncOperationHandle<SceneInstance> _loadSceneAsyncOperation;
+        private AsyncOperationHandle<SceneInstance> _unloadSceneAsyncOperation;
 
         public AddressablesSceneOperations(SceneReference sceneReference) : base(sceneReference)
         {
@@ -36,6 +35,11 @@ namespace VladislavTsurikov.SceneUtility.Scripts.Integration.Addressables
         
         protected override async UniTask UnloadScene()
         {
+            if (!_loadSceneAsyncOperation.IsValid())
+            {
+                return;
+            }
+            
             _unloadSceneAsyncOperation = UnityEngine.AddressableAssets.Addressables.UnloadSceneAsync(_loadSceneAsyncOperation);
             await _unloadSceneAsyncOperation;
         }

@@ -17,16 +17,14 @@
 //-----------------------------------------------------------------------
 
 //#define PREFAB_DEBUG
-
-using System;
-using System.Reflection;
-using UnityEditor;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
-
 #if UNITY_EDITOR
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration
+namespace OdinSerializer
 {
+    using System;
+    using System.Reflection;
+    using UnityEditor;
+    using UnityEngine;
+
     public static class OdinPrefabSerializationEditorUtility
     {
         private static bool? hasNewPrefabWorkflow;

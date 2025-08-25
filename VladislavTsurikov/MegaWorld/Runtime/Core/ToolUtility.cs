@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Attributes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
-using VladislavTsurikov.OdinSerializer.Utilities;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core
 {

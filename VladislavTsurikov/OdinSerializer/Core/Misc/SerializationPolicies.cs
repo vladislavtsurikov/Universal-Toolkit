@@ -15,16 +15,14 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Unity_Integration;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using Utilities;
+    using System;
+    using System.Reflection;
+    using System.Runtime.CompilerServices;
+    using UnityEngine;
+
     /// <summary>
     /// Contains a set of default implementations of the <see cref="ISerializationPolicy"/> interface.
     /// <para />

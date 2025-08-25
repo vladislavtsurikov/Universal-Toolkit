@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using OdinSerializer;
 using UnityEditor;
 using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.Utility.Runtime;
 
 namespace VladislavTsurikov.QuadTree.Runtime

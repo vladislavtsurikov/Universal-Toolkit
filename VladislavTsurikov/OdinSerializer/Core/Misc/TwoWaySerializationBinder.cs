@@ -16,11 +16,11 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
-	/// <summary>
+    using System;
+
+    /// <summary>
     /// Binds types to strings during serialization, and strings to types during deserialization.
     /// </summary>
     public abstract class TwoWaySerializationBinder

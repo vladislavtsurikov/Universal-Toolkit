@@ -6,7 +6,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
     {
         private bool _isAutoImplemented;
         
-        public override bool HasAttributes => true;
+        public override bool HasAttributes => false;
 
         public override AccessModifier AccessModifier { get; set; } = AccessModifier.Public;
 

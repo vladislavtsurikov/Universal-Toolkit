@@ -15,11 +15,12 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System.IO;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities
 {
+    using System;
+    using System.IO;
+    using System.Text;
+
     /// <summary>
     /// DirectoryInfo method extensions.
     /// </summary>

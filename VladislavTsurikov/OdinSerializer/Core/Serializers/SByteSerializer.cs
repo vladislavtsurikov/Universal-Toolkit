@@ -16,15 +16,12 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
     /// <summary>
     /// Serializer for the <see cref="sbyte"/> type.
     /// </summary>
-    /// <seealso cref="sbyte" />
+    /// <seealso cref="Serializer{System.SByte}" />
     public sealed class SByteSerializer : Serializer<sbyte>
     {
         /// <summary>

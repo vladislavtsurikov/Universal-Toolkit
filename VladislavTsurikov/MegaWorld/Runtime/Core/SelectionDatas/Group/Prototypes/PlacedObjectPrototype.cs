@@ -11,7 +11,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public GameObject Prefab;
         
         [NonSerialized] 
-        public PastTransform PastTransform;
         public Vector3 Extents = Vector3.one;
 
         public override string Name
@@ -47,7 +46,6 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototyp
         public override void OnCreatePrototype(Object obj)
         {
             Prefab = (GameObject)obj;
-            PastTransform = new PastTransform(Prefab.transform);
             Extents = GameObjectUtility.CalculateBoundsInstantiate(Prefab).extents;    
         }
     }

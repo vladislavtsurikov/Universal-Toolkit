@@ -16,16 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+using System.Globalization;
 
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Serializer for the <see cref="Guid"/> type.
     /// </summary>
-    /// <seealso cref="Guid" />
+    /// <seealso cref="Serializer{System.Guid}" />
     public sealed class GuidSerializer : Serializer<Guid>
     {
         /// <summary>

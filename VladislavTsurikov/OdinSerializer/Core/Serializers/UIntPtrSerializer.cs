@@ -16,16 +16,14 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Serializers
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Serializer for the <see cref="UIntPtr"/> type.
     /// </summary>
-    /// <seealso cref="UIntPtr" />
+    /// <seealso cref="Serializer{System.UIntPtr}" />
     public sealed class UIntPtrSerializer : Serializer<UIntPtr>
     {
         /// <summary>

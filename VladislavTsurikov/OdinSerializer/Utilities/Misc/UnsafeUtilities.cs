@@ -15,12 +15,11 @@
 // limitations under the License.
 // </copyright>
 //-----------------------------------------------------------------------
-
-using System;
-using System.Runtime.InteropServices;
-
-namespace VladislavTsurikov.OdinSerializer.Utilities
+namespace OdinSerializer.Utilities.Unsafe
 {
+    using System;
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// Contains utilities for performing common unsafe operations.
     /// </summary>

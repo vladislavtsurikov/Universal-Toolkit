@@ -1,88 +1,75 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace VladislavTsurikov.ObjectPool.Runtime
 {
-    public abstract class ObjectPool<T> : IObjectPool<T> where T : class
+    public abstract class ObjectPool<T> where T : class
     {
-        internal readonly Stack<T> Stack;
+        private readonly PoolCollection<T> _poolCollection;
         private readonly int _maxSize;
-        internal bool _collectionCheck;
-        private bool _countLimitation;
+        private readonly bool _collectionCheck;
         
         public int CountAll { get; private set; }
         public int CountActive => CountAll - CountInactive;
-        public int CountInactive => Stack.Count;
+        public int CountInactive => _poolCollection.Count;
 
-        protected ObjectPool(bool collectionCheck = false)
-        {
-            Stack = new Stack<T>();
-            _collectionCheck = collectionCheck;
-            _countLimitation = false;
-        }
-
-        protected ObjectPool(bool collectionCheck = false, int defaultCapacity = 10, int maxSize = 10000)
+        protected ObjectPool(PoolCollection<T> poolCollection, int maxSize = 10000, bool collectionCheck = false)
         {
             if (maxSize <= 0)
-                throw new ArgumentException("Max Size must be greater than 0", nameof (maxSize));
-            Stack = new Stack<T>(defaultCapacity);
+            {
+                throw new ArgumentException("Max size must be greater than 0", nameof(maxSize));
+            }
+
+            _poolCollection = poolCollection ?? throw new ArgumentNullException(nameof(poolCollection));
             _maxSize = maxSize;
             _collectionCheck = collectionCheck;
-            _countLimitation = false;
         }
 
-        protected abstract T OnCreateObject();
-        protected virtual void OnGet(T go){}
-        protected virtual void OnRelease(T go){}
-        protected virtual void OnDestroy(T element){}
+        protected abstract T CreateInstance();
+
+        protected virtual void OnGet(T obj) {}
+        protected virtual void OnRelease(T obj) {}
+        protected virtual void OnDestroy(T obj) {}
 
         public T Get()
         {
-            T obj;
-            if (Stack.Count == 0)
+            T item;
+            if (_poolCollection.Count == 0)
             {
-                obj = OnCreateObject();
-                ++CountAll;
+                item = CreateInstance();
+                CountAll++;
             }
             else
-                obj = Stack.Pop();
+            {
+                item = _poolCollection.Remove();
+            }
 
-            OnGet(obj);
-            return obj;
+            OnGet(item);
+            return item;
         }
 
-        public PooledObject<T> Get(out T v) => new PooledObject<T>(v = Get(), (IObjectPool<T>) this);
-
-        public void Release(T element)
+        public void Release(T item)
         {
-            if (_collectionCheck && Stack.Count > 0 && Stack.Contains(element))
-                throw new InvalidOperationException("Trying to release an object that has already been released to the pool.");
-            OnRelease(element);
-            
-            if (!_countLimitation || CountInactive < _maxSize)
+            if (_collectionCheck && _poolCollection.Contains(item))
             {
-                Stack.Push(element);
+                throw new InvalidOperationException("Trying to release an object that is already in the pool.");
+            }
+
+            OnRelease(item);
+
+            if (_poolCollection.Count < _maxSize)
+            {
+                _poolCollection.Add(item);
             }
             else
             {
-                OnDestroy(element);
+                OnDestroy(item);
             }
         }
 
         public void Clear()
         {
-            foreach (var obj in Stack) OnDestroy(obj);
-            
-            Stack.Clear();
+            _poolCollection.Clear();
             CountAll = 0;
         }
-
-        public void InternalDispose()
-        {
-            Dispose();
-            Clear();
-        }
-
-        protected virtual void Dispose() {}
     }
 }

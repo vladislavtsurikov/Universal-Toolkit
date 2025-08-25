@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 #if UNITY_EDITOR
 using UnityEditor.SceneManagement;
 #endif
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.SerializedUnityObjects;
 using VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility;
 
 namespace VladislavTsurikov.SceneDataSystem.Runtime
@@ -124,10 +125,10 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
                 SceneDataStack.ElementList[i]?.LateUpdate();
             }
         }
-
-        public void Setup(bool forceSetup = false)
+        
+        public async UniTask Setup(bool forceSetup = false, CancellationToken cancellationToken = default)
         {
-            if(!gameObject.scene.isLoaded || !gameObject.activeInHierarchy)
+            if (!gameObject.scene.isLoaded || !gameObject.activeInHierarchy)
             {
                 return;
             }
@@ -139,9 +140,11 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
             }
 #endif
 
+            cancellationToken.ThrowIfCancellationRequested();
+
             IsSetup = true;
-            
-            SceneDataStack.Setup(forceSetup, this);
+
+            await SceneDataStack.Setup(forceSetup,new object[]{this}, cancellationToken);
         }
 
         public bool RemoveMultipleSceneDataManagers()

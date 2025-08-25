@@ -16,17 +16,16 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using System.Runtime.Serialization;
-using VladislavTsurikov.OdinSerializer.Core.FormatterLocators;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using IFormatter = VladislavTsurikov.OdinSerializer.Core.Formatters.IFormatter;
+using OdinSerializer;
 
 [assembly: RegisterFormatterLocator(typeof(ISerializableFormatterLocator), -110)]
 
-namespace VladislavTsurikov.OdinSerializer.Core.FormatterLocators
+namespace OdinSerializer
 {
+    using Utilities;
+    using System;
+    using System.Runtime.Serialization;
+
     internal class ISerializableFormatterLocator : IFormatterLocator
     {
         public bool TryGetFormatter(Type type, FormatterLocationStep step, ISerializationPolicy policy, bool allowWeakFallbackFormatters, out IFormatter formatter)

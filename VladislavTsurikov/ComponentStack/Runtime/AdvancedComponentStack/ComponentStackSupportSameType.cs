@@ -25,9 +25,22 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
             }
         }
         
-        public T CreateComponent(Type type)
+        public T CreateComponent(Type type, int index = -1)
         {
-            return Create(type);
+            return Create(type, index);
+        }
+        
+        public List<T> GetElementsOfType(Type type)
+        {
+            List<T> elements = new List<T>();
+            for (int i = 0; i < _elementList.Count; i++)
+            {
+                if (_elementList[i] != null && _elementList[i].GetType() == type)
+                {
+                    elements.Add(_elementList[i]);
+                }
+            }
+            return elements;
         }
     }
 }

@@ -16,11 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using VladislavTsurikov.OdinSerializer.Core.Formatters;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     /// <summary>
     /// Attribute indicating that a class which implements the <see cref="IFormatter{T}" /> interface somewhere in its hierarchy is a custom formatter for the type T.
     /// </summary>

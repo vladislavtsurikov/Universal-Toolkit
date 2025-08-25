@@ -16,10 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Misc
+namespace OdinSerializer
 {
+    using System;
+
     [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
     public class RegisterFormatterAttribute : Attribute
     {

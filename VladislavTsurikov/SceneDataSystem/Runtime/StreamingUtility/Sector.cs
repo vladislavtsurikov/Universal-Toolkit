@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.Math.Runtime;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.SceneUtility.Runtime;
 using GameObjectUtility = VladislavTsurikov.UnityUtility.Runtime.GameObjectUtility;
 #if UNITY_EDITOR
@@ -44,7 +44,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime.StreamingUtility
                 
                 if (sceneDataManager == null)
                 {
-                    sceneDataManager = (SceneDataManager)GameObjectUtility.FindObjectOfType(typeof(SceneDataManager), SceneReference.Scene);
+                    sceneDataManager = (SceneDataManager)UnityUtility.Runtime.GameObjectUtility.FindObjectOfType(typeof(SceneDataManager), SceneReference.Scene);
 
                     if (sceneDataManager == null)
                     {

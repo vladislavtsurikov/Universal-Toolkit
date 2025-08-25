@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
+﻿using OdinSerializer;
+using UnityEngine;
 
 namespace VladislavTsurikov.QuadTree.Runtime
 {

@@ -16,14 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System.Globalization;
-using UnityEngine;
-using VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport;
+using OdinSerializer;
 
 [assembly: RegisterDictionaryKeyPathProvider(typeof(Vector3DictionaryKeyPathProvider))]
 
-namespace VladislavTsurikov.OdinSerializer.Unity_Integration.DictionaryKeySupport
+namespace OdinSerializer
 {
+    using System.Globalization;
+    using UnityEngine;
+
     /// <summary>
     /// Dictionary key path provider for <see cref="UnityEngine.Vector3"/>
     /// </summary>

@@ -6,11 +6,13 @@ using UnityEngine;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.ComponentStack.Editor.Core
 {
     public abstract class ComponentStackEditor<T, N> 
-        where T: Component
+        where T: Runtime_Core_Component
         where N: ElementEditor
     {
         public ComponentStack<T> Stack {get;}
@@ -20,7 +22,7 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
         {
             get
             {
-                return Editors.FirstOrDefault(t => ((Component)t.Target).Selected);
+                return Editors.FirstOrDefault(t => ((Runtime_Core_Component)t.Target).Selected);
             }
         }
 
@@ -41,26 +43,38 @@ namespace VladislavTsurikov.ComponentStack.Editor.Core
                 {
                     return;
                 }
-                
-                var editor = (N)Activator.CreateInstance(editorType);
-                
-                try
-                {
-                    editor.Init(settings);
-                }
-                catch
-                {
-                    Debug.LogError("Component Editor initialization: " + settings.Name);
-                }
 
-                if (index < 0)
+                CreateEditorInstance(settings, index, editorType);
+            }
+            else
+            {
+                if (!typeof(N).IsAbstract)
                 {
-                    Editors.Add(editor);
+                    CreateEditorInstance(settings, index, typeof(N));
                 }
-                else
-                {
-                    Editors[index] = editor;
-                }
+            }
+        }
+
+        private void CreateEditorInstance(T settings, int index, Type editorType)
+        {
+            var editor = (N)Activator.CreateInstance(editorType);
+
+            try
+            {
+                editor.Init(settings);
+            }
+            catch
+            {
+                Debug.LogError("Component Editor initialization: " + settings.Name);
+            }
+
+            if (index < 0)
+            {
+                Editors.Add(editor);
+            }
+            else
+            {
+                Editors[index] = editor;
             }
         }
 

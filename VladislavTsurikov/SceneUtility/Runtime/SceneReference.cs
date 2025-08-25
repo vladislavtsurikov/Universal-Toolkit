@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.SceneManagement;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using VladislavTsurikov.ReflectionUtility.Runtime;
 using Object = UnityEngine.Object;
 #if UNITY_EDITOR
@@ -18,11 +18,19 @@ namespace VladislavTsurikov.SceneUtility.Runtime
     [Serializable]
     public class SceneReference
     {
-        public delegate void OnDeleteSceneDelegate();
-        public static OnDeleteSceneDelegate OnDeleteScene;
-        
         [OdinSerialize] private bool _cachedScene;
         private SceneOperations _sceneOperations;
+        
+#if UNITY_EDITOR
+        [OdinSerialize]
+        private Object _sceneAsset;
+#endif
+        
+        [OdinSerialize]
+        private string _scenePath = string.Empty;
+        private Scene _scene;
+        
+        public static event Action OnDeleteScene;
         
         public CancellationTokenSource UnloadSceneCancellationTokenSource { get; private set; }
         public CancellationTokenSource LoadSceneCancellationTokenSource { get; private set; }
@@ -42,9 +50,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                         t => !t.IsAbstract
                     );
                 
-                var typeList = types.ToList();
-
-                foreach (var type in typeList)
+                foreach (var type in types)
                 {
                     if (type == typeof(SceneManagerSceneOperations))
                     {
@@ -70,15 +76,6 @@ namespace VladislavTsurikov.SceneUtility.Runtime
         
         public bool CachedScene => _cachedScene;
 
-#if UNITY_EDITOR
-        [OdinSerialize]
-        private Object _sceneAsset;
-#endif
-        
-        [OdinSerialize]
-        private string _scenePath = string.Empty;
-        private Scene _scene;
-        
 #if UNITY_EDITOR
         public Object SceneAsset
         {
@@ -107,8 +104,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             }
         }
 #endif
-
-
+        
         public string ScenePath
         {
             get
@@ -217,7 +213,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 
                 if (_cachedScene)
                 {
-                    SetActiveGameObjects(true);
+                    SetGameObjectsAsActive(true);
                     _cachedScene = false;
                 }
             
@@ -263,7 +259,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
 
                 if (_cachedScene)
                 {
-                    SetActiveGameObjects(true);
+                    SetGameObjectsAsActive(true);
                     _cachedScene = false;
                 }
             
@@ -307,7 +303,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
                 {
                     await UniTask.WaitForSeconds(waitForSeconds, cancellationToken: token);
                         
-                    SetActiveGameObjects(false);
+                    SetGameObjectsAsActive(false);
                     _cachedScene = true;
                         
                     await UniTask.WaitForSeconds(keepScene, cancellationToken: token);
@@ -317,7 +313,7 @@ namespace VladislavTsurikov.SceneUtility.Runtime
             }
         }
 
-        public void SetActiveGameObjects(bool setActive)
+        public void SetGameObjectsAsActive(bool setActive)
         {
             GameObject[] gameObjects = Scene.GetRootGameObjects();
 

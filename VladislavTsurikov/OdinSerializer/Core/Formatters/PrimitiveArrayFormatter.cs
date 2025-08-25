@@ -17,14 +17,12 @@
 //-----------------------------------------------------------------------
 
 
-using System;
-using System.Collections.Generic;
-using VladislavTsurikov.OdinSerializer.Core.DataReaderWriters;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
-using VladislavTsurikov.OdinSerializer.Utilities;
-
-namespace VladislavTsurikov.OdinSerializer.Core.Formatters
+namespace OdinSerializer
 {
+    using Utilities;
+    using System;
+    using System.Collections.Generic;
+
     /// <summary>
     /// Formatter for all primitive one-dimensional arrays.
     /// </summary>
