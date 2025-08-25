@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
@@ -40,7 +43,15 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         [field: NonSerialized] 
         public bool IsHappenedReset { get; internal set; }
 
-        protected virtual void SetupComponent(object[] setupData = null){}
+        protected virtual UniTask SetupComponent(object[] setupData = null)
+        {
+            return UniTask.CompletedTask;
+        }
+
+        protected virtual UniTask FirstSetupComponent(object[] setupData = null)
+        {
+            return UniTask.CompletedTask;
+        }
 
         protected virtual void OnDisableElement(){}
 
@@ -51,26 +62,29 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             return true;
         }
         
-        public void Setup(bool force = false)
+        public async UniTask Setup(bool force = false)
         {
-            SetupWithSetupData(force, _setupData);
+            await SetupWithSetupData(force, _setupData);
         }
-
-        internal void SetupWithSetupData(bool force = false, object[] setupData = null)
+        
+        public async UniTask SetupWithSetupData(bool force = false, object[] setupData = null)
         {
-            if (!force)
+            if (!force && IsSetup)
             {
-                if (IsSetup)
-                {
-                    return;
-                }
+                return;
             }
-
-            _setupData = setupData;
             
+            _setupData = setupData;
+
             IsSetup = false;
             OnDisableElement();
-            SetupComponent(setupData);
+            
+            if (!IsSetup)
+            {
+                FirstSetupComponent(setupData);
+            }
+            
+            await SetupComponent(setupData);
             IsSetup = true;
         }
 

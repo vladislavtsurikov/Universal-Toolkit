@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using OdinSerializer.Utilities;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.ReflectionUtility.Runtime;
@@ -16,13 +18,13 @@ namespace VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack
         private protected override void CreateElements()
         {
             OnCreateElements();
-            
-            CreateComponentsAttribute componentsAttribute = GetType().GetAttribute<CreateComponentsAttribute>();
-
-            if (componentsAttribute != null)
-            {
-                CreateElementIfMissingType(componentsAttribute.Types.ToArray());
-            }
+    
+            GetType().GetAttribute<CreateComponentsAttribute>()?.Types
+                .ForEach(type => CreateElementIfMissingType(type));
+    
+            AllTypesDerivedFrom<T>.Types
+                .Where(type => type.GetAttribute<PersistentComponentAttribute>() != null)
+                .ForEach(type => CreateElementIfMissingType(type));
         }
 
         protected virtual void OnCreateElements()

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace VladislavTsurikov.ComponentStack.Runtime.Core.Extensions
+﻿namespace VladislavTsurikov.ComponentStack.Runtime.Core
 {
     public static class ComponentEx
     {
