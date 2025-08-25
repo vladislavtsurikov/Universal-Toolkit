@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using VladislavTsurikov.GameObjectCollider.Editor;
 using VladislavTsurikov.UnityUtility.Runtime;
 #if UNITY_EDITOR
-using VladislavTsurikov.GameObjectCollider.Editor;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject

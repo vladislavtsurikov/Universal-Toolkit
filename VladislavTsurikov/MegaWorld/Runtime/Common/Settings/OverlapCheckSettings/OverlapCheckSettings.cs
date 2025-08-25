@@ -4,9 +4,11 @@ using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings.OverlapChecks;
 using VladislavTsurikov.MegaWorld.Runtime.Core.PreferencesSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeGameObject;
-using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.UnityUtility.Runtime;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettings
 {
@@ -18,7 +20,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.OverlapCheckSettin
     }
     
     [Name("Overlap Check Settings")]
-    public class OverlapCheckSettings : Component
+    public class OverlapCheckSettings : Runtime_Core_Component
     {
         public OverlapShapeEnum OverlapShapeEnum = OverlapShapeEnum.Sphere;
         public OBBCheck ObbCheck = new OBBCheck();

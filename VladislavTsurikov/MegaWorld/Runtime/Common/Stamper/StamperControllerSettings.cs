@@ -1,6 +1,8 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 {
@@ -14,9 +16,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
         [NonSerialized]
         public StamperTool StamperTool;
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override UniTask SetupComponent(object[] setupData = null)
         {
             StamperTool = (StamperTool)setupData[0];
+            return UniTask.CompletedTask;
         }
     }
 }

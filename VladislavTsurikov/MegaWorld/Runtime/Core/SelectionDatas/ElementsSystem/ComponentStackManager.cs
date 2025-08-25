@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using OdinSerializer;
 using UnityEngine;
 using VladislavTsurikov.IMGUIUtility.Editor.ElementStack;
+using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem.Utility;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 #if UNITY_EDITOR
 using UnityEditor;
-using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ElementsSystem;
 #endif
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
@@ -30,14 +33,14 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
         
 #if UNITY_EDITOR
         [NonSerialized] 
-        private IMGUIComponentStackEditor<Component, IMGUIElementEditor> _generalComponentStackEditor;
-        public IMGUIComponentStackEditor<Component, IMGUIElementEditor> GeneralComponentStackEditor
+        private IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor> _generalComponentStackEditor;
+        public IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor> GeneralComponentStackEditor
         {
             get
             {
                 if (_generalComponentStackEditor == null)
                 {
-                    _generalComponentStackEditor = new IMGUIComponentStackEditor<Component, IMGUIElementEditor>(_generalGeneralComponentStack);
+                    _generalComponentStackEditor = new IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor>(_generalGeneralComponentStack);
                 }
 
                 return _generalComponentStackEditor;
@@ -69,8 +72,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
             _generalGeneralComponentStack ??= new GeneralComponentStack();
             _toolsComponentStack ??= new ToolsComponentStack();
 
-            _generalGeneralComponentStack.Setup(true, addGeneralElementsAttribute, prototypeType);
-            _toolsComponentStack.Setup(true, addElementsAttribute, prototypeType);
+            _generalGeneralComponentStack.Setup(true, new object[]{addGeneralElementsAttribute, prototypeType}).Forget();
+            _toolsComponentStack.Setup(true, new object[]{addElementsAttribute, prototypeType}).Forget();
         }
 
         public List<Type> GetAllElementTypes(Type toolType, Type prototypeType = null)

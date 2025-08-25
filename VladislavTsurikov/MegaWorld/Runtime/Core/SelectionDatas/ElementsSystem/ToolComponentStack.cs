@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 
@@ -11,9 +12,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
         public ComponentStackOnlyDifferentTypes<Component> ComponentStack = 
             new ComponentStackOnlyDifferentTypes<Component>();
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override async UniTask SetupComponent(object[] setupData = null)
         {
-            ComponentStack.Setup();
+            await ComponentStack.Setup();
         }
 
         public override bool DeleteElement()

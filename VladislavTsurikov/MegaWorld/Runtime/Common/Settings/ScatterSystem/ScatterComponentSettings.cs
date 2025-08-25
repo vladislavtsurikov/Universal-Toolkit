@@ -1,6 +1,8 @@
 using System;
+using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
+using VladislavTsurikov.ReflectionUtility;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
 {
@@ -10,9 +12,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Settings.ScatterSystem
     {
         public ScatterStack ScatterStack = new ScatterStack();
 
-        protected override void SetupComponent(object[] setupData = null)
+        protected override async UniTask SetupComponent(object[] setupData = null)
         {
-            ScatterStack.Setup();
+            await ScatterStack.Setup();
         }
 
         protected override void OnCreate()

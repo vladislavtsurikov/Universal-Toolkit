@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour;
 #if UNITY_EDITOR
-using VladislavTsurikov.MegaWorld.Runtime.Common.Stamper.AutoRespawn;
 using UnityEditor;
 #endif
 

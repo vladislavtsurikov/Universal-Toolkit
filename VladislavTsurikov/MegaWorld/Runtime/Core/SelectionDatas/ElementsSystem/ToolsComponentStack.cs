@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using OdinSerializer;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
-using VladislavTsurikov.OdinSerializer.Core.Misc;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 {
@@ -98,7 +100,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
             return false;
         }
         
-        public Component GetElement(Type toolType, Type typeElement)
+        public Runtime_Core_Component GetElement(Type toolType, Type typeElement)
         {
             foreach (var globalToolSettings in ElementList)
             {

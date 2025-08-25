@@ -21,14 +21,17 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainObject;
+using VladislavTsurikov.ReflectionUtility;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
+using Runtime_Core_Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour
 {
     public class MonoBehaviourToolEditor : EditorBase, IToolEditor
     {
 	    private Vector2 _windowScrollPos;
-	    private IMGUIComponentStackEditor<Component, IMGUIElementEditor> _componentStackEditor;
+	    private IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor> _componentStackEditor;
 
 	    private bool _groupSettingsFoldout = true;
         private bool _prototypeSettingsFoldout = true;
@@ -69,7 +72,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.MonoBehaviour
 					Target.Data, target.GetType());
 			}
 			
-			_componentStackEditor = new IMGUIComponentStackEditor<Component, IMGUIElementEditor>(Target.ComponentStack);
+			_componentStackEditor = new IMGUIComponentStackEditor<Runtime_Core_Component, IMGUIElementEditor>(Target.ComponentStack);
 			
 			OnInit();
 		}

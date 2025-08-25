@@ -6,6 +6,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ColorUtility.Runtime;
+using VladislavTsurikov.Utility.Runtime;
 using VladislavTsurikov.IMGUIUtility.Editor;
 using VladislavTsurikov.IMGUIUtility.Runtime.ElementStack.IconStack;
 using VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.ResourceController;
@@ -13,8 +14,9 @@ using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture;
 using VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.Group.Prototypes.Utility;
 using VladislavTsurikov.UnityUtility.Editor;
-using VladislavTsurikov.Utility.Runtime;
 using DragAndDrop = VladislavTsurikov.IMGUIUtility.Editor.DragAndDrop;
+using Editor_DragAndDrop = VladislavTsurikov.IMGUIUtility.Editor.DragAndDrop;
+using IMGUIUtility_Editor_DragAndDrop = VladislavTsurikov.IMGUIUtility.Editor.DragAndDrop;
 
 namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototypes.PrototypeTerrainTexture
 {
@@ -34,7 +36,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.SelectionDatas.Group.Prototype
 		private static float _prototypeWindowHeight = 100f;
 
 		private static Vector2 _prototypeWindowsScroll = Vector2.zero;
-		private static readonly DragAndDrop _dragAndDrop = new DragAndDrop();
+		private static readonly IMGUIUtility_Editor_DragAndDrop _dragAndDrop = new IMGUIUtility_Editor_DragAndDrop();
 		
 		private static bool _terrainLayerSettingsFoldout;
 
