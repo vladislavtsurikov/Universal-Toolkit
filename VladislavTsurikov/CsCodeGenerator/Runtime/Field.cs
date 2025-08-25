@@ -19,7 +19,7 @@ namespace VladislavTsurikov.CsCodeGenerator.Runtime
         public virtual string DefaultValue { get; set; }
         protected string DefaultValueFormated => DefaultValue != null ? " = " + DefaultValue : "";
 
-        public override bool HasAttributes => false;
+        public override bool HasAttributes => true;
 
         protected virtual string Ending { get; } = ";";
 
