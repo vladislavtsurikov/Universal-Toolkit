@@ -1,10 +1,13 @@
-﻿
-namespace VladislavTsurikov.RendererStack.Editor.Core
+#if UNITY_EDITOR
+using VladislavTsurikov.AutoDefines.Editor;
+
+namespace VladislavTsurikov.RendererStack.Editor
 {
-    public sealed class RendererStackMathematicsEnsureRule : UpmPackagePresenceRule
+    public sealed class RendererStackMathematicsEnsureRule : PackagePresenceRule
     {
         public override string GetDefineSymbol() { return "RENDERER_STACK_MATHEMATICS"; }
-        public override string GetPackageId() { return "com.unity.mathematics"; }
-        public override bool ShouldAutoInstall() { return true; }
+        protected override string GetPackageId() { return "com.unity.mathematics"; }
+        protected override bool ShouldAutoInstall() { return true; }
     }
 }
+#endif
