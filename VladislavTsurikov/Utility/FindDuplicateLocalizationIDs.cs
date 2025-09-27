@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+#if UNITY_LOCALIZATION
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -53,4 +54,5 @@ namespace VladislavTsurikov.Utility
         }
     }
 }
+#endif
 #endif

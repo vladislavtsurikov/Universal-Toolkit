@@ -7,9 +7,6 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
         internal static void RegisterLoaderInitializers(ResourceLoaderManager manager)
         {
-            IEnumerable<ResourceLoaderRegistrar> resourceLoaderRegistrar =
-                ReflectionFactory.CreateAllInstances<ResourceLoaderRegistrar>();
-
             foreach (ResourceLoaderRegistrar registrar in resourceLoaderRegistrar)
             {
                 registrar.RegisterLoaders(manager);

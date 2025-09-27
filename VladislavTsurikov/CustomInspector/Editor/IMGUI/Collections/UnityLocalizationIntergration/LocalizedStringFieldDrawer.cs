@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+#if UNITY_LOCALIZATION
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -100,4 +101,5 @@ namespace VladislavTsurikov.CustomInspector.Editor.IMGUI
         public LocalizedString StringReference;
     }
 }
+#endif
 #endif

@@ -16,12 +16,17 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
-using System;
-using OdinSerializer.Utilities;
-using UnityEngine;
 #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
 #define CAN_EMIT
 #endif
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using OdinSerializer.Utilities;
+using UnityEngine;
+
 
 namespace OdinSerializer
 {
@@ -315,9 +320,9 @@ namespace OdinSerializer
                 return (IFormatter)Activator.CreateInstance(typeof(EmptyTypeFormatter<>).MakeGenericType(formattedType));
             }
 
-            string helperTypeName = moduleBuilder.Name + "." + 
-                formattedType.GetCompilableNiceFullName() + "___" + 
-                formattedType.Assembly.GetName().Name + "___FormatterHelper___" + 
+            string helperTypeName = moduleBuilder.Name + "." +
+                formattedType.GetCompilableNiceFullName() + "___" +
+                formattedType.Assembly.GetName().Name + "___FormatterHelper___" +
                 System.Threading.Interlocked.Increment(ref helperFormatterNameId);
 
             Dictionary<Type, MethodInfo> serializerReadMethods;

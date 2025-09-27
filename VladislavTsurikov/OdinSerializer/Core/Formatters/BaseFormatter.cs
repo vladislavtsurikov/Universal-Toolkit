@@ -16,6 +16,10 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+// #if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
+// #define CAN_EMIT
+// #endif
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,9 +29,6 @@ using System.Runtime.Serialization;
 using OdinSerializer.Utilities;
 using UnityEngine;
 using Object = UnityEngine.Object;
-#if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
-#define CAN_EMIT
-#endif
 
 namespace OdinSerializer
 {

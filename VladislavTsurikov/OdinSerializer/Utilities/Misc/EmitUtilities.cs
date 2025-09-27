@@ -16,15 +16,15 @@
 // </copyright>
 //-----------------------------------------------------------------------
 
+#if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
+#define CAN_EMIT
+#endif
+
 using System;
 using System.Reflection;
 using Object = UnityEngine.Object;
 #if NET_STANDARD_2_0
 #error Odin Inspector is incapable of compiling source code against the .NET Standard 2.0 API surface. You can change the API Compatibility Level in the Player settings.
-#endif
-
-#if (UNITY_EDITOR || UNITY_STANDALONE) && !ENABLE_IL2CPP
-#define CAN_EMIT
 #endif
 
 namespace OdinSerializer.Utilities
