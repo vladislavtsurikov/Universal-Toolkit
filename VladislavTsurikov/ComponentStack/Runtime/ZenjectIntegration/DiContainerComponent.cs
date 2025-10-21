@@ -1,3 +1,4 @@
+#if COMPONENT_STACK_ZENJECT
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using Zenject;
@@ -25,3 +26,4 @@ namespace VladislavTsurikov.ComponentStack.Runtime
         protected void InjectSelf() => DiContainer.Inject(this);
     }
 }
+#endif

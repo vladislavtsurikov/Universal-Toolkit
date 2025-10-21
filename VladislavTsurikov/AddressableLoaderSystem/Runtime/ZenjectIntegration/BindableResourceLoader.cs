@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -74,3 +76,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.ZenjectIntegration
                 });
     }
 }
+#endif
+#endif

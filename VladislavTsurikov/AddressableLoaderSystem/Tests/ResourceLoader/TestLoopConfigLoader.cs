@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.Core;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.ZenjectIntegration;
@@ -19,3 +21,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
             Config = await LoadAndBind<TestLoopConfig>(token, "TestLoopConfig");
     }
 }
+#endif
+#endif

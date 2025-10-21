@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -57,3 +59,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         }
     }
 }
+#endif
+#endif

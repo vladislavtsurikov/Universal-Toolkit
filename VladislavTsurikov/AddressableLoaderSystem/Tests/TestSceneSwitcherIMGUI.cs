@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.Core;
@@ -65,3 +67,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         }
     }
 }
+#endif
+#endif

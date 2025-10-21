@@ -1,4 +1,5 @@
-﻿#if UNITY_EDITOR
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
@@ -59,4 +60,5 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
         public static void ShowWindow() => GetWindow<ContentAddressableGroupsWindow>("Addressable Group Creator");
     }
 }
+#endif
 #endif

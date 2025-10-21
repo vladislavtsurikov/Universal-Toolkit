@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -250,3 +251,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         }
     }
 }
+#endif

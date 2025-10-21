@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System;
 using System.Collections.Generic;
 using OdinSerializer;
 using UnityEditor;
@@ -59,3 +60,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabe
 #endif
     }
 }
+#endif

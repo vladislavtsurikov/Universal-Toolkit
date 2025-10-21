@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using UnityEngine;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Tests
 {
@@ -7,3 +8,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         public string Message = "BaseConfig";
     }
 }
+#endif

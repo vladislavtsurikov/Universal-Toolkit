@@ -1,4 +1,5 @@
-﻿#if UNITY_EDITOR
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if UNITY_EDITOR
 using System.IO;
 
 namespace VladislavTsurikov.AddressableGroupGenerator.Editor
@@ -33,4 +34,5 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
         }
     }
 }
+#endif
 #endif

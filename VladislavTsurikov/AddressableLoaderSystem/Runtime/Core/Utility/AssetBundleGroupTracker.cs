@@ -1,4 +1,5 @@
-﻿namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
     /*internal static class AssetBundleGroupTracker
     {
@@ -61,3 +62,4 @@
         }
     }*/
 }
+#endif

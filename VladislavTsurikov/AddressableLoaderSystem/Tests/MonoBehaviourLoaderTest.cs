@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using UnityEngine;
 using UnityEngine.AddressableAssets;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Tests
@@ -65,3 +66,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         }
     }
 }
+#endif

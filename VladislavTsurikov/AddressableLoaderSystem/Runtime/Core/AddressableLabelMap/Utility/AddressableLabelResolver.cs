@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System;
 using System.Collections.Generic;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabelMap
@@ -12,3 +13,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core.AddressableLabe
             AddressableLabelMapAsset.Instance.GetLabelsByType(type);
     }
 }
+#endif

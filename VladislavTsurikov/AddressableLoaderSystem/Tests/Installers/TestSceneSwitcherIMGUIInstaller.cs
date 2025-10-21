@@ -1,4 +1,6 @@
-﻿using Zenject;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using Zenject;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Tests
 {
@@ -8,3 +10,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
             Container.Bind<TestSceneSwitcherIMGUI>().FromComponentInHierarchy().AsSingle();
     }
 }
+#endif
+#endif

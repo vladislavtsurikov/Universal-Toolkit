@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
 {
@@ -6,3 +7,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
     {
     }
 }
+#endif

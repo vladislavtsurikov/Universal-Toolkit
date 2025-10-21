@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -141,3 +142,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         }
     }
 }
+#endif

@@ -1,3 +1,4 @@
+#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
 using System.Collections.Generic;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
@@ -15,3 +16,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Runtime.Core
         }
     }
 }
+#endif

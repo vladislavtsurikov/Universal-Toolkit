@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using System;
 using UnityEngine;
 
 namespace VladislavTsurikov.AddressableLoaderSystem.Tests
@@ -15,3 +16,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         public TestLoopConfig backReference;
     }
 }
+#endif

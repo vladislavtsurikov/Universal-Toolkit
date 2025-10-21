@@ -1,4 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if ADDRESSABLE_LOADER_SYSTEM_ZENJECT
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.Core;
 using Zenject;
@@ -15,3 +17,5 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         private async UniTask SpawnPrefab() => await _config.PrefabRef.InstantiateWithAutoLoad();
     }
 }
+#endif
+#endif

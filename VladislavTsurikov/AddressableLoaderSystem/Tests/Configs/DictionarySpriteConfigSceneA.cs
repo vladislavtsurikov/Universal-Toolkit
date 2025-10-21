@@ -1,4 +1,5 @@
-﻿using AYellowpaper.SerializedCollections;
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+using AYellowpaper.SerializedCollections;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -11,3 +12,4 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Tests
         public SerializedDictionary<string, AssetReferenceSprite> Sprites = new();
     }
 }
+#endif

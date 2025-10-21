@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.AddressableAssets.Build;
@@ -16,13 +17,13 @@ namespace VladislavTsurikov.AddressablesEditorTools.Editor.AnalyzeTools
             AnalyzeSystem.RegisterNewRule<CheckDuplicateAddressKeys>();
         }
     }
-    
+
     public class CheckDuplicateAddressKeys : AnalyzeRule
     {
         private readonly List<AddressableAssetEntry> _duplicates = new List<AddressableAssetEntry>();
 
         public override string ruleName => "Check Duplicate Addressable Keys";
-        
+
         public override bool CanFix => true;
 
         public override List<AnalyzeResult> RefreshAnalysis(AddressableAssetSettings settings)
@@ -86,4 +87,5 @@ namespace VladislavTsurikov.AddressablesEditorTools.Editor.AnalyzeTools
         }
     }
 }
+#endif
 #endif

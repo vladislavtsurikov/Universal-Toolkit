@@ -1,4 +1,5 @@
-﻿#if UNITY_EDITOR
+﻿#if ADDRESSABLE_LOADER_SYSTEM_ADDRESSABLES
+#if UNITY_EDITOR
 using System;
 using System.IO;
 using UnityEditor;
@@ -93,4 +94,5 @@ namespace VladislavTsurikov.AddressableGroupGenerator.Editor
             string.IsNullOrEmpty(Path.GetExtension(path)) && Directory.Exists(path);
     }
 }
+#endif
 #endif
