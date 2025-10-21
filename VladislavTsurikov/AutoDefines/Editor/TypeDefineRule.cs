@@ -1,11 +1,10 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Reflection;
-using VladislavTsurikov.AutoDefines.Editor.Core;
 
 namespace VladislavTsurikov.AutoDefines.Editor
 {
-    public abstract class TypeDefineRule : AutoDefineRule
+    public abstract class TypeDefineRule : ConditionalDefineRule
     {
         public abstract string GetTypeFullName();
 

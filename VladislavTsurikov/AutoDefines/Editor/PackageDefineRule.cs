@@ -4,7 +4,7 @@ using VladislavTsurikov.AutoDefines.Editor.Core;
 
 namespace VladislavTsurikov.AutoDefines.Editor
 {
-    public abstract class PackageDefineRule : AutoDefineRule
+    public abstract class PackageDefineRule : ConditionalDefineRule
     {
         private AddRequest _addRequest;
 

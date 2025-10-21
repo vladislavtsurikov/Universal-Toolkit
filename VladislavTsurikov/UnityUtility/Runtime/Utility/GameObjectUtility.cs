@@ -188,7 +188,11 @@ namespace VladislavTsurikov.UnityUtility.Runtime
 
         public static void Unspawn(List<GameObject> unspawnPrefabs)
         {
+#if UNITY_6000_OR_NEWER
             GameObject[] allGameObjects = Object.FindObjectsOfType<GameObject>();
+#else
+            GameObject[] allGameObjects = Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+#endif
 
             for (var index = 0; index < allGameObjects.Length; index++)
             {
