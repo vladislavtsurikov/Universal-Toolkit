@@ -5,7 +5,7 @@ using VladislavTsurikov.AutoDefines.Editor.Core;
 
 namespace VladislavTsurikov.AutoDefines.Editor
 {
-    public abstract class TypeDefineRule : PresenceDefineRule
+    public abstract class TypeDefineRule : AutoDefineRule
     {
         public abstract string GetTypeFullName();
 
@@ -17,7 +17,7 @@ namespace VladislavTsurikov.AutoDefines.Editor
             }
 
             Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            foreach (var t in assemblies)
+            foreach (Assembly t in assemblies)
             {
                 if (t.GetType(GetTypeFullName(), false) != null)
                 {

@@ -8,35 +8,49 @@ using VladislavTsurikov.ReflectionUtility.Runtime;
 
 namespace VladislavTsurikov.AutoDefines.Editor.Core
 {
-    public static class DefineRulesBootstrap
+    public static class AutoDefinesInitialize
     {
         private static bool s_running;
+        private static bool s_initialized;
+        private static readonly List<AutoDefineRule> s_rules = new();
 
         [DidReloadScripts]
         private static void OnReloadScripts()
         {
-            RegisterEventsOnce();
+            if (!s_initialized)
+            {
+                InitializeRules();
+                RegisterEventsOnce();
+                s_initialized = true;
+            }
+
             UpmListCache.Refresh();
+        }
+
+        private static void InitializeRules()
+        {
+            s_rules.Clear();
+            foreach (AutoDefineRule rule in ReflectionFactory.CreateAllInstances<AutoDefineRule>())
+            {
+                s_rules.Add(rule);
+            }
         }
 
         private static void RegisterEventsOnce()
         {
-            Events.registeredPackages += _ => { UpmListCache.Refresh(); };
-
+            Events.registeredPackages += _ => UpmListCache.Refresh();
             UpmListCache.Refreshed += OnUpmListRefreshed;
         }
 
         private static void OnUpmListRefreshed(UpmListCache.State state)
         {
-            if (state != UpmListCache.State.Ready)
+            if (state == UpmListCache.State.Ready)
             {
-                return;
+                RunAllRules();
             }
-
-            RunAllRulesOnce();
         }
 
-        private static void RunAllRulesOnce()
+        private static void RunAllRules()
         {
             if (s_running)
             {
@@ -45,8 +59,7 @@ namespace VladislavTsurikov.AutoDefines.Editor.Core
 
             s_running = true;
 
-            IEnumerable<DefineRule> rules = ReflectionFactory.CreateAllInstances<DefineRule>();
-            foreach (DefineRule rule in rules)
+            foreach (AutoDefineRule rule in s_rules)
             {
                 try
                 {

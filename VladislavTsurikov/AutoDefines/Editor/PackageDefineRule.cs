@@ -1,53 +1,27 @@
 ﻿#if UNITY_EDITOR
-using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using VladislavTsurikov.AutoDefines.Editor.Core;
 
 namespace VladislavTsurikov.AutoDefines.Editor
 {
-    public abstract class PackagePresenceRule : PresenceDefineRule
+    public abstract class PackageDefineRule : AutoDefineRule
     {
         private AddRequest _addRequest;
 
         protected abstract string GetPackageId();
 
-        protected virtual bool ShouldAutoInstall()
-        {
-            return false;
-        }
+        protected virtual bool ShouldAutoInstall() => false;
 
-        protected override bool IsInstalled()
-        {
-            return UpmListCache.IsInstalled(GetPackageId());;
-        }
+        protected override bool IsInstalled() => UpmListCache.IsInstalled(GetPackageId());
 
-        protected override bool OnMissing()
+        protected override void InstallIfMissing()
         {
             if (!ShouldAutoInstall())
             {
-                return false;
+                return;
             }
 
-            UpmInstaller.Add(GetPackageId());
-
-            if (UpmInstaller.IsInstalling)
-            {
-
-            }
-
-            _addRequest = Client.Add(GetDefineSymbol());
-
-            if (_addRequest == null)
-            {
-                return false;
-            }
-
-            if (_addRequest.IsCompleted)
-            {
-                _addRequest = null;
-            }
-
-            return true;
+            UpmInstaller.Install(GetPackageId());
         }
     }
 }

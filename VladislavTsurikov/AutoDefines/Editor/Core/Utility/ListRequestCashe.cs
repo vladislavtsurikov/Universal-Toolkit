@@ -68,11 +68,7 @@ namespace VladislavTsurikov.AutoDefines.Editor.Core
             s_list = null;
             EditorApplication.update -= Tick;
 
-            Action<State> handler = Refreshed;
-            if (handler != null)
-            {
-                handler(CurrentState);
-            }
+            Refreshed?.Invoke(CurrentState);
         }
     }
 }
