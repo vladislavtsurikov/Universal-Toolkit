@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿#if ACTIONFLOW_ZENJECT
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using VladislavTsurikov.ReflectionUtility;
@@ -28,3 +29,5 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
         }
     }
 }
+#endif
+

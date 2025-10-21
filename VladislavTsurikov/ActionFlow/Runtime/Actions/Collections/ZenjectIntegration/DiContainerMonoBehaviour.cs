@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿#if ACTIONFLOW_ZENJECT
+using UnityEngine;
 using Zenject;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
@@ -16,3 +17,4 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
         protected abstract void ApplySetup();
     }
 }
+#endif

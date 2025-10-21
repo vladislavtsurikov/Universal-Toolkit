@@ -1,3 +1,4 @@
+#if ACTIONFLOW_ZENJECT
 using Cysharp.Threading.Tasks;
 using Zenject;
 
@@ -47,3 +48,4 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
         }
     }
 }
+#endif
