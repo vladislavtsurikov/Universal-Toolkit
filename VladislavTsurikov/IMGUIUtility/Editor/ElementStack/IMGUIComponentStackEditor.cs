@@ -52,7 +52,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack
                     editor.OnGUI();
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Stack.Reset(index);
                 throw;

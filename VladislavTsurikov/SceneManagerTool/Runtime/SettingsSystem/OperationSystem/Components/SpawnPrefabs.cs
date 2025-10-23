@@ -17,6 +17,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSys
             {
                 Object.Instantiate(gameObject);
             }
+            await UniTask.CompletedTask;
         }
     }
 }

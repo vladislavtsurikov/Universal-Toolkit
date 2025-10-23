@@ -31,7 +31,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
             Light selectedLight = null;
             var intensity = float.MinValue;
 
+#if UNITY_6000_0_OR_NEWER
+            Light[] lights = Object.FindObjectsByType<Light>(FindObjectsSortMode.None);
+#else
             Light[] lights = Object.FindObjectsOfType<Light>();
+#endif
             for (var i = 0; i <= lights.Length - 1; i++)
             {
                 if (lights[i].type == LightType.Directional)

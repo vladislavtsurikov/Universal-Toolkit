@@ -22,7 +22,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         {
             TerrainObjectRenderer terrainObject = TerrainObjectRenderer.Instance;
 
+#if UNITY_6000_0_OR_NEWER
+            GameObject[] sceneObjects = Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+#else
             GameObject[] sceneObjects = Object.FindObjectsOfType<GameObject>();
+#endif
 
             for (var i = 0; i < sceneObjects.Length; i++)
             {

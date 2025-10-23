@@ -65,7 +65,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
             if (selectedCamera == null)
             {
+#if UNITY_6000_0_OR_NEWER
+                UnityEngine.Camera[] cameras = Object.FindObjectsByType<UnityEngine.Camera>(FindObjectsSortMode.None);
+#else
                 UnityEngine.Camera[] cameras = Object.FindObjectsOfType<UnityEngine.Camera>();
+#endif
                 for (var i = 0; i <= cameras.Length - 1; i++)
                 {
                     if (cameras[i].gameObject.name.Contains("Main Camera") ||
@@ -82,7 +86,11 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
 
         public void FindAllCamera()
         {
+#if UNITY_6000_0_OR_NEWER
+            UnityEngine.Camera[] cameras = Object.FindObjectsByType<UnityEngine.Camera>(FindObjectsSortMode.None);
+#else
             UnityEngine.Camera[] cameras = Object.FindObjectsOfType<UnityEngine.Camera>();
+#endif
             for (var i = 0; i <= cameras.Length - 1; i++)
             {
                 AddCamera(cameras[i]);

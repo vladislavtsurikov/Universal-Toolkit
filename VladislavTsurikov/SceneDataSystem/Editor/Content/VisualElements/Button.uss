@@ -25,7 +25,6 @@
 
 .Button#ButtonIcon {
     -unity-background-scale-mode: scale-to-fit;
-    background-image: url('project://database/Assets/Doozy/Editor/EditorUI/MicroAnimations/Icons/Minus/Minus00.png?fileID=2800000&guid=638ed18ac02874749975a151a430144f&type=3#Minus00');
     width: 20px;
     height: 20px;
     -unity-background-image-tint-color: rgb(152, 152, 152);
@@ -35,7 +34,6 @@
     -unity-text-align: middle-center;
     flex-grow: 1;
     flex-shrink: 0;
-    -unity-font: url('project://database/Assets/Doozy/_Extras/Fonts/Ubuntu-Light.ttf?fileID=12800000&guid=552e0d24472ded44cad7385aa405c1e6&type=3#Ubuntu-Light');
     -unity-font-definition: initial;
     padding-left: 0;
     padding-bottom: 1px;

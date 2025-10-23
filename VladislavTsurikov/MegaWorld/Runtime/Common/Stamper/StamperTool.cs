@@ -81,6 +81,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         protected virtual async UniTask Spawn(CancellationToken token, bool displayProgressBar)
         {
+            await UniTask.CompletedTask;
         }
     }
 }

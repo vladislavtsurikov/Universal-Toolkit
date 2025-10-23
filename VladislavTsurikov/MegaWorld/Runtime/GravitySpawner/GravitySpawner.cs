@@ -178,7 +178,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.GravitySpawner
 
             _terrainsMaskManager.Dispose();
 
-            UniTask.Yield();
+            await UniTask.Yield();
         }
     }
 }

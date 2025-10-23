@@ -19,6 +19,7 @@
 using System;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build;
 
 #if UNITY_EDITOR
 
@@ -44,7 +45,9 @@ namespace OdinSerializer.Utilities.Editor
             {
                 BuildTargetGroup buildGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
 
-#if UNITY_5_6_OR_NEWER
+#if UNITY_6000_0_OR_NEWER
+                ScriptingImplementation backend = PlayerSettings.GetScriptingBackend(NamedBuildTarget.FromBuildTargetGroup(buildGroup));
+#elif UNITY_5_6_OR_NEWER
                 ScriptingImplementation backend = PlayerSettings.GetScriptingBackend(buildGroup);
 #else
                 var backend = (ScriptingImplementation)PlayerSettings.GetPropertyInt("ScriptingBackend", buildGroup);

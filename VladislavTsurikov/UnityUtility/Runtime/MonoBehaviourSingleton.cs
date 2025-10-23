@@ -16,7 +16,11 @@ namespace VladislavTsurikov.UnityUtility.Runtime
                     return _instance;
                 }
 
+#if UNITY_6000_0_OR_NEWER
+                T[] singletonInstances = FindObjectsByType<T>(FindObjectsSortMode.None);
+#else
                 T[] singletonInstances = FindObjectsOfType<T>();
+#endif
 
                 if (singletonInstances.Length == 0)
                 {

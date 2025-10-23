@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.Callbacks;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
@@ -110,7 +111,11 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
             BuildTarget buildTarget = EditorUserBuildSettings.activeBuildTarget;
             BuildTargetGroup buildGroup = BuildPipeline.GetBuildTargetGroup(buildTarget);
 
+#if UNITY_6000_0_OR_NEWER
+            var symbols = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildGroup));
+#else
             var symbols = PlayerSettings.GetScriptingDefineSymbolsForGroup(buildGroup);
+#endif
             var symbolList = new List<string>(symbols.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries));
 
             var isDirty = false;
@@ -120,7 +125,11 @@ namespace VladislavTsurikov.RendererStack.Editor.Core
             if (isDirty)
             {
                 symbols = ListElementsToString(symbolList, ";");
+#if UNITY_6000_0_OR_NEWER
+                PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(buildGroup), symbols);
+#else
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(buildGroup, symbols);
+#endif
             }
         }
 

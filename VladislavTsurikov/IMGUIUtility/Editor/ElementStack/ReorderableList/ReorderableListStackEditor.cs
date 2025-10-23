@@ -280,7 +280,7 @@ namespace VladislavTsurikov.IMGUIUtility.Editor.ElementStack.ReorderableList
             {
                 N editor = Editors[index];
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.Log(Editors.Count);
                 Debug.Log("index " + index);

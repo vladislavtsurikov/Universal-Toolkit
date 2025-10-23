@@ -9,6 +9,7 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SettingsSystem.OperationSys
     {
         public virtual async UniTask DoOperation()
         {
+            await UniTask.CompletedTask;
         }
 
         public virtual List<SceneReference> GetSceneReferences() => new();
