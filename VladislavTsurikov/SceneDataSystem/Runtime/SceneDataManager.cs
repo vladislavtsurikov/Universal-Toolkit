@@ -117,7 +117,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
             }
         }
 
-        public async UniTask Setup(bool forceSetup = false, CancellationToken cancellationToken = default)
+        public void Setup(bool forceSetup = false, CancellationToken cancellationToken = default)
         {
             if (!gameObject.scene.isLoaded || !gameObject.activeInHierarchy)
             {
@@ -135,7 +135,7 @@ namespace VladislavTsurikov.SceneDataSystem.Runtime
 
             IsSetup = true;
 
-            await SceneDataStack.Setup(forceSetup, new object[] { this }, cancellationToken);
+            SceneDataStack.Setup(forceSetup, new object[] { this });
         }
 
         public bool RemoveMultipleSceneDataManagers()

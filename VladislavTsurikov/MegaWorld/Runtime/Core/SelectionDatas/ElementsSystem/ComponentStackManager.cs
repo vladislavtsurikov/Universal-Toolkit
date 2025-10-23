@@ -40,9 +40,8 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
             _generalGeneralComponentStack ??= new GeneralComponentStack();
             _toolsComponentStack ??= new ToolsComponentStack();
 
-            _generalGeneralComponentStack.Setup(true, new object[] { addGeneralElementsAttribute, prototypeType })
-                .Forget();
-            _toolsComponentStack.Setup(true, new object[] { addElementsAttribute, prototypeType }).Forget();
+            _generalGeneralComponentStack.Setup(true, new object[] { addGeneralElementsAttribute, prototypeType });
+            _toolsComponentStack.Setup(true, new object[] { addElementsAttribute, prototypeType });
         }
 
         public List<Type> GetAllElementTypes(Type toolType, Type prototypeType = null)

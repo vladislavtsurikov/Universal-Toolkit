@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
-using Cysharp.Threading.Tasks;
+ 
 using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Editor.EditTool.ActionSystem;
@@ -27,7 +27,7 @@ namespace VladislavTsurikov.MegaWorld.Editor.EditTool
             }
         }
 
-        protected override UniTask SetupComponent(object[] setupData = null) => _actionStack.Setup();
+        protected override void SetupComponent(object[] setupData = null) => _actionStack.Setup();
     }
 }
 #endif

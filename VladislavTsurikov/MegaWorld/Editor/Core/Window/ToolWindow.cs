@@ -62,10 +62,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.Core.Window
             DoTool();
         }
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             OnEnable();
-            return UniTask.CompletedTask;
         }
 
         protected override void OnDisableElement() => Selected = false;

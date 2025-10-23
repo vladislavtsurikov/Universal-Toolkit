@@ -16,8 +16,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
         [OdinSerialize]
         public ActionCollection ActionCollection = new();
 
-        public async UniTask Setup(bool force = true, object[] setupData = null,
-            CancellationToken cancellationToken = default, HashSet<AssetActions> visited = null)
+        public void Setup(bool force = true, object[] setupData = null, HashSet<AssetActions> visited = null)
         {
             visited ??= new HashSet<AssetActions>();
 
@@ -32,10 +31,10 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions
 
             if (CancellationActions != null)
             {
-                await CancellationActions.Setup(force, setupData, cancellationToken, visited);
+                CancellationActions.Setup(force, setupData, visited);
             }
 
-            await ActionCollection.Setup(force, setupData, cancellationToken);
+            ActionCollection.Setup(force, setupData);
         }
 
         public async UniTask Run(CancellationToken token)

@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ReflectionUtility;
 using VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings;
 using VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.StreamingRules.StreamingRulesSystem;
@@ -10,12 +9,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Sectorize.GlobalSettings.Strea
     {
         public StreamingRuleComponentStack StreamingRuleComponentStack = new();
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             StreamingRuleComponentStack ??= new StreamingRuleComponentStack();
-            _ = StreamingRuleComponentStack.Setup();
-
-            return UniTask.CompletedTask;
+            StreamingRuleComponentStack.Setup();
         }
     }
 }

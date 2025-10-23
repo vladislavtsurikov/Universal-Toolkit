@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.SceneDataSystem.Runtime;
@@ -13,12 +12,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.RendererSystem
     {
         public bool ForceUpdateRendererData = false;
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             SetupSceneData();
             SetupRenderer();
-
-            return UniTask.CompletedTask;
         }
 
         private void SetupSceneData()

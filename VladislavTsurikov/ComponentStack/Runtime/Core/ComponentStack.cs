@@ -1,8 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Cysharp.Threading.Tasks;
+ 
 using OdinSerializer;
 using OdinSerializer.Utilities;
 using VladislavTsurikov.AttributeUtility.Runtime;
@@ -30,11 +29,8 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
         public event Action<int> ElementRemoved;
         public event Action ListChanged;
 
-        public async UniTask Setup(bool force = true, object[] setupData = null,
-            CancellationToken cancellationToken = default)
+        public void Setup(bool force = true, object[] setupData = null)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             _elementList ??= new AdvancedElementList<T>();
 
             _elementList.OnAdded += HandleElementAdded;
@@ -51,9 +47,8 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
 
             foreach (T element in _elementList)
             {
-                cancellationToken.ThrowIfCancellationRequested();
                 element.Stack = this;
-                await element.SetupWithSetupData(force, setupData);
+                element.SetupWithSetupData(force, setupData);
             }
 
             IsDirty = true;

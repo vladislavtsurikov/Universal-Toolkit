@@ -16,7 +16,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
 
         public Transform TransformOfFloatingOrigin;
 
-        protected override UniTask SetupComponent(object[] setupData)
+        protected override void SetupComponent(object[] setupData)
         {
             SetupFloatingOrigin();
 
@@ -24,8 +24,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.SceneSet
             {
                 FindDirectionalLight();
             }
-
-            return UniTask.CompletedTask;
         }
 
         public void FindDirectionalLight()

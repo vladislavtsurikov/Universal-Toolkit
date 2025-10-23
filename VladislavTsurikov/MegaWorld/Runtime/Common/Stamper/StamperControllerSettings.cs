@@ -1,5 +1,5 @@
 ﻿using System;
-using Cysharp.Threading.Tasks;
+ 
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.ReflectionUtility;
 
@@ -16,10 +16,9 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         public bool Visualisation = true;
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             StamperTool = (StamperTool)setupData[0];
-            return UniTask.CompletedTask;
         }
     }
 }

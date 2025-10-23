@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using OdinSerializer;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ReflectionUtility;
@@ -12,6 +11,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.TerrainObjectRenderer.GlobalSe
         [OdinSerialize]
         public ComponentStackOnlyDifferentTypes<Extension> ExtensionStack = new();
 
-        protected override UniTask SetupComponent(object[] setupData = null) => ExtensionStack.Setup();
+        protected override void SetupComponent(object[] setupData = null) => ExtensionStack.Setup();
     }
 }

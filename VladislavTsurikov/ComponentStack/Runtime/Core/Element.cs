@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using VladislavTsurikov.AttributeUtility.Runtime;
 using VladislavTsurikov.ReflectionUtility;
 
@@ -46,9 +45,13 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
             set { }
         }
 
-        protected virtual UniTask SetupComponent(object[] setupData = null) => UniTask.CompletedTask;
+        protected virtual void SetupComponent(object[] setupData = null)
+        {
+        }
 
-        protected virtual UniTask FirstSetupComponent(object[] setupData = null) => UniTask.CompletedTask;
+        protected virtual void FirstSetupComponent(object[] setupData = null)
+        {
+        }
 
         protected virtual void OnDisableElement()
         {
@@ -60,9 +63,9 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
 
         public virtual bool ShowActiveToggle() => true;
 
-        public async UniTask Setup(bool force = false) => await SetupWithSetupData(force, _setupData);
+        public void Setup(bool force = false) => SetupWithSetupData(force, _setupData);
 
-        public async UniTask SetupWithSetupData(bool force = false, object[] setupData = null)
+        public void SetupWithSetupData(bool force = false, object[] setupData = null)
         {
             if (!force && IsSetup)
             {
@@ -79,7 +82,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime.Core
                 FirstSetupComponent(setupData);
             }
 
-            await SetupComponent(setupData);
+            SetupComponent(setupData);
             IsSetup = true;
         }
 

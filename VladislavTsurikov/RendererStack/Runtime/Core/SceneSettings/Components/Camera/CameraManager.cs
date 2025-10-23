@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Cysharp.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 using VladislavTsurikov.ReflectionUtility;
@@ -15,7 +14,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
         [OnDeserializing]
         private void OnDeserializing() => VirtualCameraList ??= new List<VirtualCamera>();
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             for (var i = VirtualCameraList.Count - 1; i >= 0; i--)
             {
@@ -39,7 +38,6 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
             }
 #endif
 
-            return UniTask.CompletedTask;
         }
 
         protected override void OnCreate() => FindMainCamera();

@@ -47,7 +47,7 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Events
         private void InitializeSingleElementStack()
         {
             SingleElementStack ??= new SingleElementStack<Event>();
-            SingleElementStack.Setup(true, new object[] { this }).Forget();
+            SingleElementStack.Setup(true, new object[] { this });
             SingleElementStack.CreateFirstElementIfNecessary(typeof(OnEnableEvent));
         }
 

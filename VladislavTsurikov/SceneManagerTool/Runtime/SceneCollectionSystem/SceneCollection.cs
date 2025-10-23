@@ -62,12 +62,10 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneCollectionSystem
             }
         }
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
-            _ = SceneTypeComponentStack.Setup(true, new object[] { this });
-            _ = SettingsStack.Setup();
-
-            return UniTask.CompletedTask;
+            SceneTypeComponentStack.Setup(true, new object[] { this });
+            SettingsStack.Setup();
         }
 
         protected override void OnCreate()

@@ -1,5 +1,4 @@
 #if COMPONENT_STACK_ZENJECT
-using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using Zenject;
 
@@ -9,7 +8,7 @@ namespace VladislavTsurikov.ComponentStack.Runtime
     {
         protected DiContainer DiContainer;
 
-        protected override async UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             if (setupData == null)
             {
@@ -18,10 +17,12 @@ namespace VladislavTsurikov.ComponentStack.Runtime
 
             DiContainer = (DiContainer)setupData[0];
             InjectSelf();
-            await SetupDiContainerComponent(setupData);
+            SetupDiContainerComponent(setupData);
         }
 
-        protected virtual UniTask SetupDiContainerComponent(object[] setupData = null) => UniTask.CompletedTask;
+        protected virtual void SetupDiContainerComponent(object[] setupData = null)
+        {
+        }
 
         protected void InjectSelf() => DiContainer.Inject(this);
     }

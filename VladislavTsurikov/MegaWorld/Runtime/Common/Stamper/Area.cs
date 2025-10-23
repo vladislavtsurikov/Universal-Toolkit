@@ -36,11 +36,10 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Common.Stamper
 
         public StamperTool StamperTool;
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             StamperTool = (StamperTool)setupData[0];
             SetupArea();
-            return UniTask.CompletedTask;
         }
 
         protected virtual void SetupArea()

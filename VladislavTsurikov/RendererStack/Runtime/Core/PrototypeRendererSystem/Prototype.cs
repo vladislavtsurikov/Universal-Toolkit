@@ -94,14 +94,14 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem
             _rendererType = rendererType;
             InitPrototype(obj);
             PrototypeComponentStack = new PrototypeComponentStack();
-            _ = PrototypeComponentStack.Setup(true, new object[] { _rendererType, this });
+            PrototypeComponentStack.Setup(true, new object[] { _rendererType, this });
             PrototypeComponentStack.CreateAllComponents();
             Setup();
         }
 
         public void Setup()
         {
-            _ = PrototypeComponentStack.Setup(true, new object[] { _rendererType, this });
+            PrototypeComponentStack.Setup(true, new object[] { _rendererType, this });
 
 #if UNITY_EDITOR
             ChangeShaderCodeAttribute.ChangeShaderCode(this);

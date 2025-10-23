@@ -26,13 +26,11 @@ namespace VladislavTsurikov.SceneManagerTool.Runtime.SceneTypeSystem
 
         public ComponentStackOnlyDifferentTypes<SettingsComponent> SettingsStack = new();
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             _sceneCollection = (SceneCollection)setupData[0];
 
             SettingsStack.Setup();
-
-            return UniTask.CompletedTask;
         }
 
         internal async UniTask LoadInternal(bool force = false)

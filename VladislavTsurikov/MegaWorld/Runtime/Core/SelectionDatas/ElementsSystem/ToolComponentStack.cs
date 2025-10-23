@@ -1,5 +1,4 @@
-﻿using System;
-using Cysharp.Threading.Tasks;
+using System;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 
@@ -11,7 +10,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.SelectionDatas.ElementsSystem
 
         public Type ToolType;
 
-        protected override async UniTask SetupComponent(object[] setupData = null) => await ComponentStack.Setup();
+        protected override void SetupComponent(object[] setupData = null) => ComponentStack.Setup();
 
         public override bool DeleteElement() => ToolType != null;
     }

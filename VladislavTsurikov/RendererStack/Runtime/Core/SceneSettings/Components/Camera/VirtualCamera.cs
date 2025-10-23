@@ -69,9 +69,9 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.SceneSettings.Camera
         {
             OnDisable();
             CameraTemporaryComponentStack = new ComponentStackOnlyDifferentTypes<CameraTemporaryComponent>();
-            _ = CameraTemporaryComponentStack.Setup(true, new object[] { this }, CancellationToken.None);
+            CameraTemporaryComponentStack.Setup(true, new object[] { this });
 
-            _ = CameraComponentStack.Setup();
+            CameraComponentStack.Setup();
 
             foreach (Renderer renderer in RendererStackManager.Instance.RendererStack.ElementList)
             {

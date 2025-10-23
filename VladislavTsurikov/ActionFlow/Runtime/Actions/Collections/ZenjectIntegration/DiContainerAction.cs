@@ -1,5 +1,4 @@
 #if ACTIONFLOW_ZENJECT
-using Cysharp.Threading.Tasks;
 using Zenject;
 
 namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
@@ -12,16 +11,15 @@ namespace VladislavTsurikov.ActionFlow.Runtime.Actions.ZenjectIntegration
         protected bool IsErrorInDiContainer { get; private set; }
         protected string ErrorMessage { get; private set; }
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             if (setupData == null)
             {
-                return UniTask.CompletedTask;
+                return;
             }
 
             DiContainer = (DiContainer)setupData[0];
             SetupDiContainerAction();
-            return UniTask.CompletedTask;
         }
 
         protected virtual void SetupDiContainerAction()

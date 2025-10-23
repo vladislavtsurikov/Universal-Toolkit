@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using Component = VladislavTsurikov.ComponentStack.Runtime.Core.Component;
 
 namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.PrototypeSettings
@@ -7,11 +6,10 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.PrototypeRendererSystem.P
     {
         public Prototype Prototype { get; private set; }
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             Prototype = (Prototype)setupData[1];
             SetupPrototypeComponent();
-            return UniTask.CompletedTask;
         }
 
         protected virtual void SetupPrototypeComponent()

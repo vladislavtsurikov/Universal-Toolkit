@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using Cysharp.Threading.Tasks;
 using VladislavTsurikov.ComponentStack.Runtime.AdvancedComponentStack;
 using VladislavTsurikov.ComponentStack.Runtime.Core;
 using VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool.PhysicsEffectsSystem;
@@ -15,10 +14,9 @@ namespace VladislavTsurikov.MegaWorld.Editor.PhysicsEffectsTool
         public float Spacing = 5;
         public ComponentStackOnlyDifferentTypes<PhysicsEffect> List = new();
 
-        protected override UniTask SetupComponent(object[] setupData = null)
+        protected override void SetupComponent(object[] setupData = null)
         {
             List.CreateAllElementTypes();
-            return UniTask.CompletedTask;
         }
     }
 }

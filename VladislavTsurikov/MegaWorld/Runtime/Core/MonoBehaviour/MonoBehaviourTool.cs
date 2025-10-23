@@ -33,7 +33,7 @@ namespace VladislavTsurikov.MegaWorld.Runtime.Core.MonoBehaviour
         public void Setup()
         {
             Data.Setup();
-            _componentStack.Setup(true, new object[] { this }).Forget();
+            _componentStack.Setup(true, new object[] { this });
             OnToolEnable();
 
             IsSetup = true;

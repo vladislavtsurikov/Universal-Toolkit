@@ -13,7 +13,7 @@ namespace VladislavTsurikov.RendererStack.Runtime.Core.GlobalSettings
 
         public Type RendererType;
 
-        protected override UniTask SetupComponent(object[] setupData = null) => ComponentStack.Setup();
+        protected override void SetupComponent(object[] setupData = null) => ComponentStack.Setup();
 
         public override bool DeleteElement() => RendererType != null;
     }
