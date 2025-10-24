@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#if UI_SYSTEM_ADDRESSABLE_LOADER_SYSTEM
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UniRx;
@@ -61,3 +62,4 @@ namespace VladislavTsurikov.UISystem.Runtime.UnityUIIntegration
         }
     }
 }
+#endif

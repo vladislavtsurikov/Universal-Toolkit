@@ -1,5 +1,4 @@
-﻿#if UI_SYSTEM_ADDRESSABLE_LOADER_SYSTEM
-using System;
+﻿using System;
 using System.Linq;
 using UnityEngine;
 using VladislavTsurikov.AddressableLoaderSystem.Runtime.Core;
@@ -26,5 +25,3 @@ namespace VladislavTsurikov.UISystem.Runtime.Core
         }
     }
 }
-
-#endif

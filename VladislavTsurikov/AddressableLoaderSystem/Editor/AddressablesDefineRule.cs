@@ -7,7 +7,7 @@ namespace VladislavTsurikov.AddressableLoaderSystem.Editor.Core
     {
         protected override string GetPackageId()
         {
-            return "com.unity.addressables";
+            return "com.unity.addressables"; 
         }
 
         protected override string GetDefineToApplySymbol()

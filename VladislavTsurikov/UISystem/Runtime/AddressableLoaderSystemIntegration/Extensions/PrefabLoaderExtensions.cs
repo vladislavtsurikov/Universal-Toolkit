@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿#if UI_SYSTEM_ADDRESSABLE_LOADER_SYSTEM
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -23,3 +24,4 @@ namespace VladislavTsurikov.UISystem.Runtime.AddressableLoaderSystemIntegration
         }
     }
 }
+#endif

@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿#if UI_SYSTEM_ADDRESSABLE_LOADER_SYSTEM
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using VladislavTsurikov.SceneUtility.Editor.Utility;
@@ -64,8 +65,8 @@ namespace VladislavTsurikov.UISystem.Tests.Runtime
             if (BuildSceneUtility.IsSceneInBuildSettings(sceneName))
             {
                 await _sceneCompositionService.LoadBuiltScene(sceneName,
-                    async () => { 
-                        Debug.Log("Built scene loaded."); 
+                    async () => {
+                        Debug.Log("Built scene loaded.");
                         await UniTask.CompletedTask;
                     });
             }
@@ -78,3 +79,4 @@ namespace VladislavTsurikov.UISystem.Tests.Runtime
         }
     }
 }
+#endif
